@@ -1,0 +1,3 @@
+carreirasmatch.com.br, www.carreirasmatch.com.br {
+	reverse_proxy carreiras-match-app:3000
+}

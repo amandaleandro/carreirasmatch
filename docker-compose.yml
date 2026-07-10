@@ -1,15 +1,16 @@
+name: carreiras-match
+
 services:
   app:
     build: .
-    image: mvp-app:latest
-    ports:
-      - "3200:3000"
+    container_name: carreiras-match-app
+    restart: unless-stopped
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
       - DATABASE_URL=file:/app/data/dev.db
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_TRUST_HOST=true
-      - AUTH_URL=${APP_URL:-http://localhost:3200}
+      - AUTH_URL=${APP_URL:-https://carreirasmatch.com.br}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
       - ADZUNA_APP_ID=${ADZUNA_APP_ID:-}
@@ -22,11 +23,37 @@ services:
       - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
       - NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}
       - MERCADOPAGO_WEBHOOK_SECRET=${MERCADOPAGO_WEBHOOK_SECRET}
-      - APP_URL=${APP_URL:-http://localhost:3200}
+      - APP_URL=${APP_URL:-https://carreirasmatch.com.br}
       - ADMIN_EMAILS=${ADMIN_EMAILS:-}
       - GROQ_MODEL=${GROQ_MODEL:-}
     volumes:
       - sqlite-data:/app/data
+    networks:
+      - default
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: carreiras-match-caddy
+    restart: unless-stopped
+    depends_on:
+      - app
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    networks:
+      - default
+      - edge_net
 
 volumes:
   sqlite-data:
+  caddy-data:
+    name: carreiras-match_caddy-data
+  caddy-config:
+    name: carreiras-match_caddy-config
+
+networks:
+  default:
+    name: carreiras-match_default
+  edge_net:
+    external: true
