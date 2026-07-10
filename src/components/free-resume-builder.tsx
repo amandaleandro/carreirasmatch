@@ -27,10 +27,10 @@ const INITIAL_FORM: FormState = {
 const OPPORTUNITIES = [
   "Jovem aprendiz",
   "Primeiro emprego",
-  "Estagio",
-  "Faculdade ou tecnico",
-  "Transicao de carreira",
-  "Recolocacao",
+  "Estágio",
+  "Faculdade ou técnico",
+  "Transição de carreira",
+  "Recolocação",
 ];
 
 function splitLines(value: string) {
@@ -44,13 +44,13 @@ function buildSummary(form: FormState) {
   const target = form.objective.trim() || form.opportunity.toLowerCase();
   const skills = splitLines(form.skills).slice(0, 3).join(", ");
   const base =
-    form.opportunity === "Transicao de carreira"
-      ? `Profissional em transicao de carreira com interesse em ${target}`
+    form.opportunity === "Transição de carreira"
+      ? `Profissional em transição de carreira com interesse em ${target}`
       : `Candidato em busca de ${target}`;
 
-  return `${base}, com formacao em ${form.education.trim() || "desenvolvimento profissional"}${
+  return `${base}, com formação em ${form.education.trim() || "desenvolvimento profissional"}${
     skills ? ` e conhecimentos em ${skills}` : ""
-  }. Perfil organizado, com disposicao para aprender e contribuir em ambientes colaborativos.`;
+  }. Perfil organizado, com disposição para aprender e contribuir em ambientes colaborativos.`;
 }
 
 export function FreeResumeBuilder() {
@@ -89,22 +89,22 @@ export function FreeResumeBuilder() {
           <div className="space-y-6">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-                Curriculo Inicial Gratis
+                Currículo Inicial Grátis
               </p>
               <h1 className="mt-3 text-3xl md:text-5xl font-extrabold tracking-tight leading-tight">
-                Crie seu curriculo gratis em poucos minutos.
+                Crie seu currículo grátis em poucos minutos.
               </h1>
               <p className="mt-4 text-neutral-600 dark:text-neutral-400 max-w-xl">
-                Responda algumas perguntas e receba uma versao inicial organizada para primeiro emprego, estagio,
-                jovem aprendiz, transicao ou recolocacao.
+                Responda algumas perguntas e receba uma versão inicial organizada para primeiro emprego, estágio,
+                jovem aprendiz, transição ou recolocação.
               </p>
             </div>
 
             <div className="grid sm:grid-cols-2 gap-3">
               {[
                 "Resumo profissional",
-                "Cursos e formacao",
-                "Experiencias e projetos",
+                "Cursos e formação",
+                "Experiências e projetos",
                 "Download visual com marca discreta",
               ].map((item) => (
                 <div
@@ -138,16 +138,16 @@ export function FreeResumeBuilder() {
                 </select>
               </label>
             </div>
-            <Field label="Objetivo" value={form.objective} onChange={(value) => updateField("objective", value)} placeholder="Ex: Estagio em suporte tecnico" />
+            <Field label="Objetivo" value={form.objective} onChange={(value) => updateField("objective", value)} placeholder="Ex: Estágio em suporte técnico" />
             <Area label="Escolaridade" value={form.education} onChange={(value) => updateField("education", value)} rows={2} />
-            <Area label="Cursos" value={form.courses} onChange={(value) => updateField("courses", value)} rows={3} placeholder="Separe por virgula ou linha" />
-            <Area label="Experiencias, projetos ou atividades" value={form.experiences} onChange={(value) => updateField("experiences", value)} rows={4} />
-            <Area label="Habilidades" value={form.skills} onChange={(value) => updateField("skills", value)} rows={3} placeholder="Ex: Excel, atendimento, comunicacao" />
+            <Area label="Cursos" value={form.courses} onChange={(value) => updateField("courses", value)} rows={3} placeholder="Separe por vírgula ou linha" />
+            <Area label="Experiências, projetos ou atividades" value={form.experiences} onChange={(value) => updateField("experiences", value)} rows={4} />
+            <Area label="Habilidades" value={form.skills} onChange={(value) => updateField("skills", value)} rows={3} placeholder="Ex: Excel, atendimento, comunicação" />
             <button
               type="submit"
               className="w-full rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 text-sm transition-colors"
             >
-              Gerar meu curriculo gratis
+              Gerar meu currículo grátis
             </button>
           </form>
         </section>
@@ -155,7 +155,7 @@ export function FreeResumeBuilder() {
         {generated && (
           <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
             <article className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 md:p-8 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Curriculo inicial</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400">Currículo inicial</p>
               <h2 className="mt-2 text-2xl font-extrabold">{form.name.trim() || "Seu nome"}</h2>
               <p className="mt-1 text-sm text-blue-600 dark:text-blue-400 font-semibold">
                 {form.objective.trim() || form.opportunity}
@@ -164,18 +164,18 @@ export function FreeResumeBuilder() {
               <ResumeSection title="Resumo profissional">
                 <p>{buildSummary(form)}</p>
               </ResumeSection>
-              <ResumeSection title="Formacao">
+              <ResumeSection title="Formação">
                 <p>{form.education.trim() || "Informe sua escolaridade principal."}</p>
               </ResumeSection>
               <ResumeSection title="Cursos">
-                <BulletList items={courses.length ? courses : ["Adicione cursos livres, oficinas ou certificacoes."]} />
+                <BulletList items={courses.length ? courses : ["Adicione cursos livres, oficinas ou certificações."]} />
               </ResumeSection>
-              <ResumeSection title="Experiencias e projetos">
+              <ResumeSection title="Experiências e projetos">
                 <BulletList items={experiences.length ? experiences : ["Inclua trabalhos, voluntariado, projetos escolares ou atividades informais."]} />
               </ResumeSection>
               <ResumeSection title="Habilidades">
                 <div className="flex flex-wrap gap-2">
-                  {(skills.length ? skills : ["Comunicacao", "Organizacao", "Aprendizado rapido"]).map((skill) => (
+                  {(skills.length ? skills : ["Comunicação", "Organização", "Aprendizado rápido"]).map((skill) => (
                     <span key={skill} className="rounded-full bg-neutral-100 dark:bg-neutral-900 px-3 py-1 text-xs">
                       {skill}
                     </span>
@@ -189,20 +189,20 @@ export function FreeResumeBuilder() {
 
             <aside className="rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/70 dark:bg-blue-950/20 p-6 sticky top-6">
               <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-                Proximo passo
+                Próximo passo
               </p>
-              <h3 className="mt-2 text-2xl font-extrabold">Seu curriculo esta pronto para uma vaga real?</h3>
+              <h3 className="mt-2 text-2xl font-extrabold">Seu currículo está pronto para uma vaga real?</h3>
               <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                Faca a primeira analise por apenas R$4,90 e veja score de aderencia, palavras-chave faltantes e o que ajustar antes de aplicar.
+                Faça a primeira análise por apenas R$4,90 e veja score de aderência, palavras-chave faltantes e o que ajustar antes de aplicar.
               </p>
               <Link
                 href="/?track=internship"
                 className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 text-sm transition-colors"
               >
-                Fazer minha primeira analise
+                Fazer minha primeira análise
               </Link>
               <p className="mt-3 text-[11px] text-neutral-500 dark:text-neutral-400">
-                Leva menos de 2 minutos. Seus dados nao sao compartilhados com empresas.
+                Leva menos de 2 minutos. Seus dados não são compartilhados com empresas.
               </p>
             </aside>
           </section>

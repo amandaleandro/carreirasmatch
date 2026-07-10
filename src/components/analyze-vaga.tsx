@@ -582,7 +582,7 @@ export function AnalyzeVagaPage({
           </div>
 
           <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 dark:border-blue-900/50 dark:bg-blue-950/20">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Resumo da analise</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Resumo da análise</p>
             <p className="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">
               {selectedTrackMeta ? selectedTrackMeta.title : "Escolha seu momento"}
             </p>

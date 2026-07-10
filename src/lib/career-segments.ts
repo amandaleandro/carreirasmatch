@@ -9,10 +9,10 @@ export type CareerSegment =
 export const CAREER_SEGMENT_OPTIONS: { value: CareerSegment; label: string }[] = [
   { value: "apprentice", label: "Busco Jovem Aprendiz" },
   { value: "first_job", label: "Busco Primeiro Emprego" },
-  { value: "internship", label: "Busco Estagio" },
-  { value: "student", label: "Quero escolher faculdade ou tecnico" },
+  { value: "internship", label: "Busco Estágio" },
+  { value: "student", label: "Quero escolher faculdade ou técnico" },
   { value: "career_change", label: "Quero mudar de carreira" },
-  { value: "career_pro", label: "Quero recolocacao ou vaga melhor" },
+  { value: "career_pro", label: "Quero recolocação ou vaga melhor" },
 ];
 
 export const CAREER_SEGMENT_LABELS: Record<CareerSegment, string> = Object.fromEntries(

@@ -195,22 +195,22 @@ export default async function AdminPage() {
           </Link>
           <h1 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight">Admin do sistema</h1>
           <p className="mt-2 max-w-3xl text-sm text-neutral-600 dark:text-neutral-400">
-            Visao operacional do produto: usuarios, analises, pagamentos, vagas, candidaturas e liberacoes manuais.
+            Visão operacional do produto: usuários, análises, pagamentos, vagas, candidaturas e liberações manuais.
           </p>
         </div>
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200">
-          Atualizado em tempo real a cada carregamento da pagina.
+          Atualizado em tempo real a cada carregamento da página.
         </div>
       </header>
 
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        <StatCard label="Usuarios" value={totalUsers} helper={`+${users24h} nas ultimas 24h`} />
-        <StatCard label="Analises" value={totalAnalyses} helper={`+${analyses24h} nas ultimas 24h`} />
+        <StatCard label="Usuários" value={totalUsers} helper={`+${users24h} nas últimas 24h`} />
+        <StatCard label="Análises" value={totalAnalyses} helper={`+${analyses24h} nas últimas 24h`} />
         <StatCard label="Receita paga" value={formatCurrency(revenueTotal)} helper={`${paidCount} pagamento(s) confirmado(s)`} />
         <StatCard label="Assinaturas ativas" value={activeSubscriptions} helper={`${conversionRate}% da base total`} />
-        <StatCard label="Curriculos" value={totalResumes} helper="Arquivos e curriculos gerados" />
+        <StatCard label="Currículos" value={totalResumes} helper="Arquivos e currículos gerados" />
         <StatCard label="Vagas" value={totalJobs} helper={`${activeJobs} ativas, ${jobCoverage}% do feed`} />
-        <StatCard label="Candidaturas" value={totalApplications} helper="Pipeline acompanhado pelos usuarios" />
+        <StatCard label="Candidaturas" value={totalApplications} helper="Pipeline acompanhado pelos usuários" />
         <StatCard label="Receita 24h" value={formatCurrency(revenue24h)} helper={`${paid24hCount} pagamento(s) hoje`} />
       </section>
 
@@ -219,17 +219,17 @@ export default async function AdminPage() {
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
               <h2 className="font-semibold">Atividade recente</h2>
-              <p className="text-sm text-neutral-500">Ultimas analises geradas pelos usuarios.</p>
+              <p className="text-sm text-neutral-500">Últimas análises geradas pelos usuários.</p>
             </div>
             <Link href="/history" className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline">
-              Relatorios
+              Relatórios
             </Link>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-left text-xs uppercase tracking-wide text-neutral-500">
                 <tr className="border-b border-neutral-200 dark:border-neutral-800">
-                  <th className="py-2 pr-4 font-medium">Usuario</th>
+                  <th className="py-2 pr-4 font-medium">Usuário</th>
                   <th className="py-2 pr-4 font-medium">Vaga</th>
                   <th className="py-2 pr-4 font-medium">Score</th>
                   <th className="py-2 pr-4 font-medium">Prioridade</th>
@@ -261,7 +261,7 @@ export default async function AdminPage() {
 
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
           <h2 className="font-semibold">Funil ativo</h2>
-          <p className="mt-1 text-sm text-neutral-500">Distribuicao das candidaturas.</p>
+          <p className="mt-1 text-sm text-neutral-500">Distribuição das candidaturas.</p>
           <div className="mt-5 space-y-3">
             {applicationGroups.map((group) => {
               const count = group._count._all;
@@ -286,7 +286,7 @@ export default async function AdminPage() {
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
-          <h2 className="font-semibold">Usuarios novos</h2>
+          <h2 className="font-semibold">Usuários novos</h2>
           <div className="mt-4 divide-y divide-neutral-100 dark:divide-neutral-900">
             {recentUsers.map((user) => (
               <div key={user.id} className="py-3 flex items-center justify-between gap-4">
@@ -298,7 +298,7 @@ export default async function AdminPage() {
                   </p>
                 </div>
                 <div className="text-right text-xs text-neutral-500 shrink-0">
-                  <p>{user._count.resumes} curriculo(s)</p>
+                  <p>{user._count.resumes} currículo(s)</p>
                   <p>{user._count.applications} candidatura(s)</p>
                   <p>{user.subscription?.status === "active" ? "assinante" : `${user._count.payments} pag.`}</p>
                 </div>
@@ -313,7 +313,7 @@ export default async function AdminPage() {
             {recentPayments.map((payment) => (
               <div key={payment.id} className="py-3 flex items-center justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="font-medium truncate">{payment.user.name ?? payment.user.email ?? "Usuario"}</p>
+                  <p className="font-medium truncate">{payment.user.name ?? payment.user.email ?? "Usuário"}</p>
                   <p className="text-xs text-neutral-500">
                     {payment.kind} · {payment.segment} · {formatDate(payment.paidAt ?? payment.createdAt)}
                   </p>
@@ -336,7 +336,7 @@ export default async function AdminPage() {
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
-          <h2 className="font-semibold">Prioridade das analises</h2>
+          <h2 className="font-semibold">Prioridade das análises</h2>
           <div className="mt-4 space-y-3">
             {analysisStatusGroups.map((group) => (
               <div key={group.applicationStatus} className="flex items-center justify-between text-sm">
@@ -362,11 +362,11 @@ export default async function AdminPage() {
                   </span>
                 </div>
                 <p className="mt-3 text-xs text-neutral-500 truncate">
-                  {application.user.name ?? application.user.email ?? "Usuario"} · {formatDate(application.updatedAt)}
+                  {application.user.name ?? application.user.email ?? "Usuário"} · {formatDate(application.updatedAt)}
                 </p>
                 {application.fitScore !== null && (
                   <p className="mt-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    {application.fitScore}% de aderencia
+                    {application.fitScore}% de aderência
                   </p>
                 )}
               </div>
@@ -401,9 +401,9 @@ export default async function AdminPage() {
 
       <section className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-6">
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
-          <h2 className="font-semibold">Controle de acesso por usuario</h2>
+          <h2 className="font-semibold">Controle de acesso por usuário</h2>
           <p className="mt-1 text-sm text-neutral-500">
-            Busque por e-mail para conceder credito de analise, liberar diagnostico especifico ou conceder assinatura.
+            Busque por e-mail para conceder crédito de análise, liberar diagnóstico específico ou conceder assinatura.
           </p>
           <div className="mt-5">
             <AdminUserLookup />
@@ -411,7 +411,7 @@ export default async function AdminPage() {
         </div>
 
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
-          <h2 className="font-semibold">Atalhos de operacao</h2>
+          <h2 className="font-semibold">Atalhos de operação</h2>
           <div className="mt-4 grid gap-2">
             <Link className="rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900" href="/feed">
               Ver feed de vagas
@@ -427,7 +427,7 @@ export default async function AdminPage() {
             </Link>
           </div>
           <p className="mt-5 text-xs text-neutral-500">
-            O acesso a esta pagina continua restrito aos e-mails definidos em ADMIN_EMAILS.
+            O acesso a esta página continua restrito aos e-mails definidos em ADMIN_EMAILS.
           </p>
         </div>
       </section>
