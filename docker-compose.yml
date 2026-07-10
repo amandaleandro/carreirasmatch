@@ -1,0 +1,32 @@
+services:
+  app:
+    build: .
+    image: mvp-app:latest
+    ports:
+      - "3200:3000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - DATABASE_URL=file:/app/data/dev.db
+      - AUTH_SECRET=${AUTH_SECRET}
+      - AUTH_TRUST_HOST=true
+      - AUTH_URL=${APP_URL:-http://localhost:3200}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - ADZUNA_APP_ID=${ADZUNA_APP_ID:-}
+      - ADZUNA_APP_KEY=${ADZUNA_APP_KEY:-}
+      - JOOBLE_API_KEY=${JOOBLE_API_KEY:-}
+      - GUPY_COMPANIES=${GUPY_COMPANIES:-}
+      - SOLIDES_COMPANIES=${SOLIDES_COMPANIES:-}
+      - GLASSDOOR_PARTNER_ID=${GLASSDOOR_PARTNER_ID:-}
+      - GLASSDOOR_PARTNER_KEY=${GLASSDOOR_PARTNER_KEY:-}
+      - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
+      - NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}
+      - MERCADOPAGO_WEBHOOK_SECRET=${MERCADOPAGO_WEBHOOK_SECRET}
+      - APP_URL=${APP_URL:-http://localhost:3200}
+      - ADMIN_EMAILS=${ADMIN_EMAILS:-}
+      - GROQ_MODEL=${GROQ_MODEL:-}
+    volumes:
+      - sqlite-data:/app/data
+
+volumes:
+  sqlite-data:
