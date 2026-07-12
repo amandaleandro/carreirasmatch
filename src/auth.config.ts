@@ -9,6 +9,12 @@ const PUBLIC_PATHS = [
   "/curriculo-gratis",
   "/analise",
   "/tools/vocation-test",
+  "/sobre",
+  "/blog",
+  "/contato",
+  "/ajuda",
+  "/termos",
+  "/privacidade",
 ];
 
 export const authConfig: NextAuthConfig = {
