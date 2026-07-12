@@ -28,6 +28,10 @@ Revise esta lista manualmente antes de cada deploy.
 | `GUPY_COMPANIES` | Gupy (lista de subdomínios) |
 | `SOLIDES_COMPANIES` | Sólides (lista de slugs) |
 | `GLASSDOOR_PARTNER_ID` / `GLASSDOOR_PARTNER_KEY` | Glassdoor (exige parceria homologada, doc ainda não confirmada — ver `src/lib/job-sources/glassdoor.ts`) |
+| `GREENHOUSE_BOARDS` | Greenhouse (lista de board tokens, ex.: `stripe,figma`) |
+| `LEVER_COMPANIES` | Lever (lista de slugs de empresa, ex.: `netflix,plaid`) |
+
+Jobicy não precisa de configuração — roda sempre, como Arbeitnow/RemoteOK.
 
 ## Opcionais (blog automático)
 
@@ -49,7 +53,8 @@ Revise esta lista manualmente antes de cada deploy.
 `docker-compose.yml` hoje repassa: `GROQ_API_KEY`, `DATABASE_URL`,
 `AUTH_SECRET`, `AUTH_TRUST_HOST`, `AUTH_URL`, `GOOGLE_CLIENT_ID/SECRET`,
 `ADZUNA_APP_ID/KEY`, `JOOBLE_API_KEY`, `GUPY_COMPANIES`,
-`SOLIDES_COMPANIES`, `GLASSDOOR_PARTNER_ID/KEY`, `MERCADOPAGO_ACCESS_TOKEN`,
+`SOLIDES_COMPANIES`, `GLASSDOOR_PARTNER_ID/KEY`, `GREENHOUSE_BOARDS`,
+`LEVER_COMPANIES`, `MERCADOPAGO_ACCESS_TOKEN`,
 `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`,
 `APP_URL`, `ADMIN_EMAILS`, `GROQ_MODEL`, `RESEND_API_KEY`,
 `RESEND_FROM_EMAIL`.

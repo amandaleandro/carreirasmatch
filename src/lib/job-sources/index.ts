@@ -11,6 +11,9 @@ import { fetchGlassdoorJobs, isGlassdoorConfigured } from "./glassdoor";
 import { fetchHimalayasJobs } from "./himalayas";
 import { fetchRemoteJobsOrgJobs } from "./remotejobsorg";
 import { fetchSolidesJobs, isSolidesConfigured } from "./solides";
+import { fetchJobicyJobs } from "./jobicy";
+import { fetchGreenhouseJobs, isGreenhouseConfigured } from "./greenhouse";
+import { fetchLeverJobs, isLeverConfigured } from "./lever";
 import { FetchedJob, JobSearchTerms } from "./types";
 
 export type RequestContext = {
@@ -34,6 +37,7 @@ export async function fetchNewJobsFromAllSources(
     { name: "themuse", fetch: () => fetchTheMuseJobs(filterKeywords) },
     { name: "himalayas", fetch: () => fetchHimalayasJobs(filterKeywords) },
     { name: "remotejobsorg", fetch: () => fetchRemoteJobsOrgJobs(filterKeywords) },
+    { name: "jobicy", fetch: () => fetchJobicyJobs(filterKeywords) },
   ];
   if (isAdzunaConfigured()) {
     sources.push({ name: "adzuna", fetch: () => fetchAdzunaJobs(searchTerms?.titlePt) });
@@ -43,6 +47,12 @@ export async function fetchNewJobsFromAllSources(
   }
   if (isSolidesConfigured()) {
     sources.push({ name: "solides", fetch: () => fetchSolidesJobs() });
+  }
+  if (isGreenhouseConfigured()) {
+    sources.push({ name: "greenhouse", fetch: () => fetchGreenhouseJobs() });
+  }
+  if (isLeverConfigured()) {
+    sources.push({ name: "lever", fetch: () => fetchLeverJobs() });
   }
   if (isJoobleConfigured()) {
     sources.push({ name: "jooble", fetch: () => fetchJoobleJobs(searchTerms?.titlePt) });

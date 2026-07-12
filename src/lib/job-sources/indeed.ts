@@ -1,5 +1,8 @@
-import { chromium } from "playwright";
+import { chromium } from "playwright-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 import { FetchedJob } from "./types";
+
+chromium.use(StealthPlugin());
 
 const SEARCH_URL = "https://br.indeed.com/jobs";
 const MAX_JOB_TEXT_LENGTH = 12000;
@@ -20,11 +23,12 @@ function sleep(ms: number): Promise<void> {
 
 // O Indeed bloqueia requisições HTTP simples (fetch/curl) pela impressão
 // digital da conexão TLS/HTTP, bloqueia o Chromium "cru" do Playwright pelos
-// sinais de automação que ele expõe (navigator.webdriver e UA com
-// "HeadlessChrome"), e também bloqueia navegação direta a uma URL de vaga
-// (/viewjob?jk=...) fora do fluxo normal de busca. Por isso: usamos um
-// Chromium real com esses sinais mascarados, e abrimos cada vaga clicando no
-// card de resultado (como um usuário faria) em vez de navegar direto pra URL.
+// sinais de automação que ele expõe (navigator.webdriver, CDP, plugins/WebGL
+// ausentes etc.), e também bloqueia navegação direta a uma URL de vaga
+// (/viewjob?jk=...) fora do fluxo normal de busca. Por isso: usamos
+// playwright-extra + puppeteer-extra-plugin-stealth (patches conhecidos de
+// fingerprint) sobre um Chromium real, e abrimos cada vaga clicando no card
+// de resultado (como um usuário faria) em vez de navegar direto pra URL.
 export async function fetchIndeedJobs(searchTerm?: string): Promise<FetchedJob[]> {
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_EXECUTABLE_PATH,
@@ -38,14 +42,20 @@ export async function fetchIndeedJobs(searchTerm?: string): Promise<FetchedJob[]
       userAgent: USER_AGENT,
       viewport: { width: 1366, height: 768 },
       locale: "pt-BR",
-    });
-    await context.addInitScript(() => {
-      Object.defineProperty(navigator, "webdriver", { get: () => undefined });
+      extraHTTPHeaders: {
+        "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+        "sec-ch-ua": '"Chromium";v="131", "Not_A Brand";v="24", "Google Chrome";v="131"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+      },
     });
 
     const jobs: FetchedJob[] = [];
     const seenJobIds = new Set<string>();
     const searchPage = await context.newPage();
+    // Pequena pausa antes da primeira navegação: um humano não bate na URL
+    // no instante zero em que o browser abre.
+    await sleep(300 + Math.floor(Math.random() * 700));
 
     for (let pageIndex = 0; pageIndex < MAX_PAGES && jobs.length < MAX_DETAIL_FETCHES; pageIndex++) {
       if (pageIndex > 0) await sleep(REQUEST_DELAY_MS);

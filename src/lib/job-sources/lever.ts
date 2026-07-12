@@ -1,0 +1,74 @@
+import * as cheerio from "cheerio";
+import { FetchedJob } from "./types";
+import { isBrazilRelevantLocation } from "./location-filter";
+
+const POSTINGS_API_URL = "https://api.lever.co/v0/postings/{company}";
+const MAX_JOB_TEXT_LENGTH = 12000;
+
+type LeverPosting = {
+  id: string;
+  text: string;
+  descriptionPlain?: string;
+  hostedUrl: string;
+  categories?: { location?: string };
+};
+
+function htmlToPlainText(html: string): string {
+  return cheerio.load(html).text().replace(/\s+/g, " ").trim().slice(0, MAX_JOB_TEXT_LENGTH);
+}
+
+// Lever (ATS) expõe um feed público de vagas por empresa
+// (https://github.com/lever/postings-api), sem necessidade de chave. Mesmo
+// padrão de lista de empresas via env usado para Gupy/Sólides/Greenhouse.
+export function isLeverConfigured(): boolean {
+  return getLeverCompanies().length > 0;
+}
+
+export function getLeverCompanies(): string[] {
+  return (process.env.LEVER_COMPANIES ?? "")
+    .split(",")
+    .map((company) => company.trim())
+    .filter(Boolean);
+}
+
+async function fetchCompanyPostings(company: string): Promise<FetchedJob[]> {
+  const url = new URL(POSTINGS_API_URL.replace("{company}", company));
+  url.searchParams.set("mode", "json");
+
+  const response = await fetch(url.toString(), { signal: AbortSignal.timeout(10000) });
+  if (!response.ok) {
+    throw new Error(`Lever API (${company}) retornou erro ${response.status}`);
+  }
+
+  const postings: LeverPosting[] = await response.json();
+
+  return postings
+    .filter((posting) => posting.text && posting.hostedUrl && posting.descriptionPlain)
+    .filter((posting) => isBrazilRelevantLocation(posting.categories?.location))
+    .map((posting) => ({
+      url: posting.hostedUrl,
+      jobTitle: posting.text,
+      jobText: htmlToPlainText(posting.descriptionPlain!),
+      source: "lever",
+      location: posting.categories?.location,
+    }));
+}
+
+export async function fetchLeverJobs(
+  companies: string[] = getLeverCompanies()
+): Promise<FetchedJob[]> {
+  if (companies.length === 0) return [];
+
+  const perCompany = await Promise.allSettled(companies.map(fetchCompanyPostings));
+
+  const jobsByUrl = new Map<string, FetchedJob>();
+  for (const result of perCompany) {
+    if (result.status === "fulfilled") {
+      for (const job of result.value) {
+        if (!jobsByUrl.has(job.url)) jobsByUrl.set(job.url, job);
+      }
+    }
+  }
+
+  return [...jobsByUrl.values()];
+}

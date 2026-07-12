@@ -25,7 +25,9 @@
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^2.4.5",
     "playwright": "^1.61.1",
+    "playwright-extra": "^4.3.6",
     "prisma": "^7.8.0",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "resend": "^6.17.2"
