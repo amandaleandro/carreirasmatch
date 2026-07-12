@@ -7,29 +7,56 @@ export function ContentPage({
   eyebrow,
   title,
   description,
+  wide = false,
+  backHref,
+  backLabel,
   children,
 }: {
   eyebrow: string;
   title: string;
   description?: string;
+  /** Widens the hero copy and the content card for pages with grid layouts. */
+  wide?: boolean;
+  /** Optional secondary link (e.g. "← Voltar") shown next to the logo instead of "Entrar". */
+  backHref?: string;
+  backLabel?: string;
   children: ReactNode;
 }) {
+  const maxWidthClassName = wide ? "max-w-4xl" : "max-w-3xl";
+
   return (
     <div className="w-full">
       <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950">
         <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex items-center justify-between">
           <Link href="/">
-            <BrandLogo heightClassName="h-9" onDark />
+            <BrandLogo heightClassName="h-11" onDark />
           </Link>
-          <Link
-            href="/login"
-            className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-          >
-            Entrar
-          </Link>
+          {backHref ? (
+            <Link
+              href={backHref}
+              className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+            >
+              {backLabel}
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2.5">
+              <Link
+                href="/login"
+                className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+              >
+                Entrar
+              </Link>
+              <Link
+                href="/register"
+                className="rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-blue-950 hover:bg-blue-50 transition-colors"
+              >
+                Criar conta
+              </Link>
+            </div>
+          )}
         </header>
 
-        <div className="max-w-3xl mx-auto px-4 md:px-8 pt-6 pb-14 md:pt-10 md:pb-20">
+        <div className={`${maxWidthClassName} mx-auto px-4 md:px-8 pt-6 pb-14 md:pt-10 md:pb-20`}>
           <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 bg-blue-500/15 text-blue-300 border border-blue-400/30">
             {eyebrow}
           </span>
@@ -44,7 +71,7 @@ export function ContentPage({
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto px-4 md:px-8 -mt-8 md:-mt-10 pb-16 md:pb-20 relative z-10">
+      <main className={`${maxWidthClassName} mx-auto px-4 md:px-8 -mt-8 md:-mt-10 pb-16 md:pb-20 relative z-10`}>
         <div className="rounded-[2rem] border border-neutral-200/80 dark:border-neutral-800 bg-white/98 dark:bg-neutral-950/98 p-6 md:p-10 shadow-xl shadow-slate-900/5">
           {children}
         </div>

@@ -473,19 +473,27 @@ export function NicheLandingPage() {
       <div className={`bg-gradient-to-br ${theme.heroBg}`}>
         <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex items-center justify-between">
           <Link href="/">
-            <BrandLogo heightClassName="h-9" onDark />
+            <BrandLogo heightClassName="h-11" onDark />
           </Link>
           <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/70">
             <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
             <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
-          <Link
-            href="/login"
-            className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-          >
-            Entrar
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/login"
+              className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+            >
+              Entrar
+            </Link>
+            <Link
+              href="/register"
+              className="hidden sm:inline-flex rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-blue-950 hover:bg-blue-50 transition-colors"
+            >
+              Criar conta
+            </Link>
+          </div>
         </header>
 
         <div className="max-w-6xl mx-auto px-4 md:px-8">

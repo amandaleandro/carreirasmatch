@@ -10,87 +10,17 @@ import {
 } from "@/lib/vocation-areas";
 import type { DiscoveryResult } from "@/lib/tools";
 import { LeadGate, getStoredLeadContact } from "@/components/lead-gate";
+import { ContentPage } from "@/components/content-page";
+import {
+  CheckboxGroup,
+  RadioGroup,
+  QuizQuestion,
+  toggleInArray,
+  QUIZ_SUBMIT_BUTTON_CLASS,
+  QUIZ_FILE_INPUT_CLASS,
+} from "@/components/quiz-controls";
 
 type DiscoveryResultWithId = DiscoveryResult & { resultId?: string };
-
-function CheckboxGroup({
-  options,
-  selected,
-  onToggle,
-}: {
-  options: string[];
-  selected: string[];
-  onToggle: (option: string) => void;
-}) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-2">
-      {options.map((option) => {
-        const checked = selected.includes(option);
-        return (
-          <label
-            key={option}
-            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
-              checked
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                : "border-neutral-300 dark:border-neutral-700"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={() => onToggle(option)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            {option}
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
-function RadioGroup({
-  name,
-  options,
-  value,
-  onChange,
-}: {
-  name: string;
-  options: string[];
-  value: string;
-  onChange: (option: string) => void;
-}) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-2">
-      {options.map((option) => {
-        const checked = value === option;
-        return (
-          <label
-            key={option}
-            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
-              checked
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                : "border-neutral-300 dark:border-neutral-700"
-            }`}
-          >
-            <input
-              type="radio"
-              name={name}
-              checked={checked}
-              onChange={() => onChange(option)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            {option}
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
-function toggleInArray(list: string[], option: string) {
-  return list.includes(option) ? list.filter((o) => o !== option) : [...list, option];
-}
 
 const PATH_LABELS: Record<string, string> = {
   faculdade: "Faculdade",
@@ -101,22 +31,25 @@ const PATH_LABELS: Record<string, string> = {
 function ResultView({ result }: { result: DiscoveryResult }) {
   return (
     <div className="space-y-4">
-      <h2 className="font-semibold text-lg">Áreas recomendadas para você</h2>
+      <h2 className="font-bold text-lg">Áreas recomendadas para você</h2>
       {result.recommendedAreas.map((area, i) => (
-        <div key={i} className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+        <div key={i} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <h3 className="font-semibold">
-              {i + 1}. {area.areaLabel}
+            <h3 className="font-bold flex items-center gap-2">
+              <span className="h-6 w-6 shrink-0 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                {i + 1}
+              </span>
+              {area.areaLabel}
             </h3>
-            <span className="text-xs rounded-full px-2.5 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 shrink-0">
+            <span className="text-[11px] font-semibold rounded-full px-2.5 py-0.5 bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 shrink-0">
               {PATH_LABELS[area.suggestedPath] ?? area.suggestedPath}
             </span>
           </div>
           <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-2">{area.fitReason}</p>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">{area.pathReason}</p>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">{area.pathReason}</p>
           <Link
             href={`/tools/vocation-test/${area.areaSlug}`}
-            className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            className="inline-block text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             Fazer o teste de caminho dentro de {area.areaLabel} →
           </Link>
@@ -184,42 +117,30 @@ export function DiscoveryForm({
   const displayedResult = result ?? initialResult;
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 w-full">
-      <Link
-        href="/tools/vocation-test"
-        className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-      >
-        ← Voltar
-      </Link>
-      <header className="mt-4 mb-10">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Etapa 1: descubra sua área
-        </h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Responda o quiz para descobrir quais áreas amplas mais combinam com você e se o
-          caminho ideal é faculdade, curso técnico, ou os dois.
-        </p>
-      </header>
-
+    <ContentPage
+      eyebrow="Etapa 1"
+      title="Descubra sua área."
+      description="Responda o quiz para descobrir quais áreas amplas mais combinam com você e se o caminho ideal é faculdade, curso técnico, ou os dois."
+      backHref="/tools/vocation-test"
+      backLabel="← Voltar"
+    >
       {displayedResult && !showForm && !leadUnlocked && (
-        <div className="mb-10">
-          <LeadGate
-            source="vocation_test"
-            vocationTestResultId={result?.resultId}
-            title="Seu resultado está pronto!"
-            description="Preencha seus dados para ver quais áreas combinam com você."
-            onUnlocked={() => setLeadUnlocked(true)}
-          />
-        </div>
+        <LeadGate
+          source="vocation_test"
+          vocationTestResultId={result?.resultId}
+          title="Seu resultado está pronto!"
+          description="Preencha seus dados para ver quais áreas combinam com você."
+          onUnlocked={() => setLeadUnlocked(true)}
+        />
       )}
 
       {displayedResult && !showForm && leadUnlocked && (
-        <div className="mb-10 space-y-4">
+        <div className="space-y-4">
           <ResultView result={displayedResult} />
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             Refazer teste
           </button>
@@ -227,76 +148,58 @@ export function DiscoveryForm({
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              O que mais gosta de fazer no dia a dia?{" "}
-              <span className="text-neutral-500 font-normal">(pode marcar mais de uma)</span>
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <QuizQuestion label="O que mais gosta de fazer no dia a dia?" hint="pode marcar mais de uma">
             <CheckboxGroup
               options={DISCOVERY_ENJOYS_OPTIONS}
               selected={enjoys}
               onToggle={(o) => setEnjoys((prev) => toggleInArray(prev, o))}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Prefere trabalhar mais com pessoas ou com processos/sistemas?
-            </label>
+          <QuizQuestion label="Prefere trabalhar mais com pessoas ou com processos/sistemas?">
             <RadioGroup
               name="peopleOrSystems"
               options={VOCATION_PEOPLE_OR_PROCESS_OPTIONS}
               value={peopleOrSystems}
               onChange={setPeopleOrSystems}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Como prefere trabalhar?</label>
+          <QuizQuestion label="Como prefere trabalhar?">
             <RadioGroup
               name="workStyle"
               options={VOCATION_WORK_STYLE_OPTIONS}
               value={workStyle}
               onChange={setWorkStyle}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Você prefere seguir faculdade, curso técnico, ou ainda não decidiu?
-            </label>
+          <QuizQuestion label="Você prefere seguir faculdade, curso técnico, ou ainda não decidiu?">
             <RadioGroup
               name="educationPreference"
               options={EDUCATION_PREFERENCE_OPTIONS}
               value={educationPreference}
               onChange={setEducationPreference}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Currículo em PDF (opcional, melhora a precisão)
-            </label>
+          <QuizQuestion label="Currículo em PDF" hint="opcional, melhora a precisão">
             <input
               type="file"
               accept="application/pdf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-neutral-900 file:text-white file:px-4 file:py-2 dark:file:bg-white dark:file:text-neutral-900"
+              className={QUIZ_FILE_INPUT_CLASS}
             />
-          </div>
+          </QuizQuestion>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading} className={QUIZ_SUBMIT_BUTTON_CLASS}>
             {loading ? "Analisando..." : "Descobrir minha área"}
           </button>
         </form>
       )}
-    </main>
+    </ContentPage>
   );
 }

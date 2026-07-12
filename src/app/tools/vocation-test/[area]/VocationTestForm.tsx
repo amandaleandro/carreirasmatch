@@ -6,6 +6,15 @@ import type { VocationAreaConfig } from "@/lib/vocation-areas";
 import { VOCATION_PEOPLE_OR_PROCESS_OPTIONS, VOCATION_WORK_STYLE_OPTIONS } from "@/lib/vocation-areas";
 import { ExamMapForm } from "./ExamMapForm";
 import { LeadGate, getStoredLeadContact } from "@/components/lead-gate";
+import { ContentPage } from "@/components/content-page";
+import {
+  CheckboxGroup,
+  RadioGroup,
+  QuizQuestion,
+  toggleInArray,
+  QUIZ_SUBMIT_BUTTON_CLASS,
+  QUIZ_FILE_INPUT_CLASS,
+} from "@/components/quiz-controls";
 
 type VocationResult = {
   recommendedAreas: {
@@ -17,102 +26,31 @@ type VocationResult = {
   resultId?: string;
 };
 
-function CheckboxGroup({
-  options,
-  selected,
-  onToggle,
-}: {
-  options: string[];
-  selected: string[];
-  onToggle: (option: string) => void;
-}) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-2">
-      {options.map((option) => {
-        const checked = selected.includes(option);
-        return (
-          <label
-            key={option}
-            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
-              checked
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                : "border-neutral-300 dark:border-neutral-700"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={() => onToggle(option)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            {option}
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
-function RadioGroup({
-  name,
-  options,
-  value,
-  onChange,
-}: {
-  name: string;
-  options: string[];
-  value: string;
-  onChange: (option: string) => void;
-}) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-2">
-      {options.map((option) => {
-        const checked = value === option;
-        return (
-          <label
-            key={option}
-            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
-              checked
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                : "border-neutral-300 dark:border-neutral-700"
-            }`}
-          >
-            <input
-              type="radio"
-              name={name}
-              checked={checked}
-              onChange={() => onChange(option)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            {option}
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
-function toggleInArray(list: string[], option: string) {
-  return list.includes(option) ? list.filter((o) => o !== option) : [...list, option];
-}
-
 function ResultView({ result, areaLabel }: { result: VocationResult; areaLabel: string }) {
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <h2 className="font-semibold text-lg">Áreas recomendadas para você</h2>
+        <h2 className="font-bold text-lg">Áreas recomendadas para você</h2>
         {result.recommendedAreas.map((area, i) => (
-          <div key={i} className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-            <h3 className="font-semibold mb-1">
-              {i + 1}. {area.area}
+          <div key={i} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
+            <h3 className="font-bold mb-2 flex items-center gap-2">
+              <span className="h-6 w-6 shrink-0 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                {i + 1}
+              </span>
+              {area.area}
             </h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300 mb-3">{area.fitReason}</p>
-            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500 mb-1.5">
+            <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 mb-1.5">
               Primeiros passos
             </p>
-            <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
+            <ul className="space-y-1.5">
               {area.firstSteps.map((step, j) => (
-                <li key={j}>{step}</li>
+                <li key={j} className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+                  <span className="mt-0.5 h-4 w-4 shrink-0 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">
+                    ✓
+                  </span>
+                  {step}
+                </li>
               ))}
             </ul>
           </div>
@@ -120,13 +58,13 @@ function ResultView({ result, areaLabel }: { result: VocationResult; areaLabel: 
       </div>
 
       {result.accessibleAreasFromResume.length > 0 && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-          <h3 className="font-semibold mb-3">Áreas mais acessíveis agora (com base no seu currículo)</h3>
+        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
+          <h3 className="font-bold mb-3">Áreas mais acessíveis agora (com base no seu currículo)</h3>
           <div className="flex flex-wrap gap-2">
             {result.accessibleAreasFromResume.map((a, i) => (
               <span
                 key={i}
-                className="text-xs rounded-full px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"
+                className="text-xs font-semibold rounded-full px-3 py-1 bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"
               >
                 {a}
               </span>
@@ -135,16 +73,16 @@ function ResultView({ result, areaLabel }: { result: VocationResult; areaLabel: 
         </div>
       )}
 
-      <div className="rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/60 dark:bg-blue-950/20 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="rounded-2xl border-2 border-blue-100 dark:border-blue-900/50 bg-blue-50/60 dark:bg-blue-950/20 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-sm text-blue-900 dark:text-blue-200">
-          Agora é hora de colocar isso em prática: monte seu currículo e veja quais vagas de
-          estágio em {areaLabel} combinam com o seu perfil.
+          Agora é hora de colocar isso em prática: monte seu currículo e veja quais oportunidades
+          em {areaLabel} combinam com o seu perfil.
         </p>
         <Link
-          href="/analise?track=internship"
+          href="/analise"
           className="shrink-0 inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 text-sm transition-colors"
         >
-          Buscar vagas de estágio →
+          Ver oportunidades →
         </Link>
       </div>
     </div>
@@ -222,59 +160,51 @@ export function VocationTestForm({
   const displayedResult = result ?? initialResult;
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 w-full">
-      <Link
-        href="/tools/vocation-test"
-        className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-      >
-        ← Voltar para áreas
-      </Link>
-      <header className="mt-4 mb-10">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          {alreadyEnrolled ? `Sua especialização em ${area.label}` : `Vocação em ${area.label}`}
-        </h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          {alreadyEnrolled
-            ? `Você já faz ${area.label}. Marque as opções que mais combinam com você (e, se quiser, envie seu currículo) para descobrir qual caminho seguir dentro do seu curso.`
-            : `Marque as opções que mais combinam com você (e, se quiser, envie seu currículo) para descobrir quais caminhos dentro de ${area.label} mais combinam com você e quais estão mais acessíveis agora.`}
-        </p>
-        {!alreadyEnrolled && (
-          <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3">
-            <Link
-              href={`/tools/vocation-test/${area.slug}/study-calendar`}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Ver calendário de estudos →
-            </Link>
-            <Link
-              href={`/tools/vocation-test/${area.slug}/cutoff-estimate`}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              Calcular chance no SISU →
-            </Link>
-          </div>
-        )}
-      </header>
-
-      {displayedResult && !showForm && !leadUnlocked && (
-        <div className="mb-10">
-          <LeadGate
-            source="vocation_test"
-            vocationTestResultId={result?.resultId}
-            title="Seu resultado está pronto!"
-            description="Preencha seus dados para ver quais caminhos combinam com você."
-            onUnlocked={() => setLeadUnlocked(true)}
-          />
+    <ContentPage
+      eyebrow={alreadyEnrolled ? "Sua especialização" : "Teste vocacional"}
+      title={alreadyEnrolled ? `Sua especialização em ${area.label}` : `Vocação em ${area.label}`}
+      description={
+        alreadyEnrolled
+          ? `Você já faz ${area.label}. Marque as opções que mais combinam com você (e, se quiser, envie seu currículo) para descobrir qual caminho seguir dentro do seu curso.`
+          : `Marque as opções que mais combinam com você (e, se quiser, envie seu currículo) para descobrir quais caminhos dentro de ${area.label} mais combinam com você e quais estão mais acessíveis agora.`
+      }
+      backHref="/tools/vocation-test"
+      backLabel="← Voltar para áreas"
+    >
+      {!alreadyEnrolled && (
+        <div className="flex flex-wrap gap-x-5 gap-y-1.5 -mt-2 mb-6">
+          <Link
+            href={`/tools/vocation-test/${area.slug}/study-calendar`}
+            className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Ver calendário de estudos →
+          </Link>
+          <Link
+            href={`/tools/vocation-test/${area.slug}/cutoff-estimate`}
+            className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Calcular chance no SISU →
+          </Link>
         </div>
       )}
 
+      {displayedResult && !showForm && !leadUnlocked && (
+        <LeadGate
+          source="vocation_test"
+          vocationTestResultId={result?.resultId}
+          title="Seu resultado está pronto!"
+          description="Preencha seus dados para ver quais caminhos combinam com você."
+          onUnlocked={() => setLeadUnlocked(true)}
+        />
+      )}
+
       {displayedResult && !showForm && leadUnlocked && (
-        <div className="mb-10 space-y-4">
+        <div className="space-y-4">
           <ResultView result={displayedResult} areaLabel={area.label} />
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             Refazer teste
           </button>
@@ -282,90 +212,74 @@ export function VocationTestForm({
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              O que mais gosta de fazer no dia a dia?{" "}
-              <span className="text-neutral-500 font-normal">(pode marcar mais de uma)</span>
-            </label>
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <QuizQuestion label="O que mais gosta de fazer no dia a dia?" hint="pode marcar mais de uma">
             <CheckboxGroup
               options={area.enjoysOptions}
               selected={enjoysProblemSolving}
               onToggle={(o) => setEnjoysProblemSolving((prev) => toggleInArray(prev, o))}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Prefere trabalhar mais com pessoas ou com processos/sistemas?
-            </label>
+          <QuizQuestion label="Prefere trabalhar mais com pessoas ou com processos/sistemas?">
             <RadioGroup
               name="prefersPeopleOrSystems"
               options={VOCATION_PEOPLE_OR_PROCESS_OPTIONS}
               value={prefersPeopleOrSystems}
               onChange={setPrefersPeopleOrSystems}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Que caminhos dentro de {area.label} já despertaram seu interesse?{" "}
-              <span className="text-neutral-500 font-normal">(pode marcar mais de uma)</span>
-            </label>
+          <QuizQuestion
+            label={`Que caminhos dentro de ${area.label} já despertaram seu interesse?`}
+            hint="pode marcar mais de uma"
+          >
             <CheckboxGroup
               options={[...area.subareas, "Ainda não sei"]}
               selected={interestAreas}
               onToggle={(o) => setInterestAreas((prev) => toggleInArray(prev, o))}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Como prefere trabalhar?</label>
+          <QuizQuestion label="Como prefere trabalhar?">
             <RadioGroup
               name="workStylePreference"
               options={VOCATION_WORK_STYLE_OPTIONS}
               value={workStylePreference}
               onChange={setWorkStylePreference}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Alguma experiência prévia relevante?{" "}
-              <span className="text-neutral-500 font-normal">(pode marcar mais de uma)</span>
-            </label>
+          <QuizQuestion label="Alguma experiência prévia relevante?" hint="pode marcar mais de uma">
             <CheckboxGroup
               options={area.priorExperienceOptions}
               selected={priorExperience}
               onToggle={(o) => setPriorExperience((prev) => toggleInArray(prev, o))}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Currículo em PDF (opcional, melhora a precisão)
-            </label>
+          <QuizQuestion label="Currículo em PDF" hint="opcional, melhora a precisão">
             <input
               type="file"
               accept="application/pdf"
               onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-              className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-neutral-900 file:text-white file:px-4 file:py-2 dark:file:bg-white dark:file:text-neutral-900"
+              className={QUIZ_FILE_INPUT_CLASS}
             />
-          </div>
+          </QuizQuestion>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading} className={QUIZ_SUBMIT_BUTTON_CLASS}>
             {loading ? "Analisando..." : "Descobrir minha vocação"}
           </button>
         </form>
       )}
 
-      {!alreadyEnrolled && <ExamMapForm area={area} />}
-    </main>
+      {!alreadyEnrolled && (
+        <div className="mt-10 pt-8 border-t border-neutral-100 dark:border-neutral-900">
+          <ExamMapForm area={area} />
+        </div>
+      )}
+    </ContentPage>
   );
 }

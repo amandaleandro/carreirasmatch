@@ -11,7 +11,7 @@ export function BrandMark({ className = "h-9 w-9" }: { className?: string }) {
 
 export function BrandLogo({
   className = "",
-  heightClassName = "h-8",
+  heightClassName = "h-10",
   onDark = false,
 }: {
   className?: string;

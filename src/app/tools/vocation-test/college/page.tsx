@@ -1,32 +1,29 @@
 import Link from "next/link";
 import { VOCATION_AREAS } from "@/lib/vocation-areas";
+import { ContentPage } from "@/components/content-page";
 
 export default async function VocationCollegePage() {
   return (
-    <main className="max-w-4xl mx-auto px-4 py-12 w-full">
-      <Link href="/tools/vocation-test" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-        ← Voltar
-      </Link>
-      <header className="mt-4 mb-10">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Já faço faculdade</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Você já escolheu seu curso — vamos direto para achar sua especialização. Escolha a
-          área do seu curso abaixo.
-        </p>
-      </header>
-
+    <ContentPage
+      eyebrow="Já na faculdade"
+      title="Vamos direto para a sua especialização."
+      description="Você já escolheu seu curso — escolha a área abaixo para achar qual caminho seguir dentro dele."
+      backHref="/tools/vocation-test"
+      backLabel="← Voltar"
+      wide
+    >
       <div className="grid sm:grid-cols-2 gap-4">
         {VOCATION_AREAS.map((area) => (
           <Link
             key={area.slug}
             href={`/tools/vocation-test/${area.slug}?enrolled=1`}
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 hover:border-blue-500 transition-colors"
+            className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm hover:border-blue-500 hover:shadow-md transition-all"
           >
-            <h2 className="font-semibold mb-1.5">{area.label}</h2>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">{area.description}</p>
+            <h2 className="font-bold mb-1.5">{area.label}</h2>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">{area.description}</p>
           </Link>
         ))}
       </div>
-    </main>
+    </ContentPage>
   );
 }

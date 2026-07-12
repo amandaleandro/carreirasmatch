@@ -10,85 +10,13 @@ import {
   EXAM_SUBJECT_OPTIONS,
 } from "@/lib/vocation-areas";
 import type { ExamMapResult, ExamType } from "@/lib/tools";
-
-function CheckboxGroup({
-  options,
-  selected,
-  onToggle,
-}: {
-  options: string[];
-  selected: string[];
-  onToggle: (option: string) => void;
-}) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-2">
-      {options.map((option) => {
-        const checked = selected.includes(option);
-        return (
-          <label
-            key={option}
-            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
-              checked
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                : "border-neutral-300 dark:border-neutral-700"
-            }`}
-          >
-            <input
-              type="checkbox"
-              checked={checked}
-              onChange={() => onToggle(option)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            {option}
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
-function RadioGroup({
-  name,
-  options,
-  value,
-  onChange,
-}: {
-  name: string;
-  options: string[];
-  value: string;
-  onChange: (option: string) => void;
-}) {
-  return (
-    <div className="grid sm:grid-cols-2 gap-2">
-      {options.map((option) => {
-        const checked = value === option;
-        return (
-          <label
-            key={option}
-            className={`flex items-center gap-2 rounded-md border px-3 py-2 text-sm cursor-pointer transition-colors ${
-              checked
-                ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                : "border-neutral-300 dark:border-neutral-700"
-            }`}
-          >
-            <input
-              type="radio"
-              name={name}
-              checked={checked}
-              onChange={() => onChange(option)}
-              className="h-4 w-4 accent-blue-600"
-            />
-            {option}
-          </label>
-        );
-      })}
-    </div>
-  );
-}
-
-function toggleInArray(list: string[], option: string) {
-  return list.includes(option) ? list.filter((o) => o !== option) : [...list, option];
-}
+import {
+  CheckboxGroup,
+  RadioGroup,
+  QuizQuestion,
+  toggleInArray,
+  QUIZ_SUBMIT_BUTTON_CLASS,
+} from "@/components/quiz-controls";
 
 function ExamMapResultView({
   result,
@@ -121,8 +49,8 @@ function ExamMapResultView({
 
   return (
     <div className="space-y-4">
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-        <h3 className="font-semibold mb-3">O que estudar primeiro</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
+        <h3 className="font-bold mb-3">O que estudar primeiro</h3>
         <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
           {result.studyPlan.essential.map((s, i) => (
             <li key={i}>{s}</li>
@@ -154,9 +82,9 @@ function ExamMapResultView({
         )}
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
         <div className="flex items-center justify-between gap-2 mb-3">
-          <h3 className="font-semibold">Cronograma das próximas semanas</h3>
+          <h3 className="font-bold">Cronograma das próximas semanas</h3>
         </div>
         <div className="space-y-3">
           {result.weeklySchedule.map((block) => (
@@ -186,17 +114,17 @@ function ExamMapResultView({
               type="button"
               onClick={handleSaveCalendar}
               disabled={saving}
-              className="text-sm rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium px-4 py-2 disabled:opacity-50"
+              className="text-sm rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 transition-colors disabled:opacity-50"
             >
               {saving ? "Salvando..." : "Salvar como calendário"}
             </button>
           )}
-          {saveError && <p className="text-sm text-red-500 mt-2">{saveError}</p>}
+          {saveError && <p className="text-sm font-semibold text-red-500 mt-2">{saveError}</p>}
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-        <h3 className="font-semibold mb-3">Dicas de redação</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
+        <h3 className="font-bold mb-3">Dicas de redação</h3>
         <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
           {result.essayTips.map((s, i) => (
             <li key={i}>{s}</li>
@@ -204,8 +132,8 @@ function ExamMapResultView({
         </ul>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-        <h3 className="font-semibold mb-2">Concorrência do curso</h3>
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm">
+        <h3 className="font-bold mb-2">Concorrência do curso</h3>
         <p className="text-sm text-neutral-700 dark:text-neutral-300">{result.courseCutoffNote}</p>
       </div>
 
@@ -263,12 +191,15 @@ export function ExamMapForm({ area }: { area: VocationAreaConfig }) {
   }
 
   return (
-    <div className="mt-12 pt-10 border-t border-neutral-200 dark:border-neutral-800">
-      <header className="mb-8">
+    <div>
+      <header className="mb-6">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 rounded-full px-2.5 py-1 mb-3">
+          Extra
+        </span>
         <h2 className="text-xl md:text-2xl font-bold tracking-tight">
           Mapa de estudos para ENEM/vestibular — {area.label}
         </h2>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
+        <p className="text-neutral-500 dark:text-neutral-400 mt-2">
           Conte como está sua preparação e receba um plano priorizado de estudos
           para o curso de {area.label}.
         </p>
@@ -280,7 +211,7 @@ export function ExamMapForm({ area }: { area: VocationAreaConfig }) {
           <button
             type="button"
             onClick={() => setShowForm(true)}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             Refazer mapa de estudos
           </button>
@@ -288,9 +219,8 @@ export function ExamMapForm({ area }: { area: VocationAreaConfig }) {
       )}
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium mb-2">Qual prova você vai fazer?</label>
+        <form onSubmit={handleSubmit} className="space-y-7">
+          <QuizQuestion label="Qual prova você vai fazer?">
             <RadioGroup
               name="examType"
               options={EXAM_TYPE_OPTIONS.map((o) => o.label)}
@@ -299,59 +229,45 @@ export function ExamMapForm({ area }: { area: VocationAreaConfig }) {
                 setExamType(EXAM_TYPE_OPTIONS.find((o) => o.label === label)!.value)
               }
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Quanto tempo falta até a prova?</label>
+          <QuizQuestion label="Quanto tempo falta até a prova?">
             <RadioGroup
               name="timeUntilExam"
               options={EXAM_TIME_UNTIL_OPTIONS}
               value={timeUntilExam}
               onChange={setTimeUntilExam}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">Quantas horas por semana você consegue estudar?</label>
+          <QuizQuestion label="Quantas horas por semana você consegue estudar?">
             <RadioGroup
               name="weeklyStudyHours"
               options={EXAM_WEEKLY_HOURS_OPTIONS}
               value={weeklyStudyHours}
               onChange={setWeeklyStudyHours}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Matérias que você mais domina{" "}
-              <span className="text-neutral-500 font-normal">(pode marcar mais de uma)</span>
-            </label>
+          <QuizQuestion label="Matérias que você mais domina" hint="pode marcar mais de uma">
             <CheckboxGroup
               options={EXAM_SUBJECT_OPTIONS}
               selected={subjectStrengths}
               onToggle={(o) => setSubjectStrengths((prev) => toggleInArray(prev, o))}
             />
-          </div>
+          </QuizQuestion>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Matérias com mais dificuldade{" "}
-              <span className="text-neutral-500 font-normal">(pode marcar mais de uma)</span>
-            </label>
+          <QuizQuestion label="Matérias com mais dificuldade" hint="pode marcar mais de uma">
             <CheckboxGroup
               options={EXAM_SUBJECT_OPTIONS}
               selected={subjectWeaknesses}
               onToggle={(o) => setSubjectWeaknesses((prev) => toggleInArray(prev, o))}
             />
-          </div>
+          </QuizQuestion>
 
-          {error && <p className="text-sm text-red-500">{error}</p>}
+          {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading} className={QUIZ_SUBMIT_BUTTON_CLASS}>
             {loading ? "Gerando mapa..." : "Gerar meu mapa de estudos"}
           </button>
         </form>

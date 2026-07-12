@@ -7,7 +7,7 @@ export function SiteFooter() {
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
         <div className="col-span-2 sm:col-span-1">
           <Link href="/">
-            <BrandLogo heightClassName="h-6" />
+            <BrandLogo heightClassName="h-8" />
           </Link>
           <p className="mt-3 text-xs text-neutral-400 leading-relaxed">
             A plataforma completa para impulsionar sua carreira em qualquer momento.

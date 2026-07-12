@@ -50,7 +50,7 @@ export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col bg-gradient-to-b from-[#0d1830] via-[#0b1526] to-[#080e1c] text-white h-screen sticky top-0 border-r border-white/5">
       <div className="px-5 py-6 border-b border-white/5">
-        <BrandLogo heightClassName="h-8" onDark />
+        <BrandLogo heightClassName="h-10" onDark />
       </div>
 
       <nav className="flex-1 px-3 py-4 space-y-1">
