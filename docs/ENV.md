@@ -34,16 +34,15 @@ Revise esta lista manualmente antes de cada deploy.
 | Variável | Uso |
 |---|---|
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Login com Google — sem elas, só login por e-mail/senha fica disponível |
+| `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) — crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
+| `RESEND_FROM_EMAIL` | Remetente do e-mail de redefinição de senha. Sem ela, usa `onboarding@resend.dev` (domínio de teste do Resend, funciona mas identifica menos a marca). Para usar um remetente `@carreirasmatch.com.br`, é preciso verificar o domínio no painel do Resend primeiro. |
 
 ## Docker Compose
 
-`docker-compose.yml` hoje só repassa: `GROQ_API_KEY`, `DATABASE_URL`,
+`docker-compose.yml` hoje repassa: `GROQ_API_KEY`, `DATABASE_URL`,
 `AUTH_SECRET`, `AUTH_TRUST_HOST`, `AUTH_URL`, `GOOGLE_CLIENT_ID/SECRET`,
-`ADZUNA_APP_ID/KEY`, `ABACATEPAY_*` (obsoleto, provedor de pagamento
-anterior — pode remover), `APP_URL`, `ADMIN_EMAILS`, `GROQ_MODEL`.
-
-**Faltam:** `MERCADOPAGO_ACCESS_TOKEN`, `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`,
-`MERCADOPAGO_WEBHOOK_SECRET`, `JOOBLE_API_KEY`, `GUPY_COMPANIES`,
-`SOLIDES_COMPANIES`, `GLASSDOOR_PARTNER_ID/KEY`. Sem os três primeiros,
-o fluxo de pagamento quebra em produção via Docker (ver
-[`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md)).
+`ADZUNA_APP_ID/KEY`, `JOOBLE_API_KEY`, `GUPY_COMPANIES`,
+`SOLIDES_COMPANIES`, `GLASSDOOR_PARTNER_ID/KEY`, `MERCADOPAGO_ACCESS_TOKEN`,
+`NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`, `MERCADOPAGO_WEBHOOK_SECRET`,
+`APP_URL`, `ADMIN_EMAILS`, `GROQ_MODEL`, `RESEND_API_KEY`,
+`RESEND_FROM_EMAIL`.

@@ -15,6 +15,8 @@ const PUBLIC_PATHS = [
   "/ajuda",
   "/termos",
   "/privacidade",
+  "/esqueci-senha",
+  "/redefinir-senha",
 ];
 
 export const authConfig: NextAuthConfig = {

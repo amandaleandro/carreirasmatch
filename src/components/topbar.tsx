@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, FormEvent } from "react";
 import { LogoutButton } from "@/components/logout-button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { BrandLogo } from "@/components/brand-logo";
 import Link from "next/link";
 import { Menu, X, Search } from "lucide-react";
 
@@ -83,7 +84,7 @@ export function Topbar({
                 className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover shadow-sm"
               />
             ) : (
-              <span className="h-8 w-8 md:h-9 w-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-xs md:text-sm font-semibold shadow-sm">
+              <span className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-xs md:text-sm font-semibold shadow-sm">
                 {initials || "?"}
               </span>
             )}
@@ -114,9 +115,7 @@ export function Topbar({
           >
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-white/5">
-                <span className="font-bold tracking-tight text-lg">
-                  Carreira<span className="text-blue-500">Match</span>
-                </span>
+                <BrandLogo heightClassName="h-8" onDark />
                 <button type="button" className="text-slate-400" onClick={() => setMobileNavOpen(false)}>
                   <X className="h-5 w-5" strokeWidth={1.75} />
                 </button>

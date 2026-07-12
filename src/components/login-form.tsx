@@ -73,9 +73,14 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           />
         </div>
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
-            Senha
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
+              Senha
+            </label>
+            <Link href="/esqueci-senha" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              Esqueci minha senha
+            </Link>
+          </div>
           <input
             type="password"
             value={password}
