@@ -41,7 +41,7 @@ export function ApprenticeCompanies() {
           {FIND_APPRENTICE_JOBS_TIPS.map((tip) => (
             <div
               key={tip.title}
-              className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm"
+              className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5"
             >
               <p className="font-semibold text-sm">{tip.title}</p>
               <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5 leading-relaxed">{tip.description}</p>
@@ -54,7 +54,7 @@ export function ApprenticeCompanies() {
           </p>
           <Link
             href="/feed"
-            className="shrink-0 inline-flex items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 text-sm transition-colors"
+            className="shrink-0 inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 text-sm shadow-sm shadow-blue-600/20 transition-all"
           >
             Ver feed de vagas
           </Link>
@@ -77,7 +77,7 @@ export function ApprenticeCompanies() {
             {APPRENTICE_ORGANIZATIONS.filter((org) => org.category === category).map((org) => (
               <div
                 key={org.name}
-                className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm"
+                className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5"
               >
                 <p className="font-semibold text-sm">{org.name}</p>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 leading-relaxed">{org.description}</p>

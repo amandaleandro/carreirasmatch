@@ -43,6 +43,9 @@ export function InternshipChecklistView({ initialChecked }: { initialChecked: st
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-6">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Checklist
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Checklist de documentos de estágio
         </h1>
@@ -65,29 +68,36 @@ export function InternshipChecklistView({ initialChecked }: { initialChecked: st
       </div>
 
       <div className="space-y-2">
-        {INTERNSHIP_CHECKLIST_ITEMS.map((item) => (
-          <label
-            key={item.key}
-            className="flex items-start gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 cursor-pointer"
-          >
-            <input
-              type="checkbox"
-              checked={checked.has(item.key)}
-              onChange={() => toggle(item.key)}
-              className="mt-0.5 h-4 w-4 shrink-0"
-            />
-            <div>
-              <p
-                className={`text-sm font-medium ${
-                  checked.has(item.key) ? "line-through text-neutral-400" : ""
-                }`}
-              >
-                {item.title}
-              </p>
-              <p className="text-xs text-neutral-500 mt-0.5">{item.description}</p>
-            </div>
-          </label>
-        ))}
+        {INTERNSHIP_CHECKLIST_ITEMS.map((item) => {
+          const isChecked = checked.has(item.key);
+          return (
+            <label
+              key={item.key}
+              className={`flex items-start gap-3 rounded-xl border p-3 cursor-pointer transition-all hover:shadow-sm ${
+                isChecked
+                  ? "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900"
+                  : "border-neutral-200 dark:border-neutral-800 hover:border-blue-300 dark:hover:border-blue-800"
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={isChecked}
+                onChange={() => toggle(item.key)}
+                className="mt-0.5 h-4 w-4 shrink-0"
+              />
+              <div>
+                <p
+                  className={`text-sm font-medium ${
+                    isChecked ? "line-through text-neutral-400" : ""
+                  }`}
+                >
+                  {item.title}
+                </p>
+                <p className="text-xs text-neutral-500 mt-0.5">{item.description}</p>
+              </div>
+            </label>
+          );
+        })}
       </div>
 
       <p className="text-xs text-neutral-500 mt-4">

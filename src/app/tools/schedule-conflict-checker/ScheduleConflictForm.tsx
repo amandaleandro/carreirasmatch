@@ -91,6 +91,9 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-10">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Comparador de horários
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Conflito de horário: aula x estágio
         </h1>
@@ -108,7 +111,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
             <select
               value={classForm.dayOfWeek}
               onChange={(e) => setClassForm((p) => ({ ...p, dayOfWeek: Number(e.target.value) }))}
-              className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             >
               {DAY_OPTIONS.map((d) => (
                 <option key={d.value} value={d.value}>
@@ -123,7 +126,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
               type="time"
               value={classForm.startTime}
               onChange={(e) => setClassForm((p) => ({ ...p, startTime: e.target.value }))}
-              className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             />
           </label>
           <label className="text-xs text-neutral-500 col-span-1">
@@ -132,7 +135,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
               type="time"
               value={classForm.endTime}
               onChange={(e) => setClassForm((p) => ({ ...p, endTime: e.target.value }))}
-              className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             />
           </label>
           <label className="text-xs text-neutral-500 col-span-2 sm:col-span-1">
@@ -142,18 +145,18 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
               value={classForm.subject}
               onChange={(e) => setClassForm((p) => ({ ...p, subject: e.target.value }))}
               placeholder="Ex: Cálculo I"
-              className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-2 text-sm"
+              className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             />
           </label>
           <button
             type="submit"
             disabled={savingClass}
-            className="rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2 text-sm disabled:opacity-50"
+            className="rounded-xl bg-blue-600 text-white font-semibold py-2 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
           >
             {savingClass ? "Salvando..." : "Adicionar"}
           </button>
         </form>
-        {classError && <p className="text-sm text-red-500">{classError}</p>}
+        {classError && <p className="text-sm text-red-600 dark:text-red-400">{classError}</p>}
 
         <div className="space-y-2">
           {classItems.length === 0 && (
@@ -162,7 +165,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
           {classItems.map((c) => (
             <div
               key={c.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 text-sm"
+              className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 text-sm hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-sm transition-all"
             >
               <span>
                 <strong>{dayLabel(c.dayOfWeek)}</strong> {c.startTime}–{c.endTime} · {c.subject}
@@ -170,7 +173,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
               <button
                 type="button"
                 onClick={() => removeClassItem(c.id)}
-                className="text-red-500 hover:underline text-xs shrink-0"
+                className="text-red-600 dark:text-red-400 hover:underline text-xs shrink-0"
               >
                 Remover
               </button>
@@ -191,7 +194,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
               <select
                 value={block.dayOfWeek}
                 onChange={(e) => updateInternshipBlock(i, "dayOfWeek", e.target.value)}
-                className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-2 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
               >
                 {DAY_OPTIONS.map((d) => (
                   <option key={d.value} value={d.value}>
@@ -206,7 +209,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
                 type="time"
                 value={block.startTime}
                 onChange={(e) => updateInternshipBlock(i, "startTime", e.target.value)}
-                className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
               />
             </label>
             <label className="text-xs text-neutral-500">
@@ -215,14 +218,14 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
                 type="time"
                 value={block.endTime}
                 onChange={(e) => updateInternshipBlock(i, "endTime", e.target.value)}
-                className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2 py-2 text-sm"
+                className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-2 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
               />
             </label>
             {internshipBlocks.length > 1 && (
               <button
                 type="button"
                 onClick={() => removeInternshipBlock(i)}
-                className="text-sm text-red-500 hover:underline"
+                className="text-sm text-red-600 dark:text-red-400 hover:underline"
               >
                 Remover
               </button>
@@ -243,7 +246,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
       <section className="mt-10">
         <h2 className="font-semibold text-lg mb-3">Resultado</h2>
         {conflicts.length === 0 ? (
-          <p className="text-sm rounded-lg border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 p-4">
+          <p className="text-sm rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 p-4">
             Nenhum conflito encontrado entre a grade de aulas e o horário do estágio informado.
           </p>
         ) : (
@@ -251,7 +254,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
             {conflicts.map((c, i) => (
               <p
                 key={i}
-                className="text-sm rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 p-4"
+                className="text-sm rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 p-4"
               >
                 {dayLabel(c.classBlock.dayOfWeek)} {c.classBlock.startTime}–{c.classBlock.endTime}
                 {" "}({c.classBlock.label}) colide com o estágio das {c.internshipBlock.startTime}–

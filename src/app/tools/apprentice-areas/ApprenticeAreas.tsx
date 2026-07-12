@@ -31,7 +31,7 @@ export function ApprenticeAreas() {
           return (
             <div
               key={area.key}
-              className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 shadow-sm overflow-hidden"
+              className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 overflow-hidden"
             >
               <button
                 type="button"

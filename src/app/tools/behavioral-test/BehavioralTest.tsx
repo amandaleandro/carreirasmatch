@@ -93,6 +93,9 @@ export function BehavioralTest() {
           ← Voltar para ferramentas
         </Link>
         <header className="mt-4 mb-8">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+            Resultado
+          </span>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Seu resultado</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
             Perfil dominante:{" "}
@@ -103,7 +106,7 @@ export function BehavioralTest() {
         </header>
 
         <div className="space-y-6">
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Resumo do perfil</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300">{result.profileSummary}</p>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-3">
@@ -111,7 +114,7 @@ export function BehavioralTest() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-4">Soft skills</h3>
             <div className="space-y-3">
               {(Object.entries(result.skillScores) as [SoftSkillDimension, number][]).map(
@@ -122,7 +125,7 @@ export function BehavioralTest() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-4">Traços de personalidade</h3>
             <div className="space-y-3">
               {(Object.entries(result.personalityScores) as [PersonalityTrait, number][]).map(
@@ -133,7 +136,7 @@ export function BehavioralTest() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Pontos fortes</h3>
             <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
               {result.strengths.map((s, i) => (
@@ -142,7 +145,7 @@ export function BehavioralTest() {
             </ul>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Pontos de desenvolvimento</h3>
             <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
               {result.growthAreas.map((s, i) => (
@@ -151,7 +154,7 @@ export function BehavioralTest() {
             </ul>
           </div>
 
-          <div className="rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 px-4 py-3">
+          <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-100 dark:border-emerald-900/50 px-4 py-3">
             <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
               Dica para a entrevista
             </p>
@@ -170,6 +173,9 @@ export function BehavioralTest() {
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-8">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Simulação
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Teste de soft skills e personalidade
         </h1>
@@ -189,7 +195,7 @@ export function BehavioralTest() {
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value)}
             placeholder="Ex: Assistente de atendimento"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -201,7 +207,7 @@ export function BehavioralTest() {
           {BEHAVIORAL_QUESTIONS.map((q, i) => (
             <div
               key={q.id}
-              className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4"
+              className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5"
             >
               <p className="text-sm font-medium mb-3">
                 {i + 1}. {q.text}
@@ -213,10 +219,10 @@ export function BehavioralTest() {
                     <label
                       key={opt.value}
                       title={opt.label}
-                      className={`flex flex-col items-center gap-1 rounded-md border px-1 py-2 text-[10px] text-center cursor-pointer transition-colors ${
+                      className={`flex flex-col items-center gap-1 rounded-xl border px-1 py-2 text-[10px] text-center cursor-pointer transition-all ${
                         checked
                           ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
-                          : "border-neutral-300 dark:border-neutral-700"
+                          : "border-neutral-200 dark:border-neutral-800"
                       }`}
                     >
                       <input
@@ -235,12 +241,12 @@ export function BehavioralTest() {
           ))}
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
+          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           {loading ? "Calculando resultado..." : "Ver meu resultado"}
         </button>

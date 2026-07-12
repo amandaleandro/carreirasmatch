@@ -56,7 +56,7 @@ export function ApprenticeGuide() {
         {content.tips.map((tip, i) => (
           <div
             key={tip.title}
-            className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm"
+            className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5"
           >
             <div className="flex items-start gap-3">
               <span className="mt-0.5 h-7 w-7 shrink-0 rounded-full bg-cyan-50 dark:bg-cyan-950/30 text-cyan-600 dark:text-cyan-400 flex items-center justify-center text-xs font-bold">

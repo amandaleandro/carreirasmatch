@@ -100,6 +100,9 @@ export function ResumeFromScratchForm({
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-8">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Currículo
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Currículo do zero</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Ainda não tem currículo? Preencha as informações abaixo e a IA monta um
@@ -115,7 +118,7 @@ export function ResumeFromScratchForm({
               key={example.label}
               type="button"
               onClick={() => applyExample(example)}
-              className="text-sm rounded-full border border-neutral-300 dark:border-neutral-700 px-4 py-1.5 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+              className="text-sm rounded-full border border-blue-600 text-blue-600 dark:text-blue-400 px-4 py-1.5 font-semibold hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
             >
               {example.label}
             </button>
@@ -134,7 +137,7 @@ export function ResumeFromScratchForm({
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -145,7 +148,7 @@ export function ResumeFromScratchForm({
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value)}
             placeholder="Ex: Estágio em Suporte Técnico"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -156,7 +159,7 @@ export function ResumeFromScratchForm({
             onChange={(e) => setEducation(e.target.value)}
             rows={2}
             placeholder="Ex: Cursando Análise e Desenvolvimento de Sistemas, previsão de conclusão 2027"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -169,7 +172,7 @@ export function ResumeFromScratchForm({
             onChange={(e) => setProjects(e.target.value)}
             rows={6}
             placeholder="Descreva cada atividade relevante, mesmo que informal"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -182,11 +185,11 @@ export function ResumeFromScratchForm({
             onChange={(e) => setSkills(e.target.value)}
             rows={3}
             placeholder="Ex: Linux, Git, Excel, Python básico, inglês intermediário"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
-        <div className="rounded-md border border-neutral-200 dark:border-neutral-800 p-4">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           {!showJobFields ? (
             <button
               type="button"
@@ -216,25 +219,25 @@ export function ResumeFromScratchForm({
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
                 placeholder="Cargo da vaga, ex: Estágio em Suporte Técnico na empresa X"
-                className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
               />
               <textarea
                 value={jobText}
                 onChange={(e) => setJobText(e.target.value)}
                 rows={5}
                 placeholder="Cole aqui a descrição da vaga"
-                className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
               />
             </div>
           )}
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
+          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           {loading ? "Gerando..." : "Gerar currículo"}
         </button>

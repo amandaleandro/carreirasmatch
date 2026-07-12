@@ -49,6 +49,9 @@ export function InternshipCalculatorForm() {
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-10">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Comparador
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Calculadora de bolsa-auxílio
         </h1>
@@ -62,20 +65,20 @@ export function InternshipCalculatorForm() {
         {offers.map((offer, i) => (
           <div
             key={i}
-            className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 space-y-3"
+            className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 space-y-3"
           >
             <div className="flex items-center justify-between gap-2">
               <input
                 type="text"
                 value={offer.label}
                 onChange={(e) => updateOffer(i, "label", e.target.value)}
-                className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm font-semibold"
+                className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm font-semibold outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
               />
               {offers.length > 2 && (
                 <button
                   type="button"
                   onClick={() => removeOffer(i)}
-                  className="text-sm text-red-500 hover:underline shrink-0"
+                  className="text-sm text-red-600 dark:text-red-400 hover:underline shrink-0"
                 >
                   Remover
                 </button>
@@ -90,7 +93,7 @@ export function InternshipCalculatorForm() {
                   min={0}
                   value={offer.stipend || ""}
                   onChange={(e) => updateOffer(i, "stipend", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                 />
               </label>
               <label className="text-sm">
@@ -100,7 +103,7 @@ export function InternshipCalculatorForm() {
                   min={0}
                   value={offer.transportAid || ""}
                   onChange={(e) => updateOffer(i, "transportAid", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                 />
               </label>
               <label className="text-sm">
@@ -110,7 +113,7 @@ export function InternshipCalculatorForm() {
                   min={0}
                   value={offer.mealAid || ""}
                   onChange={(e) => updateOffer(i, "mealAid", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                 />
               </label>
               <label className="text-sm">
@@ -121,7 +124,7 @@ export function InternshipCalculatorForm() {
                   max={6}
                   value={offer.hoursPerDay || ""}
                   onChange={(e) => updateOffer(i, "hoursPerDay", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                 />
               </label>
               <label className="text-sm">
@@ -132,7 +135,7 @@ export function InternshipCalculatorForm() {
                   max={7}
                   value={offer.daysPerWeek || ""}
                   onChange={(e) => updateOffer(i, "daysPerWeek", e.target.value)}
-                  className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+                  className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                 />
               </label>
             </div>
@@ -156,10 +159,10 @@ export function InternshipCalculatorForm() {
           {results.map((r, i) => (
             <div
               key={i}
-              className={`rounded-xl border p-4 space-y-2 ${
+              className={`rounded-2xl border p-6 shadow-sm shadow-slate-900/5 space-y-2 ${
                 i === bestIndex
                   ? "border-emerald-400 dark:border-emerald-600 bg-emerald-50 dark:bg-emerald-950/30"
-                  : "border-neutral-200 dark:border-neutral-800"
+                  : "border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950"
               }`}
             >
               <div className="flex items-center justify-between">

@@ -89,6 +89,9 @@ export function CompareJobsForm() {
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-10">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Comparador
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Comparador de vagas</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Cole 2 a 4 vagas e descubra qual delas faz mais sentido pra você aplicar
@@ -103,24 +106,24 @@ export function CompareJobsForm() {
             type="file"
             accept="application/pdf"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="block w-full text-sm file:mr-4 file:rounded-md file:border-0 file:bg-neutral-900 file:text-white file:px-4 file:py-2 dark:file:bg-white dark:file:text-neutral-900"
+            className="block w-full text-sm file:mr-4 file:rounded-xl file:border-0 file:bg-neutral-900 file:text-white file:px-4 file:py-2 dark:file:bg-white dark:file:text-neutral-900"
           />
         </div>
 
         {jobs.map((job, i) => (
-          <div key={i} className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 space-y-3">
+          <div key={i} className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 space-y-3">
             <p className="text-sm font-semibold">Vaga {i + 1}</p>
             <input
               type="text"
               value={job.jobTitle}
               onChange={(e) => updateJob(i, "jobTitle", e.target.value)}
               placeholder="Cargo"
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             />
             <select
               value={job.jobType ?? ""}
               onChange={(e) => updateJobType(i, e.target.value)}
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             >
               <option value="">Tipo de vaga (opcional)</option>
               {JOB_TYPE_OPTIONS.map((opt) => (
@@ -134,7 +137,7 @@ export function CompareJobsForm() {
               onChange={(e) => updateJob(i, "jobText", e.target.value)}
               rows={4}
               placeholder="Cole a descrição da vaga"
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             />
           </div>
         ))}
@@ -149,12 +152,12 @@ export function CompareJobsForm() {
           </button>
         )}
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
+          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           {loading ? "Comparando..." : "Comparar vagas"}
         </button>
@@ -162,7 +165,7 @@ export function CompareJobsForm() {
 
       {result && (
         <div className="mt-10 space-y-6">
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 space-y-4">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 space-y-4">
             <h2 className="font-semibold text-lg">Ranking</h2>
             {result.ranking.map((r, i) => (
               <div key={i}>
@@ -178,7 +181,7 @@ export function CompareJobsForm() {
               </div>
             ))}
           </div>
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Recomendação</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300">
               {result.recommendation}

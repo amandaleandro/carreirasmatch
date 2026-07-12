@@ -51,6 +51,9 @@ export function ProjectToExperienceForm() {
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-10">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Conversor
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Transformar projeto em experiência
         </h1>
@@ -71,7 +74,7 @@ export function ProjectToExperienceForm() {
             value={targetArea}
             onChange={(e) => setTargetArea(e.target.value)}
             placeholder="Ex: DevOps Júnior"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -84,23 +87,23 @@ export function ProjectToExperienceForm() {
             onChange={(e) => setProjectDescription(e.target.value)}
             rows={8}
             placeholder="Ex: Fiz um projeto da faculdade onde criei um site de controle de tarefas usando React e um banco de dados. Também usei Git para versionar o código."
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
+          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           {loading ? "Gerando..." : "Transformar em experiência"}
         </button>
       </form>
 
       {result && (
-        <div className="mt-10 rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+        <div className="mt-10 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <h3 className="font-semibold mb-3">{result.title}</h3>
           <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
             {result.bullets.map((b, i) => (

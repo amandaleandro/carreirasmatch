@@ -56,6 +56,9 @@ export function ProfileFromScratchForm() {
         ← Voltar para ferramentas
       </Link>
       <header className="mt-4 mb-10">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Perfil do zero
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Monte seu perfil do zero
         </h1>
@@ -73,7 +76,7 @@ export function ProfileFromScratchForm() {
             value={targetRole}
             onChange={(e) => setTargetRole(e.target.value)}
             placeholder="Ex: Estágio em Desenvolvimento"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -84,7 +87,7 @@ export function ProfileFromScratchForm() {
             onChange={(e) => setEducation(e.target.value)}
             rows={3}
             placeholder="Ex: Cursando Análise e Desenvolvimento de Sistemas, previsão de conclusão 2027"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -97,7 +100,7 @@ export function ProfileFromScratchForm() {
             onChange={(e) => setProjects(e.target.value)}
             rows={5}
             placeholder="Ex: TCC sobre..., projeto pessoal de..., curso de..."
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
@@ -108,16 +111,16 @@ export function ProfileFromScratchForm() {
             onChange={(e) => setSkills(e.target.value)}
             rows={3}
             placeholder="Ex: Python, Excel, Figma, inglês intermediário"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
+          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           {loading ? "Gerando..." : "Gerar perfil"}
         </button>
@@ -125,25 +128,25 @@ export function ProfileFromScratchForm() {
 
       {result && (
         <div className="mt-10 space-y-6">
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Headline sugerida (LinkedIn)</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300">
               {result.suggestedHeadline}
             </p>
           </div>
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Seção &quot;sobre&quot; sugerida (LinkedIn)</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
               {result.suggestedAbout}
             </p>
           </div>
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Bio sugerida (GitHub)</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300">
               {result.suggestedGithubBio}
             </p>
           </div>
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Como destacar seus projetos no GitHub</h3>
             <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
               {result.projectHighlights.map((p, i) => (
@@ -151,7 +154,7 @@ export function ProfileFromScratchForm() {
               ))}
             </ul>
           </div>
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Próximos passos</h3>
             <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
               {result.nextSteps.map((s, i) => (

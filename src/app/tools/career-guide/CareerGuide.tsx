@@ -53,14 +53,14 @@ export function CareerGuide() {
       </div>
 
       <div className="space-y-5">
-        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 mb-2">
             Dia a dia
           </p>
           <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">{area.dayToDay}</p>
         </section>
 
-        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <p className="text-xs font-semibold uppercase tracking-wide text-neutral-400 mb-2">
             Faixa de salário (referência de mercado)
           </p>
@@ -68,7 +68,7 @@ export function CareerGuide() {
         </section>
 
         <div className="grid sm:grid-cols-2 gap-5">
-          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm">
+          <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-3">
               Habilidades técnicas
             </p>
@@ -84,7 +84,7 @@ export function CareerGuide() {
             </ul>
           </section>
 
-          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm">
+          <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <p className="text-xs font-semibold uppercase tracking-wide text-violet-600 dark:text-violet-400 mb-3">
               Habilidades não técnicas
             </p>
@@ -101,7 +101,7 @@ export function CareerGuide() {
           </section>
         </div>
 
-        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm">
+        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-3">
             Curiosidades
           </p>
