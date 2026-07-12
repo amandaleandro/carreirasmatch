@@ -1,15 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BrandLogo } from "@/components/brand-logo";
+import { ContentPage } from "@/components/content-page";
 
 export const metadata: Metadata = {
   title: "Central de Ajuda | CarreirasMatch",
   description: "Perguntas frequentes sobre análise de currículo, assinatura e pagamento no CarreirasMatch.",
 };
 
-const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
+const FAQ_SECTIONS: { title: string; icon: string; items: { q: string; a: string }[] }[] = [
   {
     title: "Análise de currículo",
+    icon: "📄",
     items: [
       {
         q: "Como funciona a análise de currículo?",
@@ -27,6 +28,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
   },
   {
     title: "Assinatura e pagamento",
+    icon: "💳",
     items: [
       {
         q: "Como cancelo minha assinatura?",
@@ -44,6 +46,7 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
   },
   {
     title: "Conta e dados",
+    icon: "🔒",
     items: [
       {
         q: "Como excluo minha conta e meus dados?",
@@ -59,35 +62,49 @@ const FAQ_SECTIONS: { title: string; items: { q: string; a: string }[] }[] = [
 
 export default function AjudaPage() {
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 text-neutral-800 dark:text-neutral-200">
-      <Link href="/">
-        <BrandLogo heightClassName="h-8" />
-      </Link>
-
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mt-8 mb-2">Central de Ajuda</h1>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-8">
-        Perguntas frequentes sobre a plataforma. Não achou o que precisava?{" "}
-        <Link href="/contato" className="font-semibold underline underline-offset-2">
-          Fale com a gente
-        </Link>
-        .
-      </p>
-
+    <ContentPage
+      eyebrow="Central de Ajuda"
+      title="Perguntas frequentes"
+      description="Respostas rápidas sobre análise de currículo, assinatura, pagamento e a sua conta."
+    >
       <div className="space-y-8">
         {FAQ_SECTIONS.map((section) => (
           <section key={section.title}>
-            <h2 className="text-base font-semibold mb-3">{section.title}</h2>
-            <div className="space-y-3">
+            <div className="flex items-center gap-2.5 mb-3">
+              <span className="h-8 w-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center text-sm">
+                {section.icon}
+              </span>
+              <h2 className="text-base font-bold text-neutral-900 dark:text-white">{section.title}</h2>
+            </div>
+            <div className="space-y-2">
               {section.items.map((item) => (
-                <div key={item.q} className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4">
-                  <p className="font-semibold text-sm">{item.q}</p>
-                  <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1.5 leading-relaxed">{item.a}</p>
-                </div>
+                <details
+                  key={item.q}
+                  className="group rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 open:shadow-sm transition-shadow"
+                >
+                  <summary className="flex cursor-pointer items-center justify-between gap-3 p-4 text-sm font-semibold text-neutral-800 dark:text-neutral-200 list-none">
+                    {item.q}
+                    <span className="shrink-0 text-neutral-400 transition-transform group-open:rotate-45 text-lg leading-none">
+                      +
+                    </span>
+                  </summary>
+                  <p className="px-4 pb-4 text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    {item.a}
+                  </p>
+                </details>
               ))}
             </div>
           </section>
         ))}
       </div>
-    </main>
+
+      <p className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-900 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+        Não achou o que precisava?{" "}
+        <Link href="/contato" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+          Fale com a gente
+        </Link>
+        .
+      </p>
+    </ContentPage>
   );
 }
