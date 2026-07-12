@@ -1,7 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { initMercadoPago, CardPayment } from "@mercadopago/sdk-react";
+import { FormEvent, useEffect, useState } from "react";
+import {
+  CardNumber,
+  ExpirationDate,
+  SecurityCode,
+  createCardToken,
+  initMercadoPago,
+} from "@mercadopago/sdk-react";
 
 let initialized = false;
 function ensureInitialized() {
@@ -12,51 +18,169 @@ function ensureInitialized() {
   initialized = true;
 }
 
+const secureFieldStyle = {
+  color: "#171717",
+  fontSize: "14px",
+  fontFamily: "Arial, sans-serif",
+  padding: "10px 12px",
+  placeholderColor: "#737373",
+};
+
+function digitsOnly(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function formatCpf(value: string) {
+  const digits = digitsOnly(value).slice(0, 11);
+  return digits
+    .replace(/^(\d{3})(\d)/, "$1.$2")
+    .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
+}
+
+function FieldShell({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-medium mb-1">{label}</span>
+      <div className="h-11 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 overflow-hidden">
+        {children}
+      </div>
+    </label>
+  );
+}
+
 export function MercadoPagoSubscriptionBrick({
   amount,
   payerEmail,
+  segment,
   couponCode,
   onSuccess,
 }: {
   amount: number;
   payerEmail: string;
+  segment?: string;
   couponCode?: string;
-  onSuccess: () => void;
+  onSuccess: (registerUrl?: string) => void;
 }) {
+  const [cardholderName, setCardholderName] = useState("");
+  const [cpf, setCpf] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     ensureInitialized();
   }, []);
 
-  return (
-    <div className="space-y-2">
-      <CardPayment
-        initialization={{ amount, payer: { email: payerEmail } }}
-        onSubmit={async (formData) => {
-          setError(null);
-          try {
-            const res = await fetch("/api/billing/subscription", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ token: formData.token, couponCode }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error ?? "Erro ao processar assinatura.");
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
-            if (data.status === "authorized") {
-              onSuccess();
-            } else {
-              setError("Assinatura pendente de confirmação. Você será avisado quando for ativada.");
-            }
-          } catch (err) {
-            setError(err instanceof Error ? err.message : "Erro inesperado.");
-            throw err;
-          }
-        }}
-        onError={(err) => setError(err.message ?? "Erro ao carregar o formulário de pagamento.")}
-      />
+    try {
+      if (!cardholderName.trim()) {
+        throw new Error("Informe o nome como aparece no cartão.");
+      }
+
+      const cpfDigits = digitsOnly(cpf);
+      if (cpfDigits.length !== 11) {
+        throw new Error("Informe um CPF válido para o titular do cartão.");
+      }
+
+      const cardToken = await createCardToken({
+        cardholderName: cardholderName.trim(),
+        identificationType: "CPF",
+        identificationNumber: cpfDigits,
+      });
+
+      if (!cardToken?.id) {
+        throw new Error("Não foi possível validar os dados do cartão.");
+      }
+
+      const res = await fetch("/api/billing/subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: cardToken.id,
+          payerEmail,
+          segment,
+          couponCode,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Erro ao processar assinatura.");
+
+      if (data.status === "authorized") {
+        onSuccess(data.registerUrl);
+      } else {
+        setError("Assinatura pendente de confirmação. Você será avisado quando for ativada.");
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium mb-1">Nome no cartão</label>
+        <input
+          type="text"
+          value={cardholderName}
+          onChange={(e) => setCardholderName(e.target.value)}
+          autoComplete="cc-name"
+          required
+          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+        />
+      </div>
+
+      <FieldShell label="Número do cartão">
+        <CardNumber placeholder="0000 0000 0000 0000" style={secureFieldStyle} />
+      </FieldShell>
+
+      <div className="grid grid-cols-2 gap-3">
+        <FieldShell label="Validade">
+          <ExpirationDate placeholder="MM/AA" mode="short" style={secureFieldStyle} />
+        </FieldShell>
+        <FieldShell label="CVV">
+          <SecurityCode placeholder="123" style={secureFieldStyle} />
+        </FieldShell>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium mb-1">CPF do titular</label>
+        <input
+          type="text"
+          value={cpf}
+          onChange={(e) => setCpf(formatCpf(e.target.value))}
+          inputMode="numeric"
+          autoComplete="off"
+          required
+          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+          placeholder="000.000.000-00"
+        />
+      </div>
+
       {error && <p className="text-sm text-red-500">{error}</p>}
-    </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full rounded-md bg-blue-600 text-white font-medium py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-50"
+      >
+        {loading ? "Processando..." : `Assinar agora - R$ ${amount.toFixed(2).replace(".", ",")}`}
+      </button>
+
+      <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        Dados do cartão são protegidos pelos campos seguros do Mercado Pago.
+      </p>
+    </form>
   );
 }

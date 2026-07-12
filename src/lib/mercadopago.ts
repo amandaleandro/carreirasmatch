@@ -1,4 +1,5 @@
 import { MercadoPagoConfig, Payment, PreApproval } from "mercadopago";
+import { randomUUID } from "crypto";
 
 function getClient(): MercadoPagoConfig {
   const accessToken = process.env.MERCADOPAGO_ACCESS_TOKEN;
@@ -40,6 +41,7 @@ export async function createPayment(input: {
   issuerId?: number;
   installments?: number;
   payerEmail: string;
+  payerIdentification?: { type: string; number: string };
   externalReference: string;
 }): Promise<MercadoPagoPaymentResult> {
   const payment = new Payment(getClient());
@@ -51,9 +53,13 @@ export async function createPayment(input: {
       payment_method_id: input.paymentMethodId,
       issuer_id: input.issuerId,
       installments: input.installments,
-      payer: { email: input.payerEmail },
+      payer: {
+        email: input.payerEmail,
+        identification: input.payerIdentification,
+      },
       external_reference: input.externalReference,
     },
+    requestOptions: { idempotencyKey: randomUUID() },
   });
 
   return {
@@ -106,6 +112,7 @@ export async function createPreapproval(input: {
       },
       status: "authorized",
     },
+    requestOptions: { idempotencyKey: randomUUID() },
   });
 
   return {

@@ -440,6 +440,7 @@ export function NicheLandingPage() {
   const theme = THEME_PALETTE[niche.themeAccent];
   const offer = CAREER_OFFER_BY_SEGMENT[niche.segment];
   const firstAnalysisHref = `/analise?track=${niche.track}`;
+  const subscriptionHref = `/assinar?segment=${encodeURIComponent(niche.segment)}`;
   const ctaHref = niche.primaryCtaHref ?? firstAnalysisHref;
   const completeTierHref = niche.primaryCtaHref ?? firstAnalysisHref;
   const resourceItems = offer[activeResourceTab];
@@ -913,7 +914,7 @@ export function NicheLandingPage() {
                 Sem fidelidade — cancele quando quiser
               </span>
               <Link
-                href="/settings"
+                href={subscriptionHref}
                 className={`mt-4 inline-flex items-center justify-center rounded-lg font-semibold px-5 py-3 text-sm transition-colors ${theme.btnPrimary}`}
               >
                 Assinar {offer.monthlyName}

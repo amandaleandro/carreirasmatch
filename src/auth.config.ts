@@ -3,6 +3,7 @@ import type { NextAuthConfig } from "next-auth";
 const PUBLIC_PATHS = [
   "/login",
   "/register",
+  "/assinar",
   "/report",
   "/comece",
   "/curriculo-gratis",

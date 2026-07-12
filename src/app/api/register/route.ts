@@ -34,8 +34,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
-    if (existing) {
+    const existing = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+      select: { id: true, passwordHash: true },
+    });
+    if (existing?.passwordHash) {
       return NextResponse.json(
         { error: "Já existe uma conta com este e-mail." },
         { status: 409 }
@@ -44,17 +47,20 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    await prisma.user.create({
-      data: {
-        name: name ?? null,
-        email: normalizedEmail,
-        passwordHash,
-        careerSegment,
-        professionalArea: typeof professionalArea === "string" && professionalArea.trim()
-          ? professionalArea.trim()
-          : null,
-      },
-    });
+    const data = {
+      name: name ?? null,
+      passwordHash,
+      careerSegment,
+      professionalArea: typeof professionalArea === "string" && professionalArea.trim()
+        ? professionalArea.trim()
+        : null,
+    };
+
+    if (existing) {
+      await prisma.user.update({ where: { id: existing.id }, data });
+    } else {
+      await prisma.user.create({ data: { ...data, email: normalizedEmail } });
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {

@@ -70,6 +70,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "E-mail do usuário não encontrado." }, { status: 400 });
   }
 
+  const payerIdentification =
+    typeof formData.payer?.identification?.type === "string" &&
+    typeof formData.payer?.identification?.number === "string"
+      ? {
+          type: formData.payer.identification.type,
+          number: formData.payer.identification.number,
+        }
+      : undefined;
+
   let result;
   try {
     result = await createPayment({
@@ -83,6 +92,7 @@ export async function POST(req: NextRequest) {
           : undefined,
       installments: typeof formData.installments === "number" ? formData.installments : undefined,
       payerEmail,
+      payerIdentification,
       externalReference: `${session.user.id}:${kind}`,
     });
   } catch (err) {

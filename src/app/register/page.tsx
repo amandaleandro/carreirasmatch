@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS } from "@/lib/course-catalog";
@@ -11,8 +11,9 @@ const AREA_PROMPT_SEGMENTS: CareerSegment[] = ["internship", "student"];
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [password, setPassword] = useState("");
   const [careerSegment, setCareerSegment] = useState<CareerSegment | "">("");
   const [professionalArea, setProfessionalArea] = useState("");
