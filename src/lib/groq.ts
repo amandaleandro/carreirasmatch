@@ -13,6 +13,13 @@ function getGroqClient(): Groq {
 
 const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
+// Structured-resume extraction is literal transcription (no scoring/reasoning), so it doesn't
+// need the stronger model the admin picks for analysis — a cheaper model is just as accurate
+// here, independent of whichever model is configured for analyzeResumeAgainstJob.
+// (qwen/qwen3-32b was tried first but this Groq account's on-demand tier caps it at 6K TPM,
+// which a full resume extraction call alone can exceed — gpt-oss-120b has no such issue.)
+const EXTRACTION_MODEL = "openai/gpt-oss-120b";
+
 let cachedModel: { value: string; expiresAt: number } | null = null;
 const MODEL_CACHE_TTL_MS = 30_000;
 
@@ -28,10 +35,11 @@ export async function runJsonPrompt<T>(
   systemPrompt: string,
   userMessage: string,
   temperature = 0.2,
-  maxCompletionTokens = 3500
+  maxCompletionTokens = 3500,
+  model?: string
 ): Promise<T> {
   const completion = await getGroqClient().chat.completions.create({
-    model: await getGroqModel(),
+    model: model ?? (await getGroqModel()),
     temperature,
     max_completion_tokens: maxCompletionTokens,
     response_format: { type: "json_object" },
@@ -71,25 +79,25 @@ const TRACK_LABELS: Record<CareerTrack, string> = {
 };
 
 const TRACK_GUIDANCE: Record<CareerTrack, string> = {
-  internship: `Candidato busca ESTÁGIO/PRIMEIRO EMPREGO:
-  - Não penalize falta de experiência formal. Projetos acadêmicos, TCC, cursos, projetos pessoais e GitHub contam como evidência válida.
-  - experienceScore: potencial e base de aprendizado, não anos de empresa. Só penalize se não houver prática nenhuma (nem projeto, nem curso).
-  - seniorityScore: só avalie se o nível da vaga é compatível com estágio/júnior; vaga sênior = vaga errada (sinalize em applicationStatusReason), não penalize por falta de liderança.
-  - Se cursando faculdade/técnico: priorize matérias, trabalhos em grupo, iniciação científica e monitoria como evidência técnica, conectando o período do curso à vaga.
+  internship: `ESTÁGIO/PRIMEIRO EMPREGO:
+  - Não penalize falta de experiência formal; TCC, cursos, projetos pessoais e GitHub contam.
+  - experienceScore: potencial e base de aprendizado, não anos de empresa. Só penalize se não houver prática nenhuma.
+  - seniorityScore: só avalie compatibilidade com estágio/júnior; vaga sênior = vaga errada (sinalize em applicationStatusReason), sem penalizar falta de liderança.
+  - Se cursando: matérias, trabalhos em grupo, iniciação científica e monitoria contam como evidência técnica.
   - Tom generoso e encorajador, honesto sobre lacunas reais.`,
-  career_change: `Candidato em TRANSIÇÃO DE CARREIRA:
-  - Procure habilidades TRANSFERÍVEIS da experiência anterior (organização, comunicação, gestão, tecnologia adjacente) e cite como pontos fortes.
-  - Não espere histórico extenso na nova área; foque em estudo ativo (cursos, certificações, projetos) e experiência anterior aplicável.
+  career_change: `TRANSIÇÃO DE CARREIRA:
+  - Procure habilidades TRANSFERÍVEIS da experiência anterior (organização, comunicação, gestão, tecnologia adjacente) como pontos fortes.
+  - Não espere histórico extenso na nova área; foque em estudo ativo (cursos, certificações, projetos).
   - Profundidade técnica ausente reflete no technicalScore mas não é "currículo ruim" — é trilha em construção.`,
-  reemployment: `Candidato busca RECOLOCAÇÃO, já tem experiência prévia:
-  - Seja rigoroso: senioridade, resultados quantificados, clareza de impacto, atualização técnica (tecnologia defasada pesa no score).
-  - Falta de métricas reduz atsScore mais acentuadamente do que para quem está começando.
-  - Avalie se mira vagas compatíveis com sua senioridade real.`,
-  growth: `Candidato empregado busca VAGA MELHOR/CRESCIMENTO:
-  - A vaga deve ser um passo à frente (mais responsabilidade/escopo/senioridade); se o currículo já está acima do nível da vaga, sinalize isso também.
-  - Rigor normal de mercado, sem tolerância especial — compare como profissional pleno/sênior.`,
-  apprentice: `Candidato busca JOVEM APRENDIZ (Lei da Aprendizagem, ~14-24 anos, sem experiência formal exigida):
-  - Não penalize ausência de experiência/cursos técnicos/certificações. Ensino médio (cursando/concluído), cursos livres curtos, atividades escolares/comunitárias e projetos pessoais contam como evidência positiva.
+  reemployment: `RECOLOCAÇÃO (já tem experiência prévia):
+  - Seja rigoroso: senioridade, resultados quantificados, impacto claro, atualização técnica (tecnologia defasada pesa no score).
+  - Falta de métricas reduz atsScore mais que para quem está começando.
+  - Avalie se mira vagas compatíveis com a senioridade real.`,
+  growth: `VAGA MELHOR/CRESCIMENTO (já empregado):
+  - A vaga deve ser um passo à frente; se o currículo já está acima do nível da vaga, sinalize isso.
+  - Rigor normal de mercado — compare como profissional pleno/sênior.`,
+  apprentice: `JOVEM APRENDIZ (Lei da Aprendizagem, ~14-24 anos, sem experiência formal exigida):
+  - Não penalize ausência de experiência/cursos/certificações. Ensino médio, cursos livres curtos e atividades escolares/comunitárias contam como evidência positiva.
   - experienceScore: avalie organização, comprometimento e disponibilidade, não histórico profissional.
   - seniorityScore: só compatibilidade com nível aprendiz, nunca compare com pleno/sênior.
   - Tom muito encorajador e didático — provável primeiro currículo do candidato.`,
@@ -262,11 +270,11 @@ const TRACK_EXTRA_FIELDS: Record<CareerTrack, TrackExtraField[]> = {
   ],
 };
 
-const SYSTEM_PROMPT = `Você é um recrutador sênior, cético e direto, para vagas de QUALQUER área (não assuma TI a menos que a vaga diga). Dê notas REALISTAS, sem inflar. Seja conciso: frases curtas, sem repetição, direto ao ponto.
+const SYSTEM_PROMPT = `Recrutador sênior, cético e direto, para vagas de QUALQUER área (não assuma TI sem a vaga dizer). Notas REALISTAS, sem inflar. Frases curtas, sem repetição.
 
 REGRAS DE PONTUAÇÃO:
 
-1. Antes de pontuar, identifique (só a partir do texto real da vaga, nunca invente skills de outra área): palavras-chave/competências explícitas da vaga; quais aparecem CLARAS e ESPECÍFICAS no currículo (menção vaga não conta); requisitos da vaga ausentes no currículo.
+1. Antes de pontuar, identifique (só do texto real da vaga, nunca invente skills de outra área): keywords/competências explícitas da vaga; quais aparecem CLARAS e ESPECÍFICAS no currículo (menção vaga não conta); requisitos ausentes.
 
 2. technicalScore (0-100): % de skills técnicas da vaga comprovadas com evidência concreta. <40% presentes = <50. Todas com evidência forte = >85. 90+ só se quase nada faltar.
 
@@ -274,31 +282,31 @@ REGRAS DE PONTUAÇÃO:
 
 4. seniorityScore (0-100): senioridade demonstrada (impacto, autonomia, liderança, complexidade) vs nível da vaga. Júnior em vaga pleno/sênior = <45, mesmo com skills técnicas batendo.
 
-5. atsScore (0-100): qualidade do documento — estrutura, palavras-chave da vaga presentes, clareza, métricas quantificadas, resumo direcionado. Genérico sem métricas/keywords = <55.
+5. atsScore (0-100): estrutura, keywords da vaga presentes, clareza, métricas quantificadas, resumo direcionado. Genérico sem métricas/keywords = <55.
 
-6. overallScore: média ponderada technicalScore(35%) + experienceScore(25%) + seniorityScore(20%) + atsScore(20%), ajustável em até ±5 pontos por fator crítico (ex: requisito eliminatório ausente como idioma obrigatório).
+6. overallScore: média ponderada technicalScore(35%) + experienceScore(25%) + seniorityScore(20%) + atsScore(20%), ajustável ±5 por fator crítico (ex: requisito eliminatório ausente).
 
-7. Nos textos, cite as skills/palavras exatas da vaga que faltam ou estão fracas — nunca generalidades tipo "melhore seu currículo".
+7. Nos textos, cite skills/palavras exatas da vaga que faltam ou estão fracas — nunca generalidades tipo "melhore seu currículo".
 
-8. Nunca prometa contratação — fale em termos de aderência/chance de entrevista.
+8. Nunca prometa contratação — fale em aderência/chance de entrevista.
 
-9. keywordsFound / keywordsMissing: termos EXATOS da vaga (ferramenta, técnica, certificação, idioma, anos de experiência etc.), separando comprovados de ausentes/vagos. Sem sinônimos duplicados, use os termos como na vaga.
+9. keywordsFound / keywordsMissing: termos EXATOS da vaga (ferramenta, técnica, certificação, idioma, anos de experiência), separando comprovados de ausentes/vagos. Sem sinônimos duplicados.
 
-10. applicationStatus (considera overallScore + requisitos eliminatórios ausentes: idioma, senioridade muito distante, certificação obrigatória, anos de experiência muito abaixo):
-   - "apply_now": aderência alta (score>=70), sem requisito eliminatório crítico ausente.
-   - "adjust_first": aderência média (45-69) ou alta com 1-2 lacunas fáceis de corrigir.
-   - "deprioritize": aderência baixa (<45) ou requisito eliminatório claramente ausente.
+10. applicationStatus (overallScore + requisitos eliminatórios ausentes: idioma, senioridade muito distante, certificação obrigatória, anos de experiência muito abaixo):
+   - "apply_now": score>=70, sem requisito eliminatório crítico ausente.
+   - "adjust_first": score 45-69, ou alto com 1-2 lacunas fáceis de corrigir.
+   - "deprioritize": score<45, ou requisito eliminatório claramente ausente.
    applicationStatusReason: 1-2 frases citando o fator decisivo.
 
-11. suggestedSummary: 3-4 frases em português, sem "Eu", só fatos reais do currículo, citando keywords que a pessoa realmente tem. Tom conforme momento profissional (mais humilde/potencial em estágio, mais direto/resultado em recolocação/crescimento).
+11. suggestedSummary: 3-4 frases em português, sem "Eu", só fatos reais do currículo, citando keywords que a pessoa realmente tem. Tom conforme momento profissional (mais humilde em estágio, mais direto/resultado em recolocação/crescimento).
 
-12. studyPlan: objeto {essential (1-3 itens indispensáveis), niceToHave (1-3, não bloqueia), later (0-2, baixa prioridade)}, baseado nas lacunas reais (keywordsMissing).
+12. studyPlan: {essential (1-3 indispensáveis), niceToHave (1-3, não bloqueia), later (0-2, baixa prioridade)}, baseado nas lacunas reais (keywordsMissing).
 
 13. recruiterMessage: 3-4 frases, pronta para LinkedIn/e-mail, citando 1-2 pontos fortes reais ligados à vaga. Direto, não genérico.
 
-14. alternativeRoles: só se applicationStatus="deprioritize" (ou vaga muito acima do nível do candidato): 2-4 cargos alternativos realistas, mesma área, nível mais júnior/adjacente (ex: vaga de enfermagem → "Técnico de Enfermagem"). Senão [].
+14. alternativeRoles: só se applicationStatus="deprioritize" (ou vaga muito acima do nível do candidato): 2-4 cargos alternativos realistas, mesma área, nível mais júnior/adjacente. Senão [].
 
-15. experienceSuggestions: 2-3 experiências/projetos REAIS do currículo, na ordem. Por item: "current" (descrição literal/resumida real) e "suggested" (reescrita 1-2 frases, verbos de ação, só quantifica impacto se o currículo já sugerir uma métrica plausível — nunca invente números).
+15. experienceSuggestions: 2-3 experiências/projetos REAIS do currículo, na ordem. "current" (descrição literal/resumida) e "suggested" (reescrita 1-2 frases, verbos de ação, só quantifica se o currículo já sugerir métrica plausível — nunca invente números).
 
 16. atsChecklist: exatamente estas 6 categorias fixas, cada uma com status "pass"/"warning"/"fail" e descrição curta (3-8 palavras):
    - formatting/"Formatação": estrutura, seções, tamanho.
@@ -308,19 +316,22 @@ REGRAS DE PONTUAÇÃO:
    - seniority/"Senioridade": nível comunicado claro e compatível.
    - links/"Links": contatos/links relevantes quando aplicável.
 
-17. currentSummary: copie fielmente (ou resuma se muito longo) o resumo/objetivo já existente no currículo. Se não houver, escreva exatamente: "Nenhum resumo profissional encontrado no currículo.".`;
+17. currentSummary: copie fielmente (ou resuma se muito longo) o resumo/objetivo já existente. Se não houver, escreva exatamente: "Nenhum resumo profissional encontrado no currículo.".`;
 
-const STRUCTURED_RESUME_SYSTEM_PROMPT = `Você é um extrator de dados de currículos, preciso e literal. Sua ÚNICA tarefa é transcrever o currículo abaixo para um JSON estruturado, FIEL e COMPLETO, sem inventar, sem resumir demais, sem julgar qualidade. Isso será usado para reconstruir o currículo inteiro da pessoa, então cada seção deve conter TUDO que existir no texto original, mesmo que pareça repetitivo ou extenso.
+const JSON_ONLY_INSTRUCTION =
+  "Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo exatamente este formato:";
+
+const STRUCTURED_RESUME_SYSTEM_PROMPT = `Extrator de dados de currículos, preciso e literal. ÚNICA tarefa: transcrever o currículo para um JSON estruturado, FIEL e COMPLETO, sem inventar, sem resumir demais, sem julgar qualidade. Cada seção deve conter TUDO que existir no texto original, mesmo repetitivo ou extenso.
 
 REGRAS:
 - contact: nome, e-mail, telefone, cidade/UF, linkedin, github, portfolio. "" se ausente. Nunca invente.
-- education: TODAS as formações mencionadas (instituição, curso/grau, período), sem exceção. [] apenas se realmente não houver nenhuma no texto.
-- skills: TODAS as habilidades/ferramentas/tecnologias citadas em qualquer parte do currículo, não apenas as de uma seção "Habilidades".
-- languages: TODOS os idiomas com nível informado (ex: {"language":"Inglês","level":"Avançado"}). Se não houver nível explícito, use "".
-- certifications: TODAS as certificações/cursos de certificação mencionados, lista simples de strings, sem exceção.
-- experiences: TODAS as experiências profissionais e projetos relevantes, na ordem em que aparecem (cargo, empresa/projeto, período, descrição resumida mas completa). Não omita nenhuma para economizar espaço.
+- education: TODAS as formações (instituição, curso/grau, período), sem exceção. [] só se realmente não houver nenhuma.
+- skills: TODAS as habilidades/ferramentas/tecnologias citadas em qualquer parte do currículo, não só de uma seção "Habilidades".
+- languages: TODOS os idiomas com nível (ex: {"language":"Inglês","level":"Avançado"}). Sem nível explícito, use "".
+- certifications: TODAS as certificações/cursos de certificação, lista simples de strings, sem exceção.
+- experiences: TODAS as experiências profissionais e projetos relevantes, na ordem em que aparecem (cargo, empresa/projeto, período, descrição resumida mas completa).
 
-Nunca deixe uma seção vazia só por preguiça de procurar no texto — releia o currículo inteiro antes de responder. Responda SOMENTE com o JSON, sem texto antes ou depois.`;
+Releia o currículo inteiro antes de responder — nunca deixe uma seção vazia por preguiça de procurar no texto.`;
 
 export type CandidateContext = {
   professionalArea?: string | null;
@@ -433,7 +444,7 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
       ? `\n\nCURSOS_DO_CANDIDATO (cadastrados no perfil, comprovados mesmo que não apareçam no currículo colado):\n- ${candidateContext.courses.join("\n- ")}`
       : "";
 
-  const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\nResponda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo exatamente este formato:\n${jsonTemplate}`;
+  const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
   return runJsonPrompt<ResumeAnalysis>(systemPrompt, userMessage, 0.15, 3000);
 }
@@ -451,8 +462,14 @@ const STRUCTURED_RESUME_JSON_TEMPLATE = `{
  * scoring/analysis response can't crowd out (and truncate) the full structured resume. */
 export async function extractStructuredResume(resumeText: string): Promise<StructuredResume> {
   resumeText = normalizeForPrompt(resumeText, MAX_RESUME_CHARS);
-  const userMessage = `CURRÍCULO DO CANDIDATO:\n${resumeText}\n\nResponda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo exatamente este formato:\n${STRUCTURED_RESUME_JSON_TEMPLATE}`;
-  return runJsonPrompt<StructuredResume>(STRUCTURED_RESUME_SYSTEM_PROMPT, userMessage, 0.1, 6000);
+  const userMessage = `CURRÍCULO DO CANDIDATO:\n${resumeText}\n\n${JSON_ONLY_INSTRUCTION}\n${STRUCTURED_RESUME_JSON_TEMPLATE}`;
+  return runJsonPrompt<StructuredResume>(
+    STRUCTURED_RESUME_SYSTEM_PROMPT,
+    userMessage,
+    0.1,
+    6000,
+    EXTRACTION_MODEL
+  );
 }
 
 export type ProfileSuggestionType = "course" | "certification" | "book";
@@ -471,16 +488,16 @@ export type ProfileSuggestionsResult = {
   suggestions: ProfileSuggestionItem[];
 };
 
-const PROFILE_SUGGESTIONS_SYSTEM_PROMPT = `Você é um orientador de carreira brasileiro, experiente e direto, especializado em indicar cursos, certificações e livros que realmente aumentam a empregabilidade de um profissional.
+const PROFILE_SUGGESTIONS_SYSTEM_PROMPT = `Orientador de carreira brasileiro, experiente e direto, especializado em indicar cursos, certificações e livros que aumentam a empregabilidade.
 
 REGRAS:
-1. Gere de 6 a 10 sugestões, misturando os tipos "course", "certification" e "book" (não precisa ser igual quantidade de cada, priorize o que fizer mais sentido para o perfil).
-2. Baseie as sugestões nas lacunas técnicas informadas (LACUNAS_PRIORITARIAS) e na área/momento profissional do candidato. Não repita nada que já esteja em SKILLS_COMPROVADAS ou CURSOS_JA_FEITOS.
-3. Quando houver opções em OPCOES_CURADAS compatíveis com a área do candidato, priorize indicá-las (são provedores reais e confiáveis no Brasil, como SENAI, SENAC, Sebrae). Fora isso, use seu conhecimento geral de provedores reais e reconhecidos (ex: Coursera, Alura, Udemy, Fundação Bradesco, Microsoft Learn, editoras conhecidas para livros).
-4. "priceLabel": estimativa de preço em reais (R$), como faixa aproximada (ex: "R$ 150 - R$ 300") ou "Gratuito" quando aplicável. Deixe claro que é uma ESTIMATIVA, não invente precisão que você não tem.
-5. "impactScore" (0-100): o quanto esse item, se concluído, tende a aumentar a aderência/empregabilidade do perfil nas lacunas identificadas. Reserve valores acima de 80 apenas para itens que atacam diretamente uma lacuna prioritária e frequente.
-6. "impactReason": 1 frase curta e específica, citando a lacuna ou objetivo que o item ajuda a resolver. Nunca genérico como "melhora seu currículo".
-7. Ordene o array "suggestions" por impactScore decrescente.
+1. Gere 6 a 10 sugestões, misturando "course", "certification" e "book" (quantidade livre, priorize o que fizer mais sentido).
+2. Baseie-se nas lacunas técnicas (LACUNAS_PRIORITARIAS) e na área/momento profissional. Não repita SKILLS_COMPROVADAS ou CURSOS_JA_FEITOS.
+3. Priorize OPCOES_CURADAS compatíveis com a área (provedores reais e confiáveis no Brasil, como SENAI, SENAC, Sebrae). Fora isso, use provedores reais e reconhecidos (ex: Coursera, Alura, Udemy, Fundação Bradesco, Microsoft Learn, editoras conhecidas para livros).
+4. "priceLabel": faixa estimada em reais (ex: "R$ 150 - R$ 300") ou "Gratuito". É uma ESTIMATIVA, não invente precisão que não tem.
+5. "impactScore" (0-100): quanto o item, concluído, aumenta a aderência/empregabilidade nas lacunas identificadas. >80 só para itens que atacam diretamente uma lacuna prioritária e frequente.
+6. "impactReason": 1 frase curta e específica citando a lacuna/objetivo que o item resolve. Nunca genérico como "melhora seu currículo".
+7. Ordene "suggestions" por impactScore decrescente.
 8. Responda apenas em português do Brasil.`;
 
 export async function generateProfileSuggestions(input: {
@@ -535,7 +552,7 @@ export async function generateProfileSuggestions(input: {
           .join("\n- ")}`
       : "";
 
-  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}\n\nResponda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo exatamente este formato:\n${jsonTemplate}`;
+  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
   return runJsonPrompt<ProfileSuggestionsResult>(
     PROFILE_SUGGESTIONS_SYSTEM_PROMPT,

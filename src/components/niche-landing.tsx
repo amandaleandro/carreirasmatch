@@ -1076,17 +1076,17 @@ export function NicheLandingPage() {
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wide text-neutral-500 mb-3">Institucional</p>
             <ul className="space-y-2 text-xs text-neutral-500 dark:text-neutral-400">
-              <li><Link href="/" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Sobre nós</Link></li>
-              <li><Link href="/" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Blog</Link></li>
-              <li><Link href="/" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Contato</Link></li>
+              <li><Link href="/sobre" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Sobre nós</Link></li>
+              <li><Link href="/blog" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Blog</Link></li>
+              <li><Link href="/contato" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Contato</Link></li>
             </ul>
           </div>
           <div>
             <p className="text-[11px] font-bold uppercase tracking-wide text-neutral-500 mb-3">Ajuda</p>
             <ul className="space-y-2 text-xs text-neutral-500 dark:text-neutral-400">
-              <li><Link href="/" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Central de ajuda</Link></li>
-              <li><Link href="/" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Privacidade</Link></li>
-              <li><Link href="/" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Termos</Link></li>
+              <li><Link href="/ajuda" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Central de ajuda</Link></li>
+              <li><Link href="/privacidade" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Privacidade</Link></li>
+              <li><Link href="/termos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Termos</Link></li>
             </ul>
           </div>
         </div>

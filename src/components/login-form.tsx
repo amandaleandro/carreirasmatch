@@ -41,7 +41,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
           <button
             type="button"
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 py-2.5 text-sm font-medium"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 py-3 text-sm font-semibold transition-colors hover:bg-neutral-50 dark:hover:bg-white/[0.03]"
           >
             Entrar com Google
           </button>
@@ -54,33 +54,37 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">E-mail</label>
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
+            E-mail
+          </label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Senha</label>
+        <div className="space-y-1.5">
+          <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
+            Senha
+          </label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
           />
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium py-2.5 disabled:opacity-50"
+          className="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? "Entrando..." : "Entrar"}
         </button>
@@ -88,7 +92,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
 
       <p className="text-sm text-center text-neutral-600 dark:text-neutral-400">
         Não tem conta?{" "}
-        <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline">
+        <Link href="/register" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
           Cadastre-se
         </Link>
       </p>
