@@ -4,7 +4,7 @@ import { useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BrandLogo } from "@/components/brand-logo";
+import { AuthShell } from "@/components/auth-shell";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS } from "@/lib/course-catalog";
 
@@ -64,19 +64,24 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-4 py-16">
-      <div className="w-full max-w-sm">
-        <header className="mb-8 flex flex-col items-center text-center">
-          <Link href="/">
-            <BrandLogo heightClassName="h-9" />
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight mt-4">Criar conta</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2 text-sm">
-            Leva menos de um minuto.
-          </p>
-        </header>
+    <AuthShell
+      eyebrow="Comece agora"
+      headline="Sua carreira merece um plano, não só um currículo."
+      description="Crie sua conta gratuita e receba um diagnóstico claro do que já está bom e do que ajustar antes de aplicar."
+      highlights={[
+        "Score de aderência à vaga",
+        "Plano de ação personalizado",
+        "Sem cartão de crédito para começar",
+      ]}
+    >
+      <header className="mb-8 text-center lg:text-left">
+        <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Criar conta</h1>
+        <p className="text-neutral-600 dark:text-neutral-400 mt-2 text-sm">
+          Leva menos de um minuto.
+        </p>
+      </header>
 
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 shadow-lg shadow-slate-900/5 p-6 md:p-8">
+      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 shadow-lg shadow-slate-900/5 p-6 md:p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
@@ -189,8 +194,7 @@ export default function RegisterPage() {
               Entrar
             </Link>
           </p>
-        </div>
       </div>
-    </main>
+    </AuthShell>
   );
 }
