@@ -26,7 +26,7 @@ export default async function GeneralReportDashboardPage() {
         </p>
         <Link
           href="/"
-          className="inline-block mt-6 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors"
+          className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
         >
           Fazer minha primeira análise
         </Link>
@@ -78,6 +78,9 @@ export default async function GeneralReportDashboardPage() {
   return (
     <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8">
       <div>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Evolução
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Relatório de Evolução Profissional</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-1">
           Acompanhe o crescimento da sua aderência e o preenchimento de lacunas técnicas ao longo das candidaturas.
@@ -86,7 +89,7 @@ export default async function GeneralReportDashboardPage() {
 
       {/* Grid summarizing highlights */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 flex flex-col justify-between">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
           <div>
             <p className="text-sm font-semibold text-neutral-500">Média de Aderência</p>
             <p className="text-4xl font-bold text-blue-600 mt-2">{averageAdherence}%</p>
@@ -94,7 +97,7 @@ export default async function GeneralReportDashboardPage() {
           <span className="text-xs text-neutral-400 mt-4">Cálculo de todas as {totalAnalyses} análises</span>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 flex flex-col justify-between">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
           <div>
             <p className="text-sm font-semibold text-neutral-500">Média Técnica</p>
             <p className="text-4xl font-bold text-amber-500 mt-2">{averageTechnical}%</p>
@@ -102,7 +105,7 @@ export default async function GeneralReportDashboardPage() {
           <span className="text-xs text-neutral-400 mt-4">Avaliação de competências hard-skills</span>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 flex flex-col justify-between">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
           <div>
             <p className="text-sm font-semibold text-neutral-500">Otimização ATS</p>
             <p className="text-4xl font-bold text-emerald-500 mt-2">{averageATS}%</p>
@@ -110,7 +113,7 @@ export default async function GeneralReportDashboardPage() {
           <span className="text-xs text-neutral-400 mt-4">Legibilidade por robôs de recrutamento</span>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 flex flex-col justify-between">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
           <div>
             <p className="text-sm font-semibold text-neutral-500">Evolução do Score</p>
             <p className={`text-4xl font-bold mt-2 ${scoreEvolution >= 0 ? "text-emerald-600" : "text-red-500"}`}>
@@ -122,7 +125,7 @@ export default async function GeneralReportDashboardPage() {
       </div>
 
       {/* Evolution Chart (Simulated beautiful SVG chart representing the data points) */}
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
         <h3 className="font-bold text-lg mb-2">Linha de Evolução do Score</h3>
         <p className="text-sm text-neutral-500 mb-6">Gráfico cronológico das suas análises de vagas</p>
 
@@ -197,7 +200,7 @@ export default async function GeneralReportDashboardPage() {
       {/* Breakdown keyword coverage and history list */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Keywords Evolution */}
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 space-y-4">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 space-y-4">
           <div>
             <h3 className="font-bold text-lg">Habilidades & Palavras-chave</h3>
             <p className="text-sm text-neutral-500 mt-1">Evolução do seu repositório de conhecimentos.</p>
@@ -247,7 +250,7 @@ export default async function GeneralReportDashboardPage() {
         </div>
 
         {/* Chronological list of analyses */}
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 space-y-4">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-bold text-lg">Histórico de Avanço</h3>

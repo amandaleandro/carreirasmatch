@@ -74,7 +74,7 @@ export function FeedList({
 }) {
   if (matches.length === 0) {
     return (
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 text-center">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 text-center">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
           Nenhuma vaga encontrada para os filtros selecionados.
         </p>
@@ -137,7 +137,7 @@ function FeedCard({
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5 flex flex-col sm:flex-row gap-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-5">
       <div className="flex sm:flex-col items-center gap-2 shrink-0 sm:w-24">
         <CircularScore value={match.fitScore} size={72} strokeWidth={7} color={TIER_RING_COLOR[tier]} />
         <span className={`text-xs font-semibold text-center ${TIER_TEXT_CLASS[tier]}`}>
@@ -211,7 +211,7 @@ function FeedCard({
         <button
           onClick={handleFullAnalysis}
           disabled={loading}
-          className="rounded-lg bg-blue-600 text-white font-medium px-4 py-2.5 text-sm hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
+          className="rounded-xl bg-blue-600 text-white font-semibold px-4 py-2.5 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
         >
           {loading ? "Analisando..." : "Ver análise completa"}
           {!loading && (
@@ -223,7 +223,7 @@ function FeedCard({
         <form action={saveFeedMatchAsApplication.bind(null, match.id)}>
           <button
             type="submit"
-            className="w-full rounded-lg bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-950 font-medium px-4 py-2.5 text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
+            className="w-full rounded-xl bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-950 font-semibold px-4 py-2.5 text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
               <path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4-6 4V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />

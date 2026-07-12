@@ -37,7 +37,7 @@ export function BillingSection({
           <button
             type="button"
             onClick={() => setShowBrick(true)}
-            className="rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 text-sm hover:bg-blue-700 transition-colors"
+            className="rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
           >
             {isActive ? `Renovar ${monthlyName} (${monthlyPrice})` : `Assinar ${monthlyName} (${monthlyPrice})`}
           </button>

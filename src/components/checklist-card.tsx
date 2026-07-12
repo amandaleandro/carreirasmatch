@@ -12,7 +12,7 @@ export function ChecklistCard({ items }: { items: string[] }) {
   const doneCount = checked.filter(Boolean).length;
 
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold">Checklist antes de aplicar</h3>
         <span className="text-xs text-neutral-500">

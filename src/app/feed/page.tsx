@@ -97,7 +97,7 @@ export default async function FeedPage({
         </p>
         <Link
           href="/"
-          className="inline-block mt-6 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors"
+          className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
         >
           Fazer meu primeiro diagnóstico
         </Link>
@@ -166,6 +166,9 @@ export default async function FeedPage({
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+            Recomendações para você
+          </span>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Feed de vagas</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
             Vagas recomendadas com base no seu currículo mais recente e ordenadas pela
@@ -181,9 +184,9 @@ export default async function FeedPage({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
           <div className="flex items-start gap-3 mb-4">
-            <span className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <LinkIcon className="h-4.5 w-4.5" />
             </span>
             <div>
@@ -196,9 +199,9 @@ export default async function FeedPage({
           <AddJobForm />
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
           <div className="flex items-start gap-3 mb-4">
-            <span className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
               <SparkleIcon className="h-4.5 w-4.5" />
             </span>
             <div>
@@ -283,8 +286,8 @@ function StatTile({
   hint: string;
 }) {
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 flex items-start gap-3">
-      <span className={`h-10 w-10 rounded-lg flex items-center justify-center shrink-0 ${iconClass}`}>
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex items-start gap-3">
+      <span className={`h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${iconClass}`}>
         {icon}
       </span>
       <div className="min-w-0">

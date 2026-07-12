@@ -58,7 +58,7 @@ export function InterestedRolesForm({ initialRoles }: { initialRoles: string[] }
           {roles.map((role) => (
             <li
               key={role}
-              className="flex items-center gap-1.5 rounded-full border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900 px-3 py-1 text-sm"
+              className="flex items-center gap-1.5 rounded-full border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 px-3 py-1 text-sm font-medium"
             >
               {role}
               <button
@@ -88,7 +88,7 @@ export function InterestedRolesForm({ initialRoles }: { initialRoles: string[] }
             }
           }}
           placeholder="Ex: Eletricista, Vendedor(a)..."
-          className="flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+          className="flex-1 rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
         />
         <datalist id="interested-roles-suggestions">
           {COMMON_PROFESSIONAL_AREAS.filter((option) => !roles.includes(option)).map((option) => (
@@ -99,7 +99,7 @@ export function InterestedRolesForm({ initialRoles }: { initialRoles: string[] }
           type="button"
           onClick={() => addRole(input)}
           disabled={saving || !input.trim()}
-          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-4 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-900 disabled:opacity-50"
+          className="rounded-xl border border-neutral-200 dark:border-neutral-700 px-4 py-2.5 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50"
         >
           Adicionar
         </button>

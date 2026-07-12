@@ -25,7 +25,7 @@ export default async function ApplicationInterviewPage({
         <h1 className="text-2xl font-bold tracking-tight">Candidatura não encontrada</h1>
         <Link
           href="/applications"
-          className="inline-block mt-6 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors"
+          className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
         >
           Voltar para candidaturas
         </Link>
@@ -55,7 +55,7 @@ export default async function ApplicationInterviewPage({
         {analyses.length === 0 ? (
           <Link
             href="/"
-            className="inline-block mt-6 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors"
+            className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
           >
             Fazer minha primeira análise
           </Link>
@@ -67,7 +67,7 @@ export default async function ApplicationInterviewPage({
             <select
               name="analysisId"
               required
-              className="min-w-0 flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3 py-2 text-sm"
+              className="min-w-0 flex-1 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500"
             >
               {analyses.map((a) => (
                 <option key={a.id} value={a.id}>
@@ -77,7 +77,7 @@ export default async function ApplicationInterviewPage({
             </select>
             <button
               type="submit"
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
             >
               Vincular e continuar
             </button>

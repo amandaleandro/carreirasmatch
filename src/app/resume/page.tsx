@@ -26,7 +26,7 @@ export default async function ResumeIndexPage() {
       </p>
       <Link
         href="/"
-        className="inline-block mt-6 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors"
+        className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
       >
         Fazer minha primeira análise
       </Link>

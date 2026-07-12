@@ -122,6 +122,9 @@ export default async function ApplicationsPage() {
     <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
       <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+            Pipeline
+          </span>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Candidaturas</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
             Acompanhe vagas salvas, aplicações, entrevistas, testes e ofertas em um único fluxo.
@@ -129,13 +132,13 @@ export default async function ApplicationsPage() {
         </div>
         <Link
           href="/feed"
-          className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+          className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
         >
           Buscar vagas no feed
         </Link>
       </div>
 
-      <section className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
         <h2 className="font-semibold">Sua jornada de busca</h2>
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
           {journeyStats.map((stat) => (
@@ -153,7 +156,7 @@ export default async function ApplicationsPage() {
           return (
             <div
               key={metric.label}
-              className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950"
+              className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
@@ -172,7 +175,7 @@ export default async function ApplicationsPage() {
       </section>
 
       {upcomingDeadlines.length > 0 && (
-        <section className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
           <h2 className="font-semibold">Prazos próximos</h2>
           <div className="mt-3 space-y-2">
             {upcomingDeadlines.map((item) => {
@@ -199,7 +202,7 @@ export default async function ApplicationsPage() {
       <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6">
         <form
           action={createApplication}
-          className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950 space-y-4"
+          className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 space-y-4"
         >
           <div>
             <h2 className="font-semibold">Adicionar candidatura</h2>
@@ -208,30 +211,30 @@ export default async function ApplicationsPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="jobTitle" required placeholder="Cargo" className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm" />
-            <input name="company" placeholder="Empresa" className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm" />
-            <input name="jobUrl" type="url" placeholder="Link da vaga" className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm md:col-span-2" />
-            <select name="status" defaultValue="saved" className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3 py-2 text-sm">
+            <input name="jobTitle" required placeholder="Cargo" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors" />
+            <input name="company" placeholder="Empresa" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors" />
+            <input name="jobUrl" type="url" placeholder="Link da vaga" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors md:col-span-2" />
+            <select name="status" defaultValue="saved" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
               {APPLICATION_STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {APPLICATION_STATUS_CONFIG[status].label}
                 </option>
               ))}
             </select>
-            <input name="notes" placeholder="Nota rápida" className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm" />
+            <input name="notes" placeholder="Nota rápida" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors" />
             <label className="text-xs text-neutral-500 md:col-span-2">
               Prazo de inscrição (opcional)
-              <input name="deadline" type="date" className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm text-neutral-950 dark:text-neutral-50" />
+              <input name="deadline" type="date" className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
             </label>
           </div>
-          <button type="submit" className="rounded-md bg-neutral-950 text-white dark:bg-neutral-100 dark:text-neutral-950 px-4 py-2 text-sm font-semibold">
+          <button type="submit" className="rounded-xl bg-blue-600 text-white px-5 py-2.5 text-sm font-semibold shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all">
             Salvar candidatura
           </button>
         </form>
 
         <form
           action={updateWeeklyGoal}
-          className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950 space-y-4"
+          className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 space-y-4"
         >
           <div>
             <h2 className="font-semibold">Metas da semana</h2>
@@ -242,18 +245,18 @@ export default async function ApplicationsPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <label className="text-xs text-neutral-500">
               Aplicações
-              <input name="targetApplications" type="number" min="1" defaultValue={currentGoal.targetApplications} className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm text-neutral-950 dark:text-neutral-50" />
+              <input name="targetApplications" type="number" min="1" defaultValue={currentGoal.targetApplications} className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
             </label>
             <label className="text-xs text-neutral-500">
               Ajustes
-              <input name="targetResumeTweaks" type="number" min="0" defaultValue={currentGoal.targetResumeTweaks} className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm text-neutral-950 dark:text-neutral-50" />
+              <input name="targetResumeTweaks" type="number" min="0" defaultValue={currentGoal.targetResumeTweaks} className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
             </label>
             <label className="text-xs text-neutral-500">
               Entrevistas
-              <input name="targetInterviews" type="number" min="0" defaultValue={currentGoal.targetInterviews} className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm text-neutral-950 dark:text-neutral-50" />
+              <input name="targetInterviews" type="number" min="0" defaultValue={currentGoal.targetInterviews} className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
             </label>
           </div>
-          <button type="submit" className="rounded-md border border-blue-600 px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400">
+          <button type="submit" className="rounded-xl border border-blue-600 px-5 py-2.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors">
             Atualizar metas
           </button>
         </form>
@@ -264,7 +267,7 @@ export default async function ApplicationsPage() {
           const config = APPLICATION_STATUS_CONFIG[status];
           const items = applications.filter((item) => item.status === status);
           return (
-            <div key={status} className={`rounded-lg border p-3 min-h-72 ${config.column}`}>
+            <div key={status} className={`rounded-2xl border p-3 min-h-72 shadow-sm shadow-slate-900/5 ${config.column}`}>
               <div className="flex items-center justify-between gap-2 mb-3">
                 <div>
                   <h2 className="text-sm font-semibold flex items-center gap-2">
@@ -279,7 +282,7 @@ export default async function ApplicationsPage() {
               </div>
               <div className="space-y-3">
                 {items.map((item) => (
-                  <article key={item.id} className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3">
+                  <article key={item.id} className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3 shadow-sm shadow-slate-900/5 hover:shadow-md transition-shadow">
                     <h3 className="text-sm font-semibold leading-snug">{item.jobTitle}</h3>
                     {item.company && <p className="text-xs text-neutral-500 mt-1">{item.company}</p>}
                     {item.fitScore !== null && (
@@ -294,14 +297,14 @@ export default async function ApplicationsPage() {
                       </span>
                     )}
                     <form action={updateApplicationStatus.bind(null, item.id)} className="mt-3 flex gap-2">
-                      <select name="status" defaultValue={item.status} className="min-w-0 flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-1.5 text-xs">
+                      <select name="status" defaultValue={item.status} className="min-w-0 flex-1 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-1.5 text-xs">
                         {APPLICATION_STATUSES.map((option) => (
                           <option key={option} value={option}>
                             {APPLICATION_STATUS_CONFIG[option].label}
                           </option>
                         ))}
                       </select>
-                      <button type="submit" className="rounded-md bg-neutral-900 px-2.5 py-1.5 text-xs font-semibold text-white dark:bg-neutral-100 dark:text-neutral-950">
+                      <button type="submit" className="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors">
                         Mover
                       </button>
                     </form>
@@ -311,9 +314,9 @@ export default async function ApplicationsPage() {
                           type="datetime-local"
                           name="interviewAt"
                           defaultValue={item.interviewAt ? toDatetimeLocalValue(item.interviewAt) : ""}
-                          className="min-w-0 flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-1.5 text-xs"
+                          className="min-w-0 flex-1 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-1.5 text-xs"
                         />
-                        <button type="submit" className="rounded-md border border-violet-600 px-2.5 py-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400">
+                        <button type="submit" className="rounded-lg border border-violet-600 px-2.5 py-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40 transition-colors">
                           Agendar
                         </button>
                       </form>

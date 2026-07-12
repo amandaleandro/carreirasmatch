@@ -195,6 +195,9 @@ export function InterviewPrep({
   return (
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-6">
       <div>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Simulação de entrevista
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Prepare-se para a entrevista</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Treine com perguntas baseadas na vaga selecionada e receba feedback
@@ -202,7 +205,7 @@ export function InterviewPrep({
         </p>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 flex items-center justify-between flex-wrap gap-2">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 flex items-center justify-between flex-wrap gap-2">
         <p className="font-medium">{jobTitle}</p>
         <span className="flex items-center gap-1.5 text-xs font-medium rounded-full px-3 py-1 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Simulação ativa
@@ -210,7 +213,7 @@ export function InterviewPrep({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <div className="lg:col-span-2 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
             <h2 className="font-semibold flex items-center gap-1.5">
               Perguntas prováveis <InfoIcon className="h-4 w-4 text-neutral-400" />
@@ -238,10 +241,10 @@ export function InterviewPrep({
               return (
                 <div
                   key={i}
-                  className={`rounded-lg border ${
+                  className={`rounded-xl border transition-colors ${
                     isOpen
                       ? "border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/20"
-                      : "border-neutral-200 dark:border-neutral-800"
+                      : "border-neutral-200 dark:border-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-700"
                   }`}
                 >
                   <button
@@ -274,7 +277,7 @@ export function InterviewPrep({
                         rows={3}
                         maxLength={1500}
                         placeholder="Escreva sua resposta aqui..."
-                        className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-950 px-3 py-2 text-sm"
+                        className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                       />
                       <div className="flex items-center justify-between mt-1.5">
                         <span className="text-xs text-neutral-400">
@@ -299,7 +302,7 @@ export function InterviewPrep({
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4 flex items-center gap-1.5">
               Feedback da IA <InfoIcon className="h-4 w-4 text-neutral-400" />
             </h2>
@@ -318,7 +321,7 @@ export function InterviewPrep({
           </div>
 
           {latestFeedback && (
-            <div className="rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/30 p-4">
+            <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/30 p-4 shadow-sm shadow-emerald-900/5">
               <p className="text-sm font-semibold flex items-center gap-1.5 mb-2">
                 <BulbIcon className="h-4 w-4" /> Como melhorar sua resposta
               </p>
@@ -330,7 +333,7 @@ export function InterviewPrep({
             </div>
           )}
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4 flex items-center gap-1.5">
               Roteiro sugerido <InfoIcon className="h-4 w-4 text-neutral-400" />
             </h2>
@@ -365,7 +368,7 @@ export function InterviewPrep({
           type="button"
           onClick={resetSimulation}
           disabled={regenerating || finalizing}
-          className="flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 font-medium px-5 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-5 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50"
         >
           <RefreshIcon className="h-4 w-4" /> {regenerating ? "Gerando..." : "Gerar nova simulação"}
         </button>
@@ -373,7 +376,7 @@ export function InterviewPrep({
           type="button"
           onClick={finalizeSimulation}
           disabled={finalizing || regenerating || !allAnswered}
-          className="flex items-center gap-1.5 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-xl bg-blue-600 text-white font-semibold px-5 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           <ChatIcon className="h-4 w-4" />
           {finalizing ? "Avaliando respostas..." : "Finalizar simulação e ver feedback"}

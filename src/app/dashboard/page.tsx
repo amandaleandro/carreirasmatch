@@ -66,7 +66,7 @@ export default async function DashboardPage() {
         </p>
         <Link
           href="/"
-          className="inline-block mt-6 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors"
+          className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
         >
           Fazer meu primeiro diagnóstico
         </Link>
@@ -130,6 +130,9 @@ export default async function DashboardPage() {
   return (
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8">
       <div>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Visão geral
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
           Seu mapa da próxima oportunidade
         </h1>
@@ -140,7 +143,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
+        <div className="lg:col-span-2 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
           <div>
             <p className="text-sm text-neutral-500">Aderência média às vagas</p>
             <p className="text-5xl font-bold text-blue-600 mt-2">
@@ -159,7 +162,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <p className="text-sm font-semibold mb-4">Semáforo de prioridade</p>
           <div className="space-y-3">
             {(Object.keys(STATUS_CONFIG) as (keyof typeof STATUS_CONFIG)[]).map(
@@ -181,7 +184,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <div className="lg:col-span-1 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <div className="flex items-center justify-between mb-4">
             <p className="font-semibold">Melhores vagas para você agora</p>
             <Link href="/history" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
@@ -193,7 +196,7 @@ export default async function DashboardPage() {
               <Link
                 key={a.id}
                 href={`/report/${a.id}`}
-                className="flex items-center gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 hover:border-neutral-400 dark:hover:border-neutral-600 transition-colors"
+                className="flex items-center gap-3 rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-sm transition-all"
               >
                 <div className="min-w-0 flex-1">
                   <p className="font-medium text-sm truncate">{a.jobTitle}</p>
@@ -207,7 +210,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 flex flex-col">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 flex flex-col">
           <p className="font-semibold mb-4">Próximo passo recomendado</p>
           <p className="text-sm font-medium">
             Ajuste seu currículo para vagas de{" "}
@@ -218,21 +221,21 @@ export default async function DashboardPage() {
           </p>
           <Link
             href="/"
-            className="mt-4 block text-center rounded-md bg-blue-600 text-white font-medium py-2.5 hover:bg-blue-700 transition-colors"
+            className="mt-4 block text-center rounded-xl bg-blue-600 text-white font-semibold py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
           >
             Ajustar currículo
           </Link>
           {topRecommendedTool && (
             <Link
               href={topRecommendedTool.href}
-              className="mt-2 block text-center rounded-md border border-blue-600 text-blue-600 dark:text-blue-400 font-medium py-2.5 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+              className="mt-2 block text-center rounded-xl border border-blue-600 text-blue-600 dark:text-blue-400 font-semibold py-3 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
             >
               {topRecommendedTool.title}
             </Link>
           )}
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 flex flex-col">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 flex flex-col">
           <p className="font-semibold mb-4">Resumo do currículo</p>
           <p className="text-sm font-medium">
             {latest.atsScore >= 75
@@ -245,7 +248,7 @@ export default async function DashboardPage() {
           </p>
           <Link
             href={`/report/${latest.id}`}
-            className="mt-4 block text-center rounded-md border border-blue-600 text-blue-600 dark:text-blue-400 font-medium py-2.5 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+            className="mt-4 block text-center rounded-xl border border-blue-600 text-blue-600 dark:text-blue-400 font-semibold py-3 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
           >
             Ver análise completa
           </Link>
@@ -253,7 +256,7 @@ export default async function DashboardPage() {
       </div>
 
       {upcomingDeadlines.length > 0 && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <p className="font-semibold mb-4">Prazos próximos</p>
           <div className="space-y-2">
             {upcomingDeadlines.map((item) => {
@@ -264,7 +267,7 @@ export default async function DashboardPage() {
                 <Link
                   href="/applications"
                   key={item.id}
-                  className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 hover:border-blue-300 dark:hover:border-blue-800 transition-colors text-sm"
+                  className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-sm transition-all text-sm"
                 >
                   <div className="min-w-0">
                     <p className="font-medium truncate">{item.jobTitle}</p>
@@ -292,14 +295,14 @@ export default async function DashboardPage() {
       )}
 
       {upcomingInterviews.length > 0 && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <p className="font-semibold mb-4">Próximas entrevistas</p>
           <div className="space-y-2">
             {upcomingInterviews.map((item) => (
               <Link
                 href={`/interviews/${item.id}`}
                 key={item.id}
-                className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 hover:border-violet-300 dark:hover:border-violet-800 transition-colors text-sm"
+                className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 hover:border-violet-300 dark:hover:border-violet-800 hover:shadow-sm transition-all text-sm"
               >
                 <div className="min-w-0">
                   <p className="font-medium truncate">{item.jobTitle}</p>
@@ -314,7 +317,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <p className="font-semibold mb-4">Sua jornada de busca</p>
         <div className="grid grid-cols-3 gap-4">
           <div>
@@ -338,7 +341,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div>
             <p className="font-semibold">Pipeline de candidaturas</p>
@@ -363,7 +366,7 @@ export default async function DashboardPage() {
               <Link
                 href="/applications"
                 key={item.id}
-                className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 hover:border-blue-300 dark:hover:border-blue-800 transition-colors"
+                className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-sm transition-all"
               >
                 <p className="text-sm font-medium truncate">{item.jobTitle}</p>
                 <p className="text-xs text-neutral-500 mt-1 truncate">
@@ -380,7 +383,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <p className="font-semibold mb-6">Plano de evolução</p>
         <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
           {[

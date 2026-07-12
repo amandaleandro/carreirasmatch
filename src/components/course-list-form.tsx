@@ -45,7 +45,7 @@ export function CourseListForm({
             {courses.map((course) => (
               <li
                 key={course.id}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-neutral-200 dark:border-neutral-800 px-3.5 py-2.5 text-sm"
               >
                 <div className="min-w-0">
                   <p className="font-medium break-words">{course.title}</p>
@@ -74,7 +74,7 @@ export function CourseListForm({
             type="text"
             name="title"
             required
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -83,7 +83,7 @@ export function CourseListForm({
             <input
               type="text"
               name="provider"
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
             />
           </div>
           <div>
@@ -91,7 +91,7 @@ export function CourseListForm({
             <select
               name="status"
               defaultValue="completed"
-              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3 py-2 text-sm"
+              className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500"
             >
               <option value="completed">Concluído</option>
               <option value="in_progress">Em andamento</option>
@@ -103,13 +103,13 @@ export function CourseListForm({
           <input
             type="url"
             name="url"
-            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>
         <button
           type="submit"
           disabled={isPending}
-          className="rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           Adicionar curso
         </button>
@@ -122,7 +122,7 @@ export function CourseListForm({
             {suggestions.map((entry) => (
               <li
                 key={`${entry.title}-${entry.provider}`}
-                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm"
+                className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 rounded-xl border border-neutral-200 dark:border-neutral-800 px-3.5 py-2.5 text-sm"
               >
                 <div className="min-w-0">
                   <p className="font-medium break-words">{entry.title}</p>

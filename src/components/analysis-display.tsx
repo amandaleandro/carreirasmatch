@@ -130,7 +130,7 @@ export function KeywordCard({
       ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"
       : "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300";
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <h3 className="font-semibold mb-3">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-neutral-500">Nenhum item identificado.</p>
@@ -168,7 +168,7 @@ export function ScoreBar({ label, value }: { label: string; value: number }) {
 
 export function ListCard({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <h3 className="font-semibold mb-3">{title}</h3>
       {items.length === 0 ? (
         <p className="text-sm text-neutral-500">Nenhum item identificado nesta análise.</p>
@@ -191,7 +191,7 @@ export function SummaryCard({
   summary: string;
 }) {
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <h3 className="font-semibold mb-3">{title}</h3>
       <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
         {summary}
@@ -208,7 +208,7 @@ export function OrderedListCard({
   items: string[];
 }) {
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <h3 className="font-semibold mb-3">{title}</h3>
       <ol className="space-y-2 list-decimal list-inside text-sm text-neutral-700 dark:text-neutral-300">
         {items.map((item, i) => (
@@ -226,7 +226,7 @@ export function StudyPlanCard({ plan }: { plan: StudyPlanPhased }) {
     { label: "Pode ficar para depois", items: plan.later },
   ];
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <h3 className="font-semibold mb-3">Plano de estudo</h3>
       <div className="space-y-4">
         {groups.map(
@@ -273,7 +273,7 @@ export function AnalysisTeaserView({
         reason={result.applicationStatusReason}
       />
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 space-y-4">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 space-y-4">
         <h2 className="font-semibold text-lg">Primeira análise</h2>
         <ScoreBar label="Aderência geral" value={result.overallScore} />
         <ScoreBar label="Currículo / ATS" value={result.atsScore} />
@@ -367,7 +367,7 @@ export function AnalysisResult({
         reason={result.applicationStatusReason}
       />
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 space-y-4">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 space-y-4">
         <h2 className="font-semibold text-lg">Diagnóstico para esta vaga</h2>
         <ScoreBar label="Aderência geral" value={result.overallScore} />
         <ScoreBar label="Técnica" value={result.technicalScore} />

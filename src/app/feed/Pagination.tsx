@@ -28,10 +28,10 @@ export function Pagination({
       <Link
         href={hrefFor(prevPage)}
         aria-disabled={page === 1}
-        className={`rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm font-medium transition-colors ${
+        className={`rounded-xl border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm font-medium transition-colors ${
           page === 1
             ? "pointer-events-none opacity-40"
-            : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            : "hover:bg-neutral-50 dark:hover:bg-neutral-800"
         }`}
       >
         Anterior
@@ -42,10 +42,10 @@ export function Pagination({
       <Link
         href={hrefFor(nextPage)}
         aria-disabled={page === totalPages}
-        className={`rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-2 text-sm font-medium transition-colors ${
+        className={`rounded-xl border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm font-medium transition-colors ${
           page === totalPages
             ? "pointer-events-none opacity-40"
-            : "hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            : "hover:bg-neutral-50 dark:hover:bg-neutral-800"
         }`}
       >
         Próxima

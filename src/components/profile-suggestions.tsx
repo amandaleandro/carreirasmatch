@@ -64,6 +64,9 @@ export function ProfileSuggestions({
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+            Desenvolvimento
+          </span>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Sugestões de Melhoria</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
             Cursos, certificações e livros sugeridos para fortalecer seu perfil, com preço e
@@ -74,20 +77,20 @@ export function ProfileSuggestions({
           type="button"
           onClick={generate}
           disabled={loading}
-          className="shrink-0 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="shrink-0 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           {loading ? "Gerando..." : suggestions.length > 0 ? "Atualizar sugestões" : "Gerar sugestões"}
         </button>
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-sm px-4 py-3">
+        <div className="rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-sm px-4 py-3">
           {error}
         </div>
       )}
 
       {suggestions.length === 0 && !loading && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-10 text-center">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-10 shadow-sm shadow-slate-900/5 text-center">
           <p className="font-medium">Você ainda não gerou sugestões de melhoria.</p>
           <p className="text-sm text-neutral-500 mt-2">
             Clique em &quot;Gerar sugestões&quot; para receber recomendações personalizadas com
@@ -107,7 +110,7 @@ export function ProfileSuggestions({
               return (
                 <div
                   key={s.id}
-                  className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 flex flex-col gap-3"
+                  className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 hover:shadow-md transition-shadow flex flex-col gap-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">

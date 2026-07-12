@@ -138,7 +138,7 @@ export function ProfileForm({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-md border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+            className="rounded-xl border border-neutral-200 dark:border-neutral-700 px-3.5 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
           >
             Escolher foto
           </button>
@@ -164,7 +164,7 @@ export function ProfileForm({
             setSaved(false);
           }}
           placeholder="Seu nome"
-          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
         />
       </div>
 
@@ -174,7 +174,7 @@ export function ProfileForm({
       <button
         type="submit"
         disabled={saving}
-        className="rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-50"
+        className="rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
       >
         {saving ? "Salvando..." : "Salvar perfil"}
       </button>

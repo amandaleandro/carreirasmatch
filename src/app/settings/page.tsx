@@ -57,11 +57,14 @@ export default async function SettingsPage({
   }
 
   return (
-    <main className="max-w-lg mx-auto px-4 py-12 w-full">
+    <main className="max-w-2xl mx-auto px-4 md:px-8 py-12 w-full space-y-6">
       <Link href="/dashboard" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
         ← Voltar
       </Link>
-      <header className="mt-4 mb-8">
+      <header>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Sua conta
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Perfil</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Atualize o seu momento de carreira e área de atuação para receber recomendações mais precisas.
@@ -69,12 +72,12 @@ export default async function SettingsPage({
       </header>
 
       {upgrade === "1" && (
-        <div className="mb-8 rounded-md border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-4 text-sm text-blue-900 dark:text-blue-200">
+        <div className="rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-4 text-sm text-blue-900 dark:text-blue-200">
           Essa ferramenta faz parte do plano mensal. Assine abaixo para continuar.
         </div>
       )}
 
-      <section>
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <h2 className="text-lg font-semibold mb-4">Dados pessoais</h2>
         <ProfileForm
           initialName={user?.name ?? session.user.name ?? ""}
@@ -82,9 +85,7 @@ export default async function SettingsPage({
         />
       </section>
 
-      <hr className="my-8 border-neutral-200 dark:border-neutral-800" />
-
-      <section>
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <h2 className="text-lg font-semibold mb-4">Momento de carreira</h2>
         <SettingsForm
           initialSegment={normalizeCareerSegment(user?.careerSegment)}
@@ -93,32 +94,26 @@ export default async function SettingsPage({
         />
       </section>
 
-      <hr className="my-8 border-neutral-200 dark:border-neutral-800" />
-
-      <section>
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <InterestedRolesForm initialRoles={interestedRoles} />
       </section>
 
       {offer && (
-        <>
-          <hr className="my-8 border-neutral-200 dark:border-neutral-800" />
-
-          <section>
-            <h2 className="text-lg font-semibold mb-4">Pagamento</h2>
-            <BillingSection
-              monthlyPrice={offer.monthlyPrice}
-              monthlyName={offer.monthlyName}
-              subscriptionStatus={subscription?.status ?? null}
-              currentPeriodEnd={subscription?.currentPeriodEnd?.toISOString() ?? null}
-              payerEmail={session.user.email ?? ""}
-            />
-          </section>
-        </>
+        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+          <h2 className="text-lg font-semibold mb-4">Pagamento</h2>
+          <BillingSection
+            monthlyPrice={offer.monthlyPrice}
+            monthlyName={offer.monthlyName}
+            subscriptionStatus={subscription?.status ?? null}
+            currentPeriodEnd={subscription?.currentPeriodEnd?.toISOString() ?? null}
+            payerEmail={session.user.email ?? ""}
+          />
+        </section>
       )}
 
-      <hr className="my-8 border-neutral-200 dark:border-neutral-800" />
-
-      <CourseListForm courses={courses} professionalArea={user?.professionalArea ?? null} />
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <CourseListForm courses={courses} professionalArea={user?.professionalArea ?? null} />
+      </section>
     </main>
   );
 }

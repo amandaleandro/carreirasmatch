@@ -65,7 +65,7 @@ export function FeedFilters({
   }
 
   const selectClass =
-    "rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200";
+    "rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-sm font-medium text-neutral-700 dark:text-neutral-200";
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -80,7 +80,7 @@ export function FeedFilters({
         <button
           type="button"
           onClick={toggleInternshipOnly}
-          className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+          className={`rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
             seniority === "Estágio"
               ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
               : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-200"

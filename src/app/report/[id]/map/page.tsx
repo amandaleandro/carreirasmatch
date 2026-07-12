@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 function MapSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
       <h3 className="font-semibold mb-3">{title}</h3>
       {children}
     </div>
@@ -60,10 +60,10 @@ export default async function OpportunityMapPage({
         ← Voltar para o diagnóstico
       </Link>
       <header className="mt-4 mb-8">
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
           Mapa da Próxima Oportunidade
-        </p>
-        <h1 className="text-2xl font-bold tracking-tight mt-1">{record.jobTitle}</h1>
+        </span>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">{record.jobTitle}</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-1">
           Trilha: {TRACK_LABELS[record.careerTrack as CareerTrack]}
         </p>

@@ -219,6 +219,9 @@ export function ActionPlan({
   return (
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-6">
       <div>
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Próximos passos
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Seu plano de ação</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Veja o que você pode fazer nos próximos 15 dias para chegar ao seu
@@ -227,7 +230,7 @@ export function ActionPlan({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 flex gap-3 items-start">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex gap-3 items-start">
           <span className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <GoalIcon className="h-5 w-5" />
           </span>
@@ -240,7 +243,7 @@ export function ActionPlan({
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 flex gap-3 items-start">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex gap-3 items-start">
           <span className="h-9 w-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CalendarIcon className="h-5 w-5" />
           </span>
@@ -253,7 +256,7 @@ export function ActionPlan({
           </div>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 flex gap-3 items-center">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex gap-3 items-center">
           <CircularScore value={overallScore} size={48} strokeWidth={5} />
           <div>
             <p className="text-xs text-neutral-500">Aderência atual</p>
@@ -268,7 +271,7 @@ export function ActionPlan({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+        <div className="lg:col-span-2 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
           <h2 className="font-semibold mb-4">Plano personalizado</h2>
           <div className="space-y-6">
             {buckets.map((bucket) => {
@@ -372,7 +375,7 @@ export function ActionPlan({
             </div>
           )}
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4">Lacunas prioritárias</h2>
             <div className="space-y-3">
               {priorityGaps.map((gap) => (
@@ -397,7 +400,7 @@ export function ActionPlan({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <div className="flex items-center justify-between mb-4">
               <h2 className="font-semibold">Cursos e temas recomendados</h2>
             </div>
@@ -440,7 +443,7 @@ export function ActionPlan({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <div className="flex items-center gap-3">
               <span className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <GoalIcon className="h-5 w-5" />
@@ -470,14 +473,14 @@ export function ActionPlan({
           type="button"
           onClick={() => persist(checked)}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 hover:bg-blue-700 transition-colors disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-xl bg-blue-600 text-white font-semibold px-5 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
           <CheckIcon className="h-4 w-4" />
           {saved ? "Progresso salvo ✓" : saving ? "Salvando..." : "Marcar progresso"}
         </button>
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 font-medium px-5 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+          className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-5 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
         >
           <PersonIcon className="h-4 w-4" />
           Ver evolução do plano

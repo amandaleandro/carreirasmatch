@@ -53,7 +53,7 @@ export function InterviewSimulator({
   if (questions.length === 0) return null;
 
   return (
-    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 space-y-4">
+    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 space-y-4">
       <h3 className="font-semibold">Simulado de entrevista</h3>
 
       <div>
@@ -64,7 +64,7 @@ export function InterviewSimulator({
             setSelectedQuestion(e.target.value);
             setFeedback(null);
           }}
-          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500"
         >
           {questions.map((q, i) => (
             <option key={i} value={q}>
@@ -81,7 +81,7 @@ export function InterviewSimulator({
           onChange={(e) => setAnswer(e.target.value)}
           rows={5}
           placeholder="Escreva como você responderia essa pergunta em uma entrevista real"
-          className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-3 py-2 text-sm"
+          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
         />
       </div>
 
@@ -91,7 +91,7 @@ export function InterviewSimulator({
         type="button"
         onClick={handleSubmit}
         disabled={loading}
-        className="rounded-md bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-medium px-4 py-2 text-sm disabled:opacity-50"
+        className="rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
       >
         {loading ? "Avaliando..." : "Pedir feedback"}
       </button>

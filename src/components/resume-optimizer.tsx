@@ -151,12 +151,12 @@ function TagEditor({
             }
           }}
           placeholder={placeholder}
-          className="flex-1 rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+          className="flex-1 rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
         />
         <button
           type="button"
           onClick={addItem}
-          className="rounded-md border border-neutral-300 dark:border-neutral-700 px-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          className="rounded-lg border border-neutral-200 dark:border-neutral-700 px-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
           aria-label={`Adicionar em ${label}`}
         >
           <PlusIcon className="h-4 w-4" />
@@ -587,6 +587,9 @@ export function ResumeOptimizer({
   return (
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full">
       <div className="mb-8">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+          Editor de currículo
+        </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Otimize seu currículo</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2 max-w-2xl">
           Edite todas as seções do seu currículo sem perder nenhuma informação
@@ -610,7 +613,7 @@ export function ResumeOptimizer({
         </p>
       </div>
 
-      <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 mb-6 flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 mb-6 shadow-sm shadow-slate-900/5 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="font-semibold">Currículo em PDF</h2>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
@@ -626,12 +629,12 @@ export function ResumeOptimizer({
               href={`/api/resume/${analysisId}/pdf`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 font-medium px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+              className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
             >
               <DownloadIcon className="h-4 w-4" /> Ver PDF anexado
             </a>
           )}
-          <label className="flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 font-medium px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors cursor-pointer">
+          <label className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors cursor-pointer">
             <UploadIcon className="h-4 w-4" />
             {uploadingPdf ? "Enviando..." : pdfAttached ? "Substituir PDF" : "Enviar PDF"}
             <input
@@ -647,7 +650,7 @@ export function ResumeOptimizer({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <div className="lg:col-span-2 space-y-6">
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4">Dados de contato</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {(
@@ -666,14 +669,14 @@ export function ResumeOptimizer({
                   <input
                     value={contact[key]}
                     onChange={(e) => setContact((prev) => ({ ...prev, [key]: e.target.value }))}
-                    className="mt-1 w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+                    className="mt-1 w-full rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                   />
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4">Resumo profissional</h2>
             <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500 mb-1.5">Atual</p>
             <div className="rounded-lg bg-neutral-50 dark:bg-neutral-900 p-3 text-sm text-neutral-600 dark:text-neutral-400">
@@ -697,7 +700,7 @@ export function ResumeOptimizer({
                 <button
                   type="button"
                   onClick={applySummary}
-                  className="rounded-md bg-blue-600 text-white text-sm font-medium px-4 py-1.5 hover:bg-blue-700 transition-colors"
+                  className="rounded-lg bg-blue-600 text-white text-sm font-semibold px-4 py-1.5 hover:bg-blue-700 transition-colors"
                 >
                   {summaryApplied ? "Sugestão aplicada ✓" : "Aplicar sugestão"}
                 </button>
@@ -705,7 +708,7 @@ export function ResumeOptimizer({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4">Experiências e projetos</h2>
             <div className="space-y-4">
               {experiences.map((exp, i) => (
@@ -801,7 +804,7 @@ export function ResumeOptimizer({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 space-y-5">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 space-y-5">
             <h2 className="font-semibold">Formação, habilidades e idiomas</h2>
 
             <div>
@@ -824,7 +827,7 @@ export function ResumeOptimizer({
                       onChange={(e) =>
                         setEducation((prev) => prev.map((p, idx) => (idx === i ? { ...p, institution: e.target.value } : p)))
                       }
-                      className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+                      className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                     />
                     <input
                       value={ed.degree}
@@ -832,7 +835,7 @@ export function ResumeOptimizer({
                       onChange={(e) =>
                         setEducation((prev) => prev.map((p, idx) => (idx === i ? { ...p, degree: e.target.value } : p)))
                       }
-                      className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+                      className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                     />
                     <input
                       value={ed.period}
@@ -840,7 +843,7 @@ export function ResumeOptimizer({
                       onChange={(e) =>
                         setEducation((prev) => prev.map((p, idx) => (idx === i ? { ...p, period: e.target.value } : p)))
                       }
-                      className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+                      className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                     />
                     <button
                       type="button"
@@ -878,7 +881,7 @@ export function ResumeOptimizer({
                       onChange={(e) =>
                         setLanguages((prev) => prev.map((p, idx) => (idx === i ? { ...p, language: e.target.value } : p)))
                       }
-                      className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+                      className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                     />
                     <input
                       value={lg.level}
@@ -886,7 +889,7 @@ export function ResumeOptimizer({
                       onChange={(e) =>
                         setLanguages((prev) => prev.map((p, idx) => (idx === i ? { ...p, level: e.target.value } : p)))
                       }
-                      className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-transparent px-2.5 py-1.5 text-sm outline-none focus:border-blue-400"
+                      className="rounded-lg border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-2.5 py-1.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
                     />
                     <button
                       type="button"
@@ -921,7 +924,7 @@ export function ResumeOptimizer({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold">Preview do currículo</h2>
             <div className="grid grid-cols-1 sm:grid-cols-[160px_1fr] gap-4 mt-4 items-start">
               <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white p-3 text-[6px] leading-tight text-neutral-800 overflow-hidden h-44">
@@ -947,14 +950,14 @@ export function ResumeOptimizer({
                   <button
                     type="button"
                     onClick={handleDownloadPdf}
-                    className="flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 font-medium px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+                    className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
                   >
                     <DownloadIcon className="h-4 w-4" /> Baixar PDF
                   </button>
                   <button
                     type="button"
                     onClick={handleCopy}
-                    className="flex items-center gap-1.5 rounded-md border border-neutral-300 dark:border-neutral-700 font-medium px-4 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+                    className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
                   >
                     <CopyIcon className="h-4 w-4" /> {copied ? "Copiado ✓" : "Copiar texto"}
                   </button>
@@ -962,7 +965,7 @@ export function ResumeOptimizer({
                     type="button"
                     onClick={() => persist({})}
                     disabled={saving}
-                    className="flex items-center gap-1.5 rounded-md bg-blue-600 text-white font-medium px-4 py-2 text-sm hover:bg-blue-700 transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1.5 rounded-xl bg-blue-600 text-white font-semibold px-4 py-2 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
                   >
                     <StarIcon className="h-4 w-4" />
                     {saved ? "Versão salva ✓" : saving ? "Salvando..." : "Salvar versão para esta vaga"}
@@ -990,7 +993,7 @@ export function ResumeOptimizer({
             </div>
           )}
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4 flex items-center gap-1.5">
               Palavras-chave para esta vaga <InfoIcon className="h-4 w-4 text-neutral-400" />
             </h2>
@@ -1018,7 +1021,7 @@ export function ResumeOptimizer({
             </div>
           </div>
 
-          <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6">
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h2 className="font-semibold mb-4 flex items-center gap-1.5">
               Checklist ATS <InfoIcon className="h-4 w-4 text-neutral-400" />
             </h2>
@@ -1041,7 +1044,7 @@ export function ResumeOptimizer({
           </div>
 
           {hasBaseline && (
-            <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-6 text-center">
+            <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 text-center">
               <h2 className="font-semibold mb-4">Pronto para aplicar?</h2>
               <div className="flex justify-center">
                 <CircularScore value={atsScore} size={120} strokeWidth={10} />
