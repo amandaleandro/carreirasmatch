@@ -29,6 +29,13 @@ Revise esta lista manualmente antes de cada deploy.
 | `SOLIDES_COMPANIES` | Sólides (lista de slugs) |
 | `GLASSDOOR_PARTNER_ID` / `GLASSDOOR_PARTNER_KEY` | Glassdoor (exige parceria homologada, doc ainda não confirmada — ver `src/lib/job-sources/glassdoor.ts`) |
 
+## Opcionais (blog automático)
+
+| Variável | Uso | Observação |
+| --- | --- | --- |
+| `BLOG_AUTOGEN_ENABLED` | Liga/desliga o scheduler de geração automática de posts (`src/instrumentation.ts` → `src/lib/blog-scheduler.ts`) | default `true`; defina `"false"` para desligar sem mudar código |
+| `BLOG_POSTS_PER_DAY` | Meta de posts gerados por dia (rodízio pelos nichos em `VOCATION_AREAS`) | default `5` |
+
 ## Opcionais (auth)
 
 | Variável | Uso |

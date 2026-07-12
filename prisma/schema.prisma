@@ -390,3 +390,21 @@ model AppSetting {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+/// Posts do blog gerados automaticamente por IA, um por nicho em rodízio.
+model Post {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  areaSlug    String
+  areaLabel   String
+  coverEmoji  String
+  gradientIdx Int      @default(0)
+  contentJson String // JSON.stringify(ContentBlock[])
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  @@index([publishedAt])
+  @@index([areaSlug])
+}
