@@ -31,29 +31,12 @@ export function ContentPage({
           <Link href="/">
             <BrandLogo heightClassName="h-11" onDark />
           </Link>
-          {backHref ? (
-            <Link
-              href={backHref}
-              className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-            >
-              {backLabel}
-            </Link>
-          ) : (
-            <div className="flex items-center gap-2.5">
-              <Link
-                href="/login"
-                className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-              >
-                Entrar
-              </Link>
-              <Link
-                href="/register"
-                className="rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-blue-950 hover:bg-blue-50 transition-colors"
-              >
-                Criar conta
-              </Link>
-            </div>
-          )}
+          <Link
+            href={backHref ?? "/login"}
+            className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+          >
+            {backLabel ?? "Entrar"}
+          </Link>
         </header>
 
         <div className={`${maxWidthClassName} mx-auto px-4 md:px-8 pt-6 pb-14 md:pt-10 md:pb-20`}>

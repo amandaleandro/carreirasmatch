@@ -480,20 +480,12 @@ export function NicheLandingPage() {
             <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
           </nav>
-          <div className="flex items-center gap-2.5">
-            <Link
-              href="/login"
-              className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-            >
-              Entrar
-            </Link>
-            <Link
-              href="/register"
-              className="hidden sm:inline-flex rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-blue-950 hover:bg-blue-50 transition-colors"
-            >
-              Criar conta
-            </Link>
-          </div>
+          <Link
+            href="/login"
+            className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
+          >
+            Entrar
+          </Link>
         </header>
 
         <div className="max-w-6xl mx-auto px-4 md:px-8">
