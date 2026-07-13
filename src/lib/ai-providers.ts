@@ -7,7 +7,7 @@ import OpenAI from "openai";
  *
  * Um endpoint só entra na rotação se a chave dele estiver setada. A cada
  * requisição a ordem é rotacionada (round-robin) para espalhar o uso entre os
- * provedores — e, se um falhar (limite, erro), a chamada cai para o próximo
+ * provedores, e, se um falhar (limite, erro), a chamada cai para o próximo
  * automaticamente. Cada resultado é logado com provedor/modelo/tempo para dar
  * pra comparar qual é o melhor.
  *
@@ -86,13 +86,32 @@ function clientFor(e: AiEndpoint): OpenAI {
   return c;
 }
 
-// Contador de rotação (round-robin) — em memória, por instância. Espalha o
+// Contador de rotação (round-robin), em memória, por instância. Espalha o
 // ponto de partida entre requisições para não sobrecarregar sempre o mesmo.
 let rotationCounter = 0;
 
 function statusOf(err: unknown): string {
   if (err && typeof err === "object" && "status" in err) return String((err as { status: unknown }).status);
   return err instanceof Error ? err.message.slice(0, 80) : "erro";
+}
+
+/**
+ * Normaliza a resposta para JSON puro. Alguns provedores/modelos ignoram o
+ * response_format e devolvem o JSON dentro de cerca de código markdown
+ * (```json ... ```) ou com texto ao redor. Remove a cerca e, se ainda houver
+ * ruído, recorta do primeiro "{" ao último "}".
+ */
+function extractJson(raw: string): string {
+  let s = raw.trim();
+  if (s.startsWith("```")) {
+    s = s.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "").trim();
+  }
+  if (!s.startsWith("{")) {
+    const first = s.indexOf("{");
+    const last = s.lastIndexOf("}");
+    if (first !== -1 && last > first) s = s.slice(first, last + 1);
+  }
+  return s;
 }
 
 /**
@@ -112,6 +131,9 @@ export async function runJsonAcrossProviders(
     throw new Error("Nenhum provedor de IA configurado (defina ao menos GROQ_API_KEY).");
   }
 
+  // Regra global de estilo: nada de travessão/meia-risca (cara de texto de IA).
+  const systemWithStyle = `${systemPrompt}\n\nESTILO: escreva em português natural. NUNCA use travessão (—) nem meia-risca (–); use vírgula, ponto, dois-pontos ou parênteses no lugar.`;
+
   const start = rotationCounter++ % endpoints.length;
   const ordered = [...endpoints.slice(start), ...endpoints.slice(0, start)];
 
@@ -125,7 +147,7 @@ export async function runJsonAcrossProviders(
         max_tokens: maxTokens,
         response_format: { type: "json_object" },
         messages: [
-          { role: "system", content: systemPrompt },
+          { role: "system", content: systemWithStyle },
           { role: "user", content: userMessage },
         ],
       });
@@ -137,10 +159,10 @@ export async function runJsonAcrossProviders(
         console.error(`[AI] ${e.id}/${e.model} resposta truncada por max_tokens; campos podem faltar.`);
       }
       console.log(`[AI] ok provider=${e.id} model=${e.model} ms=${Date.now() - t0}`);
-      return content;
+      return extractJson(content);
     } catch (err) {
       lastErr = err;
-      console.warn(`[AI] falha provider=${e.id} model=${e.model} ms=${Date.now() - t0} status=${statusOf(err)} — tentando próximo`);
+      console.warn(`[AI] falha provider=${e.id} model=${e.model} ms=${Date.now() - t0} status=${statusOf(err)}, tentando próximo`);
       continue;
     }
   }
