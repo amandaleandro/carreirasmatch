@@ -1,13 +1,21 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
-import { TOOLS_CATALOG } from "@/lib/tools-catalog";
 
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
+// Ferramentas realmente públicas (as demais /tools/* exigem assinatura por
+// design — não entram no sitemap para não apontar a crawler para páginas que
+// redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts.
+const PUBLIC_TOOL_PATHS = [
+  "/tools/vocation-test",
+  "/tools/vocation-test/discover",
+  "/tools/vocation-test/college",
+];
+
 /**
  * Sitemap para os crawlers. Cobre só as páginas públicas/indexáveis — landing,
- * institucional, ferramentas gratuitas e posts do blog. Áreas logadas (/dashboard,
- * /report, /settings, etc.) ficam de fora de propósito (ver app/robots.ts).
+ * institucional, ferramentas gratuitas e posts do blog. Áreas logadas e
+ * ferramentas por assinatura ficam de fora de propósito (ver app/robots.ts).
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
@@ -28,8 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/register`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
   ];
 
-  const toolRoutes: MetadataRoute.Sitemap = TOOLS_CATALOG.map((tool) => ({
-    url: `${BASE_URL}${tool.href}`,
+  const toolRoutes: MetadataRoute.Sitemap = PUBLIC_TOOL_PATHS.map((path) => ({
+    url: `${BASE_URL}${path}`,
     lastModified: now,
     changeFrequency: "monthly",
     priority: 0.7,
