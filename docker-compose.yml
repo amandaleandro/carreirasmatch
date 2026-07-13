@@ -2,7 +2,14 @@ name: carreiras-match
 
 services:
   app:
-    build: .
+    build:
+      context: .
+      args:
+        # Embutidas no bundle do cliente em build time (ver Dockerfile).
+        NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY: ${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY:-}
+        NEXT_PUBLIC_SENTRY_DSN: ${NEXT_PUBLIC_SENTRY_DSN:-}
+        NEXT_PUBLIC_PLAUSIBLE_DOMAIN: ${NEXT_PUBLIC_PLAUSIBLE_DOMAIN:-}
+        NEXT_PUBLIC_PLAUSIBLE_SRC: ${NEXT_PUBLIC_PLAUSIBLE_SRC:-}
     container_name: carreiras-match-app
     restart: unless-stopped
     environment:

@@ -20,6 +20,18 @@ FROM mcr.microsoft.com/playwright:v1.61.1-noble AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Variáveis NEXT_PUBLIC_* são embutidas no bundle do cliente em BUILD time.
+# Como o .env é dockerignore, elas precisam chegar como build args (passados
+# pelo docker-compose a partir do .env da VPS). Sem elas, ficam vazias no
+# navegador (Sentry client inerte, chave do Mercado Pago ausente no brick).
+ARG NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
+ARG NEXT_PUBLIC_SENTRY_DSN
+ARG NEXT_PUBLIC_PLAUSIBLE_DOMAIN
+ARG NEXT_PUBLIC_PLAUSIBLE_SRC
+ENV NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=$NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY \
+    NEXT_PUBLIC_SENTRY_DSN=$NEXT_PUBLIC_SENTRY_DSN \
+    NEXT_PUBLIC_PLAUSIBLE_DOMAIN=$NEXT_PUBLIC_PLAUSIBLE_DOMAIN \
+    NEXT_PUBLIC_PLAUSIBLE_SRC=$NEXT_PUBLIC_PLAUSIBLE_SRC
 RUN npx prisma generate
 RUN npm run build
 
