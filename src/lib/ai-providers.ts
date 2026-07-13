@@ -5,9 +5,9 @@ import OpenAI from "openai";
  * API OpenAI (mesmo formato de chat.completions), então usamos um único cliente
  * e só trocamos baseURL / apiKey / model.
  *
- * Um endpoint só entra na rotação se a chave dele estiver setada. A cada
- * requisição a ordem é rotacionada (round-robin) para espalhar o uso entre os
- * provedores, e, se um falhar (limite, erro), a chamada cai para o próximo
+ * Um endpoint só entra na fila se a chave dele estiver setada. Os provedores são
+ * tentados por PRIORIDADE (a ordem do registro abaixo, Groq primeiro por ser o
+ * mais rápido); se um falhar (limite, erro), a chamada cai para o próximo
  * automaticamente. Cada resultado é logado com provedor/modelo/tempo para dar
  * pra comparar qual é o melhor.
  *
@@ -86,10 +86,6 @@ function clientFor(e: AiEndpoint): OpenAI {
   return c;
 }
 
-// Contador de rotação (round-robin), em memória, por instância. Espalha o
-// ponto de partida entre requisições para não sobrecarregar sempre o mesmo.
-let rotationCounter = 0;
-
 function statusOf(err: unknown): string {
   if (err && typeof err === "object" && "status" in err) return String((err as { status: unknown }).status);
   return err instanceof Error ? err.message.slice(0, 80) : "erro";
@@ -115,9 +111,9 @@ function extractJson(raw: string): string {
 }
 
 /**
- * Executa um prompt JSON tentando os provedores configurados em ordem
- * rotacionada; cai para o próximo em qualquer falha. Retorna o conteúdo bruto
- * (string JSON). Lança se todos falharem ou se nenhum provedor estiver configurado.
+ * Executa um prompt JSON tentando os provedores configurados por prioridade
+ * (ordem do registro); cai para o próximo em qualquer falha. Retorna o conteúdo
+ * bruto (string JSON). Lança se todos falharem ou se nenhum estiver configurado.
  */
 export async function runJsonAcrossProviders(
   systemPrompt: string,
@@ -134,8 +130,9 @@ export async function runJsonAcrossProviders(
   // Regra global de estilo: nada de travessão/meia-risca (cara de texto de IA).
   const systemWithStyle = `${systemPrompt}\n\nESTILO: escreva em português natural. NUNCA use travessão (—) nem meia-risca (–); use vírgula, ponto, dois-pontos ou parênteses no lugar.`;
 
-  const start = rotationCounter++ % endpoints.length;
-  const ordered = [...endpoints.slice(start), ...endpoints.slice(0, start)];
+  // Prioridade: tenta sempre na ordem do registro (Groq primeiro, que é o mais
+  // rápido) e só cai para o próximo provedor se o atual falhar.
+  const ordered = endpoints;
 
   let lastErr: unknown;
   for (const e of ordered) {
