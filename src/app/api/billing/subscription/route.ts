@@ -4,6 +4,7 @@ import { applyCoupon, registerCouponUsage } from "@/lib/coupons";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { isCareerSegment, normalizeCareerSegment } from "@/lib/career-segments";
 import { isValidEmail, normalizeEmail } from "@/lib/email";
+import { sendSubscriptionConfirmationEmail } from "@/lib/resend";
 import { createPreapproval } from "@/lib/mercadopago";
 import { parseBRLToCents } from "@/lib/pricing";
 import { NextRequest, NextResponse } from "next/server";
@@ -105,6 +106,9 @@ export async function POST(req: NextRequest) {
       update: { segment, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
     });
     await registerCouponUsage(couponId);
+    // E-mail no caminho síncrono (assinatura autorizada na hora). No caminho
+    // assíncrono o e-mail sai no webhook, com guard para não duplicar.
+    void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
   }
 
   return NextResponse.json({
