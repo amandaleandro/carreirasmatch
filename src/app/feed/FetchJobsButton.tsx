@@ -21,7 +21,9 @@ export function FetchJobsButton() {
           ? `${data.added} nova(s) vaga(s) adicionada(s) ao feed.`
           : "Nenhuma vaga nova encontrada no momento.";
       const errorNote =
-        data.errors?.length > 0 ? ` (falha em: ${data.errors.join("; ")})` : "";
+        data.errors?.length > 0
+          ? " Algumas fontes externas ficaram indisponíveis e foram puladas."
+          : "";
       setMessage(summary + errorNote);
       router.refresh();
     } catch (err) {

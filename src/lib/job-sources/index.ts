@@ -3,7 +3,7 @@ import { fetchArbeitnowJobs } from "./arbeitnow";
 import { fetchRemoteOkJobs } from "./remoteok";
 import { fetchAdzunaJobs, isAdzunaConfigured } from "./adzuna";
 import { fetchLinkedInJobs } from "./linkedin";
-import { fetchIndeedJobs } from "./indeed";
+import { fetchIndeedJobs, isIndeedConfigured } from "./indeed";
 import { fetchGupyJobs, isGupyConfigured } from "./gupy";
 import { fetchTheMuseJobs } from "./themuse";
 import { fetchJoobleJobs, isJoobleConfigured } from "./jooble";
@@ -12,6 +12,7 @@ import { fetchHimalayasJobs } from "./himalayas";
 import { fetchRemoteJobsOrgJobs } from "./remotejobsorg";
 import { fetchSolidesJobs, isSolidesConfigured } from "./solides";
 import { fetchJobicyJobs } from "./jobicy";
+import { fetchRemotiveJobs } from "./remotive";
 import { fetchGreenhouseJobs, isGreenhouseConfigured } from "./greenhouse";
 import { fetchLeverJobs, isLeverConfigured } from "./lever";
 import { FetchedJob, JobSearchTerms } from "./types";
@@ -20,6 +21,16 @@ export type RequestContext = {
   userIp: string;
   userAgent: string;
 };
+
+function toSourceError(sourceName: string, reason: unknown): string {
+  const message = reason instanceof Error ? reason.message : "erro desconhecido";
+
+  if (message.includes("403")) {
+    return `${sourceName}: fonte externa bloqueou a consulta`;
+  }
+
+  return `${sourceName}: ${message}`;
+}
 
 export async function fetchNewJobsFromAllSources(
   searchTerms?: JobSearchTerms,
@@ -33,12 +44,15 @@ export async function fetchNewJobsFromAllSources(
     { name: "arbeitnow", fetch: () => fetchArbeitnowJobs(filterKeywords) },
     { name: "remoteok", fetch: () => fetchRemoteOkJobs(filterKeywords) },
     { name: "linkedin", fetch: () => fetchLinkedInJobs(searchTerms) },
-    { name: "indeed", fetch: () => fetchIndeedJobs(searchTerms?.titlePt) },
     { name: "themuse", fetch: () => fetchTheMuseJobs(filterKeywords) },
     { name: "himalayas", fetch: () => fetchHimalayasJobs(filterKeywords) },
     { name: "remotejobsorg", fetch: () => fetchRemoteJobsOrgJobs(filterKeywords) },
     { name: "jobicy", fetch: () => fetchJobicyJobs(filterKeywords) },
+    { name: "remotive", fetch: () => fetchRemotiveJobs(filterKeywords) },
   ];
+  if (isIndeedConfigured()) {
+    sources.push({ name: "indeed", fetch: () => fetchIndeedJobs(searchTerms?.titlePt) });
+  }
   if (isAdzunaConfigured()) {
     sources.push({ name: "adzuna", fetch: () => fetchAdzunaJobs(searchTerms?.titlePt) });
   }
@@ -74,7 +88,7 @@ export async function fetchNewJobsFromAllSources(
         if (!candidatesByUrl.has(job.url)) candidatesByUrl.set(job.url, job);
       }
     } else {
-      errors.push(`${sources[index].name}: ${result.reason?.message ?? "erro desconhecido"}`);
+      errors.push(toSourceError(sources[index].name, result.reason));
     }
   });
 

@@ -4,15 +4,15 @@ import { useRouter } from "next/navigation";
 
 const TIER_OPTIONS = [
   { value: "all", label: "Fit score: todos" },
-  { value: "strong", label: "Fit score: 75% – 100%" },
-  { value: "medium", label: "Fit score: 50% – 74%" },
-  { value: "low", label: "Fit score: 0% – 49%" },
+  { value: "strong", label: "Fit score: 75% - 100%" },
+  { value: "medium", label: "Fit score: 50% - 74%" },
+  { value: "low", label: "Fit score: 0% - 49%" },
 ];
 
 const SORT_OPTIONS = [
   { value: "fit", label: "Melhores matches" },
   { value: "recent", label: "Mais recentes" },
-  { value: "salary", label: "Maior salário" },
+  { value: "salary", label: "Maior salario" },
 ];
 
 export function FeedFilters({
@@ -32,6 +32,7 @@ export function FeedFilters({
     area?: string;
     seniority?: string;
     location?: string;
+    entryLevel?: string;
     sort?: string;
   };
 }) {
@@ -42,14 +43,20 @@ export function FeedFilters({
   const area = current.area ?? "all";
   const seniority = current.seniority ?? "all";
   const location = current.location ?? "all";
+  const entryLevel = current.entryLevel ?? "all";
   const sort = current.sort ?? "fit";
 
   const hasActiveFilters =
-    tier !== "all" || workModel !== "all" || area !== "all" || seniority !== "all" || location !== "all";
+    tier !== "all" ||
+    workModel !== "all" ||
+    area !== "all" ||
+    seniority !== "all" ||
+    location !== "all" ||
+    entryLevel !== "all";
 
   function setParam(key: string, value: string) {
     const params = new URLSearchParams();
-    const next = { tier, workModel, area, seniority, location, sort, [key]: value };
+    const next = { tier, workModel, area, seniority, location, entryLevel, sort, [key]: value };
     for (const [paramKey, paramValue] of Object.entries(next)) {
       if (paramValue && paramValue !== "all") params.set(paramKey, paramValue);
     }
@@ -61,7 +68,11 @@ export function FeedFilters({
   }
 
   function toggleInternshipOnly() {
-    setParam("seniority", seniority === "Estágio" ? "all" : "Estágio");
+    setParam("seniority", seniority === "Estagio" ? "all" : "Estagio");
+  }
+
+  function toggleEntryLevelOnly() {
+    setParam("entryLevel", entryLevel === "yes" ? "all" : "yes");
   }
 
   const selectClass =
@@ -76,19 +87,31 @@ export function FeedFilters({
         Filtros
       </span>
 
-      {seniorities.includes("Estágio") && (
+      {seniorities.includes("Estagio") && (
         <button
           type="button"
           onClick={toggleInternshipOnly}
           className={`rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
-            seniority === "Estágio"
+            seniority === "Estagio"
               ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
               : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-200"
           }`}
         >
-          Somente estágio
+          Somente estagio
         </button>
       )}
+
+      <button
+        type="button"
+        onClick={toggleEntryLevelOnly}
+        className={`rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
+          entryLevel === "yes"
+            ? "bg-neutral-900 text-white dark:bg-white dark:text-neutral-900"
+            : "border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-200"
+        }`}
+      >
+        Sem experiencia / entrada
+      </button>
 
       <select value={tier} onChange={(e) => setParam("tier", e.target.value)} className={selectClass}>
         {TIER_OPTIONS.map((opt) => (
@@ -98,11 +121,7 @@ export function FeedFilters({
         ))}
       </select>
 
-      <select
-        value={workModel}
-        onChange={(e) => setParam("workModel", e.target.value)}
-        className={selectClass}
-      >
+      <select value={workModel} onChange={(e) => setParam("workModel", e.target.value)} className={selectClass}>
         <option value="all">Modelo de trabalho</option>
         {workModels.map((option) => (
           <option key={option} value={option}>
@@ -112,7 +131,7 @@ export function FeedFilters({
       </select>
 
       <select value={area} onChange={(e) => setParam("area", e.target.value)} className={selectClass}>
-        <option value="all">Área</option>
+        <option value="all">Area</option>
         {areas.map((option) => (
           <option key={option} value={option}>
             {option}
@@ -120,12 +139,8 @@ export function FeedFilters({
         ))}
       </select>
 
-      <select
-        value={seniority}
-        onChange={(e) => setParam("seniority", e.target.value)}
-        className={selectClass}
-      >
-        <option value="all">Nível de senioridade</option>
+      <select value={seniority} onChange={(e) => setParam("seniority", e.target.value)} className={selectClass}>
+        <option value="all">Nivel de senioridade</option>
         {seniorities.map((option) => (
           <option key={option} value={option}>
             {option}
@@ -137,7 +152,7 @@ export function FeedFilters({
         value={location}
         onChange={(e) => setParam("location", e.target.value)}
         className={selectClass}
-        title="Vagas remotas e híbridas aparecem para qualquer localidade"
+        title="Vagas remotas e hibridas aparecem para qualquer localidade"
       >
         <option value="all">Localidade</option>
         {locations.map((option) => (
@@ -147,11 +162,7 @@ export function FeedFilters({
         ))}
       </select>
 
-      <select
-        value={sort}
-        onChange={(e) => setParam("sort", e.target.value)}
-        className={`${selectClass} ml-auto`}
-      >
+      <select value={sort} onChange={(e) => setParam("sort", e.target.value)} className={`${selectClass} ml-auto`}>
         {SORT_OPTIONS.map((opt) => (
           <option key={opt.value} value={opt.value}>
             Ordenar: {opt.label}

@@ -20,13 +20,14 @@ export type FeedMatch = {
   id: string;
   fitScore: number;
   reason: string;
-  job: {
-    id: string;
-    jobTitle: string;
-    jobText: string;
-    url: string;
-    location?: string | null;
-  };
+    job: {
+      id: string;
+      jobTitle: string;
+      jobText: string;
+      url: string;
+      source: string;
+      location?: string | null;
+    };
 };
 
 function CheckIcon({ className }: { className?: string }) {
@@ -155,7 +156,7 @@ function FeedCard({
           {match.job.jobTitle}
         </a>
         <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5 flex items-center gap-1">
-          {tags.company}
+          {tags.company} · via {match.job.source}
           <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 text-blue-500">
             <circle cx="12" cy="12" r="9" fill="currentColor" fillOpacity="0.15" />
             <path d="m8 12.3 2.6 2.6L16.5 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />

@@ -31,7 +31,14 @@ Revise esta lista manualmente antes de cada deploy.
 | `GREENHOUSE_BOARDS` | Greenhouse (lista de board tokens, ex.: `stripe,figma`) |
 | `LEVER_COMPANIES` | Lever (lista de slugs de empresa, ex.: `netflix,plaid`) |
 
-Jobicy não precisa de configuração — roda sempre, como Arbeitnow/RemoteOK.
+Jobicy e Remotive não precisam de configuração — rodam sempre, como
+Arbeitnow/RemoteOK.
+Indeed roda por padrão via scraping com Playwright. Se houver bloqueio anti-bot
+temporário, a fonte falha sozinha e o feed continua com as demais.
+Jooble exige uma chave válida e ativa; 403 significa chave inválida/sem acesso
+segundo a documentação oficial da Jooble.
+Greenhouse e Lever usam listas padrão de empresas brasileiras/remote-friendly
+quando as variáveis `GREENHOUSE_BOARDS` e `LEVER_COMPANIES` ficam vazias.
 
 ## Opcionais (blog automático)
 
@@ -39,6 +46,20 @@ Jobicy não precisa de configuração — roda sempre, como Arbeitnow/RemoteOK.
 | --- | --- | --- |
 | `BLOG_AUTOGEN_ENABLED` | Liga/desliga o scheduler de geração automática de posts (`src/instrumentation.ts` → `src/lib/blog-scheduler.ts`) | default `true`; defina `"false"` para desligar sem mudar código |
 | `BLOG_POSTS_PER_DAY` | Meta de posts gerados por dia (rodízio pelos nichos em `VOCATION_AREAS`) | default `5` |
+
+## Opcionais (feed automático de vagas)
+
+| Variável | Uso | Observação |
+| --- | --- | --- |
+| `JOB_FEED_AUTOFETCH_ENABLED` | Liga/desliga a rotina automática de busca de vagas | default `true`; defina `"false"` para desligar |
+| `JOB_FEED_RUN_TIMES` | Horários diários em `America/Sao_Paulo` | default `08:00,14:00,20:00` |
+| `JOB_FEED_QUERIES` | Termos em rodízio para a busca automática | formato `Título PT|Título EN|keyword1,keyword2;Outro PT|Outro EN|keyword` |
+| `FEED_MATCH_BATCH_SIZE` | Quantas vagas salvas são pontuadas por visita ao feed | default `20`; usa IA, então aumente com cuidado |
+
+A lista padrão local cobre vagas sem experiência/primeiro emprego e áreas
+gerais: administrativo, atendimento, vendas, marketing, RH, financeiro,
+logística, operações, saúde, educação, jurídico, engenharia, produto, design,
+tecnologia, estágio e jovem aprendiz.
 
 ## Opcionais (auth)
 

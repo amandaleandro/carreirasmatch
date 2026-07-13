@@ -4,6 +4,19 @@ import { isBrazilRelevantLocation } from "./location-filter";
 
 const BOARD_API_URL = "https://boards-api.greenhouse.io/v1/boards/{board}/jobs";
 const MAX_JOB_TEXT_LENGTH = 12000;
+const DEFAULT_BOARDS = [
+  "rdstation",
+  "arcoeducacao",
+  "xpinc",
+  "zupinnovation",
+  "capco",
+  "nubank",
+  "cloudwalk",
+  "quintoandar",
+  "hotmart",
+  "gympass",
+  "wellhub",
+];
 
 type GreenhouseJob = {
   id: number;
@@ -29,7 +42,10 @@ export function isGreenhouseConfigured(): boolean {
 }
 
 export function getGreenhouseBoards(): string[] {
-  return (process.env.GREENHOUSE_BOARDS ?? "")
+  const raw = process.env.GREENHOUSE_BOARDS;
+  if (!raw) return DEFAULT_BOARDS;
+
+  return raw
     .split(",")
     .map((board) => board.trim())
     .filter(Boolean);

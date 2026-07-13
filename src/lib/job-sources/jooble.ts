@@ -22,7 +22,7 @@ function htmlToPlainText(html: string): string {
 }
 
 export function isJoobleConfigured(): boolean {
-  return Boolean(process.env.JOOBLE_API_KEY);
+  return process.env.JOOBLE_JOBS_ENABLED !== "false" && Boolean(process.env.JOOBLE_API_KEY);
 }
 
 // API oficial de parceiro da Jooble (precisa de uma chave gratuita em
@@ -38,10 +38,16 @@ export async function fetchJoobleJobs(searchTerm?: string): Promise<FetchedJob[]
     body: JSON.stringify({
       keywords: searchTerm ?? "",
       location: "Brasil",
+      page: "1",
+      ResultOnPage: "20",
+      companysearch: "false",
     }),
     signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error("Jooble API recusou a chave configurada (403)");
+    }
     throw new Error(`Jooble API retornou erro ${response.status}`);
   }
 

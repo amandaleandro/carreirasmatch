@@ -1,15 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { compareJobs } from "@/lib/tools";
 
-const MAX_JOBS_PER_BATCH = 4;
+function jobsPerBatch(): number {
+  const raw = Number(process.env.FEED_MATCH_BATCH_SIZE);
+  return Number.isFinite(raw) && raw > 0 ? raw : 20;
+}
+
 export const FEED_PAGE_SIZE = 10;
 
 async function scoreUnscoredJobs(resumeId: string, resumeText: string) {
   const unscoredJobs = await prisma.job.findMany({
     where: { active: true, matches: { none: { resumeId } } },
-    take: MAX_JOBS_PER_BATCH,
-    // Mais antigas primeiro: evita que vagas novas cheguem em cada carregamento
-    // de página e "empurrem" vagas antigas para sempre fora do lote.
+    take: jobsPerBatch(),
     orderBy: { createdAt: "asc" },
   });
 
@@ -53,22 +55,23 @@ async function scoreUnscoredJobs(resumeId: string, resumeText: string) {
 }
 
 export async function getOrCreateFeedMatches(userId: string, resumeId: string, resumeText: string) {
-  // Pontuar vagas novas envolve uma chamada de IA, que é lenta. Isso não deve
-  // bloquear o carregamento da página: disparamos em segundo plano e servimos
-  // o feed com o que já está pontuado no banco.
-  scoreUnscoredJobs(resumeId, resumeText).catch((error) => {
-    console.error("Falha ao pontuar vagas no feed:", error);
-  });
+  async function findMatches() {
+    return prisma.jobMatch.findMany({
+      where: { resume: { userId }, status: { not: "discarded" } },
+      orderBy: { createdAt: "desc" },
+      include: { job: true },
+    });
+  }
 
-  // Um usuário pode ter mais de um Resume (um por diagnóstico refeito). As
-  // vagas combinadas ficam presas ao resumeId, então buscamos por todos os
-  // currículos do usuário para não perder o histórico de matches ao refazer
-  // o diagnóstico.
-  const matches = await prisma.jobMatch.findMany({
-    where: { resume: { userId }, status: { not: "discarded" } },
-    orderBy: { createdAt: "desc" },
-    include: { job: true },
-  });
+  let matches = await findMatches();
+  if (matches.length === 0) {
+    await scoreUnscoredJobs(resumeId, resumeText);
+    matches = await findMatches();
+  } else {
+    scoreUnscoredJobs(resumeId, resumeText).catch((error) => {
+      console.error("Falha ao pontuar vagas no feed:", error);
+    });
+  }
 
   const seenJobIds = new Set<string>();
   const deduped = [];

@@ -4,6 +4,18 @@ import { isBrazilRelevantLocation } from "./location-filter";
 
 const POSTINGS_API_URL = "https://api.lever.co/v0/postings/{company}";
 const MAX_JOB_TEXT_LENGTH = 12000;
+const DEFAULT_COMPANIES = [
+  "ciandt",
+  "flashapp",
+  "unico",
+  "bv",
+  "neon",
+  "loadsmart",
+  "wildlife",
+  "pipefy",
+  "ebanx",
+  "olist",
+];
 
 type LeverPosting = {
   id: string;
@@ -25,7 +37,10 @@ export function isLeverConfigured(): boolean {
 }
 
 export function getLeverCompanies(): string[] {
-  return (process.env.LEVER_COMPANIES ?? "")
+  const raw = process.env.LEVER_COMPANIES;
+  if (!raw) return DEFAULT_COMPANIES;
+
+  return raw
     .split(",")
     .map((company) => company.trim())
     .filter(Boolean);

@@ -11,7 +11,7 @@ export const TIER_LABEL: Record<FeedTier, string> = {
   excellent: "Excelente match",
   good: "Bom match",
   medium: "Match mediano",
-  low: "Baixa aderência",
+  low: "Baixa aderencia",
 };
 
 export const TIER_RING_COLOR: Record<FeedTier, string> = {
@@ -36,16 +36,19 @@ export const TIER_ICON_BG: Record<FeedTier, string> = {
 };
 
 const SENIORITY_PATTERNS: [RegExp, string][] = [
-  [/est[aá]gi[oá]|estagi[aá]rio/i, "Estágio"],
-  [/j[uú]nior|jr\.?\b/i, "Júnior"],
+  [/sem experi[eê]ncia|sem experiencia|n[aã]o exige experi[eê]ncia|nao exige experiencia|primeir[oa] emprego|entrada|entry[- ]?level|aprendiz|jovem aprendiz/i, "Sem experiencia"],
+  [/est[aá]gi[oá]|estagi[aá]rio|trainee/i, "Estagio"],
+  [/j[uú]nior|jr\.?\b/i, "Junior"],
   [/pleno/i, "Pleno"],
-  [/s[eê]nior|sr\.?\b/i, "Sênior"],
+  [/s[eê]nior|sr\.?\b/i, "Senior"],
   [/especialista|principal|staff/i, "Especialista"],
 ];
 
+export const ENTRY_LEVEL_SENIORITIES = new Set(["Sem experiencia", "Estagio", "Junior"]);
+
 const WORK_MODEL_PATTERNS: [RegExp, string][] = [
   [/remot[oa]/i, "Remoto"],
-  [/h[ií]brid[oa]/i, "Híbrido"],
+  [/h[ií]brid[oa]/i, "Hibrido"],
   [/presencial/i, "Presencial"],
 ];
 
@@ -56,6 +59,11 @@ const AREA_PATTERNS: [RegExp, string][] = [
   [/recursos humanos|\brh\b|people ?ops|gente e gest[aã]o/i, "RH"],
   [/vendas|comercial/i, "Vendas"],
   [/financeiro|finan[cç]as/i, "Financeiro"],
+  [/log[ií]stica|estoque|expedi[cç][aã]o/i, "Logistica"],
+  [/administra[cç][aã]o|administrativo|escrit[oó]rio/i, "Administrativo"],
+  [/educa[cç][aã]o|professor|ensino/i, "Educacao"],
+  [/sa[uú]de|enfermagem|hospital|farm[aá]cia/i, "Saude"],
+  [/jur[ií]dico|advogado|contratos/i, "Juridico"],
   [/design/i, "Design"],
   [/desenvolvedor|engenheiro de software|programador|sistemas|\bti\b|tecnologia/i, "Tecnologia"],
 ];
@@ -122,13 +130,42 @@ export function deriveJobTags(job: {
   };
 }
 
-// Vagas remotas ou híbridas não ficam presas a uma cidade específica — devem
-// aparecer independente do filtro de localidade selecionado.
+export function isEntryLevelJob(job: {
+  jobTitle: string;
+  jobText: string;
+  url: string;
+  location?: string | null;
+}): boolean {
+  const tags = deriveJobTags(job);
+  if (tags.seniority && ENTRY_LEVEL_SENIORITIES.has(tags.seniority)) return true;
+
+  const haystack = `${job.jobTitle} ${job.jobText}`.toLowerCase();
+  return [
+    "sem experiência",
+    "sem experiencia",
+    "não exige experiência",
+    "nao exige experiencia",
+    "primeiro emprego",
+    "primeira experiência",
+    "primeira experiencia",
+    "jovem aprendiz",
+    "aprendiz",
+    "estágio",
+    "estagio",
+    "estagiário",
+    "estagiario",
+    "trainee",
+    "entry level",
+    "entry-level",
+  ].some((term) => haystack.includes(term));
+}
+
 export function bypassesLocationFilter(workModel?: string): boolean {
-  return workModel === "Remoto" || workModel === "Híbrido";
+  return workModel === "Remoto" || workModel === "Hibrido";
 }
 
 const NEGATIVE_HINTS = [
+  "nao",
   "não",
   "falta",
   "menor",
@@ -139,6 +176,7 @@ const NEGATIVE_HINTS = [
   "sem ",
   "distante",
   "desalinh",
+  "nao alinhad",
   "não alinhad",
 ];
 

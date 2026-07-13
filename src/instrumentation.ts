@@ -6,10 +6,16 @@ export async function register() {
   initSentry("server");
 
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
-  if (process.env.BLOG_AUTOGEN_ENABLED === "false") return;
 
-  const { startBlogScheduler } = await import("@/lib/blog-scheduler");
-  startBlogScheduler();
+  if (process.env.BLOG_AUTOGEN_ENABLED !== "false") {
+    const { startBlogScheduler } = await import("@/lib/blog-scheduler");
+    startBlogScheduler();
+  }
+
+  if (process.env.JOB_FEED_AUTOFETCH_ENABLED !== "false") {
+    const { startJobFeedScheduler } = await import("@/lib/job-feed-scheduler");
+    startJobFeedScheduler();
+  }
 }
 
 // Reporta erros de renderização/rotas server ao Sentry (no-op sem DSN).

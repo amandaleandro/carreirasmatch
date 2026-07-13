@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateFeedMatches, FEED_PAGE_SIZE } from "@/lib/job-feed";
 import { CareerTrack } from "@/components/analysis-display";
-import { deriveJobTags, tierFromScore, bypassesLocationFilter } from "@/lib/feed-tags";
+import { deriveJobTags, tierFromScore, bypassesLocationFilter, isEntryLevelJob } from "@/lib/feed-tags";
 import { FeedList } from "./FeedList";
 import { AddJobForm } from "./AddJobForm";
 import { FetchJobsButton } from "./FetchJobsButton";
@@ -73,6 +73,7 @@ export default async function FeedPage({
     area?: string;
     seniority?: string;
     location?: string;
+    entryLevel?: string;
     sort?: string;
   }>;
 }) {
@@ -139,6 +140,7 @@ export default async function FeedPage({
   if (params.workModel) filtered = filtered.filter((e) => e.tags.workModel === params.workModel);
   if (params.area) filtered = filtered.filter((e) => e.tags.area === params.area);
   if (params.seniority) filtered = filtered.filter((e) => e.tags.seniority === params.seniority);
+  if (params.entryLevel === "yes") filtered = filtered.filter((e) => isEntryLevelJob(e.match.job));
   if (params.location) {
     filtered = filtered.filter(
       (e) => bypassesLocationFilter(e.tags.workModel) || e.tags.location === params.location
@@ -257,6 +259,7 @@ export default async function FeedPage({
           area: params.area,
           seniority: params.seniority,
           location: params.location,
+          entryLevel: params.entryLevel,
           sort: params.sort,
         }}
       />
