@@ -24,23 +24,52 @@ passando, build de produção completo).
   formulário de cadastro (`/register`).
 - [x] README.md, `docs/ARCHITECTURE.md` e `docs/ENV.md` recriados.
 
+## ✅ Adicionado na revisão de produto (2026-07-13)
+
+- [x] **SEO**: `/sitemap.xml` e `/robots.txt` gerados automaticamente
+  (`src/app/sitemap.ts`, `src/app/robots.ts`) — cobrem landing, ferramentas
+  e posts do blog; áreas logadas e `/api` ficam fora da indexação. Corrigido
+  também `<html lang>` de `en` para `pt-BR`.
+- [x] **Analytics de funil** (Plausible, privacy-first / sem banner de
+  cookies): camada `track()` em `src/lib/analytics.ts` + `Analytics` no
+  layout, com eventos nos passos-chave (análise iniciada/concluída, lead
+  capturado, unlock, pagamento confirmado, assinatura, cadastro). Inerte sem
+  `NEXT_PUBLIC_PLAUSIBLE_DOMAIN`.
+- [x] **E-mails transacionais** (Resend): boas-vindas no cadastro,
+  confirmação de pagamento avulso e de assinatura (disparados no webhook, só
+  na transição para pago). `src/lib/resend.ts`.
+- [x] **Monitoramento de erros** (Sentry): `src/lib/sentry-init.ts` +
+  `instrumentation.ts` / `instrumentation-client.ts`. Inerte sem
+  `SENTRY_DSN`. Não usa o plugin de build (não sobe source maps — stack
+  traces vêm minificadas até configurarem isso depois).
+
+> Verificado: type-check limpo, lint só com os warnings pré-existentes,
+> 60/60 testes e build de produção completos.
+
 ## 🔴 Só o usuário pode resolver — bloqueia aceitar pagamento real
 
-- [ ] **Configurar `MERCADOPAGO_WEBHOOK_SECRET` com o valor real** do
-  painel do Mercado Pago (Sua integração → Webhooks → Assinatura
-  secreta). Hoje é o placeholder `"..."` em `.env`. Com esse valor
-  errado, `src/lib/webhook-secret.ts` rejeita (401) **todo** webhook real
-  — nenhum pagamento/assinatura é confirmado automaticamente, mesmo que o
-  cliente seja cobrado de verdade (o token é de produção, `APP_USR-...`).
-  Isso não é algo que eu possa gerar por código — precisa ser copiado do
-  painel da conta Mercado Pago.
+- [x] **`MERCADOPAGO_WEBHOOK_SECRET` preenchido** no `.env` local com um
+  valor real (64 hex, não é mais o placeholder `"..."`). Falta apenas
+  garantir que o **mesmo valor** esteja no `.env` de produção e que ele
+  corresponda exatamente ao do painel (Sua integração → Webhooks →
+  Assinatura secreta) da integração usada por este site — se a conta MP for
+  compartilhada com outro site, cada integração tem uma assinatura
+  diferente. Com valor errado, `src/lib/webhook-secret.ts` rejeita (401)
+  todo webhook e nenhum pagamento é confirmado automaticamente.
 - [ ] **Testar o fluxo completo de pagamento em produção** (Payment Brick
   → webhook → ativação de assinatura) antes de divulgar o link
   publicamente, idealmente com uma cobrança real pequena de teste, já que
-  o token não é sandbox.
+  o token não é sandbox. Este é o único passo que ainda não dá para dar
+  como concluído sem uma transação real.
 - [ ] Confirmar que `ADMIN_EMAILS` está definido corretamente no ambiente
   de produção (não só local) — não consigo verificar isso de dentro do
   código sem ver o `.env` de produção.
+- [ ] **Ligar analytics/Sentry (opcional mas recomendado no dia 1)**:
+  preencher `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` e `SENTRY_DSN` /
+  `NEXT_PUBLIC_SENTRY_DSN` em produção. Sem eles, os recursos ficam inertes.
+  Como `NEXT_PUBLIC_*` são embutidas no build (mesmo caso do
+  `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY`), garanta que estejam presentes no
+  ambiente onde o `npm run build` roda — não só em runtime.
 
 ## 🟡 Importante, mas não impede o lançamento de amanhã
 

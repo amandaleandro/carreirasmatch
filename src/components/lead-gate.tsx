@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 const LEAD_STORAGE_KEY = "carreiramatch:lead-contact";
 
@@ -68,6 +69,7 @@ export function LeadGate({
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar seus dados.");
 
       storeLeadContact({ name: name.trim(), email: email.trim(), phone: phone.trim() });
+      track(ANALYTICS_EVENTS.LEAD_CAPTURED, { source });
       onUnlocked();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { AuthShell } from "@/components/auth-shell";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS } from "@/lib/course-catalog";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 const AREA_PROMPT_SEGMENTS: CareerSegment[] = ["internship", "student"];
 
@@ -54,6 +55,7 @@ export default function RegisterPage() {
         throw new Error("Cadastro feito, mas não foi possível entrar automaticamente.");
       }
 
+      track(ANALYTICS_EVENTS.SIGNUP_COMPLETED, { careerSegment: careerSegment || "unknown" });
       router.push("/dashboard");
       router.refresh();
     } catch (err) {

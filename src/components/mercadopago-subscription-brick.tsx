@@ -8,6 +8,7 @@ import {
   createCardToken,
   initMercadoPago,
 } from "@mercadopago/sdk-react";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 let initialized = false;
 function ensureInitialized() {
@@ -116,6 +117,7 @@ export function MercadoPagoSubscriptionBrick({
       if (!res.ok) throw new Error(data.error ?? "Erro ao processar assinatura.");
 
       if (data.status === "authorized") {
+        track(ANALYTICS_EVENTS.SUBSCRIPTION_STARTED, { segment: segment ?? "unknown" });
         onSuccess(data.registerUrl);
       } else {
         setError("Assinatura pendente de confirmação. Você será avisado quando for ativada.");

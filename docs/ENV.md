@@ -48,6 +48,19 @@ Jobicy não precisa de configuração — roda sempre, como Arbeitnow/RemoteOK.
 | `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) — crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
 | `RESEND_FROM_EMAIL` | Remetente do e-mail de redefinição de senha. Sem ela, usa `onboarding@resend.dev` (domínio de teste do Resend, funciona mas identifica menos a marca). Para usar um remetente `@carreirasmatch.com.br`, é preciso verificar o domínio no painel do Resend primeiro. |
 
+## Opcionais (analytics e monitoramento)
+
+| Variável | Uso | Observação |
+|---|---|---|
+| `NEXT_PUBLIC_PLAUSIBLE_DOMAIN` | Liga o Plausible Analytics de funil (`src/components/analytics.tsx`, `src/lib/analytics.ts`) | Sem ela, nenhum script carrega e `track()` vira no-op. Plausible é sem cookies, então não exige banner de consentimento. |
+| `NEXT_PUBLIC_PLAUSIBLE_SRC` | URL do script do Plausible | Opcional; default `https://plausible.io/js/script.tagged-events.js`. Troque se auto-hospedar. |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | Monitoramento de erros server / client (`src/lib/sentry-init.ts`, `src/instrumentation.ts`, `src/instrumentation-client.ts`) | Sem elas, o Sentry fica inerte. Só envia em produção. Não usamos o plugin de build do Sentry, então source maps não sobem automaticamente (stack traces vêm minificadas). |
+| `SENTRY_TRACES_SAMPLE_RATE` | Amostragem de tracing de performance (0 a 1) | Default `0` (sem tracing, só erros). |
+
+> SEO: `/sitemap.xml` e `/robots.txt` são gerados automaticamente
+> (`src/app/sitemap.ts`, `src/app/robots.ts`) usando `APP_URL` como base. Não
+> precisam de env var própria além de `APP_URL`.
+
 ## Docker Compose
 
 `docker-compose.yml` hoje repassa: `GROQ_API_KEY`, `DATABASE_URL`,

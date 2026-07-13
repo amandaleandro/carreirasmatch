@@ -200,7 +200,15 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
 - **Pagamento avulso** (`POST /api/billing/payment`, Payment Brick):
   para `first_analysis` (desbloqueio da primeira análise) ou
   `diagnostic` (desbloqueio de diagnóstico de uma análise específica),
-  com suporte a cupom de desconto.
+  com suporte a cupom de desconto. **Funciona sem login** (mesmo padrão da
+  assinatura): o visitante paga com e-mail, a conta é criada/recuperada por
+  e-mail e ele é levado a `/register?email=…` para definir a senha. No
+  diagnóstico anônimo, a análise só pode ser desbloqueada se estiver **sem
+  dono** (`resume.userId == null`) — e nesse caso é reivindicada para o
+  usuário ao confirmar o pagamento (síncrono no cartão, via webhook no PIX);
+  análise já pertencente a uma conta exige login. Preço do avulso é uniforme
+  entre segmentos, então o segmento default do fluxo anônimo não altera o
+  valor cobrado.
 - **Assinatura recorrente** (`POST /api/billing/subscription`,
   Preapproval/Subscription Brick): cria `Subscription` vinculada ao
   usuário (1:1), com `currentPeriodEnd` e status.

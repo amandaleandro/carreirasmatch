@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isCareerSegment } from "@/lib/career-segments";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { isValidEmail, normalizeEmail } from "@/lib/email";
+import { sendWelcomeEmail } from "@/lib/resend";
 
 const REGISTER_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
@@ -60,6 +61,8 @@ export async function POST(req: NextRequest) {
       await prisma.user.update({ where: { id: existing.id }, data });
     } else {
       await prisma.user.create({ data: { ...data, email: normalizedEmail } });
+      // Fire-and-forget: nunca bloqueia o cadastro se o e-mail falhar.
+      void sendWelcomeEmail(normalizedEmail, data.name);
     }
 
     return NextResponse.json({ ok: true });

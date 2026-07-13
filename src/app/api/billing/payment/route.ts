@@ -1,17 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/require-auth";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { createPayment } from "@/lib/mercadopago";
 import { parseBRLToCents } from "@/lib/pricing";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
-import { normalizeCareerSegment } from "@/lib/career-segments";
+import { isCareerSegment, normalizeCareerSegment } from "@/lib/career-segments";
+import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { applyCoupon, registerCouponUsage } from "@/lib/coupons";
 
-export async function POST(req: NextRequest) {
-  const { session, response } = await requireAuth();
-  if (!session) return response!;
+// Segmento default para pagamento avulso sem login. O preço do avulso
+// (first_analysis/diagnostic) é uniforme entre todos os segmentos, então esse
+// default nunca muda o valor cobrado — só rotula o Payment enquanto o usuário
+// não escolhe o segmento real no cadastro.
+const DEFAULT_ANON_SEGMENT = "career_pro";
 
-  const { kind, analysisId, formData, couponCode } = await req.json();
+export async function POST(req: NextRequest) {
+  const session = await auth();
+  const { kind, analysisId, formData, couponCode, segment: requestedSegment } = await req.json();
+
   if (kind !== "first_analysis" && kind !== "diagnostic") {
     return NextResponse.json({ error: "Tipo de cobrança inválido." }, { status: 400 });
   }
@@ -19,30 +25,63 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Dados de pagamento ausentes." }, { status: 400 });
   }
 
+  const isLoggedIn = Boolean(session?.user?.id);
+
+  // Diagnóstico desbloqueia uma análise específica: valida existência e posse.
+  // - Logado: precisa ser dono da análise.
+  // - Anônimo: a análise precisa estar SEM dono (pode reivindicá-la ao pagar).
+  let analysisRecord: { resumeId: string; resume: { userId: string | null } } | null = null;
   if (kind === "diagnostic") {
     if (typeof analysisId !== "string" || !analysisId) {
       return NextResponse.json({ error: "Análise não informada." }, { status: 400 });
     }
-    const analysis = await prisma.analysis.findUnique({
+    analysisRecord = await prisma.analysis.findUnique({
       where: { id: analysisId },
-      include: { resume: true },
+      select: { resumeId: true, resume: { select: { userId: true } } },
     });
-    if (!analysis || analysis.resume.userId !== session.user.id) {
+    if (!analysisRecord) {
       return NextResponse.json({ error: "Análise não encontrada." }, { status: 404 });
+    }
+    if (isLoggedIn) {
+      if (analysisRecord.resume.userId !== session!.user.id) {
+        return NextResponse.json({ error: "Análise não encontrada." }, { status: 404 });
+      }
+    } else if (analysisRecord.resume.userId) {
+      // Já pertence a uma conta — não dá para desbloquear anonimamente.
+      return NextResponse.json(
+        { error: "Faça login para desbloquear esta análise." },
+        { status: 401 }
+      );
     }
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { careerSegment: true },
-  });
-
-  const segment = normalizeCareerSegment(user?.careerSegment);
-  if (!segment) {
+  const email = normalizeEmail(session?.user?.email ?? formData.payer?.email);
+  if (!isValidEmail(email)) {
     return NextResponse.json(
-      { error: "Defina seu momento de carreira em Perfil antes de continuar." },
+      { error: "Informe um e-mail válido para continuar." },
       { status: 400 }
     );
+  }
+
+  let userId = session?.user?.id ?? null;
+  const existingUser = userId
+    ? await prisma.user.findUnique({ where: { id: userId }, select: { careerSegment: true } })
+    : await prisma.user.findUnique({ where: { email }, select: { id: true, careerSegment: true } });
+
+  const segment =
+    normalizeCareerSegment(existingUser?.careerSegment) ??
+    (typeof requestedSegment === "string" && isCareerSegment(requestedSegment) ? requestedSegment : null) ??
+    DEFAULT_ANON_SEGMENT;
+
+  // Cria/recupera o usuário pelo e-mail quando anônimo (mesmo padrão da assinatura).
+  if (!userId) {
+    const user = await prisma.user.upsert({
+      where: { email },
+      create: { email, careerSegment: segment },
+      update: { careerSegment: existingUser?.careerSegment ? undefined : segment },
+      select: { id: true },
+    });
+    userId = user.id;
   }
 
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
@@ -63,11 +102,6 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-  }
-
-  const payerEmail = formData.payer?.email ?? session.user.email;
-  if (!payerEmail) {
-    return NextResponse.json({ error: "E-mail do usuário não encontrado." }, { status: 400 });
   }
 
   const payerIdentification =
@@ -91,9 +125,9 @@ export async function POST(req: NextRequest) {
           ? Number(formData.issuer_id)
           : undefined,
       installments: typeof formData.installments === "number" ? formData.installments : undefined,
-      payerEmail,
+      payerEmail: email,
       payerIdentification,
-      externalReference: `${session.user.id}:${kind}`,
+      externalReference: `${userId}:${kind}`,
     });
   } catch (err) {
     return NextResponse.json(
@@ -106,7 +140,7 @@ export async function POST(req: NextRequest) {
 
   await prisma.payment.create({
     data: {
-      userId: session.user.id,
+      userId,
       kind,
       segment,
       amount: amountCents,
@@ -120,11 +154,18 @@ export async function POST(req: NextRequest) {
 
   if (status === "paid") {
     await registerCouponUsage(couponId);
+    // Aprovação síncrona (cartão): reivindica a análise sem dono para o usuário,
+    // senão ele não conseguiria vê-la em /report após o cadastro. Para PIX
+    // (pending), isso acontece no webhook quando o pagamento confirma.
+    if (kind === "diagnostic" && analysisRecord && analysisRecord.resume.userId == null) {
+      await prisma.resume.update({ where: { id: analysisRecord.resumeId }, data: { userId } });
+    }
   }
 
   return NextResponse.json({
     status: result.status,
     statusDetail: result.statusDetail,
     pix: result.pix,
+    ...(isLoggedIn ? {} : { registerUrl: `/register?email=${encodeURIComponent(email)}` }),
   });
 }

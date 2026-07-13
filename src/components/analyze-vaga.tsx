@@ -12,6 +12,7 @@ import {
 import { AnalysisTeaser } from "@/lib/analysis-teaser";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
 import { LeadGate, getStoredLeadContact } from "@/components/lead-gate";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 type AnalysisWithId =
   | ({ id: string; unlocked: true; diagnosticPrice: string; loggedIn: boolean } & Analysis)
@@ -300,6 +301,7 @@ export function AnalyzeVagaPage({
 
     setLoading(true);
     setResult(null);
+    track(ANALYTICS_EVENTS.ANALYSIS_STARTED, { careerTrack });
 
     try {
       const finalJobText = jobLink.trim()
@@ -328,6 +330,7 @@ export function AnalyzeVagaPage({
       setResult(data as AnalysisWithId);
       setResultTrack(careerTrack);
       setResultJobTitle(jobTitle);
+      track(ANALYTICS_EVENTS.ANALYSIS_COMPLETED, { careerTrack });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
@@ -375,12 +378,18 @@ export function AnalyzeVagaPage({
               <p className="text-sm text-neutral-600 dark:text-neutral-400">
                 Score detalhado, palavras-chave, currículo otimizado, plano de estudo, perguntas de entrevista e mensagem pronta para o recrutador.
               </p>
-              <a
-                href="/register"
-                className="inline-flex w-full sm:w-auto items-center justify-center rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
-              >
-                {`Criar conta grátis e desbloquear por ${result.diagnosticPrice}`}
-              </a>
+              <UnlockDiagnosticButton
+                analysisId={result.id}
+                price={result.diagnosticPrice}
+                payerEmail={getStoredLeadContact()?.email}
+              />
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Sem cadastro prévio: você paga e cria sua conta em seguida para acessar. Já tem conta?{" "}
+                <a href="/login" className="font-semibold text-blue-600 dark:text-blue-400 underline">
+                  Entrar
+                </a>
+                .
+              </p>
             </div>
           </SimpleFitTeaser>
         ) : (

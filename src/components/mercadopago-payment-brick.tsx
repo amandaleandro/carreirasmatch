@@ -20,6 +20,7 @@ export function MercadoPagoPaymentBrick({
   analysisId,
   payerEmail,
   couponCode,
+  segment,
   onSuccess,
 }: {
   amount: number;
@@ -27,10 +28,12 @@ export function MercadoPagoPaymentBrick({
   analysisId?: string;
   payerEmail?: string;
   couponCode?: string;
+  segment?: string;
   onSuccess: () => void;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [pix, setPix] = useState<PixResult>(null);
+  const [registerUrl, setRegisterUrl] = useState<string | null>(null);
 
   useEffect(() => {
     ensureInitialized();
@@ -55,6 +58,15 @@ export function MercadoPagoPaymentBrick({
         <p className="text-xs text-neutral-500 dark:text-neutral-400">
           Após o pagamento, a liberação acontece automaticamente em alguns instantes.
         </p>
+        {registerUrl && (
+          <p className="text-xs text-neutral-600 dark:text-neutral-400">
+            Depois de pagar,{" "}
+            <a href={registerUrl} className="font-semibold text-blue-600 dark:text-blue-400 underline">
+              crie sua conta com o mesmo e-mail
+            </a>{" "}
+            para acessar o diagnóstico.
+          </p>
+        )}
       </div>
     );
   }
@@ -72,15 +84,21 @@ export function MercadoPagoPaymentBrick({
             const res = await fetch("/api/billing/payment", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ kind, analysisId, formData, couponCode }),
+              body: JSON.stringify({ kind, analysisId, formData, couponCode, segment }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error ?? "Erro ao processar pagamento.");
 
             if (data.pix) {
+              setRegisterUrl(data.registerUrl ?? null);
               setPix(data.pix);
             } else if (data.status === "approved") {
-              onSuccess();
+              // Anônimo: manda definir a senha (a conta já foi criada). Logado: callback normal.
+              if (data.registerUrl) {
+                window.location.href = data.registerUrl;
+              } else {
+                onSuccess();
+              }
             } else if (data.status === "rejected") {
               setError("Pagamento recusado. Tente outro cartão.");
             } else {
