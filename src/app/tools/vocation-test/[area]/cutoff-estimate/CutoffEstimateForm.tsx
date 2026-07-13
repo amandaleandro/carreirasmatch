@@ -36,7 +36,7 @@ function ResultView({ result }: { result: CutoffEstimateResult }) {
         </ul>
       </div>
       <p className="text-xs text-neutral-500 italic">
-        Estimativa aproximada — notas de corte reais variam por instituição, campus, turno e ano.
+        Estimativa aproximada, notas de corte reais variam por instituição, campus, turno e ano.
       </p>
     </div>
   );
@@ -92,7 +92,7 @@ export function CutoffEstimateForm({ area }: { area: VocationAreaConfig }) {
       </Link>
       <header className="mt-4 mb-10">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Chance no SISU — {area.label}
+          Chance no SISU, {area.label}
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Informe sua nota (real ou estimada) e veja uma comparação aproximada com a

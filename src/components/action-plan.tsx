@@ -172,7 +172,7 @@ export function ActionPlan({
       title: `Candidatar-se a vagas alinhadas`,
       description:
         applyNowCount > 0
-          ? `Você já tem ${applyNowCount} vaga(s) com aderência alta — aplique agora.`
+          ? `Você já tem ${applyNowCount} vaga(s) com aderência alta, aplique agora.`
           : "Aplique e acompanhe o progresso das suas candidaturas.",
     },
   ];

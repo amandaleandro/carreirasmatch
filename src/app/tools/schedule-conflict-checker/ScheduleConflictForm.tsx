@@ -185,7 +185,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
       <section className="mt-10 space-y-4">
         <h2 className="font-semibold text-lg">Horários do estágio sendo avaliado</h2>
         <p className="text-sm text-neutral-500">
-          Não precisa salvar — é só para checar contra sua grade de aulas.
+          Não precisa salvar, é só para checar contra sua grade de aulas.
         </p>
         {internshipBlocks.map((block, i) => (
           <div key={i} className="grid grid-cols-2 sm:grid-cols-4 gap-2 items-end">

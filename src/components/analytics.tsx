@@ -6,7 +6,7 @@ import Script from "next/script";
  * banner de cookies, já que o Plausible é sem cookies / privacy-first).
  *
  * `script.tagged-events.js` habilita eventos customizados via window.plausible()
- * — ver src/lib/analytics.ts.
+ *, ver src/lib/analytics.ts.
  */
 export function Analytics() {
   const domain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;

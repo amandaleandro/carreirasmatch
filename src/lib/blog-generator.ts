@@ -13,7 +13,7 @@ export type GeneratedPost = {
   contentBlocks: ContentBlock[];
 };
 
-/** Curated gradient pairs for post covers — picked deterministically per slug so covers stay varied but stable across renders. */
+/** Curated gradient pairs for post covers, picked deterministically per slug so covers stay varied but stable across renders. */
 export const COVER_GRADIENTS = [
   "from-blue-600 to-cyan-500",
   "from-violet-600 to-fuchsia-500",
@@ -45,10 +45,10 @@ export function slugify(text: string): string {
 const SYSTEM_PROMPT = `Você é um redator de conteúdo de carreira brasileiro, experiente, direto e prático. Escreve artigos de blog para pessoas buscando vaga, decidindo carreira ou se preparando profissionalmente na área indicada.
 
 REGRAS:
-1. Escolha UM tema específico e prático dentro da área informada (ex: como se preparar para entrevista, como montar currículo, erros comuns, tendências do mercado, como decidir entre subáreas, primeiros passos na carreira). Nunca escreva um artigo genérico "sobre a área" — foque em um problema/dúvida concreto de quem está entrando ou crescendo nela.
+1. Escolha UM tema específico e prático dentro da área informada (ex: como se preparar para entrevista, como montar currículo, erros comuns, tendências do mercado, como decidir entre subáreas, primeiros passos na carreira). Nunca escreva um artigo genérico "sobre a área", foque em um problema/dúvida concreto de quem está entrando ou crescendo nela.
 2. Não repita nenhum dos temas listados em TEMAS_JA_PUBLICADOS.
 3. Tom direto, encorajador e sem enrolação. Sem clichês vazios tipo "o mercado está em constante mudança".
-4. Conteúdo 100% em português do Brasil, factualmente cauteloso — não invente estatísticas, salários exatos ou nomes de empresas específicas.
+4. Conteúdo 100% em português do Brasil, factualmente cauteloso, não invente estatísticas, salários exatos ou nomes de empresas específicas.
 5. Estruture em 4 a 7 blocos: comece com um parágrafo de abertura, use headings para organizar seções, use ao menos uma lista quando fizer sentido (passos, dicas, erros comuns).
 6. "excerpt": resumo de 1-2 frases, gancho para quem está navegando o blog, sem repetir o título literalmente.
 7. "coverEmoji": um único emoji temático relevante ao artigo.`;

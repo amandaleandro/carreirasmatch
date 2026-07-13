@@ -38,7 +38,7 @@ function htmlToPlainText(html: string): string {
 }
 
 // A API pública do RemoteJobs.org não filtra de fato por palavra-chave (o
-// total de resultados não muda) — por isso, como nas outras fontes de feed
+// total de resultados não muda), por isso, como nas outras fontes de feed
 // geral, buscamos algumas páginas e filtramos no cliente por localidade e
 // por palavra-chave.
 export async function fetchRemoteJobsOrgJobs(keywords?: string[]): Promise<FetchedJob[]> {

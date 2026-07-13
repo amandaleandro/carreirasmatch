@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const sourceLabel = `${match.institution.name} ${match.year} — ${match.file.label}`;
+    const sourceLabel = `${match.institution.name} ${match.year}, ${match.file.label}`;
     const result = await generateMockExamQuestions(examText, sourceLabel);
 
     return NextResponse.json(result);

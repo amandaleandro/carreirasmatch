@@ -22,7 +22,7 @@ export const FIRST_JOB_GUIDE: FirstJobPathContent[] = [
     tips: [
       {
         title: "Currículo por competências, não por formação",
-        body: "Sem diploma ou curso técnico para preencher o currículo, a saída é organizar por competências: liste 4 a 5 habilidades práticas (atendimento, organização, comunicação, informática básica) e, embaixo de cada uma, uma frase curta provando que você já usou essa habilidade em algum contexto — escola, casa, trabalho informal ou voluntariado.",
+        body: "Sem diploma ou curso técnico para preencher o currículo, a saída é organizar por competências: liste 4 a 5 habilidades práticas (atendimento, organização, comunicação, informática básica) e, embaixo de cada uma, uma frase curta provando que você já usou essa habilidade em algum contexto, escola, casa, trabalho informal ou voluntariado.",
         action: "Escreva 3 frases do tipo \"Já organizei [situação] usando [habilidade]\" antes de montar o currículo final.",
       },
       {
@@ -32,12 +32,12 @@ export const FIRST_JOB_GUIDE: FirstJobPathContent[] = [
       },
       {
         title: "Transforme experiência informal em prova de responsabilidade",
-        body: "Trabalho informal, ajuda no negócio da família, cuidar de irmãos mais novos ou organizar eventos da comunidade mostram responsabilidade, pontualidade e trabalho em equipe — características que pesam tanto quanto experiência formal em vagas de entrada.",
+        body: "Trabalho informal, ajuda no negócio da família, cuidar de irmãos mais novos ou organizar eventos da comunidade mostram responsabilidade, pontualidade e trabalho em equipe, características que pesam tanto quanto experiência formal em vagas de entrada.",
         action: "Liste 2 experiências informais e descreva em uma frase objetiva o que você aprendeu com cada uma.",
       },
       {
         title: "Escolha as vagas certas para aplicar",
-        body: "Vagas que dizem \"não exige experiência\" ou \"com ou sem experiência\" têm processos seletivos desenhados para quem está começando — a chance de avançar é maior do que em vagas genéricas de nível pleno.",
+        body: "Vagas que dizem \"não exige experiência\" ou \"com ou sem experiência\" têm processos seletivos desenhados para quem está começando, a chance de avançar é maior do que em vagas genéricas de nível pleno.",
         action: "Ao buscar vagas, filtre por palavras como \"iniciante\", \"sem experiência\" ou \"nível de entrada\".",
       },
       {
@@ -54,27 +54,27 @@ export const FIRST_JOB_GUIDE: FirstJobPathContent[] = [
       "Ter formação (mesmo em andamento) muda o que vale a pena destacar: projetos acadêmicos, estágios e programas de trainee pesam mais do que experiência informal. O guia abaixo mostra como usar isso a seu favor.",
     tips: [
       {
-        title: "A formação em andamento já vale — não espere o diploma",
+        title: "A formação em andamento já vale, não espere o diploma",
         body: "A maioria das vagas de primeiro emprego para quem tem faculdade ou técnico aceita formação em andamento. Coloque o curso, a instituição e a previsão de conclusão logo no topo do currículo, mesmo que faltem semestres.",
         action: "Adicione \"previsão de conclusão: [mês/ano]\" junto ao nome do curso no currículo.",
       },
       {
         title: "Projetos acadêmicos e TCC viram experiência",
-        body: "Um projeto de faculdade bem descrito — objetivo, o que você fez, resultado — funciona como um case de experiência profissional para quem está entrando no mercado. O erro comum é só citar o nome do projeto sem explicar o que foi feito.",
+        body: "Um projeto de faculdade bem descrito, objetivo, o que você fez, resultado, funciona como um case de experiência profissional para quem está entrando no mercado. O erro comum é só citar o nome do projeto sem explicar o que foi feito.",
         action: "Reescreva 1 a 2 projetos no formato \"fiz X para resolver Y, resultado Z\".",
       },
       {
         title: "Estágios e monitorias contam como experiência real",
-        body: "Mesmo estágios não remunerados, monitorias e participação em ligas acadêmicas demonstram que você já operou em um ambiente estruturado, com prazos e responsabilidades — isso pesa mais do que parece para quem está do outro lado da mesa.",
+        body: "Mesmo estágios não remunerados, monitorias e participação em ligas acadêmicas demonstram que você já operou em um ambiente estruturado, com prazos e responsabilidades, isso pesa mais do que parece para quem está do outro lado da mesa.",
         action: "Liste essas experiências na seção de experiência profissional, não em \"atividades extracurriculares\".",
       },
       {
         title: "Programas de trainee e primeiro emprego são a porta de entrada certa",
-        body: "Empresas grandes costumam ter programas específicos para recém-formados, com processos seletivos desenhados para quem não tem anos de experiência — a concorrência é mais equilibrada do que em vagas abertas ao mercado geral.",
+        body: "Empresas grandes costumam ter programas específicos para recém-formados, com processos seletivos desenhados para quem não tem anos de experiência, a concorrência é mais equilibrada do que em vagas abertas ao mercado geral.",
         action: "Pesquise \"programa trainee\" ou \"programa de primeiro emprego\" + nome da sua área de formação.",
       },
       {
-        title: "Explique por que escolheu o curso — e prove que aplica o que aprendeu",
+        title: "Explique por que escolheu o curso, e prove que aplica o que aprendeu",
         body: "Recrutadores testam se a escolha do curso foi consciente e se você consegue conectar teoria com prática. Uma resposta genérica (\"sempre gostei da área\") pesa contra você.",
         action: "Prepare uma resposta com um exemplo concreto de como usou um conceito do curso fora da sala de aula.",
       },

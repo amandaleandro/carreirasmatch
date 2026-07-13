@@ -9,7 +9,7 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
 
   useEffect(() => {
     // Server always renders "light" (no access to localStorage), so the real
-    // theme — already applied to <html> by the inline script in layout.tsx —
+    // theme, already applied to <html> by the inline script in layout.tsx, 
     // can only be read after mount without causing a hydration mismatch.
     const current = document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light";
     // eslint-disable-next-line react-hooks/set-state-in-effect

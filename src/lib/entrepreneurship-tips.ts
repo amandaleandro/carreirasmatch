@@ -18,7 +18,7 @@ export const ENTREPRENEURSHIP_GUIDE: EntrepreneurshipStageContent[] = [
     key: "ideia",
     label: "Tenho uma ideia",
     intro:
-      "Antes de gastar tempo ou dinheiro, o objetivo é testar se alguém pagaria pela sua ideia — sem precisar construir tudo primeiro.",
+      "Antes de gastar tempo ou dinheiro, o objetivo é testar se alguém pagaria pela sua ideia, sem precisar construir tudo primeiro.",
     tips: [
       {
         title: "Valide antes de construir",
@@ -50,7 +50,7 @@ export const ENTREPRENEURSHIP_GUIDE: EntrepreneurshipStageContent[] = [
       },
       {
         title: "Precifique olhando custo e valor, não só concorrência",
-        body: "Preço baixo demais no início parece atrair mais clientes, mas costuma inviabilizar o negócio. Calcule seu custo real (tempo, material, taxas) e o valor que o cliente ganha ao resolver o problema — não só o que o concorrente cobra.",
+        body: "Preço baixo demais no início parece atrair mais clientes, mas costuma inviabilizar o negócio. Calcule seu custo real (tempo, material, taxas) e o valor que o cliente ganha ao resolver o problema, não só o que o concorrente cobra.",
         action: "Calcule seu custo por unidade/hora e defina uma margem mínima antes de fechar o preço final.",
       },
       {
@@ -69,7 +69,7 @@ export const ENTREPRENEURSHIP_GUIDE: EntrepreneurshipStageContent[] = [
     key: "formalizacao",
     label: "Formalização",
     intro:
-      "Formalizar o negócio protege você legalmente e abre portas (emitir nota fiscal, vender para empresas, abrir conta PJ) — mas o momento certo é quando já existe alguma venda recorrente.",
+      "Formalizar o negócio protege você legalmente e abre portas (emitir nota fiscal, vender para empresas, abrir conta PJ), mas o momento certo é quando já existe alguma venda recorrente.",
     tips: [
       {
         title: "MEI costuma ser o ponto de partida mais simples",
@@ -78,12 +78,12 @@ export const ENTREPRENEURSHIP_GUIDE: EntrepreneurshipStageContent[] = [
       },
       {
         title: "Separe finanças pessoais das do negócio desde o início",
-        body: "Misturar dinheiro pessoal e do negócio é um dos erros mais comuns de quem está começando — dificulta saber se o negócio está dando lucro de verdade.",
+        body: "Misturar dinheiro pessoal e do negócio é um dos erros mais comuns de quem está começando, dificulta saber se o negócio está dando lucro de verdade.",
         action: "Abra uma conta (ou carteira) exclusiva para as movimentações do negócio, mesmo antes do CNPJ.",
       },
       {
         title: "Entenda as obrigações básicas antes de formalizar",
-        body: "Depois de formalizado, existem obrigações mensais (guias, declaração anual) que, se ignoradas, geram multa. Não é preciso saber tudo sozinho — um contador (mesmo online, de baixo custo) resolve isso rápido.",
+        body: "Depois de formalizado, existem obrigações mensais (guias, declaração anual) que, se ignoradas, geram multa. Não é preciso saber tudo sozinho, um contador (mesmo online, de baixo custo) resolve isso rápido.",
         action: "Pesquise 2 opções de contabilidade online para MEI/ME e compare o custo mensal.",
       },
     ],

@@ -6,11 +6,11 @@ const API_URL = "http://api.glassdoor.com/api/api.htm";
 // ATENÇÃO: a Glassdoor Jobs API é uma API de parceiro (precisa virar parceiro
 // homologado com eles, não é cadastro self-service). A seção da documentação
 // com o nome exato da ação de busca de vagas e seus parâmetros só é visível
-// logado como parceiro aprovado — não tive acesso a ela. O que está abaixo
+// logado como parceiro aprovado, não tive acesso a ela. O que está abaixo
 // segue a estrutura genérica documentada publicamente (v, format, t.p, t.k,
 // userip, useragent, action, q) com "action=jobs" e "q=<termo>" como palpite
 // pela convenção usada nos outros exemplos da doc (ex.: action=employers).
-// Precisa ser confirmado/ajustado assim que houver acesso de parceiro real —
+// Precisa ser confirmado/ajustado assim que houver acesso de parceiro real, 
 // os nomes dos campos de resposta abaixo (jobListings/jobTitle/jobViewUrl/
 // description) também são um palpite e provavelmente vão precisar de ajuste.
 const MAX_JOB_TEXT_LENGTH = 12000;

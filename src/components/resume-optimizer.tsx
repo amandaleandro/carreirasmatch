@@ -943,7 +943,7 @@ export function ResumeOptimizer({
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Veja como seu currículo ficará para o recrutador. O preview e o
                   PDF final incluem contato, resumo, experiências, formação,
-                  habilidades, idiomas e certificações — nada do currículo
+                  habilidades, idiomas e certificações, nada do currículo
                   original é perdido.
                 </p>
                 <div className="flex flex-wrap gap-3 mt-4">

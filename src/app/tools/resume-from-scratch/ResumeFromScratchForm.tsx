@@ -125,7 +125,7 @@ export function ResumeFromScratchForm({
           ))}
         </div>
         <p className="text-xs text-neutral-500 mt-2">
-          Isso preenche o formulário com um exemplo pronto — edite os campos com suas
+          Isso preenche o formulário com um exemplo pronto, edite os campos com suas
           informações reais antes de gerar.
         </p>
       </div>

@@ -5,10 +5,10 @@ import { runJsonAcrossProviders } from "@/lib/ai-providers";
 const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
 // Structured-resume extraction is literal transcription (no scoring/reasoning), so it doesn't
-// need the stronger model the admin picks for analysis — a cheaper model is just as accurate
+// need the stronger model the admin picks for analysis, a cheaper model is just as accurate
 // here, independent of whichever model is configured for analyzeResumeAgainstJob.
 // (qwen/qwen3-32b was tried first but this Groq account's on-demand tier caps it at 6K TPM,
-// which a full resume extraction call alone can exceed — gpt-oss-120b has no such issue.)
+// which a full resume extraction call alone can exceed, gpt-oss-120b has no such issue.)
 const EXTRACTION_MODEL = "openai/gpt-oss-120b";
 
 // Modelos com TPM (tokens/minuto) baixo demais para o tamanho das nossas
@@ -79,19 +79,19 @@ const TRACK_GUIDANCE: Record<CareerTrack, string> = {
   career_change: `TRANSIÇÃO DE CARREIRA:
   - Procure habilidades TRANSFERÍVEIS da experiência anterior (organização, comunicação, gestão, tecnologia adjacente) como pontos fortes.
   - Não espere histórico extenso na nova área; foque em estudo ativo (cursos, certificações, projetos).
-  - Profundidade técnica ausente reflete no technicalScore mas não é "currículo ruim" — é trilha em construção.`,
+  - Profundidade técnica ausente reflete no technicalScore mas não é "currículo ruim", é trilha em construção.`,
   reemployment: `RECOLOCAÇÃO (já tem experiência prévia):
   - Seja rigoroso: senioridade, resultados quantificados, impacto claro, atualização técnica (tecnologia defasada pesa no score).
   - Falta de métricas reduz atsScore mais que para quem está começando.
   - Avalie se mira vagas compatíveis com a senioridade real.`,
   growth: `VAGA MELHOR/CRESCIMENTO (já empregado):
   - A vaga deve ser um passo à frente; se o currículo já está acima do nível da vaga, sinalize isso.
-  - Rigor normal de mercado — compare como profissional pleno/sênior.`,
+  - Rigor normal de mercado, compare como profissional pleno/sênior.`,
   apprentice: `JOVEM APRENDIZ (Lei da Aprendizagem, ~14-24 anos, sem experiência formal exigida):
   - Não penalize ausência de experiência/cursos/certificações. Ensino médio, cursos livres curtos e atividades escolares/comunitárias contam como evidência positiva.
   - experienceScore: avalie organização, comprometimento e disponibilidade, não histórico profissional.
   - seniorityScore: só compatibilidade com nível aprendiz, nunca compare com pleno/sênior.
-  - Tom muito encorajador e didático — provável primeiro currículo do candidato.`,
+  - Tom muito encorajador e didático, provável primeiro currículo do candidato.`,
 };
 
 export type StudyPlanPhased = {
@@ -277,9 +277,9 @@ REGRAS DE PONTUAÇÃO:
 
 6. overallScore: média ponderada technicalScore(35%) + experienceScore(25%) + seniorityScore(20%) + atsScore(20%), ajustável ±5 por fator crítico (ex: requisito eliminatório ausente).
 
-7. Nos textos, cite skills/palavras exatas da vaga que faltam ou estão fracas — nunca generalidades tipo "melhore seu currículo".
+7. Nos textos, cite skills/palavras exatas da vaga que faltam ou estão fracas, nunca generalidades tipo "melhore seu currículo".
 
-8. Nunca prometa contratação — fale em aderência/chance de entrevista.
+8. Nunca prometa contratação, fale em aderência/chance de entrevista.
 
 9. keywordsFound / keywordsMissing: termos EXATOS da vaga (ferramenta, técnica, certificação, idioma, anos de experiência), separando comprovados de ausentes/vagos. Sem sinônimos duplicados.
 
@@ -297,7 +297,7 @@ REGRAS DE PONTUAÇÃO:
 
 14. alternativeRoles: só se applicationStatus="deprioritize" (ou vaga muito acima do nível do candidato): 2-4 cargos alternativos realistas, mesma área, nível mais júnior/adjacente. Senão [].
 
-15. experienceSuggestions: 2-3 experiências/projetos REAIS do currículo, na ordem. "current" (descrição literal/resumida) e "suggested" (reescrita 1-2 frases, verbos de ação, só quantifica se o currículo já sugerir métrica plausível — nunca invente números).
+15. experienceSuggestions: 2-3 experiências/projetos REAIS do currículo, na ordem. "current" (descrição literal/resumida) e "suggested" (reescrita 1-2 frases, verbos de ação, só quantifica se o currículo já sugerir métrica plausível, nunca invente números).
 
 16. atsChecklist: exatamente estas 6 categorias fixas, cada uma com status "pass"/"warning"/"fail" e descrição curta (3-8 palavras):
    - formatting/"Formatação": estrutura, seções, tamanho.
@@ -322,7 +322,7 @@ REGRAS:
 - certifications: TODAS as certificações/cursos de certificação, lista simples de strings, sem exceção.
 - experiences: TODAS as experiências profissionais e projetos relevantes, na ordem em que aparecem (cargo, empresa/projeto, período, descrição resumida mas completa).
 
-Releia o currículo inteiro antes de responder — nunca deixe uma seção vazia por preguiça de procurar no texto.`;
+Releia o currículo inteiro antes de responder, nunca deixe uma seção vazia por preguiça de procurar no texto.`;
 
 export type CandidateContext = {
   professionalArea?: string | null;
@@ -366,7 +366,7 @@ O CANDIDATO INFORMOU QUE NÃO TEM FORMAÇÃO ACADÊMICA FORMAL NA ÁREA (sem dip
 - NÃO penalize a ausência de diploma, curso técnico ou faculdade em nenhum dos scores.
 - Trate cursos livres, cursos profissionalizantes (mesmo curtos, gratuitos ou pagos), certificados e experiência prática/informal como evidência técnica válida e suficiente, no mesmo nível que se fossem formação formal.
 - Se a lista CURSOS_DO_CANDIDATO for informada abaixo, considere-a como comprovação real de qualificação, mesmo que os cursos não estejam mencionados no texto do currículo colado.
-- Só penalize technicalScore se faltar prática/comprovação real (nenhum curso, nenhuma experiência, nenhum projeto citado) — nunca apenas por falta de diploma.`;
+- Só penalize technicalScore se faltar prática/comprovação real (nenhum curso, nenhuma experiência, nenhum projeto citado), nunca apenas por falta de diploma.`;
 
 export async function analyzeResumeAgainstJob(
   resumeText: string,
@@ -449,7 +449,7 @@ const STRUCTURED_RESUME_JSON_TEMPLATE = `{
   "experiences": [{ "role": string, "company": string, "period": string, "description": string }]
 }`;
 
-/** Dedicated, single-purpose extraction call — kept separate from analyzeResumeAgainstJob so a long
+/** Dedicated, single-purpose extraction call, kept separate from analyzeResumeAgainstJob so a long
  * scoring/analysis response can't crowd out (and truncate) the full structured resume. */
 export async function extractStructuredResume(resumeText: string): Promise<StructuredResume> {
   resumeText = normalizeForPrompt(resumeText, MAX_RESUME_CHARS);
@@ -522,7 +522,7 @@ export async function generateProfileSuggestions(input: {
     : "";
   const educationBlock =
     input.hasFormalEducation === false
-      ? "\n\nO candidato não tem formação acadêmica formal na área — priorize cursos livres/profissionalizantes e certificações acessíveis, sem exigir pré-requisitos de diploma."
+      ? "\n\nO candidato não tem formação acadêmica formal na área, priorize cursos livres/profissionalizantes e certificações acessíveis, sem exigir pré-requisitos de diploma."
       : "";
   const gapsBlock =
     input.topSkillGaps.length > 0

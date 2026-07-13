@@ -45,7 +45,7 @@ export default async function StudyCalendarPage({
       </Link>
       <header className="mt-4 mb-8">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-          Calendário de estudos — {area.label}
+          Calendário de estudos, {area.label}
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Marque as tarefas conforme for concluindo ao longo das semanas.

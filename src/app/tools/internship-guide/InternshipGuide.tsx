@@ -39,7 +39,7 @@ export function InternshipGuide() {
           Guia completo do estágio
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Da primeira candidatura à efetivação — portfólio, LinkedIn, cursos e dinheiro em um só lugar.
+          Da primeira candidatura à efetivação, portfólio, LinkedIn, cursos e dinheiro em um só lugar.
         </p>
       </header>
 

@@ -62,7 +62,7 @@ export function buildResumeHtml(data: ResumeTemplateData): string {
       return `
         <article class="entry">
           <div class="entry-head">
-            <h3 class="entry-title">${escapeHtml(exp.role)}<span class="entry-sep"> — </span>${escapeHtml(
+            <h3 class="entry-title">${escapeHtml(exp.role)}<span class="entry-sep">, </span>${escapeHtml(
         exp.company
       )}</h3>
             ${periodHtml}
@@ -78,7 +78,7 @@ export function buildResumeHtml(data: ResumeTemplateData): string {
       return `
         <article class="entry entry--compact">
           <div class="entry-head">
-            <h3 class="entry-title">${escapeHtml(ed.degree)}<span class="entry-sep"> — </span>${escapeHtml(
+            <h3 class="entry-title">${escapeHtml(ed.degree)}<span class="entry-sep">, </span>${escapeHtml(
         ed.institution
       )}</h3>
             ${periodHtml}

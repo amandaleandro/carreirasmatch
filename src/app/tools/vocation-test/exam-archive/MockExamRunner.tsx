@@ -61,7 +61,7 @@ function MockExamQuiz({ questions, label }: { questions: MockExamQuestion[]; lab
 
   return (
     <div className="mt-4 w-full max-w-2xl rounded-xl border border-neutral-200 dark:border-neutral-800 p-5 space-y-5">
-      <h4 className="font-semibold text-sm">Simulado — {label}</h4>
+      <h4 className="font-semibold text-sm">Simulado, {label}</h4>
       {questions.map((q, qi) => (
         <div key={qi}>
           <p className="text-sm font-medium mb-2">

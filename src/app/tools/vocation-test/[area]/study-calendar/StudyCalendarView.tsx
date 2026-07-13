@@ -62,7 +62,7 @@ export function StudyCalendarView({ items }: { items: StudyScheduleItem[] }) {
           className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5"
         >
           <h3 className="font-semibold mb-1">
-            Semana {i + 1} — {formatWeekStart(week.weekStart)}
+            Semana {i + 1}, {formatWeekStart(week.weekStart)}
           </h3>
           <p className="text-sm text-neutral-500 mb-3">{week.focus}</p>
           <ul className="space-y-2">

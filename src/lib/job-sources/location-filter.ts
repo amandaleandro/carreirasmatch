@@ -1,4 +1,4 @@
-// Greenhouse e Lever não têm filtro de país na API — empresas com presença
+// Greenhouse e Lever não têm filtro de país na API, empresas com presença
 // global (ex.: Remote.com, Capco) retornam vagas de dezenas de países junto
 // com as do Brasil. Esse heurístico mantém só o que é relevante pro público
 // brasileiro: local desconhecido, Brasil/LatAm explícito, ou remoto global

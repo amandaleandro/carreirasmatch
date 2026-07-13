@@ -38,12 +38,12 @@ function button(href: string, label: string) {
 }
 
 /**
- * Dispara um e-mail sem nunca lançar erro para o chamador — se o Resend não
+ * Dispara um e-mail sem nunca lançar erro para o chamador, se o Resend não
  * estiver configurado ou o envio falhar, apenas loga. Chame com fire-and-forget.
  */
 async function send(to: string, subject: string, bodyHtml: string) {
   if (!resend) {
-    console.error(`RESEND_API_KEY não configurada — e-mail "${subject}" não foi enviado para ${to}.`);
+    console.error(`RESEND_API_KEY não configurada, e-mail "${subject}" não foi enviado para ${to}.`);
     return;
   }
   try {

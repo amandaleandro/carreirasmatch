@@ -24,7 +24,7 @@ function htmlToPlainText(html: string): string {
 }
 
 // A API pública do Himalayas não filtra de fato pelo parâmetro "country" (a
-// lista retornada é idêntica com ou sem o parâmetro) — por isso, como no
+// lista retornada é idêntica com ou sem o parâmetro), por isso, como no
 // Arbeitnow/The Muse, buscamos algumas páginas do feed geral (é 100% remoto)
 // e filtramos no cliente por Brasil/LatAm/mundo afora e por palavra-chave.
 export async function fetchHimalayasJobs(keywords?: string[]): Promise<FetchedJob[]> {

@@ -23,10 +23,10 @@ export const EXAM_ARCHIVE: ExamArchiveInstitution[] = [
     years: [2024, 2023, 2022, 2021, 2020].map((year) => ({
       year,
       files: [
-        { label: "Dia 1 — Prova", path: `/exam-archive/enem/${year}/dia1-prova.pdf` },
-        { label: "Dia 1 — Gabarito", path: `/exam-archive/enem/${year}/dia1-gabarito.pdf` },
-        { label: "Dia 2 — Prova", path: `/exam-archive/enem/${year}/dia2-prova.pdf` },
-        { label: "Dia 2 — Gabarito", path: `/exam-archive/enem/${year}/dia2-gabarito.pdf` },
+        { label: "Dia 1, Prova", path: `/exam-archive/enem/${year}/dia1-prova.pdf` },
+        { label: "Dia 1, Gabarito", path: `/exam-archive/enem/${year}/dia1-gabarito.pdf` },
+        { label: "Dia 2, Prova", path: `/exam-archive/enem/${year}/dia2-prova.pdf` },
+        { label: "Dia 2, Gabarito", path: `/exam-archive/enem/${year}/dia2-gabarito.pdf` },
       ],
     })),
   },
@@ -38,9 +38,9 @@ export const EXAM_ARCHIVE: ExamArchiveInstitution[] = [
       year,
       files: [
         { label: "1ª fase", path: `/exam-archive/ita/${year}/fase1.pdf` },
-        { label: "2ª fase — Matemática", path: `/exam-archive/ita/${year}/fase2-matematica.pdf` },
-        { label: "2ª fase — Física", path: `/exam-archive/ita/${year}/fase2-fisica.pdf` },
-        { label: "2ª fase — Química", path: `/exam-archive/ita/${year}/fase2-quimica.pdf` },
+        { label: "2ª fase, Matemática", path: `/exam-archive/ita/${year}/fase2-matematica.pdf` },
+        { label: "2ª fase, Física", path: `/exam-archive/ita/${year}/fase2-fisica.pdf` },
+        { label: "2ª fase, Química", path: `/exam-archive/ita/${year}/fase2-quimica.pdf` },
       ],
     })),
   },

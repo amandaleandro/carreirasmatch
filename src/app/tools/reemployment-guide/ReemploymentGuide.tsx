@@ -37,7 +37,7 @@ export function ReemploymentGuide() {
           Guia completo de recolocação
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Do desligamento à próxima oferta — como voltar ao mercado com estratégia e sem perder o ritmo.
+          Do desligamento à próxima oferta, como voltar ao mercado com estratégia e sem perder o ritmo.
         </p>
       </header>
 

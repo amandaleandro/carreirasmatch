@@ -22,7 +22,7 @@ export function CareerGuide() {
           Como é a profissão na prática?
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Rotina real, faixa de salário e as habilidades técnicas e comportamentais que pesam em cada área — antes de você escolher.
+          Rotina real, faixa de salário e as habilidades técnicas e comportamentais que pesam em cada área, antes de você escolher.
         </p>
         <Link
           href="/tools/vocation-test"

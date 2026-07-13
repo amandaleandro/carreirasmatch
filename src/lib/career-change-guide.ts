@@ -24,12 +24,12 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
     key: "planejar_transicao",
     label: "Planejar a transição",
     intro:
-      "Trocar de área raramente é um salto único — é uma sequência de passos. Escolher o ritmo certo evita tanto a frustração de nunca sair do lugar quanto o risco de queimar a ponte antes de estar pronto.",
+      "Trocar de área raramente é um salto único, é uma sequência de passos. Escolher o ritmo certo evita tanto a frustração de nunca sair do lugar quanto o risco de queimar a ponte antes de estar pronto.",
     tips: [
       {
         title: "Escolha entre transição rápida, gradual ou paralela",
         body: "Rápida (pedir demissão e mergulhar full-time) exige reserva financeira e tolerância a risco. Gradual (estudar e aplicar aos poucos enquanto mantém o emprego atual) é mais lenta mas mais segura. Paralela (freelas ou projetos na área nova, mantendo o emprego atual) prova experiência real antes de migrar de vez.",
-        action: "Defina hoje qual dos três ritmos combina com sua reserva financeira e tolerância a risco atual — isso muda todo o resto do plano.",
+        action: "Defina hoje qual dos três ritmos combina com sua reserva financeira e tolerância a risco atual, isso muda todo o resto do plano.",
       },
       {
         title: "Defina o objetivo final e o primeiro passo, não só um dos dois",
@@ -42,7 +42,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
         action: "Marque pelo menos 2 conversas de 20 minutos com profissionais que já atuam na área que você quer entrar.",
       },
       {
-        title: "Não abandone sua experiência anterior — reposicione ela",
+        title: "Não abandone sua experiência anterior, reposicione ela",
         body: "Quem migra de carreira tende a esconder o histórico anterior por vergonha de 'não ser da área'. Isso é um erro: recrutadores confiam mais em quem mostra de onde veio e por que está mudando com clareza.",
         action: "Liste 3 conquistas da sua carreira anterior que ainda têm valor, independente da área nova.",
       },
@@ -57,7 +57,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
     key: "habilidades_transferiveis",
     label: "Habilidades transferíveis",
     intro:
-      "Ninguém começa do zero de verdade. Gestão, comunicação, análise, atendimento ao cliente e organização aparecem em quase todas as áreas — o trabalho é traduzir essas habilidades para o vocabulário da área nova.",
+      "Ninguém começa do zero de verdade. Gestão, comunicação, análise, atendimento ao cliente e organização aparecem em quase todas as áreas, o trabalho é traduzir essas habilidades para o vocabulário da área nova.",
     tips: [
       {
         title: "Separe habilidades técnicas de habilidades transferíveis",
@@ -66,7 +66,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Traduza a experiência para o vocabulário da área nova",
-        body: "'Organizei a rotina de uma equipe de vendas' pode virar 'gerenciei prazos e priorização de demandas' ao mirar uma vaga de Analista de Projetos — mesmo fato, vocabulário da vaga.",
+        body: "'Organizei a rotina de uma equipe de vendas' pode virar 'gerenciei prazos e priorização de demandas' ao mirar uma vaga de Analista de Projetos, mesmo fato, vocabulário da vaga.",
         action: "Reescreva uma experiência do seu currículo atual usando 2-3 palavras-chave da vaga que você quer.",
       },
       {
@@ -90,7 +90,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
     key: "cargos_ponte",
     label: "Cargos-ponte",
     intro:
-      "Um cargo-ponte é a posição intermediária que te leva até o objetivo final sem exigir o salto completo de uma vez — geralmente mais júnior, mais próximo da sua experiência atual, mas já dentro (ou na borda) da área nova.",
+      "Um cargo-ponte é a posição intermediária que te leva até o objetivo final sem exigir o salto completo de uma vez, geralmente mais júnior, mais próximo da sua experiência atual, mas já dentro (ou na borda) da área nova.",
     tips: [
       {
         title: "Mapeie 2 a 4 cargos-ponte realistas até o objetivo final",
@@ -99,12 +99,12 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Cargo-ponte não é 'dar um passo para trás'",
-        body: "É comum sentir que aceitar um cargo mais júnior é um retrocesso. Na prática, é o caminho mais rápido e menos arriscado para consolidar experiência real na área nova — muito mais rápido do que tentar entrar direto no nível pleno/sênior sem histórico.",
+        body: "É comum sentir que aceitar um cargo mais júnior é um retrocesso. Na prática, é o caminho mais rápido e menos arriscado para consolidar experiência real na área nova, muito mais rápido do que tentar entrar direto no nível pleno/sênior sem histórico.",
         action: "Escreva 2 frases explicando por que o cargo-ponte escolhido acelera, e não atrasa, seu objetivo final.",
       },
       {
         title: "Priorize empresas que promovem internamente",
-        body: "Empresas com cultura forte de promoção interna reduzem o risco de ficar 'preso' no cargo-ponte — pesquise antes de aceitar uma proposta.",
+        body: "Empresas com cultura forte de promoção interna reduzem o risco de ficar 'preso' no cargo-ponte, pesquise antes de aceitar uma proposta.",
         action: "Nas próximas candidaturas, pergunte na entrevista como funciona a trilha de carreira interna da posição.",
       },
       {
@@ -114,7 +114,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Use o cargo-ponte para construir portfólio real na área nova",
-        body: "Todo cargo-ponte é uma chance de gerar evidências concretas (projetos, relatórios, resultados) que vão pesar na próxima candidatura — não é só 'esperar o tempo passar'.",
+        body: "Todo cargo-ponte é uma chance de gerar evidências concretas (projetos, relatórios, resultados) que vão pesar na próxima candidatura, não é só 'esperar o tempo passar'.",
         action: "No cargo-ponte atual (ou ao entrar em um novo), defina 1 entregável que possa virar item de portfólio.",
       },
     ],
@@ -137,12 +137,12 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Mostre movimento real, não só intenção",
-        body: "'Quero migrar para Dados' convence pouco sozinho. 'Estou migrando para Dados: já concluí um curso de SQL, fiz 2 projetos práticos e estou aplicando para vagas Jr' convence muito mais — porque prova ação, não só desejo.",
+        body: "'Quero migrar para Dados' convence pouco sozinho. 'Estou migrando para Dados: já concluí um curso de SQL, fiz 2 projetos práticos e estou aplicando para vagas Jr' convence muito mais, porque prova ação, não só desejo.",
         action: "Liste as ações concretas que você já tomou rumo à área nova para citar na entrevista.",
       },
       {
         title: "Prepare-se para a objeção sobre falta de experiência",
-        body: "Recrutadores costumam questionar profundidade técnica de quem está migrando. A resposta forte reconhece a lacuna e mostra o plano ativo para fechá-la — não tenta esconder ou minimizar.",
+        body: "Recrutadores costumam questionar profundidade técnica de quem está migrando. A resposta forte reconhece a lacuna e mostra o plano ativo para fechá-la, não tenta esconder ou minimizar.",
         action: "Escreva uma resposta de 2-3 frases para 'como você compensa não ter experiência formal na área?'.",
       },
       {
@@ -156,7 +156,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
     key: "financeiro",
     label: "Planejamento financeiro",
     intro:
-      "Transições de carreira quase sempre envolvem algum período de instabilidade financeira — estudar, aceitar um cargo-ponte com salário menor ou ficar um tempo sem renda. Planejar isso com antecedência é o que separa uma transição bem-sucedida de uma decisão precipitada revertida por pressão financeira.",
+      "Transições de carreira quase sempre envolvem algum período de instabilidade financeira, estudar, aceitar um cargo-ponte com salário menor ou ficar um tempo sem renda. Planejar isso com antecedência é o que separa uma transição bem-sucedida de uma decisão precipitada revertida por pressão financeira.",
     tips: [
       {
         title: "Calcule sua reserva mínima antes de qualquer decisão radical",
@@ -180,7 +180,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Revise o plano financeiro a cada marco, não só no início",
-        body: "Reserva financeira e prazo de transição não são fixos — reavaliar a cada 60-90 dias evita continuar em um plano que já não é mais sustentável sem perceber.",
+        body: "Reserva financeira e prazo de transição não são fixos, reavaliar a cada 60-90 dias evita continuar em um plano que já não é mais sustentável sem perceber.",
         action: "Marque uma revisão financeira recorrente a cada 60-90 dias durante a transição.",
       },
     ],
@@ -189,7 +189,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
     key: "cursos_certificacoes",
     label: "Cursos e certificações",
     intro:
-      "Certificações não substituem experiência prática, mas são o jeito mais rápido de mostrar comprometimento real com a área nova — principalmente quando ainda não há histórico profissional nela.",
+      "Certificações não substituem experiência prática, mas são o jeito mais rápido de mostrar comprometimento real com a área nova, principalmente quando ainda não há histórico profissional nela.",
     tips: [
       {
         title: "Priorize certificações reconhecidas pelo mercado da área nova",
@@ -198,7 +198,7 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Combine curso teórico com projeto prático",
-        body: "Um certificado sozinho prova conhecimento teórico. Um projeto aplicado junto (mesmo pequeno) prova que você sabe usar o que aprendeu — e vira item de portfólio.",
+        body: "Um certificado sozinho prova conhecimento teórico. Um projeto aplicado junto (mesmo pequeno) prova que você sabe usar o que aprendeu, e vira item de portfólio.",
         action: "Ao concluir um curso, aplique o conteúdo em um projeto pequeno e real antes de seguir para o próximo.",
       },
       {
@@ -208,12 +208,12 @@ export const CAREER_CHANGE_GUIDE: CareerChangeGuideSectionContent[] = [
       },
       {
         title: "Não empilhe certificados sem aplicar nenhum deles",
-        body: "Colecionar certificados sem projetos práticos entre eles é um padrão comum de procrastinação disfarçada de produtividade — recrutadores notam quando não há nenhuma aplicação real.",
+        body: "Colecionar certificados sem projetos práticos entre eles é um padrão comum de procrastinação disfarçada de produtividade, recrutadores notam quando não há nenhuma aplicação real.",
         action: "Antes de iniciar um novo curso, confirme que já aplicou o conteúdo do curso anterior em algo prático.",
       },
       {
         title: "Atualize currículo e LinkedIn assim que concluir cada certificação",
-        body: "Um certificado só ajuda se for visível para quem está avaliando seu perfil — atualizar imediatamente evita esquecer ou acumular tudo para depois.",
+        body: "Um certificado só ajuda se for visível para quem está avaliando seu perfil, atualizar imediatamente evita esquecer ou acumular tudo para depois.",
         action: "Adicione a certificação mais recente ao currículo e ao LinkedIn ainda hoje, se ainda não fez isso.",
       },
     ],

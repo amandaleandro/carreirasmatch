@@ -26,7 +26,7 @@ export function EntrepreneurshipTips() {
           Da ideia ao primeiro cliente, sem travar
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Um caminho prático por etapa — o que fazer agora, sem precisar saber tudo de negócios antes de começar.
+          Um caminho prático por etapa, o que fazer agora, sem precisar saber tudo de negócios antes de começar.
         </p>
       </header>
 

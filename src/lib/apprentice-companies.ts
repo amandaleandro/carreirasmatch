@@ -7,14 +7,14 @@ export type ApprenticeOrganization = {
 
 export const APPRENTICE_ORGANIZATIONS: ApprenticeOrganization[] = [
   {
-    name: "CIEE — Centro de Integração Empresa-Escola",
+    name: "CIEE, Centro de Integração Empresa-Escola",
     category: "Agente de integração / entidade formadora",
     description:
       "Um dos maiores agentes de integração do país, conecta jovens a empresas parceiras em todo o Brasil e oferece a formação teórica exigida por lei.",
-    howToApply: "Cadastre-se gratuitamente no site do CIEE e mantenha o perfil atualizado — empresas buscam candidatos direto na base.",
+    howToApply: "Cadastre-se gratuitamente no site do CIEE e mantenha o perfil atualizado, empresas buscam candidatos direto na base.",
   },
   {
-    name: "IEL — Instituto Euvaldo Lodi",
+    name: "IEL, Instituto Euvaldo Lodi",
     category: "Agente de integração / entidade formadora",
     description:
       "Ligado ao sistema da indústria (FIEP/CNI), conecta jovens a vagas de aprendizagem principalmente em empresas industriais e do setor produtivo.",
@@ -32,7 +32,7 @@ export const APPRENTICE_ORGANIZATIONS: ApprenticeOrganization[] = [
     category: "Agente de integração / entidade formadora",
     description:
       "Diversas ONGs certificadas pelo Ministério do Trabalho atuam como entidades formadoras em programas sociais voltados a jovens de comunidades específicas.",
-    howToApply: "Pesquise se existe uma entidade habilitada na sua cidade — muitas priorizam jovens de escolas públicas e baixa renda.",
+    howToApply: "Pesquise se existe uma entidade habilitada na sua cidade, muitas priorizam jovens de escolas públicas e baixa renda.",
   },
   {
     name: "SINE / Sistema Nacional de Emprego",
@@ -46,7 +46,7 @@ export const APPRENTICE_ORGANIZATIONS: ApprenticeOrganization[] = [
     category: "Setor que mais contrata",
     description:
       "Grandes bancos têm programas próprios e recorrentes de jovem aprendiz, geralmente para funções administrativas e de atendimento em agências.",
-    howToApply: "Acompanhe as páginas de \"carreiras\" e \"programas de aprendizagem\" de cada banco — as inscrições costumam abrir em datas fixas do ano.",
+    howToApply: "Acompanhe as páginas de \"carreiras\" e \"programas de aprendizagem\" de cada banco, as inscrições costumam abrir em datas fixas do ano.",
   },
   {
     name: "Redes de varejo (Magazine Luiza, Carrefour, Renner, Riachuelo)",
@@ -60,14 +60,14 @@ export const APPRENTICE_ORGANIZATIONS: ApprenticeOrganization[] = [
     category: "Setor que mais contrata",
     description:
       "Empresas industriais contratam aprendizes com frequência via IEL e SENAI, geralmente para áreas técnicas, administrativas e de produção.",
-    howToApply: "Verifique se há polo industrial na sua região e cadastre-se no IEL local — muitas vagas nem chegam a ser divulgadas fora dessa base.",
+    howToApply: "Verifique se há polo industrial na sua região e cadastre-se no IEL local, muitas vagas nem chegam a ser divulgadas fora dessa base.",
   },
   {
-    name: "CIEE — Programa de Estágio para Ensino Médio",
+    name: "CIEE, Programa de Estágio para Ensino Médio",
     category: "Estágio para estudante de ensino médio",
     description:
       "Além do jovem aprendiz, o CIEE também intermedia vagas de estágio (Lei 11.788/2008) para quem cursa o ensino médio técnico/profissionalizante, com carga horária reduzida compatível com a escola.",
-    howToApply: "Cadastre-se no site do CIEE informando que está cursando o ensino médio técnico — o sistema já filtra as vagas de estágio compatíveis com essa etapa.",
+    howToApply: "Cadastre-se no site do CIEE informando que está cursando o ensino médio técnico, o sistema já filtra as vagas de estágio compatíveis com essa etapa.",
   },
   {
     name: "NUBE",
@@ -88,12 +88,12 @@ export const APPRENTICE_ORGANIZATIONS: ApprenticeOrganization[] = [
     category: "Estágio para estudante de ensino médio",
     description:
       "Quem estuda em escola técnica ou instituto federal (curso técnico integrado ou concomitante) costuma ter uma coordenação de estágios própria, com parcerias diretas com empresas da região.",
-    howToApply: "Procure a coordenação de estágios ou o setor de relações empresariais da sua escola técnica/IF — muitas vagas circulam só internamente, sem passar por plataforma nenhuma.",
+    howToApply: "Procure a coordenação de estágios ou o setor de relações empresariais da sua escola técnica/IF, muitas vagas circulam só internamente, sem passar por plataforma nenhuma.",
   },
 ];
 
 export const HIGH_SCHOOL_INTERNSHIP_NOTE =
-  "Estágio (Lei 11.788/2008) é diferente de Jovem Aprendiz (CLT). Quem cursa o ensino médio técnico/profissionalizante (integrado, concomitante ou no IF) pode fazer estágio não obrigatório desde os 16 anos. Já quem está no ensino médio regular, sem curso técnico, normalmente só se qualifica para estágio depois que entrar na faculdade — antes disso, o caminho mais comum é o programa de Jovem Aprendiz.";
+  "Estágio (Lei 11.788/2008) é diferente de Jovem Aprendiz (CLT). Quem cursa o ensino médio técnico/profissionalizante (integrado, concomitante ou no IF) pode fazer estágio não obrigatório desde os 16 anos. Já quem está no ensino médio regular, sem curso técnico, normalmente só se qualifica para estágio depois que entrar na faculdade, antes disso, o caminho mais comum é o programa de Jovem Aprendiz.";
 
 export type FindApprenticeJobTip = {
   title: string;
@@ -103,7 +103,7 @@ export type FindApprenticeJobTip = {
 export const FIND_APPRENTICE_JOBS_TIPS: FindApprenticeJobTip[] = [
   {
     title: "Cadastre-se em mais de um agente de integração",
-    description: "CIEE, IEL e SINE têm bases diferentes de empresas parceiras — estar em mais de um aumenta suas chances.",
+    description: "CIEE, IEL e SINE têm bases diferentes de empresas parceiras, estar em mais de um aumenta suas chances.",
   },
   {
     title: "Siga as páginas oficiais das empresas que você quer",

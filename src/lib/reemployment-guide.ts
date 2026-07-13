@@ -23,11 +23,11 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
     key: "desligamento_e_gap",
     label: "Desligamento e gap no currículo",
     intro:
-      "Como explicar a saída do último emprego e um período sem trabalhar formal costuma pesar mais na cabeça de quem busca recolocação do que na do recrutador — o segredo é ter uma narrativa curta, honesta e sem tom defensivo.",
+      "Como explicar a saída do último emprego e um período sem trabalhar formal costuma pesar mais na cabeça de quem busca recolocação do que na do recrutador, o segredo é ter uma narrativa curta, honesta e sem tom defensivo.",
     tips: [
       {
         title: "Tenha uma frase pronta para o motivo da saída",
-        body: "'Fui desligado(a) num corte de equipe' ou 'a empresa reestruturou a área' são respostas neutras e comuns — o mercado sabe que demissões em massa não são culpa individual. Evite justificativas longas, que soam defensivas.",
+        body: "'Fui desligado(a) num corte de equipe' ou 'a empresa reestruturou a área' são respostas neutras e comuns, o mercado sabe que demissões em massa não são culpa individual. Evite justificativas longas, que soam defensivas.",
         action: "Escreva em uma frase o motivo da sua saída, sem adjetivos negativos sobre a empresa anterior.",
       },
       {
@@ -47,7 +47,7 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
       },
       {
         title: "Se o gap for longo, mostre atualização recente",
-        body: "Quanto maior o tempo fora do mercado, mais importa mostrar que você está atualizado agora — um curso recente, uma certificação, uma vaga temporária. Isso reduz a dúvida de 'ficou parado esse tempo todo?'.",
+        body: "Quanto maior o tempo fora do mercado, mais importa mostrar que você está atualizado agora, um curso recente, uma certificação, uma vaga temporária. Isso reduz a dúvida de 'ficou parado esse tempo todo?'.",
         action: "Se possível, conclua algo pequeno e recente (curso, certificação) para citar como prova de atualização.",
       },
     ],
@@ -56,7 +56,7 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
     key: "rede_de_contatos",
     label: "Reativar a rede de contatos",
     intro:
-      "A maioria das vagas de nível pleno/sênior nunca chega a ser publicada — são preenchidas por indicação. Reativar sua rede é a ação de maior retorno por hora investida na busca por recolocação.",
+      "A maioria das vagas de nível pleno/sênior nunca chega a ser publicada, são preenchidas por indicação. Reativar sua rede é a ação de maior retorno por hora investida na busca por recolocação.",
     tips: [
       {
         title: "Avise que está buscando, sem constrangimento",
@@ -113,7 +113,7 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
       },
       {
         title: "Revise a estratégia a cada 2-3 semanas",
-        body: "Se um tipo de vaga ou abordagem não está gerando nenhuma resposta depois de várias tentativas, é sinal de ajustar o alvo, o currículo ou a rede — não de aplicar mais do mesmo jeito.",
+        body: "Se um tipo de vaga ou abordagem não está gerando nenhuma resposta depois de várias tentativas, é sinal de ajustar o alvo, o currículo ou a rede, não de aplicar mais do mesmo jeito.",
         action: "A cada 2 semanas, confira sua taxa de resposta em /applications e ajuste o que não está funcionando.",
       },
     ],
@@ -122,7 +122,7 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
     key: "objecoes_na_entrevista",
     label: "Contornar objeções na entrevista",
     intro:
-      "Recrutadores costumam ter perguntas específicas para quem está em recolocação — idade, motivo da saída, expectativa salarial, tempo fora do mercado. Ter resposta pronta para essas objeções muda o resultado da conversa.",
+      "Recrutadores costumam ter perguntas específicas para quem está em recolocação, idade, motivo da saída, expectativa salarial, tempo fora do mercado. Ter resposta pronta para essas objeções muda o resultado da conversa.",
     tips: [
       {
         title: "Antecipe a pergunta sobre o desligamento",
@@ -141,12 +141,12 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
       },
       {
         title: "Mostre que pesquisou a empresa e a vaga",
-        body: "Quem está buscando recolocação há tempo às vezes aplica em volume e chega despreparado para a entrevista. Isso é perceptível e pesa contra — pesquisar a empresa antes é rápido e muda a percepção do recrutador.",
+        body: "Quem está buscando recolocação há tempo às vezes aplica em volume e chega despreparado para a entrevista. Isso é perceptível e pesa contra, pesquisar a empresa antes é rápido e muda a percepção do recrutador.",
         action: "Antes de cada entrevista, anote 3 informações recentes sobre a empresa para citar na conversa.",
       },
       {
         title: "Treine as perguntas específicas da vaga",
-        body: "Use a simulação de entrevista vinculada à candidatura para praticar respostas com feedback antes da conversa real — chegar treinado reduz a ansiedade e melhora a clareza das respostas.",
+        body: "Use a simulação de entrevista vinculada à candidatura para praticar respostas com feedback antes da conversa real, chegar treinado reduz a ansiedade e melhora a clareza das respostas.",
         action: "Abra a candidatura em /applications e treine a simulação de entrevista antes da conversa marcada.",
       },
     ],
@@ -159,7 +159,7 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
     tips: [
       {
         title: "Trate a busca como um trabalho com horário",
-        body: "Definir um bloco fixo do dia para candidaturas, rede e estudo evita tanto a procrastinação quanto o excesso — buscar emprego o dia inteiro sem pausa também cansa e reduz a qualidade das candidaturas.",
+        body: "Definir um bloco fixo do dia para candidaturas, rede e estudo evita tanto a procrastinação quanto o excesso, buscar emprego o dia inteiro sem pausa também cansa e reduz a qualidade das candidaturas.",
         action: "Defina um bloco fixo (ex: 2-3h por dia) dedicado à busca e respeite esse horário como um compromisso de trabalho.",
       },
       {
@@ -179,7 +179,7 @@ export const REEMPLOYMENT_GUIDE: ReemploymentGuideSectionContent[] = [
       },
       {
         title: "Comemore os marcos intermediários",
-        body: "Primeira entrevista marcada, primeira resposta positiva, primeira segunda fase — cada marco é sinal de que a estratégia está funcionando, mesmo antes da oferta final.",
+        body: "Primeira entrevista marcada, primeira resposta positiva, primeira segunda fase, cada marco é sinal de que a estratégia está funcionando, mesmo antes da oferta final.",
         action: "Na próxima vez que avançar de fase numa candidatura, reconheça isso como uma vitória real, não só 'mais um passo'.",
       },
     ],

@@ -44,7 +44,7 @@ export default async function BlogPage({
       <ContentPage
         eyebrow="Blog"
         title="Conteúdo direto ao ponto sobre currículo, entrevistas e carreira."
-        description="Estamos preparando os primeiros artigos — dicas práticas para cada momento: estágio, primeiro emprego, transição de carreira, recolocação e jovem aprendiz."
+        description="Estamos preparando os primeiros artigos, dicas práticas para cada momento: estágio, primeiro emprego, transição de carreira, recolocação e jovem aprendiz."
       >
         <div className="rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/60 dark:bg-neutral-900/40 p-5 text-sm text-neutral-500 dark:text-neutral-400">
           Em breve por aqui. Enquanto isso, veja abaixo o que já estamos preparando.
@@ -84,7 +84,7 @@ export default async function BlogPage({
     <ContentPage
       eyebrow="Blog"
       title="Conteúdo direto ao ponto sobre currículo, entrevistas e carreira."
-      description="Artigos práticos gerados para cada área profissional — estágio, primeiro emprego, transição de carreira, recolocação e crescimento."
+      description="Artigos práticos gerados para cada área profissional, estágio, primeiro emprego, transição de carreira, recolocação e crescimento."
       wide
     >
       <div className="flex flex-wrap gap-2">

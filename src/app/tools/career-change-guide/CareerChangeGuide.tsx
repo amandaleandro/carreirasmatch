@@ -37,7 +37,7 @@ export function CareerChangeGuide() {
           Guia completo de transição de carreira
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Do planejamento ao cargo-ponte certo — como trocar de área sem começar do zero.
+          Do planejamento ao cargo-ponte certo, como trocar de área sem começar do zero.
         </p>
       </header>
 

@@ -117,7 +117,7 @@ export default async function DashboardPage() {
     : [];
   const nextStep =
     weakestAnalysis.careerTrack === "career_change" && weakestBridgeRoles[0]
-      ? `Busque vagas de "${weakestBridgeRoles[0]}" — o cargo-ponte mais acessível até seu objetivo.`
+      ? `Busque vagas de "${weakestBridgeRoles[0]}", o cargo-ponte mais acessível até seu objetivo.`
       : fixes[0];
 
   const diagnosisDone = analyses.length > 0;
@@ -289,7 +289,7 @@ export default async function DashboardPage() {
             })}
           </div>
           <p className="text-xs text-neutral-500 mt-3">
-            Confira sempre no site da empresa — não enviamos lembrete automático por e-mail.
+            Confira sempre no site da empresa, não enviamos lembrete automático por e-mail.
           </p>
         </div>
       )}
@@ -322,19 +322,19 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-3xl font-bold text-blue-600">
-              {journey.daysSearching !== null ? journey.daysSearching : "—"}
+              {journey.daysSearching !== null ? journey.daysSearching : ", "}
             </p>
             <p className="text-xs text-neutral-500 mt-1">Dias em busca</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-blue-600">
-              {journey.responseRate !== null ? `${journey.responseRate}%` : "—"}
+              {journey.responseRate !== null ? `${journey.responseRate}%` : ", "}
             </p>
             <p className="text-xs text-neutral-500 mt-1">Taxa de resposta</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-blue-600">
-              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—"}
+              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : ", "}
             </p>
             <p className="text-xs text-neutral-500 mt-1">Taxa de rejeição</p>
           </div>

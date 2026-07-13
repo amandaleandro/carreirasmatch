@@ -142,7 +142,7 @@ export default function RegisterPage() {
                 ))}
               </select>
               <p className="text-xs text-neutral-500">
-                Definimos seu perfil com base nisso — as ferramentas mostradas dependem dele.
+                Definimos seu perfil com base nisso, as ferramentas mostradas dependem dele.
               </p>
             </div>
 

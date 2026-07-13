@@ -37,7 +37,7 @@ export function CareerGrowthGuide() {
           Guia completo de crescimento de carreira
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Promoção interna ou troca de empresa — como subir de senioridade com estratégia.
+          Promoção interna ou troca de empresa, como subir de senioridade com estratégia.
         </p>
       </header>
 

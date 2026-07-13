@@ -24,7 +24,7 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
     key: "conseguir_estagio",
     label: "Conseguir o 1º estágio",
     intro:
-      "A maior parte das vagas de estágio não chega até você por acaso — elas estão concentradas em alguns canais específicos. Concentre energia neles antes de sair aplicando em qualquer lugar.",
+      "A maior parte das vagas de estágio não chega até você por acaso, elas estão concentradas em alguns canais específicos. Concentre energia neles antes de sair aplicando em qualquer lugar.",
     tips: [
       {
         title: "Cadastre-se nos grandes agentes de integração",
@@ -57,7 +57,7 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
     key: "efetivacao",
     label: "Como ser efetivado",
     intro:
-      "Boa parte das empresas contrata efetivos entre os próprios estagiários — é mais barato e menos arriscado do que contratar alguém de fora. Esses comportamentos aumentam de verdade a chance de virar proposta de efetivo.",
+      "Boa parte das empresas contrata efetivos entre os próprios estagiários, é mais barato e menos arriscado do que contratar alguém de fora. Esses comportamentos aumentam de verdade a chance de virar proposta de efetivo.",
     tips: [
       {
         title: "Entregue o básico com consistência antes de tentar se destacar",
@@ -76,7 +76,7 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
       },
       {
         title: "Construa relação com o time, não só com quem te supervisiona",
-        body: "A decisão de efetivar raramente é só do supervisor direto — costuma envolver a opinião de outras pessoas do time e às vezes do RH. Ser lembrado só por quem manda em você é arriscado.",
+        body: "A decisão de efetivar raramente é só do supervisor direto, costuma envolver a opinião de outras pessoas do time e às vezes do RH. Ser lembrado só por quem manda em você é arriscado.",
         action: "Puxe conversa com alguém de outra área ou nível hierárquico diferente do seu esta semana.",
       },
       {
@@ -99,7 +99,7 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
       },
       {
         title: "Todo projeto precisa de um README que conta a história",
-        body: "O README deve responder: qual problema o projeto resolve, quais tecnologias foram usadas e o que você especificamente fez. Recrutadores raramente rodam o código — eles leem o README.",
+        body: "O README deve responder: qual problema o projeto resolve, quais tecnologias foram usadas e o que você especificamente fez. Recrutadores raramente rodam o código, eles leem o README.",
         action: "Escolha seu projeto mais forte e reescreva o README respondendo essas três perguntas em poucas linhas.",
       },
       {
@@ -156,7 +156,7 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
     key: "cursos_certificacoes",
     label: "Cursos e certificações",
     intro:
-      "Certificados não substituem experiência prática, mas ajudam a preencher currículo e mostrar iniciativa quando você ainda não tem estágio. Priorize cursos gratuitos e relevantes para a sua área — use o campo de curso/área do seu perfil como guia de busca.",
+      "Certificados não substituem experiência prática, mas ajudam a preencher currículo e mostrar iniciativa quando você ainda não tem estágio. Priorize cursos gratuitos e relevantes para a sua área, use o campo de curso/área do seu perfil como guia de busca.",
     tips: [
       {
         title: "Comece pelos cursos gratuitos de fundamentos",
@@ -180,7 +180,7 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
       },
       {
         title: "Coloque certificados concluídos no currículo e no LinkedIn",
-        body: "Um certificado que fica só guardado no e-mail não ajuda em nada — ele precisa aparecer no currículo e na seção de \"Licenças e certificados\" do LinkedIn.",
+        body: "Um certificado que fica só guardado no e-mail não ajuda em nada, ele precisa aparecer no currículo e na seção de \"Licenças e certificados\" do LinkedIn.",
         action: "Assim que concluir um curso, adicione o certificado no currículo e no LinkedIn no mesmo dia.",
       },
     ],
@@ -189,11 +189,11 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
     key: "financeiro",
     label: "Guia financeiro",
     intro:
-      "A bolsa-auxílio de estágio segue regras diferentes de um salário CLT — entender isso evita expectativas erradas e ajuda a organizar as finanças desde o primeiro estágio.",
+      "A bolsa-auxílio de estágio segue regras diferentes de um salário CLT, entender isso evita expectativas erradas e ajuda a organizar as finanças desde o primeiro estágio.",
     tips: [
       {
         title: "Bolsa-auxílio não é salário CLT",
-        body: "Estágio (Lei 11.788/2008) não gera vínculo empregatício: não há FGTS, 13º salário nem férias remuneradas garantidos por lei — apenas bolsa-auxílio, recesso remunerado proporcional e, em muitos casos, vale-transporte.",
+        body: "Estágio (Lei 11.788/2008) não gera vínculo empregatício: não há FGTS, 13º salário nem férias remuneradas garantidos por lei, apenas bolsa-auxílio, recesso remunerado proporcional e, em muitos casos, vale-transporte.",
         action: "Releia seu termo de compromisso de estágio e confirme quais benefícios estão previstos além da bolsa.",
       },
       {
@@ -208,12 +208,12 @@ export const INTERNSHIP_GUIDE: InternshipGuideSectionContent[] = [
       },
       {
         title: "Evite parcelar compras com base no salário do mês seguinte",
-        body: "Parcelar vários gastos pequenos compromete boa parte da bolsa do mês seguinte antes mesmo de ela cair na conta — especialmente arriscado em um contrato de prazo determinado como o estágio.",
+        body: "Parcelar vários gastos pequenos compromete boa parte da bolsa do mês seguinte antes mesmo de ela cair na conta, especialmente arriscado em um contrato de prazo determinado como o estágio.",
         action: "Antes de parcelar qualquer compra, pergunte se conseguiria pagar à vista guardando por 2-3 meses.",
       },
       {
         title: "Comece a guardar dinheiro, mesmo que pouco",
-        body: "O estágio costuma ser o primeiro contato com dinheiro próprio — criar o hábito de guardar uma quantia pequena todo mês importa mais do que o valor guardado no início.",
+        body: "O estágio costuma ser o primeiro contato com dinheiro próprio, criar o hábito de guardar uma quantia pequena todo mês importa mais do que o valor guardado no início.",
         action: "Programe uma transferência automática pequena para uma reserva assim que a bolsa cair na conta.",
       },
     ],

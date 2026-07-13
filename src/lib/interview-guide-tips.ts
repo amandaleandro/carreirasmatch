@@ -18,7 +18,7 @@ export const INTERVIEW_GUIDE: InterviewGuideSectionContent[] = [
     key: "postura",
     label: "Como funciona e como se portar",
     intro:
-      "A maioria das entrevistas de emprego segue uma estrutura parecida — entender essa estrutura e treinar a postura certa reduz boa parte da ansiedade.",
+      "A maioria das entrevistas de emprego segue uma estrutura parecida, entender essa estrutura e treinar a postura certa reduz boa parte da ansiedade.",
     tips: [
       {
         title: "As 3 partes de quase toda entrevista",
@@ -51,7 +51,7 @@ export const INTERVIEW_GUIDE: InterviewGuideSectionContent[] = [
     key: "portfolio",
     label: "Portfólio",
     intro:
-      "Um portfólio bem montado prova na prática o que o currículo só descreve — mesmo para quem está buscando o primeiro emprego e ainda não tem experiência formal.",
+      "Um portfólio bem montado prova na prática o que o currículo só descreve, mesmo para quem está buscando o primeiro emprego e ainda não tem experiência formal.",
     tips: [
       {
         title: "Portfólio não é só para área criativa ou tech",
@@ -70,7 +70,7 @@ export const INTERVIEW_GUIDE: InterviewGuideSectionContent[] = [
       },
       {
         title: "Coloque o link do portfólio em todo lugar",
-        body: "Currículo, LinkedIn e e-mail de candidatura devem ter o link do portfólio visível. Recrutadores raramente vão procurar por conta própria — o link precisa estar fácil de encontrar.",
+        body: "Currículo, LinkedIn e e-mail de candidatura devem ter o link do portfólio visível. Recrutadores raramente vão procurar por conta própria, o link precisa estar fácil de encontrar.",
         action: "Adicione o link do portfólio no topo do currículo, junto com e-mail e telefone.",
       },
     ],
@@ -79,7 +79,7 @@ export const INTERVIEW_GUIDE: InterviewGuideSectionContent[] = [
     key: "dress_code",
     label: "Dress code",
     intro:
-      "Vestir-se de forma adequada para a entrevista reduz uma fonte de ansiedade e evita distração — sua roupa não deveria ser o assunto da conversa.",
+      "Vestir-se de forma adequada para a entrevista reduz uma fonte de ansiedade e evita distração, sua roupa não deveria ser o assunto da conversa.",
     tips: [
       {
         title: "Regra geral: vista-se um degrau acima do dia a dia da empresa",
@@ -88,12 +88,12 @@ export const INTERVIEW_GUIDE: InterviewGuideSectionContent[] = [
       },
       {
         title: "Na dúvida, formal simples nunca erra",
-        body: "Calça social ou jeans escuro sem rasgos, camisa ou blusa lisa, sapato fechado limpo. Evite estampas chamativas, roupas muito curtas ou amassadas — o objetivo é parecer cuidado(a), não necessariamente engravatado(a).",
+        body: "Calça social ou jeans escuro sem rasgos, camisa ou blusa lisa, sapato fechado limpo. Evite estampas chamativas, roupas muito curtas ou amassadas, o objetivo é parecer cuidado(a), não necessariamente engravatado(a).",
         action: "Separe a roupa da entrevista no dia anterior e confira se está limpa e passada.",
       },
       {
         title: "Entrevista online também tem dress code",
-        body: "Mesmo em vídeo, vista-se como se fosse presencial (pelo menos da cintura para cima) — isso muda sua postura e sua concentração, além de evitar imprevistos se precisar se levantar.",
+        body: "Mesmo em vídeo, vista-se como se fosse presencial (pelo menos da cintura para cima), isso muda sua postura e sua concentração, além de evitar imprevistos se precisar se levantar.",
         action: "Escolha a roupa da entrevista online com a mesma atenção que teria numa presencial.",
       },
       {

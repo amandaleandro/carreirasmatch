@@ -30,7 +30,7 @@ export default async function ToolsPage() {
         </p>
         {segment && (
           <p className="relative text-sm text-blue-100/90 mt-3">
-            Mostrando recomendações para: <span className="font-medium text-white">{CAREER_SEGMENT_LABELS[segment]}</span> —{" "}
+            Mostrando recomendações para: <span className="font-medium text-white">{CAREER_SEGMENT_LABELS[segment]}</span>, {" "}
             <Link href="/settings" className="text-amber-300 hover:underline">
               alterar
             </Link>

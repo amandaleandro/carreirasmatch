@@ -28,7 +28,7 @@ function htmlToPlainText(html: string): string {
 }
 
 // A API pública do The Muse não filtra de fato pelo parâmetro "location" (o
-// total de resultados não muda entre buscas) — por isso, como no Arbeitnow,
+// total de resultados não muda entre buscas), por isso, como no Arbeitnow,
 // buscamos algumas páginas do feed geral e filtramos no cliente por vagas
 // remotas/no Brasil e por palavra-chave.
 export async function fetchTheMuseJobs(keywords?: string[]): Promise<FetchedJob[]> {

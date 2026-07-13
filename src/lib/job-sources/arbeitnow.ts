@@ -52,7 +52,7 @@ function htmlToPlainText(html: string): string {
     .slice(0, MAX_JOB_TEXT_LENGTH);
 }
 
-// A API do Arbeitnow ignora o parâmetro "search" — retorna sempre o mesmo feed.
+// A API do Arbeitnow ignora o parâmetro "search", retorna sempre o mesmo feed.
 // Por isso buscamos tudo e filtramos por palavra-chave no cliente.
 export async function fetchArbeitnowJobs(keywords?: string[]): Promise<FetchedJob[]> {
   const allJobs: ArbeitnowJob[] = [];

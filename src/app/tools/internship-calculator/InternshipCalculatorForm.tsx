@@ -57,7 +57,7 @@ export function InternshipCalculatorForm() {
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Compare propostas de estágio considerando bolsa, vale-transporte, vale-refeição e carga
-          horária — para ver de fato quanto sobra por mês e por hora trabalhada.
+          horária, para ver de fato quanto sobra por mês e por hora trabalhada.
         </p>
       </header>
 

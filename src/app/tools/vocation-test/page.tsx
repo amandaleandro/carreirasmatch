@@ -55,7 +55,7 @@ export default async function VocationTestHubPage() {
           </span>
           <h2 className="font-bold mt-3 mb-1.5">Já faço faculdade</h2>
           <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            Você já escolheu seu curso — vá direto para descobrir sua especialização dentro
+            Você já escolheu seu curso, vá direto para descobrir sua especialização dentro
             dele.
           </p>
         </Link>

@@ -16,7 +16,7 @@ export function UnlockDiagnosticButton({
   price: string;
   /** Pré-preenche o e-mail do pagador (fluxo anônimo, vindo do lead capturado). */
   payerEmail?: string;
-  /** Segmento do usuário anônimo — só rotula o pagamento; o preço do avulso é uniforme. */
+  /** Segmento do usuário anônimo, só rotula o pagamento; o preço do avulso é uniforme. */
   segment?: string;
 }) {
   const [showBrick, setShowBrick] = useState(false);

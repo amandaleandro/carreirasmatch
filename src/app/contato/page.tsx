@@ -14,7 +14,7 @@ export default function ContatoPage() {
     <ContentPage
       eyebrow="Contato"
       title="Fale com a gente."
-      description="Dúvidas sobre sua conta, cobrança, uma análise que não ficou clara ou sugestão para o produto? Escreva pra gente — respondemos por e-mail."
+      description="Dúvidas sobre sua conta, cobrança, uma análise que não ficou clara ou sugestão para o produto? Escreva pra gente, respondemos por e-mail."
     >
       <a
         href={`mailto:${CONTACT_EMAIL}`}
@@ -39,7 +39,7 @@ export default function ContatoPage() {
         <Link href="/ajuda" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
           Central de Ajuda
         </Link>{" "}
-        — a resposta pode estar lá.
+, a resposta pode estar lá.
       </p>
     </ContentPage>
   );

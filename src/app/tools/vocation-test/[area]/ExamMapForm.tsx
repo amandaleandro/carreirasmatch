@@ -90,7 +90,7 @@ function ExamMapResultView({
           {result.weeklySchedule.map((block) => (
             <div key={block.week}>
               <p className="text-sm font-medium">
-                Semana {block.week} — {block.focus}
+                Semana {block.week}, {block.focus}
               </p>
               <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
                 {block.tasks.map((t, i) => (
@@ -197,7 +197,7 @@ export function ExamMapForm({ area }: { area: VocationAreaConfig }) {
           Extra
         </span>
         <h2 className="text-xl md:text-2xl font-bold tracking-tight">
-          Mapa de estudos para ENEM/vestibular — {area.label}
+          Mapa de estudos para ENEM/vestibular, {area.label}
         </h2>
         <p className="text-neutral-500 dark:text-neutral-400 mt-2">
           Conte como está sua preparação e receba um plano priorizado de estudos

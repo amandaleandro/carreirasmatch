@@ -26,7 +26,7 @@ export function ApprenticeGuide() {
           Guia do Jovem Aprendiz
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Direitos e deveres, comportamento, escola, dinheiro e efetivação — tudo em um só lugar.
+          Direitos e deveres, comportamento, escola, dinheiro e efetivação, tudo em um só lugar.
         </p>
       </header>
 

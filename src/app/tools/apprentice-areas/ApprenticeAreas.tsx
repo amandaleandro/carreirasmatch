@@ -60,7 +60,7 @@ export function ApprenticeAreas() {
                   <ul className="space-y-1.5">
                     {area.courses.map((course) => (
                       <li key={course.title} className="text-sm text-neutral-700 dark:text-neutral-300">
-                        {course.title} <span className="text-neutral-400">— {course.provider}</span>
+                        {course.title} <span className="text-neutral-400">, {course.provider}</span>
                       </li>
                     ))}
                   </ul>

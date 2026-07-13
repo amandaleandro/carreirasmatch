@@ -49,7 +49,7 @@ export default async function OpportunityMapPage({
       ? "Seu perfil está bem alinhado com esta vaga agora."
       : record.applicationStatus === "adjust_first"
       ? "Você tem chance nesta vaga, mas vale ajustar alguns pontos antes de aplicar."
-      : "Esta vaga específica está distante do seu perfil atual — considere as alternativas abaixo.";
+      : "Esta vaga específica está distante do seu perfil atual, considere as alternativas abaixo.";
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-12 w-full">

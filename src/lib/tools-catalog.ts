@@ -63,7 +63,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
   {
     href: "/tools/vocation-test",
     title: "Teste vocacional",
-    description: "Descubra o caminho certo dentro da sua área — TI, Medicina, Direito e mais.",
+    description: "Descubra o caminho certo dentro da sua área, TI, Medicina, Direito e mais.",
     segments: ["student", "career_change", "internship"],
     icon: "compass",
     color: "amber",
@@ -167,7 +167,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
   {
     href: "/tools/internship-guide",
     title: "Guia completo do estágio",
-    description: "Da primeira candidatura à efetivação — portfólio, LinkedIn, cursos e dinheiro.",
+    description: "Da primeira candidatura à efetivação, portfólio, LinkedIn, cursos e dinheiro.",
     segments: ["internship"],
     icon: "compass",
     color: "indigo",
@@ -191,7 +191,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
   {
     href: "/tools/career-change-guide",
     title: "Guia completo de transição de carreira",
-    description: "Do planejamento ao cargo-ponte certo — como trocar de área sem começar do zero.",
+    description: "Do planejamento ao cargo-ponte certo, como trocar de área sem começar do zero.",
     segments: ["career_change"],
     icon: "compass",
     color: "amber",
@@ -207,7 +207,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
   {
     href: "/tools/reemployment-guide",
     title: "Guia completo de recolocação",
-    description: "Do desligamento à próxima oferta — estratégia, rede e como sustentar a motivação na busca.",
+    description: "Do desligamento à próxima oferta, estratégia, rede e como sustentar a motivação na busca.",
     segments: ["career_pro"],
     icon: "compass",
     color: "rose",
@@ -215,7 +215,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
   {
     href: "/tools/career-growth-guide",
     title: "Guia completo de crescimento de carreira",
-    description: "Promoção interna ou troca de empresa — como subir de senioridade com estratégia.",
+    description: "Promoção interna ou troca de empresa, como subir de senioridade com estratégia.",
     segments: ["career_pro"],
     icon: "compass",
     color: "emerald",

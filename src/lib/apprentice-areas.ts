@@ -37,7 +37,7 @@ export const APPRENTICE_AREAS: ApprenticeArea[] = [
     key: "logistica",
     label: "Logística e estoque",
     description:
-      "Apoio em conferência de estoque, organização de almoxarifado, separação de pedidos e suporte a operações de armazém — presente em indústrias, varejo e e-commerce.",
+      "Apoio em conferência de estoque, organização de almoxarifado, separação de pedidos e suporte a operações de armazém, presente em indústrias, varejo e e-commerce.",
     courses: [
       { title: "Noções de Logística e Entregas", provider: "Sebrae" },
       { title: "Fundamentos de Administração", provider: "Fundação Bradesco" },
@@ -47,7 +47,7 @@ export const APPRENTICE_AREAS: ApprenticeArea[] = [
     key: "tecnologia_suporte",
     label: "Tecnologia e suporte",
     description:
-      "Suporte técnico básico, apoio em cadastro de sistemas e primeiro contato com rotinas de tecnologia — uma área em crescimento para programas de aprendizagem em empresas maiores.",
+      "Suporte técnico básico, apoio em cadastro de sistemas e primeiro contato com rotinas de tecnologia, uma área em crescimento para programas de aprendizagem em empresas maiores.",
     courses: [
       { title: "Fundamentos de tecnologia e produtividade", provider: "Microsoft Learn" },
       { title: "Comunicação, cidadania e tecnologia básica", provider: "Escola Virtual Gov" },
@@ -55,9 +55,9 @@ export const APPRENTICE_AREAS: ApprenticeArea[] = [
   },
   {
     key: "saude_apoio",
-    label: "Saúde — apoio administrativo",
+    label: "Saúde, apoio administrativo",
     description:
-      "Funções de apoio administrativo em clínicas, hospitais e laboratórios: recepção de pacientes, organização de prontuários e agendamento — não envolve procedimentos de saúde, apenas rotina administrativa.",
+      "Funções de apoio administrativo em clínicas, hospitais e laboratórios: recepção de pacientes, organização de prontuários e agendamento, não envolve procedimentos de saúde, apenas rotina administrativa.",
     courses: [
       { title: "Atendimento ao Cliente", provider: "Sebrae" },
       { title: "Excel, Word e Pacote Office", provider: "Fundação Bradesco" },

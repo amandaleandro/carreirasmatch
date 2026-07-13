@@ -148,17 +148,17 @@ export const NICHES = {
     eyebrow: "Para estagiários",
     headline: "Sua vaga de estágio pede experiência que você ainda não tem?",
     subheadline:
-      "A gente sabe: quase toda vaga de estágio parece exigir mais do que um estudante pode ter. Envie seu currículo e a vaga que você quer e veja exatamente onde focar para se destacar — sem precisar de anos de experiência.",
+      "A gente sabe: quase toda vaga de estágio parece exigir mais do que um estudante pode ter. Envie seu currículo e a vaga que você quer e veja exatamente onde focar para se destacar, sem precisar de anos de experiência.",
     painPoints: [
       "Currículo genérico que não destaca projetos da faculdade ou cursos",
       "Insegurança sobre o que colocar quando você nunca trabalhou antes",
       "Não saber quais perguntas o recrutador vai fazer numa primeira entrevista",
     ],
     benefits: [
-      { title: "Score de aderência", description: "Um número de 0 a 100 que mostra se vale a pena aplicar — antes de você perder a vaga esperando resposta." },
+      { title: "Score de aderência", description: "Um número de 0 a 100 que mostra se vale a pena aplicar, antes de você perder a vaga esperando resposta." },
       { title: "Gaps de palavras-chave", description: "As palavras exatas que faltam no currículo para passar pelo filtro automático do RH." },
       { title: "Resposta pronta para \"fale sobre você\"", description: "Um roteiro natural, sem decoreba, para você não travar na frente do recrutador." },
-      { title: "Perguntas de entrevista prováveis", description: "As perguntas que esse tipo de vaga mais faz — chegue treinado mesmo na sua primeira entrevista." },
+      { title: "Perguntas de entrevista prováveis", description: "As perguntas que esse tipo de vaga mais faz, chegue treinado mesmo na sua primeira entrevista." },
     ],
     ctaLabel: "Analisar meu currículo de estágio →",
     themeAccent: "green",
@@ -205,7 +205,7 @@ export const NICHES = {
     heroIcon: "💼",
     heroImage: "/niche-hero/primeiro-emprego.png",
     quickFeatures: ["Currículo profissional com IA", "Vagas que combinam com seu perfil", "Simulados e testes online", "Dicas de entrevista"],
-    socialProof: "Se você nunca teve carteira assinada, isso não te deixa para trás — só pede um currículo contado do jeito certo.",
+    socialProof: "Se você nunca teve carteira assinada, isso não te deixa para trás, só pede um currículo contado do jeito certo.",
     samplePreview: {
       score: 64,
       scoreLabel: "Aderência à vaga de Assistente Administrativo",
@@ -228,14 +228,14 @@ export const NICHES = {
     eyebrow: "Para transição de carreira",
     headline: "Trocar de área não é começar do zero.",
     subheadline:
-      "Você já tem experiência — só não está na área nova ainda. Envie seu currículo e a vaga que você quer e veja quais habilidades da sua trajetória atual já contam a seu favor.",
+      "Você já tem experiência, só não está na área nova ainda. Envie seu currículo e a vaga que você quer e veja quais habilidades da sua trajetória atual já contam a seu favor.",
     painPoints: [
       "Sensação de estar competindo com quem já é da área há anos",
       "Dificuldade de explicar por que está mudando de carreira",
       "Não saber quais cargos-ponte usar para chegar até o objetivo final",
     ],
     benefits: [
-      { title: "Habilidades transferíveis", description: "O que da sua experiência atual já conta ponto na área nova — pare de se sentir \"atrás de todo mundo\"." },
+      { title: "Habilidades transferíveis", description: "O que da sua experiência atual já conta ponto na área nova, pare de se sentir \"atrás de todo mundo\"." },
       { title: "Narrativa de transição", description: "Um texto pronto para LinkedIn e entrevistas que explica sua mudança sem parecer fuga." },
       { title: "Cargos-ponte", description: "O cargo intermediário certo para entrar na área nova sem dar um salto grande demais." },
       { title: "Resposta para \"por que você quer mudar de área?\"", description: "Uma resposta estratégica e pronta, que vira ponto forte em vez de alarme no processo." },
@@ -275,7 +275,7 @@ export const NICHES = {
       "Candidaturas sem retorno e sem saber o motivo",
     ],
     benefits: [
-      { title: "Objeções prováveis do recrutador", description: "O que provavelmente vai pesar contra você nessa vaga — e como responder antes que perguntem." },
+      { title: "Objeções prováveis do recrutador", description: "O que provavelmente vai pesar contra você nessa vaga, e como responder antes que perguntem." },
       { title: "Estratégia de candidatura", description: "Como se posicionar para esta vaga específica, sem reciclar o mesmo currículo de sempre." },
       { title: "Plano semanal de candidaturas", description: "Ações concretas para retomar a busca sem se perder ou travar de novo." },
       { title: "Análise de feedbacks anteriores", description: "Cole os feedbacks que já recebeu e descubra o padrão que está te barrando." },
@@ -308,15 +308,15 @@ export const NICHES = {
     eyebrow: "Para jovem aprendiz",
     headline: "Seu primeiro currículo, pronto para o programa de aprendizagem.",
     subheadline:
-      "Ninguém espera que você já tenha experiência de trabalho — mas o currículo ainda precisa mostrar o seu potencial. Envie o que você já tem e receba dicas simples para melhorar antes de aplicar.",
+      "Ninguém espera que você já tenha experiência de trabalho, mas o currículo ainda precisa mostrar o seu potencial. Envie o que você já tem e receba dicas simples para melhorar antes de aplicar.",
     painPoints: [
       "Nunca ter feito um currículo antes e não saber o que colocar",
       "Achar que \"não tem nada\" para mostrar por ainda não ter trabalhado",
       "Não saber o que esperar de uma primeira entrevista",
     ],
     benefits: [
-      { title: "Diagnóstico simples e direto", description: "Sem termo difícil, direto ao ponto — feito para quem está começando agora." },
-      { title: "O que já conta a seu favor", description: "Escola, cursos livres e atividades extracurriculares contam, sim — a gente mostra como usar isso." },
+      { title: "Diagnóstico simples e direto", description: "Sem termo difícil, direto ao ponto, feito para quem está começando agora." },
+      { title: "O que já conta a seu favor", description: "Escola, cursos livres e atividades extracurriculares contam, sim, a gente mostra como usar isso." },
       { title: "Resposta pronta para \"fale sobre você\"", description: "Um roteiro fácil de decorar para você não travar na primeira entrevista da vida." },
       { title: "Checklist de currículo", description: "Os ajustes rápidos que deixam o currículo com cara de profissional." },
     ],
@@ -355,7 +355,7 @@ export const NICHES = {
       "Testes vocacionais genéricos que não explicam o dia a dia real da profissão",
     ],
     benefits: [
-      { title: "Teste vocacional por área", description: "Descubra qual caminho dentro da área combina mais com você — não só \"exatas ou humanas\"." },
+      { title: "Teste vocacional por área", description: "Descubra qual caminho dentro da área combina mais com você, não só \"exatas ou humanas\"." },
       { title: "Faculdade x técnico", description: "Compare tempo, investimento e mercado de cada opção antes de decidir." },
       { title: "Mapa de áreas e trilhas", description: "Veja os caminhos possíveis dentro da profissão escolhida, sem travar na primeira escolha." },
       { title: "Plano de decisão", description: "Passos práticos para sair da dúvida e decidir com mais segurança." },
@@ -715,7 +715,7 @@ export function NicheLandingPage() {
               Veja o que a análise te devolve
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-              Um exemplo de diagnóstico gerado pelo sistema para o seu momento — o seu vai usar o seu currículo e a vaga real.
+              Um exemplo de diagnóstico gerado pelo sistema para o seu momento, o seu vai usar o seu currículo e a vaga real.
             </p>
           </div>
 
@@ -840,7 +840,7 @@ export function NicheLandingPage() {
           </p>
         </section>
 
-        {/* Pricing: grátis, pagamento único e assinatura mensal — valor específico do nicho */}
+        {/* Pricing: grátis, pagamento único e assinatura mensal, valor específico do nicho */}
         <section id="planos" className="py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
           <div className="text-center max-w-2xl mx-auto">
             <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>O que você ganha</p>
@@ -892,7 +892,7 @@ export function NicheLandingPage() {
               </Link>
             </div>
 
-            {/* Tier 3: assinatura mensal — valor por nicho */}
+            {/* Tier 3: assinatura mensal, valor por nicho */}
             <div className={`relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
               <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full text-white text-[10px] font-bold uppercase tracking-wide px-3 py-1 shadow-sm whitespace-nowrap ${theme.numberBg}`}>
                 Melhor custo-benefício
@@ -914,7 +914,7 @@ export function NicheLandingPage() {
                 ))}
               </div>
               <span className="mt-4 inline-flex w-fit items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 text-[11px] font-semibold px-2.5 py-1">
-                Sem fidelidade — cancele quando quiser
+                Sem fidelidade, cancele quando quiser
               </span>
               <Link
                 href={subscriptionHref}

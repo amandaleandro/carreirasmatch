@@ -48,7 +48,7 @@ export const APPRENTICE_GUIDE: ApprenticeGuideSectionContent[] = [
       {
         title: "Rescisão tem regras diferentes de um contrato comum",
         body: "A empresa só pode encerrar o contrato antes do prazo em situações específicas: desempenho insuficiente, falta disciplinar grave, falta injustificada às aulas teóricas, pedido do próprio aprendiz ou quando ele completa 24 anos (exceto aprendiz com deficiência).",
-        action: "Se for desligado antes do prazo, peça por escrito o motivo — isso ajuda a confirmar se a rescisão seguiu a lei.",
+        action: "Se for desligado antes do prazo, peça por escrito o motivo, isso ajuda a confirmar se a rescisão seguiu a lei.",
       },
     ],
   },
@@ -81,7 +81,7 @@ export const APPRENTICE_GUIDE: ApprenticeGuideSectionContent[] = [
       {
         title: "Feedback é ferramenta, não crítica pessoal",
         body: "Supervisores costumam dar feedback direto para ajudar você a melhorar rápido, já que o programa tem prazo. Ouvir sem se fechar e perguntar \"como eu posso melhorar isso?\" é o que diferencia quem cresce rápido no programa.",
-        action: "Da próxima vez que receber uma correção, anote em vez de só concordar de cabeça — ajuda a não repetir o erro.",
+        action: "Da próxima vez que receber uma correção, anote em vez de só concordar de cabeça, ajuda a não repetir o erro.",
       },
     ],
   },
@@ -89,7 +89,7 @@ export const APPRENTICE_GUIDE: ApprenticeGuideSectionContent[] = [
     key: "rendimento_escolar",
     label: "Rendimento escolar",
     intro:
-      "Conciliar trabalho e escola é o maior desafio prático da aprendizagem. A lei já garante horário compatível — mas a organização do seu tempo faz toda a diferença no resultado.",
+      "Conciliar trabalho e escola é o maior desafio prático da aprendizagem. A lei já garante horário compatível, mas a organização do seu tempo faz toda a diferença no resultado.",
     tips: [
       {
         title: "Tenha uma agenda única para escola e trabalho",
@@ -103,12 +103,12 @@ export const APPRENTICE_GUIDE: ApprenticeGuideSectionContent[] = [
       },
       {
         title: "Avise a escola e a empresa sobre datas importantes com antecedência",
-        body: "Provas, conselhos de classe e entrega de trabalhos importantes devem ser avisados à empresa com antecedência — a lei protege seu direito de frequentar a escola, mas isso funciona melhor quando você já avisa com tempo, não em cima da hora.",
+        body: "Provas, conselhos de classe e entrega de trabalhos importantes devem ser avisados à empresa com antecedência, a lei protege seu direito de frequentar a escola, mas isso funciona melhor quando você já avisa com tempo, não em cima da hora.",
         action: "No início de cada bimestre, avise seu supervisor sobre as datas de prova já divulgadas pela escola.",
       },
       {
         title: "Se o cansaço estiver afetando as notas, fale antes de piorar",
-        body: "É comum o rendimento cair nos primeiros meses de adaptação. Se isso acontecer, converse com a família, a escola e, se necessário, com a entidade formadora — ajustar rotina de sono e estudo cedo evita que o problema fique maior.",
+        body: "É comum o rendimento cair nos primeiros meses de adaptação. Se isso acontecer, converse com a família, a escola e, se necessário, com a entidade formadora, ajustar rotina de sono e estudo cedo evita que o problema fique maior.",
         action: "Se notar 2 notas seguidas caindo, converse com um adulto responsável (família ou coordenador) ainda essa semana.",
       },
       {
@@ -169,7 +169,7 @@ export const APPRENTICE_GUIDE: ApprenticeGuideSectionContent[] = [
       },
       {
         title: "Construa relação com o time, não só com o supervisor",
-        body: "Quem só se relaciona bem com o chefe direto, mas é indiferente com o resto do time, costuma perder pontos na hora da decisão de efetivação — que geralmente ouve a opinião de mais gente do que só o supervisor imediato.",
+        body: "Quem só se relaciona bem com o chefe direto, mas é indiferente com o resto do time, costuma perder pontos na hora da decisão de efetivação, que geralmente ouve a opinião de mais gente do que só o supervisor imediato.",
         action: "Puxe conversa com um colega de outro setor essa semana, mesmo que seja rápido.",
       },
       {

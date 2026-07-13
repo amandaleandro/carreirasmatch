@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
 // Ferramentas realmente públicas (as demais /tools/* exigem assinatura por
-// design — não entram no sitemap para não apontar a crawler para páginas que
+// design, não entram no sitemap para não apontar a crawler para páginas que
 // redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts.
 const PUBLIC_TOOL_PATHS = [
   "/tools/vocation-test",
@@ -13,7 +13,7 @@ const PUBLIC_TOOL_PATHS = [
 ];
 
 /**
- * Sitemap para os crawlers. Cobre só as páginas públicas/indexáveis — landing,
+ * Sitemap para os crawlers. Cobre só as páginas públicas/indexáveis, landing,
  * institucional, ferramentas gratuitas e posts do blog. Áreas logadas e
  * ferramentas por assinatura ficam de fora de propósito (ver app/robots.ts).
  */

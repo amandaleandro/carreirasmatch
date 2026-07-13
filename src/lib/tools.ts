@@ -7,7 +7,7 @@ import {
   type PersonalityTrait,
 } from "@/lib/behavioral-test";
 
-const BASE_RULES = `Responda SEMPRE em português do Brasil. Seja específico e baseie-se apenas em fatos fornecidos pelo usuário — nunca invente experiência, ferramentas ou resultados que não foram mencionados. Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois.`;
+const BASE_RULES = `Responda SEMPRE em português do Brasil. Seja específico e baseie-se apenas em fatos fornecidos pelo usuário, nunca invente experiência, ferramentas ou resultados que não foram mencionados. Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois.`;
 
 // --- Transformar projeto em experiência ---
 
@@ -24,7 +24,7 @@ export async function generateProjectExperience(
 ${BASE_RULES}
 Formato de resposta:
 {
-  "title": string (título curto para a seção, ex: "Projeto acadêmico — Sistema de controle de tarefas"),
+  "title": string (título curto para a seção, ex: "Projeto acadêmico, Sistema de controle de tarefas"),
   "bullets": string[] (3 a 5 bullets no estilo currículo, começando com verbo de ação, destacando tecnologias, decisões técnicas e organização/processo, SEM inventar métricas de impacto que não foram informadas)
 }`;
 
@@ -62,7 +62,7 @@ export async function analyzeVocationTest(
   alreadyEnrolled = false
 ): Promise<VocationResult> {
   const enrolledGuidance = alreadyEnrolled
-    ? `\nA pessoa JÁ ESTÁ CURSANDO faculdade/técnico em ${area.label} — ela não está decidindo se quer entrar na área, e sim escolhendo sua especialização/caminho dentro do curso que já faz. Ajuste "firstSteps" para passos de quem já é aluno(a): matérias eletivas para priorizar, tipos de estágio para buscar, temas de TCC/projeto final, monitorias ou iniciação científica relacionadas — nunca passos de "como entrar na área".`
+    ? `\nA pessoa JÁ ESTÁ CURSANDO faculdade/técnico em ${area.label}, ela não está decidindo se quer entrar na área, e sim escolhendo sua especialização/caminho dentro do curso que já faz. Ajuste "firstSteps" para passos de quem já é aluno(a): matérias eletivas para priorizar, tipos de estágio para buscar, temas de TCC/projeto final, monitorias ou iniciação científica relacionadas, nunca passos de "como entrar na área".`
     : "";
 
   const systemPrompt = `Você é um orientador de carreira especializado em ${area.label}. Sua tarefa é, com base nas respostas de um quiz de interesses e (se disponível) no currículo da pessoa, recomendar os caminhos dentro de ${area.label} mais alinhados ao perfil dela.
@@ -112,7 +112,7 @@ export async function analyzeCareerDiscovery(
   answers: DiscoveryAnswers,
   resumeText: string
 ): Promise<DiscoveryResult> {
-  const areaCatalog = VOCATION_AREAS.map((a) => `- ${a.slug}: ${a.label} — ${a.description}`).join(
+  const areaCatalog = VOCATION_AREAS.map((a) => `- ${a.slug}: ${a.label}, ${a.description}`).join(
     "\n"
   );
 
@@ -120,7 +120,7 @@ export async function analyzeCareerDiscovery(
 ${BASE_RULES}
 CATÁLOGO DE ÁREAS (use exatamente estes slugs):
 ${areaCatalog}
-Além da área, para cada recomendação diga se o caminho ideal é faculdade, curso técnico ou ambos — considere a preferência informada pela pessoa (PREFERÊNCIA_EDUCACIONAL), mas seja honesto se a área normalmente exigir um caminho específico (ex: Medicina exige faculdade).
+Além da área, para cada recomendação diga se o caminho ideal é faculdade, curso técnico ou ambos, considere a preferência informada pela pessoa (PREFERÊNCIA_EDUCACIONAL), mas seja honesto se a área normalmente exigir um caminho específico (ex: Medicina exige faculdade).
 Formato de resposta:
 {
   "recommendedAreas": [
@@ -262,15 +262,15 @@ export type EssayGradeResult = {
 };
 
 const ENEM_COMPETENCIES = [
-  "Competência 1 — Domínio da norma culta da língua escrita",
-  "Competência 2 — Compreensão do tema e uso de conhecimentos de outras áreas",
-  "Competência 3 — Seleção e organização de argumentos e informações",
-  "Competência 4 — Uso de mecanismos linguísticos de coesão",
-  "Competência 5 — Proposta de intervenção que respeite os direitos humanos",
+  "Competência 1, Domínio da norma culta da língua escrita",
+  "Competência 2, Compreensão do tema e uso de conhecimentos de outras áreas",
+  "Competência 3, Seleção e organização de argumentos e informações",
+  "Competência 4, Uso de mecanismos linguísticos de coesão",
+  "Competência 5, Proposta de intervenção que respeite os direitos humanos",
 ];
 
 export async function gradeEssay(essayText: string, theme: string): Promise<EssayGradeResult> {
-  const systemPrompt = `Você é um corretor experiente de redações do ENEM. Avalie a redação abaixo segundo as 5 competências oficiais do ENEM, cada uma valendo de 0 a 200 pontos (múltiplos de 40: 0, 40, 80, 120, 160, 200), com rigor realista — não infle notas.
+  const systemPrompt = `Você é um corretor experiente de redações do ENEM. Avalie a redação abaixo segundo as 5 competências oficiais do ENEM, cada uma valendo de 0 a 200 pontos (múltiplos de 40: 0, 40, 80, 120, 160, 200), com rigor realista, não infle notas.
 ${BASE_RULES}
 As 5 competências, na ordem exata em que devem aparecer no array "competencyScores":
 ${ENEM_COMPETENCIES.map((c, i) => `${i + 1}. ${c}`).join("\n")}
@@ -352,7 +352,7 @@ export async function generateResumeFromScratch(
   const systemPrompt = `Você é um especialista em currículos para quem está começando na carreira (estágio/primeiro emprego), sem experiência profissional formal. Monte um currículo completo e estruturado a partir das informações brutas fornecidas.
 ${BASE_RULES}${
     hasJob
-      ? "\nUma vaga específica foi informada abaixo (VAGA-ALVO). Priorize, no resumo e na descrição de cada experiência, os termos, tecnologias e requisitos dessa vaga — mas SEM inventar nada que a pessoa não tenha informado sobre si mesma."
+      ? "\nUma vaga específica foi informada abaixo (VAGA-ALVO). Priorize, no resumo e na descrição de cada experiência, os termos, tecnologias e requisitos dessa vaga, mas SEM inventar nada que a pessoa não tenha informado sobre si mesma."
       : ""
   }
 Formato de resposta:
@@ -438,7 +438,7 @@ ${BASE_RULES}
 Formato de resposta:
 {
   "overallImpression": string (2-3 frases sobre a impressão geral do GitHub em relação ao objetivo informado),
-  "strongestRepos": string[] (nomes dos repositórios/projetos, citados pelo usuário, que mais valem a pena destacar no currículo — array vazio se nenhum se destacar),
+  "strongestRepos": string[] (nomes dos repositórios/projetos, citados pelo usuário, que mais valem a pena destacar no currículo, array vazio se nenhum se destacar),
   "fixes": string[] (3 a 6 ações concretas para melhorar o GitHub: READMEs, nomes de repositórios, descrições, pin de projetos, etc)
 }`;
 
@@ -678,7 +678,7 @@ Antes de gerar as perguntas, identifique o nível de senioridade pedido pela vag
 - Estágio/júnior: fundamentos, potencial de aprendizado, projetos acadêmicos/pessoais, situações simples do dia a dia.
 - Pleno: experiência aplicada, decisões técnicas reais, trade-offs em projetos que já executou.
 - Sênior/especialista: arquitetura, liderança técnica, mentoria, decisões de alto impacto, trade-offs complexos.
-Gere um conjunto DIFERENTE de perguntas a cada chamada, mesmo para a mesma vaga — varie o enunciado, os tópicos e o ângulo (nunca repita literalmente um banco fixo de perguntas). Dê ênfase especial, em pelo menos 2 das perguntas, aos seguintes temas: ${focuses.join(", ")}.
+Gere um conjunto DIFERENTE de perguntas a cada chamada, mesmo para a mesma vaga, varie o enunciado, os tópicos e o ângulo (nunca repita literalmente um banco fixo de perguntas). Dê ênfase especial, em pelo menos 2 das perguntas, aos seguintes temas: ${focuses.join(", ")}.
 Formato de resposta:
 {
   "questions": string[] (5 a 8 perguntas prováveis, misturando técnicas e comportamentais, baseadas nos requisitos e na senioridade da vaga)
@@ -715,12 +715,12 @@ export async function generateCoverLetter(
   jobText: string,
   tone: CoverLetterTone
 ): Promise<CoverLetterResult> {
-  const systemPrompt = `Você é um especialista em redigir cartas de apresentação (cover letters) para vagas de emprego no Brasil. Escreva SOMENTE com base em fatos reais presentes no currículo — nunca invente experiência, ferramentas ou resultados que não foram mencionados.
+  const systemPrompt = `Você é um especialista em redigir cartas de apresentação (cover letters) para vagas de emprego no Brasil. Escreva SOMENTE com base em fatos reais presentes no currículo, nunca invente experiência, ferramentas ou resultados que não foram mencionados.
 ${BASE_RULES}
 O tom da carta deve ser ${COVER_LETTER_TONE_LABELS[tone]}.
 Formato de resposta:
 {
-  "coverLetter": string (carta de apresentação completa, 3 a 5 parágrafos curtos, pronta para enviar, conectando o perfil do candidato aos requisitos da vaga, SEM saudação genérica tipo "Prezados" seguida de placeholder — use "Olá," ou algo natural no início e assine apenas com o nome se ele aparecer no currículo, senão sem assinatura),
+  "coverLetter": string (carta de apresentação completa, 3 a 5 parágrafos curtos, pronta para enviar, conectando o perfil do candidato aos requisitos da vaga, SEM saudação genérica tipo "Prezados" seguida de placeholder, use "Olá," ou algo natural no início e assine apenas com o nome se ele aparecer no currículo, senão sem assinatura),
   "tips": string[] (3-5 dicas de como personalizar ainda mais essa carta antes de enviar, ex: adicionar o nome do recrutador, citar um projeto específico da empresa)
 }`;
 

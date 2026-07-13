@@ -12,7 +12,7 @@ export default function PrivacidadePage() {
       <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
         Esta Política de Privacidade explica como o CarreirasMatch coleta, usa,
         armazena e protege dados pessoais, em conformidade com a Lei Geral de
-        Proteção de Dados (Lei nº 13.709/2018 — LGPD).
+        Proteção de Dados (Lei nº 13.709/2018, LGPD).
       </p>
 
       <ContentSection title="1. Dados que coletamos">

@@ -51,7 +51,7 @@ export const INTERNSHIP_CHECKLIST_ITEMS: InternshipChecklistItem[] = [
     key: "relatorio_atividades",
     title: "Relatório de atividades",
     description:
-      "Vá guardando (ou peça para a empresa emitir) relatórios periódicos das atividades — servem de comprovação para a faculdade e para seu currículo depois.",
+      "Vá guardando (ou peça para a empresa emitir) relatórios periódicos das atividades, servem de comprovação para a faculdade e para seu currículo depois.",
   },
   {
     key: "prazo_maximo",

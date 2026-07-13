@@ -7,7 +7,7 @@ export default async function VocationCollegePage() {
     <ContentPage
       eyebrow="Já na faculdade"
       title="Vamos direto para a sua especialização."
-      description="Você já escolheu seu curso — escolha a área abaixo para achar qual caminho seguir dentro dele."
+      description="Você já escolheu seu curso, escolha a área abaixo para achar qual caminho seguir dentro dele."
       backHref="/tools/vocation-test"
       backLabel="← Voltar"
       wide

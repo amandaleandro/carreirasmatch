@@ -23,7 +23,7 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
     key: "escolher_caminho",
     label: "Promoção ou troca de empresa?",
     intro:
-      "Subir de senioridade acontece de dois jeitos: crescendo dentro da empresa atual ou trocando de empresa para um cargo maior. Nenhum dos dois é superior por padrão — o caminho certo depende do que a empresa atual oferece de verdade, não só do que promete.",
+      "Subir de senioridade acontece de dois jeitos: crescendo dentro da empresa atual ou trocando de empresa para um cargo maior. Nenhum dos dois é superior por padrão, o caminho certo depende do que a empresa atual oferece de verdade, não só do que promete.",
     tips: [
       {
         title: "Olhe o histórico real de promoções da sua empresa, não só o discurso",
@@ -37,17 +37,17 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
       },
       {
         title: "Pergunte diretamente ao seu gestor sobre o caminho de promoção",
-        body: "Muita gente evita essa conversa por medo de parecer ambiciosa demais. Na prática, gestores costumam reagir bem a quem pergunta com clareza o que falta para o próximo nível — e isso já sinaliza intenção de crescer.",
+        body: "Muita gente evita essa conversa por medo de parecer ambiciosa demais. Na prática, gestores costumam reagir bem a quem pergunta com clareza o que falta para o próximo nível, e isso já sinaliza intenção de crescer.",
         action: "Marque uma conversa 1:1 com seu gestor e pergunte especificamente o que falta para você chegar ao próximo nível.",
       },
       {
         title: "Não espere a promoção 'acontecer sozinha' por tempo de casa",
-        body: "Tempo de casa sozinho raramente é critério de promoção nas empresas atuais — impacto e escopo entregues pesam muito mais. Se sua entrega não mudou nos últimos 12 meses, é sinal de agir, seja pedindo mais escopo, seja começando a buscar fora.",
+        body: "Tempo de casa sozinho raramente é critério de promoção nas empresas atuais, impacto e escopo entregues pesam muito mais. Se sua entrega não mudou nos últimos 12 meses, é sinal de agir, seja pedindo mais escopo, seja começando a buscar fora.",
         action: "Avalie se o escopo do seu trabalho cresceu nos últimos 12 meses. Se não, isso é o primeiro ponto a resolver.",
       },
       {
         title: "Rode os dois caminhos em paralelo até decidir",
-        body: "Buscar promoção interna não impede aplicar para vagas externas de nível maior ao mesmo tempo — a proposta externa concreta, inclusive, costuma acelerar uma decisão de promoção interna que estava travada.",
+        body: "Buscar promoção interna não impede aplicar para vagas externas de nível maior ao mesmo tempo, a proposta externa concreta, inclusive, costuma acelerar uma decisão de promoção interna que estava travada.",
         action: "Enquanto conversa sobre promoção internamente, mantenha 1-2 candidaturas externas de nível acima em andamento.",
       },
     ],
@@ -56,7 +56,7 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
     key: "caso_para_promocao",
     label: "Construir o caso para promoção",
     intro:
-      "Promoção raramente é dada só por bom desempenho no cargo atual — é dada para quem já demonstra, na prática, comportamento do próximo nível antes de ser promovido formalmente. Construir esse caso é um trabalho ativo, não passivo.",
+      "Promoção raramente é dada só por bom desempenho no cargo atual, é dada para quem já demonstra, na prática, comportamento do próximo nível antes de ser promovido formalmente. Construir esse caso é um trabalho ativo, não passivo.",
     tips: [
       {
         title: "Descubra os critérios formais do próximo nível",
@@ -65,7 +65,7 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
       },
       {
         title: "Já comece a agir como o próximo nível, dentro do possível",
-        body: "Assumir mais autonomia em decisões, ajudar a resolver problemas fora do seu escopo formal e apoiar pessoas mais juniores são sinais concretos de senioridade maior — muito mais visíveis do que só pedir a promoção verbalmente.",
+        body: "Assumir mais autonomia em decisões, ajudar a resolver problemas fora do seu escopo formal e apoiar pessoas mais juniores são sinais concretos de senioridade maior, muito mais visíveis do que só pedir a promoção verbalmente.",
         action: "Escolha uma responsabilidade do próximo nível e comece a exercê-la nas próximas semanas, mesmo informalmente.",
       },
       {
@@ -75,12 +75,12 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
       },
       {
         title: "Peça feedback específico sobre gaps para o próximo nível, não feedback genérico",
-        body: "'Como estou indo?' gera resposta vaga. 'O que especificamente falta para eu chegar ao nível sênior?' gera resposta acionável — e mostra ao gestor que você já está pensando na promoção de forma estruturada.",
+        body: "'Como estou indo?' gera resposta vaga. 'O que especificamente falta para eu chegar ao nível sênior?' gera resposta acionável, e mostra ao gestor que você já está pensando na promoção de forma estruturada.",
         action: "Na próxima 1:1, pergunte especificamente: 'o que falta hoje para eu estar pronto para o próximo nível?'.",
       },
       {
         title: "Formalize o pedido, não deixe só no campo do subentendido",
-        body: "Gestores lidam com várias prioridades ao mesmo tempo — quem não formaliza o pedido de promoção corre o risco de ser esquecido no ciclo, mesmo merecendo. Um pedido claro, com dados de impacto, entra no radar de forma diferente de uma expectativa implícita.",
+        body: "Gestores lidam com várias prioridades ao mesmo tempo, quem não formaliza o pedido de promoção corre o risco de ser esquecido no ciclo, mesmo merecendo. Um pedido claro, com dados de impacto, entra no radar de forma diferente de uma expectativa implícita.",
         action: "Marque uma conversa formal com seu gestor para apresentar seu caso de promoção, com os dados de impacto reunidos.",
       },
     ],
@@ -89,7 +89,7 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
     key: "estrategia_troca_empresa",
     label: "Estratégia para troca de empresa",
     intro:
-      "Buscar um cargo de nível maior em outra empresa é diferente de buscar recolocação: aqui a narrativa precisa mostrar crescimento, não só continuidade — e o filtro de vagas precisa mirar o próximo nível, não o nível atual.",
+      "Buscar um cargo de nível maior em outra empresa é diferente de buscar recolocação: aqui a narrativa precisa mostrar crescimento, não só continuidade, e o filtro de vagas precisa mirar o próximo nível, não o nível atual.",
     tips: [
       {
         title: "Aplique para vagas do próximo nível, não só do nível atual em outro lugar",
@@ -122,7 +122,7 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
     key: "negociacao",
     label: "Negociação de cargo e salário",
     intro:
-      "Seja na promoção interna, seja numa proposta externa, negociar o salto de nível é diferente de negociar um reajuste comum — o valor em jogo é maior e a conversa exige preparo específico.",
+      "Seja na promoção interna, seja numa proposta externa, negociar o salto de nível é diferente de negociar um reajuste comum, o valor em jogo é maior e a conversa exige preparo específico.",
     tips: [
       {
         title: "Nunca aceite a primeira proposta sem pelo menos uma contraproposta",
@@ -164,22 +164,22 @@ export const CAREER_GROWTH_GUIDE: CareerGrowthGuideSectionContent[] = [
       },
       {
         title: "Desenvolva a habilidade de influenciar sem autoridade formal",
-        body: "Convencer colegas e outras áreas a seguir uma direção, mesmo sem ser o chefe deles, é uma competência central de senioridade — e raramente é ensinada formalmente, precisa ser praticada.",
+        body: "Convencer colegas e outras áreas a seguir uma direção, mesmo sem ser o chefe deles, é uma competência central de senioridade, e raramente é ensinada formalmente, precisa ser praticada.",
         action: "Na próxima decisão em que você discordar de algo, pratique defender sua posição com argumentos, não só concordar por comodidade.",
       },
       {
         title: "Aprenda a delegar e revisar, não só executar",
-        body: "Quem sobe de nível deixa de ser avaliado só pelo que executa sozinho e passa a ser avaliado também pelo que consegue multiplicar através de outras pessoas — orientar, revisar e dar feedback fazem parte disso.",
+        body: "Quem sobe de nível deixa de ser avaliado só pelo que executa sozinho e passa a ser avaliado também pelo que consegue multiplicar através de outras pessoas, orientar, revisar e dar feedback fazem parte disso.",
         action: "Se houver alguém mais júnior no seu time, ofereça orientação ativa em uma tarefa nas próximas semanas.",
       },
       {
         title: "Fique confortável em tomar decisões com informação incompleta",
         body: "Esperar 100% de certeza antes de decidir é comportamento júnior. Senioridade envolve decidir com informação parcial, assumir o risco calculado e ajustar o curso conforme surgem novos dados.",
-        action: "Na próxima decisão pequena, evite adiar por falta de 100% de certeza — decida com o que você já tem e ajuste depois se precisar.",
+        action: "Na próxima decisão pequena, evite adiar por falta de 100% de certeza, decida com o que você já tem e ajuste depois se precisar.",
       },
       {
         title: "Busque visibilidade além do seu time direto",
-        body: "Senioridade também é reconhecimento — apresentar resultados em reuniões maiores, escrever documentação que outras áreas usam ou participar de decisões multi-time aumenta a visibilidade do seu trabalho na organização.",
+        body: "Senioridade também é reconhecimento, apresentar resultados em reuniões maiores, escrever documentação que outras áreas usam ou participar de decisões multi-time aumenta a visibilidade do seu trabalho na organização.",
         action: "Identifique uma oportunidade de apresentar um resultado seu para além do seu time direto nas próximas semanas.",
       },
     ],

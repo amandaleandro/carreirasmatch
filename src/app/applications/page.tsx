@@ -102,15 +102,15 @@ export default async function ApplicationsPage() {
   const journeyStats = [
     {
       label: "Dias em busca",
-      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "—",
+      value: journey.daysSearching !== null ? `${journey.daysSearching}` : ", ",
     },
     {
       label: "Taxa de resposta",
-      value: journey.responseRate !== null ? `${journey.responseRate}%` : "—",
+      value: journey.responseRate !== null ? `${journey.responseRate}%` : ", ",
     },
     {
       label: "Taxa de rejeição",
-      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—",
+      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : ", ",
     },
     {
       label: "Candidaturas na semana",
@@ -194,7 +194,7 @@ export default async function ApplicationsPage() {
             })}
           </div>
           <p className="text-xs text-neutral-500 mt-3">
-            Confira sempre no site da empresa — não enviamos lembrete automático por e-mail.
+            Confira sempre no site da empresa, não enviamos lembrete automático por e-mail.
           </p>
         </section>
       )}

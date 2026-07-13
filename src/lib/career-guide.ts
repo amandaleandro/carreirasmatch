@@ -18,7 +18,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     curiosities: [
       "Não existe um único caminho certo: muita gente entra por bootcamp ou curso livre, sem faculdade de Ciência da Computação.",
       "Portfólio no GitHub costuma pesar mais do que o diploma nas primeiras vagas.",
-      "A área muda rápido — quem entra precisa se acostumar a aprender ferramentas novas o tempo todo.",
+      "A área muda rápido, quem entra precisa se acostumar a aprender ferramentas novas o tempo todo.",
     ],
     technicalSkills: ["Lógica de programação", "Ao menos uma linguagem (Python, JS, Java...)", "Git/controle de versão", "Banco de dados básico (SQL)"],
     softSkills: ["Resolução de problemas", "Comunicação assíncrona (escrita clara)", "Autonomia para pesquisar/aprender sozinho", "Lidar bem com feedback técnico direto"],
@@ -30,8 +30,8 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
       "Rotina longa desde a graduação: aulas teóricas, estágios em hospital (internato) e plantões. Depois de formado, a maioria faz residência (2 a 5 anos) antes de atuar com mais autonomia. O trabalho envolve contato direto e constante com pacientes, decisões sob pressão e muita atualização constante.",
     salaryRange: "Residente: R$ 4.100 (bolsa nacional) · Recém-formado (plantão): R$ 3.000 – R$ 8.000/plantão fixo · Especialista consolidado: R$ 15.000 – R$ 40.000+",
     curiosities: [
-      "É um dos cursos mais concorridos do vestibular/ENEM — muita gente presta mais de uma vez.",
-      "A escolha da especialidade só acontece depois de formado, na residência — dá para mudar de ideia pelo caminho.",
+      "É um dos cursos mais concorridos do vestibular/ENEM, muita gente presta mais de uma vez.",
+      "A escolha da especialidade só acontece depois de formado, na residência, dá para mudar de ideia pelo caminho.",
       "Plantões noturnos e fins de semana fazem parte da rotina mesmo depois de anos de carreira.",
     ],
     technicalSkills: ["Anatomia e fisiologia aprofundadas", "Raciocínio clínico/diagnóstico", "Procedimentos práticos da especialidade", "Leitura de exames e literatura científica"],
@@ -44,7 +44,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
       "Muda muito conforme a área: quem está no contencioso passa tempo em audiências e prazos processuais; quem está no consultivo foca em análise de contratos e pareceres. Estágio em escritório ou órgão público durante a faculdade é praticamente padrão para quem quer boas oportunidades depois.",
     salaryRange: "Estágio: R$ 800 – R$ 2.000 · Recém-formado (OAB): R$ 2.200 – R$ 4.500 · Especialista/concursado: R$ 8.000 – R$ 30.000+",
     curiosities: [
-      "Passar na OAB é obrigatório para advogar — o curso sozinho não basta.",
+      "Passar na OAB é obrigatório para advogar, o curso sozinho não basta.",
       "Carreiras públicas (juiz, promotor, procurador) costumam ter os maiores salários da área, mas exigem concursos concorridos.",
       "Boa parte do trabalho é escrita: petições, pareceres e contratos, não só falar em audiência.",
     ],
@@ -59,7 +59,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     salaryRange: "Estágio: R$ 1.200 – R$ 2.800 · Júnior: R$ 3.500 – R$ 6.500 · Pleno/Sênior: R$ 7.000 – R$ 20.000+",
     curiosities: [
       "O registro no CREA é necessário para assinar projetos como engenheiro em muitas frentes.",
-      "Estágio técnico durante o curso pesa muito na hora da primeira vaga — mais do que nota de faculdade.",
+      "Estágio técnico durante o curso pesa muito na hora da primeira vaga, mais do que nota de faculdade.",
       "Engenharia de Produção é uma das poucas que mistura técnica com gestão de pessoas e processos.",
     ],
     technicalSkills: ["Cálculo e matemática aplicada", "Softwares de projeto/CAD da área", "Normas técnicas do setor", "Gestão básica de projetos"],
@@ -86,7 +86,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
       "Rotina orientada a campanhas e métricas: planejar conteúdo, acompanhar performance de anúncios, reuniões com outras áreas (vendas, produto) e ajustes constantes baseados em dados. Prazos costumam ser curtos e a prioridade muda com frequência.",
     salaryRange: "Estágio: R$ 1.000 – R$ 2.200 · Júnior: R$ 2.500 – R$ 4.800 · Pleno/Sênior: R$ 5.500 – R$ 15.000+",
     curiosities: [
-      "É uma das áreas mais abertas a quem não fez faculdade da área — portfólio e resultado prático pesam muito.",
+      "É uma das áreas mais abertas a quem não fez faculdade da área, portfólio e resultado prático pesam muito.",
       "Boa parte das vagas júnior pede domínio de ferramentas (Meta Ads, Google Analytics) mais do que teoria de marketing.",
       "Gerenciar rede social própria ou de terceiros já conta como experiência real para o currículo.",
     ],
@@ -114,7 +114,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
       "É uma das áreas mais amplas: pode significar cuidar de operações do dia a dia, liderar pessoas, analisar números financeiros ou planejar estratégia. A rotina muda bastante conforme a frente escolhida, mas organização e reuniões fazem parte da maioria delas.",
     salaryRange: "Estágio: R$ 1.000 – R$ 2.200 · Júnior: R$ 2.500 – R$ 5.000 · Pleno/Sênior/Gestão: R$ 6.000 – R$ 18.000+",
     curiosities: [
-      "É um curso comum para quem quer empreender — dá base para abrir e organizar o próprio negócio.",
+      "É um curso comum para quem quer empreender, dá base para abrir e organizar o próprio negócio.",
       "Empresa júnior durante a faculdade é uma das formas mais valorizadas de ganhar experiência prática.",
       "A formação abre portas para praticamente qualquer setor, não só empresas tradicionais.",
     ],
@@ -129,7 +129,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     salaryRange: "Estágio: R$ 1.100 – R$ 2.400 · Júnior: R$ 2.800 – R$ 5.500 · Pleno/Sênior: R$ 6.500 – R$ 20.000+",
     curiosities: [
       "O registro no CRC é exigido para atuar como contador, mesmo com o diploma em mãos.",
-      "É uma das áreas com maior estabilidade de demanda — toda empresa precisa de alguém cuidando das finanças.",
+      "É uma das áreas com maior estabilidade de demanda, toda empresa precisa de alguém cuidando das finanças.",
       "Cursos de Excel financeiro e certificações (como CFA, para investimentos) pesam bastante além do diploma.",
     ],
     technicalSkills: ["Excel financeiro avançado", "Normas contábeis e tributárias", "Análise de demonstrativos financeiros", "Sistemas de gestão financeira (ERPs)"],
@@ -139,11 +139,11 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     slug: "comunicacao",
     label: "Comunicação e Jornalismo",
     dayToDay:
-      "Rotina de apuração, escrita e edição — seja para uma matéria jornalística, um release de assessoria ou um conteúdo digital. Prazos apertados (deadlines) são constantes, e boa parte do trabalho é revisar e reescrever até o texto ficar redondo.",
+      "Rotina de apuração, escrita e edição, seja para uma matéria jornalística, um release de assessoria ou um conteúdo digital. Prazos apertados (deadlines) são constantes, e boa parte do trabalho é revisar e reescrever até o texto ficar redondo.",
     salaryRange: "Estágio: R$ 900 – R$ 2.000 · Júnior: R$ 2.300 – R$ 4.500 · Pleno/Sênior: R$ 5.000 – R$ 14.000+",
     curiosities: [
       "Ter um blog, canal ou perfil próprio já funciona como portfólio real para a primeira vaga.",
-      "A área se expandiu muito além da redação tradicional — hoje inclui podcast, conteúdo para redes e comunicação corporativa.",
+      "A área se expandiu muito além da redação tradicional, hoje inclui podcast, conteúdo para redes e comunicação corporativa.",
       "Freelances de redação são uma porta de entrada comum antes da primeira vaga CLT.",
     ],
     technicalSkills: ["Redação e revisão de texto", "Apuração e checagem de fatos", "Ferramentas de edição (texto, áudio ou vídeo)", "Noções de SEO/algoritmos de distribuição"],
@@ -167,7 +167,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     slug: "odontologia",
     label: "Odontologia",
     dayToDay:
-      "Grande parte do tempo é em consultório, atendendo pacientes em procedimentos que exigem precisão manual e paciência — muitos deles ansiosos ou com medo. Quem tem consultório próprio também lida com gestão de agenda, equipe e finanças do negócio.",
+      "Grande parte do tempo é em consultório, atendendo pacientes em procedimentos que exigem precisão manual e paciência, muitos deles ansiosos ou com medo. Quem tem consultório próprio também lida com gestão de agenda, equipe e finanças do negócio.",
     salaryRange: "Estágio: R$ 1.000 – R$ 2.000 · Recém-formado: R$ 2.500 – R$ 5.000 · Especialista/consultório próprio: R$ 8.000 – R$ 25.000+",
     curiosities: [
       "Boa parte dos dentistas abre consultório próprio nos primeiros anos de carreira, unindo técnica e gestão de negócio.",
@@ -297,7 +297,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     salaryRange: "Estágio: R$ 1.200 – R$ 2.500 · Júnior: R$ 3.000 – R$ 5.500 · Pleno/Sênior/consultoria: R$ 6.500 – R$ 16.000+",
     curiosities: [
       "É uma das áreas com maior demanda em cidades do interior, muitas vezes com mais oportunidades do que nas capitais.",
-      "Muitos agrônomos vêm de família produtora, mas não é pré-requisito — só ajuda a entender a rotina de campo.",
+      "Muitos agrônomos vêm de família produtora, mas não é pré-requisito, só ajuda a entender a rotina de campo.",
       "Sustentabilidade e agricultura de precisão (tecnologia no campo) são as frentes que mais crescem na área.",
     ],
     technicalSkills: ["Análise de solo e manejo de cultura", "Uso de tecnologia agrícola (drones, sensores)", "Gestão de produção rural", "Controle fitossanitário"],
@@ -396,7 +396,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     curiosities: [
       "É uma das áreas com rotina mais intensa em horários não convencionais: noites, fins de semana e feriados.",
       "Muitos chefs começam literalmente lavando louça e subindo posição por posição dentro da cozinha.",
-      "Turismo tem forte sazonalidade — épocas de alta e baixa temporada mudam bastante o volume de trabalho.",
+      "Turismo tem forte sazonalidade, épocas de alta e baixa temporada mudam bastante o volume de trabalho.",
     ],
     technicalSkills: ["Técnicas de cozinha/confeitaria", "Gestão de estoque e custos", "Atendimento e organização de eventos/roteiros", "Normas de higiene e segurança alimentar"],
     softSkills: ["Trabalho sob pressão em horário de pico", "Resistência física", "Atendimento e hospitalidade", "Trabalho em equipe em ritmo acelerado"],
@@ -408,7 +408,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
       "Alterna entre fases bem distintas: pré-produção (roteiro, planejamento), produção (gravação, geralmente em equipe e com prazo apertado) e pós-produção (edição, longas horas sozinho ou em dupla). Prazos de entrega marcam praticamente todo o processo.",
     salaryRange: "Estágio/freela iniciante: R$ 800 – R$ 2.000/projeto · Júnior: R$ 2.500 – R$ 4.500 · Pleno/Sênior/diretor: R$ 5.500 – R$ 15.000+",
     curiosities: [
-      "Grande parte do mercado funciona por projeto (freelance), não por CLT fixa — a rede de contatos pesa muito.",
+      "Grande parte do mercado funciona por projeto (freelance), não por CLT fixa, a rede de contatos pesa muito.",
       "Criar conteúdo próprio (canal, curtas) é uma forma comum de construir portfólio antes da primeira produtora.",
       "A pós-produção (edição) é uma das portas de entrada mais acessíveis, já que dá para aprender e praticar sozinho com poucos recursos.",
     ],

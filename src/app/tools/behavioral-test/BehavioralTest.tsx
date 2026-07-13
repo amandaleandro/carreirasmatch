@@ -181,7 +181,7 @@ export function BehavioralTest() {
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Responda o quanto cada afirmação combina com você. Não existe resposta certa ou
-          errada — seja honesto(a).
+          errada, seja honesto(a).
         </p>
       </header>
 

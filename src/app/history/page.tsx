@@ -142,7 +142,7 @@ export default async function HistoryPage({
             {seniorityTimeline.map((a) => (
               <div
                 key={a.id}
-                title={`${a.jobTitle} — ${a.seniorityScore}/100 (${new Date(a.createdAt).toLocaleDateString("pt-BR")})`}
+                title={`${a.jobTitle}, ${a.seniorityScore}/100 (${new Date(a.createdAt).toLocaleDateString("pt-BR")})`}
                 className="flex-1 min-w-[6px] rounded-t bg-blue-500/80 dark:bg-blue-500/70 hover:bg-blue-600 transition-colors"
                 style={{ height: `${Math.max(4, a.seniorityScore)}%` }}
               />

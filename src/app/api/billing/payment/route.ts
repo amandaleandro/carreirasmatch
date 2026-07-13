@@ -11,7 +11,7 @@ import { sendPaymentConfirmationEmail } from "@/lib/resend";
 
 // Segmento default para pagamento avulso sem login. O preço do avulso
 // (first_analysis/diagnostic) é uniforme entre todos os segmentos, então esse
-// default nunca muda o valor cobrado — só rotula o Payment enquanto o usuário
+// default nunca muda o valor cobrado, só rotula o Payment enquanto o usuário
 // não escolhe o segmento real no cadastro.
 const DEFAULT_ANON_SEGMENT = "career_pro";
 
@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Análise não encontrada." }, { status: 404 });
       }
     } else if (analysisRecord.resume.userId) {
-      // Já pertence a uma conta — não dá para desbloquear anonimamente.
+      // Já pertence a uma conta, não dá para desbloquear anonimamente.
       return NextResponse.json(
         { error: "Faça login para desbloquear esta análise." },
         { status: 401 }
@@ -162,7 +162,7 @@ export async function POST(req: NextRequest) {
       await prisma.resume.update({ where: { id: analysisRecord.resumeId }, data: { userId } });
     }
     // E-mail de confirmação no caminho síncrono (cartão). No PIX o Payment nasce
-    // "pending" e o e-mail sai no webhook — o guard de lá evita envio duplicado.
+    // "pending" e o e-mail sai no webhook, o guard de lá evita envio duplicado.
     void sendPaymentConfirmationEmail(email, { kind, amountCents });
   }
 

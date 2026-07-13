@@ -93,7 +93,7 @@ const CURIOSITIES = [
   "Cerca de 75% das grandes empresas usam sistemas de ATS para filtrar currículos antes de um humano ler.",
   "Currículos com verbos de ação (\"liderei\", \"implementei\", \"reduzi\") têm mais chance de avançar na triagem.",
   "Incluir números e resultados concretos pode aumentar em até 40% o interesse do recrutador.",
-  "Vagas no LinkedIn recebem em média 250 candidaturas — se destacar nos primeiros segundos é essencial.",
+  "Vagas no LinkedIn recebem em média 250 candidaturas, se destacar nos primeiros segundos é essencial.",
   "Erros de português ainda são o motivo nº 1 de descarte imediato de currículos no Brasil.",
   "Currículos de 1 página têm taxa de leitura completa maior que os de 2 páginas ou mais.",
   "Personalizar o currículo para cada vaga pode dobrar a taxa de resposta dos recrutadores.",

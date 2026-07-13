@@ -1,7 +1,7 @@
 /**
  * Camada de analytics provider-agnóstica. Hoje envia para o Plausible (se
  * configurado via NEXT_PUBLIC_PLAUSIBLE_DOMAIN), mas `track()` é um no-op seguro
- * quando nenhum provedor está carregado — então pode ser chamado em qualquer
+ * quando nenhum provedor está carregado, então pode ser chamado em qualquer
  * lugar sem quebrar nada.
  *
  * Os nomes de evento em ANALYTICS_EVENTS mapeiam o funil do produto:
@@ -31,7 +31,7 @@ declare global {
   }
 }
 
-/** Registra um evento de funil. Seguro chamar no servidor ou sem provedor — vira no-op. */
+/** Registra um evento de funil. Seguro chamar no servidor ou sem provedor, vira no-op. */
 export function track(event: AnalyticsEvent, props?: Record<string, string | number | boolean>) {
   if (typeof window === "undefined" || typeof window.plausible !== "function") return;
   try {

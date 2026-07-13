@@ -2,7 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 
 /**
  * Inicializa o Sentry apenas quando um DSN está configurado. Sem DSN (dev ou
- * ambiente sem monitoramento), tudo vira no-op — nenhum evento é enviado.
+ * ambiente sem monitoramento), tudo vira no-op, nenhum evento é enviado.
  *
  * Não usamos o plugin de build do Sentry (withSentryConfig) de propósito, para
  * não alterar o pipeline de build de produção deste Next customizado. Isso
