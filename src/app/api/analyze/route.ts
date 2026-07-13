@@ -245,11 +245,14 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("Erro ao analisar currículo:", error);
 
-    if (error instanceof Groq.APIError && error.status === 429) {
+    // 429 = rate limit por minuto; 413 = requisição grande demais para o TPM.
+    // A camada do Groq já tenta modelos alternativos antes de chegar aqui; se
+    // ainda assim falhar (todos no limite), devolve mensagem amigável.
+    if (error instanceof Groq.APIError && (error.status === 429 || error.status === 413)) {
       return NextResponse.json(
         {
           error:
-            "Limite diário de análises por IA atingido. Tente novamente em alguns minutos.",
+            "No momento a análise por IA está com muita demanda. Aguarde alguns instantes e tente novamente.",
         },
         { status: 429 }
       );

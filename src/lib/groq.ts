@@ -20,26 +20,43 @@ const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 // which a full resume extraction call alone can exceed — gpt-oss-120b has no such issue.)
 const EXTRACTION_MODEL = "openai/gpt-oss-120b";
 
+// Modelos com TPM (tokens/minuto) baixo demais para o tamanho das nossas
+// requisições de análise nesta conta Groq (tier gratuito). qwen/qwen3-32b é
+// capado em 6K TPM e uma análise sozinha já pede ~6,6K → 413 garantido. Se o
+// admin tiver esse modelo salvo, ignoramos e usamos o default (12K TPM), sem
+// exigir troca manual no /admin.
+const LOW_TPM_MODELS = new Set(["qwen/qwen3-32b"]);
+
+// Ordem de fallback quando um modelo estoura o limite (429/413), por folga de
+// TPM. A chamada tenta o próximo sozinha, então uma análise não falha só porque
+// o modelo ativo bateu no teto do minuto.
+const FALLBACK_MODELS = ["llama-3.3-70b-versatile", "openai/gpt-oss-120b"];
+
 let cachedModel: { value: string; expiresAt: number } | null = null;
 const MODEL_CACHE_TTL_MS = 30_000;
 
 async function getGroqModel(): Promise<string> {
   if (cachedModel && cachedModel.expiresAt > Date.now()) return cachedModel.value;
   const stored = await getSetting(GROQ_MODEL_SETTING_KEY);
-  const value = stored || DEFAULT_GROQ_MODEL;
+  const value = stored && !LOW_TPM_MODELS.has(stored) ? stored : DEFAULT_GROQ_MODEL;
   cachedModel = { value, expiresAt: Date.now() + MODEL_CACHE_TTL_MS };
   return value;
 }
 
-export async function runJsonPrompt<T>(
+/** Erro de limite do Groq (rate limit por minuto ou requisição grande demais para o TPM). */
+function isGroqRateOrSizeError(err: unknown): err is InstanceType<typeof Groq.APIError> {
+  return err instanceof Groq.APIError && (err.status === 429 || err.status === 413);
+}
+
+async function runJsonPromptOnce<T>(
   systemPrompt: string,
   userMessage: string,
-  temperature = 0.2,
-  maxCompletionTokens = 3500,
-  model?: string
+  temperature: number,
+  maxCompletionTokens: number,
+  model: string
 ): Promise<T> {
   const completion = await getGroqClient().chat.completions.create({
-    model: model ?? (await getGroqModel()),
+    model,
     temperature,
     max_completion_tokens: maxCompletionTokens,
     response_format: { type: "json_object" },
@@ -59,6 +76,35 @@ export async function runJsonPrompt<T>(
   }
 
   return JSON.parse(content) as T;
+}
+
+export async function runJsonPrompt<T>(
+  systemPrompt: string,
+  userMessage: string,
+  temperature = 0.2,
+  maxCompletionTokens = 3500,
+  model?: string
+): Promise<T> {
+  const primary = model ?? (await getGroqModel());
+  // Tenta o modelo primário e, se bater no limite, cai para os de maior folga.
+  const chain = [primary, ...FALLBACK_MODELS.filter((m) => m !== primary)];
+
+  let lastErr: unknown;
+  for (const candidate of chain) {
+    try {
+      return await runJsonPromptOnce<T>(systemPrompt, userMessage, temperature, maxCompletionTokens, candidate);
+    } catch (err) {
+      lastErr = err;
+      if (isGroqRateOrSizeError(err)) {
+        console.warn(
+          `Groq: modelo "${candidate}" retornou ${err.status} (limite). Tentando próximo modelo...`
+        );
+        continue;
+      }
+      throw err;
+    }
+  }
+  throw lastErr;
 }
 
 export type ApplicationStatus = "apply_now" | "adjust_first" | "deprioritize";
