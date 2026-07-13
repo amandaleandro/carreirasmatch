@@ -471,15 +471,15 @@ export function NicheLandingPage() {
   return (
     <div className="w-full">
       <div className={`bg-gradient-to-br ${theme.heroBg}`}>
-        <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex items-center justify-between">
+        <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-11" onDark />
           </Link>
-          <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/70">
-            <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
-            <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
-            <a href="#planos" className="hover:text-white transition-colors">Planos</a>
-            <Link href="/vagas-de-hoje" className="hover:text-white transition-colors">Vagas de hoje</Link>
+          <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-white/70">
+            <a href="#como-funciona" className="hidden sm:inline hover:text-white transition-colors">Como funciona</a>
+            <a href="#recursos" className="hidden sm:inline hover:text-white transition-colors">Recursos</a>
+            <a href="#planos" className="hidden sm:inline hover:text-white transition-colors">Planos</a>
+            <Link href="/vagas-de-hoje" className="hover:text-white transition-colors whitespace-nowrap">Vagas de hoje</Link>
             <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
           </nav>
           <Link
