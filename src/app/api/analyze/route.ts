@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Groq from "groq-sdk";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { analyzeResumeAgainstJob, extractStructuredResume, CareerTrack, StructuredResume } from "@/lib/groq";
@@ -246,9 +245,13 @@ export async function POST(req: NextRequest) {
     console.error("Erro ao analisar currículo:", error);
 
     // 429 = rate limit por minuto; 413 = requisição grande demais para o TPM.
-    // A camada do Groq já tenta modelos alternativos antes de chegar aqui; se
-    // ainda assim falhar (todos no limite), devolve mensagem amigável.
-    if (error instanceof Groq.APIError && (error.status === 429 || error.status === 413)) {
+    // A camada multi-provedor já tenta outros provedores antes de chegar aqui;
+    // se ainda assim falhar (todos no limite), devolve mensagem amigável.
+    const status =
+      error && typeof error === "object" && "status" in error
+        ? (error as { status?: number }).status
+        : undefined;
+    if (status === 429 || status === 413) {
       return NextResponse.json(
         {
           error:

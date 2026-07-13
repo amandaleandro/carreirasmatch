@@ -48,6 +48,27 @@ Jobicy não precisa de configuração — roda sempre, como Arbeitnow/RemoteOK.
 | `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) — crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
 | `RESEND_FROM_EMAIL` | Remetente do e-mail de redefinição de senha. Sem ela, usa `onboarding@resend.dev` (domínio de teste do Resend, funciona mas identifica menos a marca). Para usar um remetente `@carreirasmatch.com.br`, é preciso verificar o domínio no painel do Resend primeiro. |
 
+## Opcionais (provedores de IA extras — multi-provedor com fallback)
+
+O sistema usa **Groq** por padrão (`GROQ_API_KEY` / `GROQ_MODEL`), mas a camada de
+IA (`src/lib/ai-providers.ts`) é multi-provedor: qualquer provedor abaixo com
+chave setada entra numa **rotação com fallback automático** — se um bater no
+limite ou falhar, a chamada tenta o próximo. Cada requisição loga
+`provider=… model=… ms=…` para comparar qual é o melhor. Todos são compatíveis
+com a API OpenAI.
+
+| Variável | Provedor | Onde pegar a chave |
+|---|---|---|
+| `CEREBRAS_API_KEY` / `CEREBRAS_MODEL` | Cerebras (rápido, tipo Groq) | cloud.cerebras.ai |
+| `GEMINI_API_KEY` / `GEMINI_MODEL` | Google Gemini (free tier generoso) | aistudio.google.com/apikey |
+| `TOGETHER_API_KEY` / `TOGETHER_MODEL` | Together AI | api.together.xyz |
+| `DEEPINFRA_API_KEY` / `DEEPINFRA_MODEL` | DeepInfra (barato) | deepinfra.com |
+| `OPENROUTER_API_KEY` / `OPENROUTER_MODEL` | OpenRouter (agrega vários) | openrouter.ai/keys |
+
+> `*_MODEL` é opcional — sobrescreve o modelo default de cada provedor. O
+> `qwen/qwen3-32b` do Groq é ignorado no código por ter TPM baixo demais nesta
+> conta (ver `src/lib/groq.ts`).
+
 ## Opcionais (analytics e monitoramento)
 
 | Variável | Uso | Observação |
