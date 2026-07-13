@@ -293,7 +293,7 @@ REGRAS DE PONTUAÇÃO:
 
 12. studyPlan: {essential (1-3 indispensáveis), niceToHave (1-3, não bloqueia), later (0-2, baixa prioridade)}, baseado nas lacunas reais (keywordsMissing).
 
-13. recruiterMessage: 3-4 frases, pronta para LinkedIn/e-mail, citando 1-2 pontos fortes reais ligados à vaga. Direto, não genérico.
+13. recruiterMessage: mensagem que O CANDIDATO envia AO recrutador (1ª pessoa: "Olá, tenho interesse na vaga..."), 3-4 frases, pronta para LinkedIn/e-mail, demonstrando interesse na vaga e citando 1-2 pontos fortes reais do próprio candidato ligados à vaga. NUNCA escreva do ponto de vista do recrutador (não é o recrutador chamando o candidato). Direto, não genérico.
 
 14. alternativeRoles: só se applicationStatus="deprioritize" (ou vaga muito acima do nível do candidato): 2-4 cargos alternativos realistas, mesma área, nível mais júnior/adjacente. Senão [].
 
