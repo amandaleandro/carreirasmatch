@@ -112,6 +112,10 @@ export default async function JobsTodayPage({
           <Link href="/" className="font-bold text-lg tracking-tight">
             CarreirasMatch
           </Link>
+          <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-neutral-600 dark:text-neutral-300">
+            <Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link>
+            <Link href="/comece" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Como funciona</Link>
+          </nav>
           <div className="flex items-center gap-2">
             <Link
               href="/login"

@@ -479,6 +479,8 @@ export function NicheLandingPage() {
             <a href="#como-funciona" className="hover:text-white transition-colors">Como funciona</a>
             <a href="#recursos" className="hover:text-white transition-colors">Recursos</a>
             <a href="#planos" className="hover:text-white transition-colors">Planos</a>
+            <Link href="/vagas-de-hoje" className="hover:text-white transition-colors">Vagas de hoje</Link>
+            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
           </nav>
           <Link
             href="/login"

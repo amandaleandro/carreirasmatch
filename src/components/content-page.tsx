@@ -31,6 +31,10 @@ export function ContentPage({
           <Link href="/">
             <BrandLogo heightClassName="h-11" onDark />
           </Link>
+          <nav className="hidden sm:flex items-center gap-6 text-sm font-medium text-white/70">
+            <Link href="/vagas-de-hoje" className="hover:text-white transition-colors">Vagas de hoje</Link>
+            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+          </nav>
           <Link
             href={backHref ?? "/login"}
             className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
