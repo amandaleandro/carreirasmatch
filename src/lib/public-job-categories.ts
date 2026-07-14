@@ -25,7 +25,10 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
     title: "Vagas de primeiro emprego | CarreirasMatch",
     h1: "Vagas para primeiro emprego",
     description: "Oportunidades para quem está começando a carreira.",
-    where: { entryLevel: true, q: ["primeiro emprego", "sem experiencia", "aprendiz"] },
+    where: {
+      entryLevel: true,
+      q: ["primeiro emprego", "primeiro trabalho", "sem experiência", "sem experiencia", "aprendiz"],
+    },
   },
   {
     slug: "estagio",
@@ -39,7 +42,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
     title: "Vagas de jovem aprendiz | CarreirasMatch",
     h1: "Vagas de jovem aprendiz",
     description: "Vagas de jovem aprendiz e aprendizagem para entrada no mercado.",
-    where: { q: ["jovem aprendiz", "aprendiz"] },
+    where: { q: ["jovem aprendiz", "menor aprendiz", "aprendiz"] },
   },
   {
     slug: "home-office",
@@ -60,7 +63,9 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
     title: "Vagas de atendimento ao cliente | CarreirasMatch",
     h1: "Vagas de atendimento ao cliente",
     description: "Vagas de atendimento, suporte ao cliente, recepção e relacionamento.",
-    where: { q: ["atendimento", "cliente", "recepcionista", "suporte"] },
+    where: {
+      q: ["atendimento", "atendente", "recepcionista", "recepção", "recepcao", "call center", "sac", "televendas"],
+    },
   },
   {
     slug: "comercial",

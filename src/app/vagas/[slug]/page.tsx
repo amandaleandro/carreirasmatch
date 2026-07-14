@@ -29,15 +29,21 @@ function buildWhere(category: NonNullable<ReturnType<typeof findPublicJobCategor
   if (category.where.workModel) and.push({ workModel: category.where.workModel });
   if (category.where.area) and.push({ area: category.where.area });
 
-  const terms = [...(category.where.q ?? []), ...(q ? [q] : [])];
-  for (const term of terms) {
-    and.push({
-      OR: [
-        { jobTitle: { contains: term } },
-        { jobText: { contains: term } },
-        { location: { contains: term } },
-      ],
-    });
+  const matchesTerm = (term: string): Prisma.JobWhereInput[] => [
+    { jobTitle: { contains: term } },
+    { jobText: { contains: term } },
+    { location: { contains: term } },
+  ];
+
+  // Category synonyms are alternatives: a job matches if it contains ANY of them.
+  const synonyms = category.where.q ?? [];
+  if (synonyms.length > 0) {
+    and.push({ OR: synonyms.flatMap(matchesTerm) });
+  }
+
+  // The user's free-text query narrows further (AND).
+  if (q) {
+    and.push({ OR: matchesTerm(q) });
   }
 
   return { AND: and };
