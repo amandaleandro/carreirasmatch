@@ -11,12 +11,15 @@ const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 // which a full resume extraction call alone can exceed, gpt-oss-120b has no such issue.)
 const EXTRACTION_MODEL = "openai/gpt-oss-120b";
 
-// Modelos com TPM (tokens/minuto) baixo demais para o tamanho das nossas
-// requisições de análise nesta conta Groq (tier gratuito). qwen/qwen3-32b é
-// capado em 6K TPM e uma análise sozinha já pede ~6,6K → 413 garantido. Se o
-// admin tiver esse modelo salvo, ignoramos e usamos o default (12K TPM), sem
-// exigir troca manual no /admin.
-const LOW_TPM_MODELS = new Set(["qwen/qwen3-32b"]);
+// Modelo preferido para a ANÁLISE: rápido (~6s) e com bom TPM (12K).
+const PREFERRED_GROQ_MODEL = "llama-3.3-70b-versatile";
+
+// Modelos a evitar COMO MODELO DE ANÁLISE (o de extração é fixo à parte):
+// - qwen/qwen3-32b: TPM baixo demais (6K), estoura numa análise (~6,6K).
+// - openai/gpt-oss-120b: muito lento na análise grande (~40s), mesmo sendo ok
+//   na extração. Se vier do env/admin, trocamos pelo preferido sem depender de
+//   configuração externa.
+const ANALYSIS_AVOID_MODELS = new Set(["qwen/qwen3-32b", "openai/gpt-oss-120b"]);
 
 let cachedModel: { value: string; expiresAt: number } | null = null;
 const MODEL_CACHE_TTL_MS = 30_000;
@@ -24,7 +27,8 @@ const MODEL_CACHE_TTL_MS = 30_000;
 async function getGroqModel(): Promise<string> {
   if (cachedModel && cachedModel.expiresAt > Date.now()) return cachedModel.value;
   const stored = await getSetting(GROQ_MODEL_SETTING_KEY);
-  const value = stored && !LOW_TPM_MODELS.has(stored) ? stored : DEFAULT_GROQ_MODEL;
+  const configured = stored || DEFAULT_GROQ_MODEL;
+  const value = ANALYSIS_AVOID_MODELS.has(configured) ? PREFERRED_GROQ_MODEL : configured;
   cachedModel = { value, expiresAt: Date.now() + MODEL_CACHE_TTL_MS };
   return value;
 }
@@ -437,7 +441,7 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
 
   const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
-  return runJsonPrompt<ResumeAnalysis>(systemPrompt, userMessage, 0.15, 3000);
+  return runJsonPrompt<ResumeAnalysis>(systemPrompt, userMessage, 0.15, 6000);
 }
 
 const STRUCTURED_RESUME_JSON_TEMPLATE = `{
