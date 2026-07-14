@@ -33,6 +33,23 @@ const OPPORTUNITIES = [
   "Recolocação",
 ];
 
+const NICHE_TO_OPPORTUNITY: Record<string, string> = {
+  estagiarios: "Estágio",
+  "primeiro-emprego": "Primeiro emprego",
+  "transicao-de-carreira": "Transição de carreira",
+  recolocacao: "Recolocação",
+  "menor-aprendiz": "Jovem aprendiz",
+  estudante: "Faculdade ou técnico",
+};
+
+function getInitialForm() {
+  if (typeof window === "undefined") return INITIAL_FORM;
+  const niche = new URLSearchParams(window.location.search).get("nicho");
+  const opportunity = niche ? NICHE_TO_OPPORTUNITY[niche] : null;
+
+  return opportunity ? { ...INITIAL_FORM, opportunity } : INITIAL_FORM;
+}
+
 function splitLines(value: string) {
   return value
     .split(/\n|,/)
@@ -54,7 +71,7 @@ function buildSummary(form: FormState) {
 }
 
 export function FreeResumeBuilder() {
-  const [form, setForm] = useState<FormState>(INITIAL_FORM);
+  const [form, setForm] = useState<FormState>(getInitialForm);
   const [generated, setGenerated] = useState(false);
 
   const skills = useMemo(() => splitLines(form.skills), [form.skills]);

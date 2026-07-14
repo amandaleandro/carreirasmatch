@@ -441,6 +441,7 @@ export function NicheLandingPage() {
   const theme = THEME_PALETTE[niche.themeAccent];
   const offer = CAREER_OFFER_BY_SEGMENT[niche.segment];
   const firstAnalysisHref = `/analise?track=${niche.track}`;
+  const freeResumeHref = `/curriculo-gratis?nicho=${encodeURIComponent(niche.slug)}`;
   const subscriptionHref = `/assinar?segment=${encodeURIComponent(niche.segment)}`;
   const ctaHref = niche.primaryCtaHref ?? firstAnalysisHref;
   const completeTierHref = niche.primaryCtaHref ?? firstAnalysisHref;
@@ -532,10 +533,10 @@ export function NicheLandingPage() {
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <Link
-                  href={ctaHref}
+                  href={freeResumeHref}
                   className={`inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
                 >
-                  {niche.ctaLabel.replace(" →", "")}
+                  Criar currículo grátis
                 </Link>
                 <Link
                   href={firstAnalysisHref}
@@ -824,17 +825,17 @@ export function NicheLandingPage() {
             Crie seu currículo grátis e dê o primeiro passo para o seu futuro.
           </p>
           <Link
-            href={ctaHref}
+            href={freeResumeHref}
             className={`mt-5 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
           >
-            {niche.ctaLabel.replace(" →", "")}
+            Criar currículo grátis
           </Link>
           <p className="mt-3 text-[11px] text-neutral-400">
             Não precisa de cartão de crédito.
           </p>
           <p className="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
             Ainda não tem currículo nenhum?{" "}
-            <Link href="/curriculo-gratis" className={`font-semibold hover:underline ${theme.accentText}`}>
+            <Link href={freeResumeHref} className={`font-semibold hover:underline ${theme.accentText}`}>
               Monte um do zero, grátis
             </Link>
           </p>
@@ -859,7 +860,7 @@ export function NicheLandingPage() {
                 {niche.simpleTierDescription ?? "Score básico, pontos fortes e de atenção, e as palavras-chave que faltam no currículo."}
               </p>
               <Link
-                href={firstAnalysisHref}
+                href={freeResumeHref}
                 className="mt-6 inline-flex items-center justify-center rounded-lg font-semibold px-5 py-3 text-sm border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
               >
                 Começar grátis
@@ -1036,16 +1037,16 @@ export function NicheLandingPage() {
         {/* Final CTA */}
         <section className="py-14 pb-24 sm:pb-14 border-t border-neutral-100 dark:border-neutral-900 text-center">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Pronto para ver sua análise?
+            Pronto para montar seu currículo?
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2 max-w-md mx-auto text-sm">
-            Todos os seus dados são criptografados e confidenciais. Sem compromisso, cancele quando quiser.
+            Comece pelo fluxo grátis e, depois, use a análise completa quando quiser comparar com uma vaga real.
           </p>
           <Link
-            href={ctaHref}
+            href={freeResumeHref}
             className={`mt-6 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
           >
-            {niche.ctaLabel}
+            Criar currículo grátis
           </Link>
         </section>
       </main>
@@ -1053,10 +1054,10 @@ export function NicheLandingPage() {
       {/* Sticky mobile CTA */}
       <div className="sm:hidden fixed bottom-0 inset-x-0 z-20 border-t border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur px-4 py-3">
         <Link
-          href={ctaHref}
+          href={freeResumeHref}
           className={`flex items-center justify-center rounded-xl font-semibold px-6 py-3 text-sm transition-all shadow-md ${theme.btnPrimary}`}
         >
-          {niche.ctaLabel}
+          Criar currículo grátis
         </Link>
       </div>
 
