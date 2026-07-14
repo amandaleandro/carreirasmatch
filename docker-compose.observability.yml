@@ -58,7 +58,10 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?defina GRAFANA_ADMIN_PASSWORD no .env}
-      - GF_SERVER_ROOT_URL=https://grafana.carreirasmatch.com.br
+      # Servido sob /grafana no domínio principal (ver Caddyfile). serve_from_sub_path
+      # faz o Grafana montar assets e rotas sob esse prefixo.
+      - GF_SERVER_ROOT_URL=https://carreirasmatch.com.br/grafana
+      - GF_SERVER_SERVE_FROM_SUB_PATH=true
       - GF_USERS_ALLOW_SIGN_UP=false
     volumes:
       - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro

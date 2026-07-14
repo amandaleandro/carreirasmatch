@@ -19,9 +19,14 @@ carreirasmatch.com.br, www.carreirasmatch.com.br {
 	@metrics path /api/metrics /api/metrics/*
 	respond @metrics 404
 
-	reverse_proxy carreiras-match-app:3000
-}
+	# Grafana servido sob /grafana (sem subdomínio, sem DNS novo). O Grafana está
+	# configurado com serve_from_sub_path=true e espera o prefixo /grafana, então
+	# usamos handle (não handle_path) para NÃO remover o prefixo.
+	handle /grafana* {
+		reverse_proxy carreiras-match-grafana:3000
+	}
 
-grafana.carreirasmatch.com.br {
-	reverse_proxy carreiras-match-grafana:3000
+	handle {
+		reverse_proxy carreiras-match-app:3000
+	}
 }

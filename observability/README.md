@@ -4,7 +4,7 @@ Stack de monitoramento self-hosted, complementar ao Sentry (erros) e Plausible (
 
 - **Prometheus** — métricas (série temporal). Faz scrape do app, do Caddy, do host e dos containers.
 - **Loki + Promtail** — logs centralizados de todos os containers.
-- **Grafana** — dashboards e exploração, em `https://grafana.carreirasmatch.com.br`.
+- **Grafana** — dashboards e exploração, em `https://carreirasmatch.com.br/grafana`.
 - **cAdvisor** — métricas por container (CPU/memória/rede/IO).
 - **node-exporter** — métricas do host (CPU, memória, disco, rede).
 
@@ -50,12 +50,12 @@ docker compose -f docker-compose.observability.yml up -d
 
 ## DNS
 
-Aponte `grafana.carreirasmatch.com.br` (registro A) para o IP da VPS. O Caddy emite o
-certificado TLS automaticamente no primeiro acesso.
+Nenhum registro novo é necessário: o Grafana é servido sob `/grafana` no domínio
+principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
 
 ## Acessar
 
-- Grafana: `https://grafana.carreirasmatch.com.br` (login com as credenciais acima).
+- Grafana: `https://carreirasmatch.com.br/grafana` (login com as credenciais acima).
 - O dashboard **"Carreiras Match — Visão Geral"** já vem provisionado, junto com os
   datasources Prometheus e Loki.
 
