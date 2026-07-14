@@ -13,11 +13,13 @@
 }
 
 carreirasmatch.com.br, www.carreirasmatch.com.br {
-	# Bloqueia o endpoint de métricas do app vindo da internet. O Prometheus
-	# acessa direto o container (carreiras-match-app:3000/api/metrics), sem passar
-	# por aqui, então bloquear na borda não afeta a coleta.
-	@metrics path /api/metrics /api/metrics/*
-	respond @metrics 404
+	# Bloqueia o endpoint de métricas do app vindo da internet. Precisa ser um
+	# handle (não um respond solto) para entrar na cadeia mutuamente exclusiva e
+	# ser avaliado ANTES do catch-all abaixo. O Prometheus acessa direto o
+	# container (carreiras-match-app:3000/api/metrics), sem passar por aqui.
+	handle /api/metrics* {
+		respond 404
+	}
 
 	# Grafana servido sob /grafana (sem subdomínio, sem DNS novo). O Grafana está
 	# configurado com serve_from_sub_path=true e espera o prefixo /grafana, então
