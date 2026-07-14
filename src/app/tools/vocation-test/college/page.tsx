@@ -1,8 +1,26 @@
 import Link from "next/link";
 import { VOCATION_AREAS } from "@/lib/vocation-areas";
 import { ContentPage } from "@/components/content-page";
+import { requireSubscriptionPage } from "@/lib/require-subscription-page";
+import { ToolAccessGate } from "@/components/ToolAccessGate";
+import { hasFullAccessEmail } from "@/lib/full-access-users";
+import { normalizeCareerSegment } from "@/lib/career-segments";
+import { prisma } from "@/lib/prisma";
 
 export default async function VocationCollegePage() {
+  const session = await requireSubscriptionPage();
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: { careerSegment: true },
+  });
+
+  if (
+    !hasFullAccessEmail(session.user.email) &&
+    normalizeCareerSegment(user?.careerSegment) !== "internship"
+  ) {
+    return <ToolAccessGate hasSegment={Boolean(user?.careerSegment)} />;
+  }
+
   return (
     <ContentPage
       eyebrow="Já na faculdade"

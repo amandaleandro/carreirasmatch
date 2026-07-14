@@ -4,7 +4,6 @@ import { useState, FormEvent } from "react";
 import Link from "next/link";
 import type { VocationAreaConfig } from "@/lib/vocation-areas";
 import { VOCATION_PEOPLE_OR_PROCESS_OPTIONS, VOCATION_WORK_STYLE_OPTIONS } from "@/lib/vocation-areas";
-import { ExamMapForm } from "./ExamMapForm";
 import { LeadGate, getStoredLeadContact } from "@/components/lead-gate";
 import { ContentPage } from "@/components/content-page";
 import {
@@ -174,10 +173,10 @@ export function VocationTestForm({
       {!alreadyEnrolled && (
         <div className="flex flex-wrap gap-x-5 gap-y-1.5 -mt-2 mb-6">
           <Link
-            href={`/tools/vocation-test/${area.slug}/study-calendar`}
+            href={`/tools/vocation-test/${area.slug}/exam-map`}
             className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Ver calendário de estudos →
+            Gerar mapa ENEM/vestibular com assinatura -&gt;
           </Link>
           <Link
             href={`/tools/vocation-test/${area.slug}/cutoff-estimate`}
@@ -275,11 +274,6 @@ export function VocationTestForm({
         </form>
       )}
 
-      {!alreadyEnrolled && (
-        <div className="mt-10 pt-8 border-t border-neutral-100 dark:border-neutral-900">
-          <ExamMapForm area={area} />
-        </div>
-      )}
     </ContentPage>
   );
 }

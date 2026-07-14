@@ -27,12 +27,12 @@ export default async function VocationTestHubPage() {
     <ContentPage
       eyebrow="Gratuito · para estudantes do ensino médio"
       title="Descubra qual caminho combina com você."
-      description="Escolha por onde começar: descubra sua área, escolha o caminho dentro de uma área que já conhece, ou vá direto para a especialização se já faz faculdade."
+      description="Comece pela etapa gratuita para descobrir quais áreas combinam com você e se o caminho faz mais sentido por faculdade, curso técnico, ou os dois."
       backHref="/tools/vocation-test/exam-archive"
       backLabel="Provas anteriores →"
       wide
     >
-      <div className="grid sm:grid-cols-2 gap-4">
+      <div className="grid gap-4">
         <Link
           href="/tools/vocation-test/discover"
           className="rounded-2xl border-2 border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm hover:border-blue-500 hover:shadow-md transition-all"
@@ -46,25 +46,11 @@ export default async function VocationTestHubPage() {
             faculdade, técnico, ou os dois.
           </p>
         </Link>
-        <Link
-          href="/tools/vocation-test/college"
-          className="rounded-2xl border-2 border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm hover:border-blue-500 hover:shadow-md transition-all"
-        >
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 rounded-full px-2.5 py-1">
-            Já na faculdade
-          </span>
-          <h2 className="font-bold mt-3 mb-1.5">Já faço faculdade</h2>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
-            Você já escolheu seu curso, vá direto para descobrir sua especialização dentro
-            dele.
-          </p>
-        </Link>
       </div>
 
       {areaOfTheDay && (
         <div className="mt-6 rounded-2xl border-2 border-amber-200 dark:border-amber-900/50 bg-amber-50/70 dark:bg-amber-950/20 p-5">
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-base">✨</span>
             <span className="text-[11px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
               Área do dia
             </span>
@@ -101,11 +87,9 @@ export default async function VocationTestHubPage() {
 
       <div className="mt-10 pt-8 border-t border-neutral-100 dark:border-neutral-900">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 rounded-full px-2.5 py-1">
-          Etapa 2
+          Depois da etapa 1
         </span>
-        <h2 className="font-bold mt-3 mb-4">
-          Já sei minha área, quero saber meu caminho dentro dela
-        </h2>
+        <h2 className="font-bold mt-3 mb-4">Já sabe sua área? Aprofunde dentro dela</h2>
 
         <div className="grid sm:grid-cols-2 gap-4">
           {VOCATION_AREAS.map((area) => (
@@ -125,6 +109,19 @@ export default async function VocationTestHubPage() {
               <p className="text-sm text-neutral-500 dark:text-neutral-400">{area.description}</p>
             </Link>
           ))}
+
+          <Link
+            href="/tools/vocation-test/college"
+            className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/60 dark:bg-emerald-950/20 p-5 shadow-sm hover:border-emerald-500 hover:shadow-md transition-all"
+          >
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 rounded-full px-2.5 py-1">
+              Assinantes · estagiários
+            </span>
+            <h3 className="font-bold mt-3 mb-1.5">Já faço faculdade</h3>
+            <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              Para quem já cursa faculdade e quer escolher especialização, estágio e próximos passos.
+            </p>
+          </Link>
         </div>
       </div>
     </ContentPage>

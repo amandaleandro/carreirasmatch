@@ -5,6 +5,7 @@ import { getVocationArea } from "@/lib/vocation-areas";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { PDFParse } from "pdf-parse";
+import { requireToolAccess } from "@/lib/require-auth";
 
 const MAX_RESUME_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const ANONYMOUS_LIMIT = { limit: 15, windowMs: 60 * 60 * 1000 };
@@ -44,6 +45,13 @@ export async function POST(
     }
 
     const alreadyEnrolled = formData.get("alreadyEnrolled") === "true";
+    if (alreadyEnrolled) {
+      const { session: paidSession, response } = await requireToolAccess(
+        "/tools/vocation-test",
+        "internship"
+      );
+      if (!paidSession) return response!;
+    }
 
     const answers: VocationAnswers = {
       enjoysProblemSolving: (formData.get("enjoysProblemSolving") as string) ?? "",

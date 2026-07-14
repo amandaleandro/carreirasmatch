@@ -16,7 +16,7 @@ export async function POST(
       return NextResponse.json({ error: "Área inválida." }, { status: 400 });
     }
 
-    const { session, response } = await requireToolAccess("/tools/vocation-test");
+    const { session, response } = await requireToolAccess("/tools/vocation-test", "student");
     if (!session) return response!;
 
     const body = await req.json();

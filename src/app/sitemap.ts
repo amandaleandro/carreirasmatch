@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
@@ -44,6 +45,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const publicJobRoutes: MetadataRoute.Sitemap = PUBLIC_JOB_CATEGORIES.map((category) => ({
+    url: `${BASE_URL}/vagas/${category.slug}`,
+    lastModified: now,
+    changeFrequency: "daily",
+    priority: category.slug === "sem-experiencia" ? 0.9 : 0.8,
+  }));
+
   let postRoutes: MetadataRoute.Sitemap = [];
   try {
     const posts = await prisma.post.findMany({
@@ -62,5 +70,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     postRoutes = [];
   }
 
-  return [...staticRoutes, ...toolRoutes, ...postRoutes];
+  return [...staticRoutes, ...toolRoutes, ...publicJobRoutes, ...postRoutes];
 }

@@ -4,6 +4,10 @@ import { prisma } from "@/lib/prisma";
 import { getVocationArea } from "@/lib/vocation-areas";
 import { VocationTestForm } from "./VocationTestForm";
 import type { VocationResult } from "@/lib/tools";
+import { requireSubscriptionPage } from "@/lib/require-subscription-page";
+import { ToolAccessGate } from "@/components/ToolAccessGate";
+import { hasFullAccessEmail } from "@/lib/full-access-users";
+import { normalizeCareerSegment } from "@/lib/career-segments";
 
 export default async function VocationTestAreaPage({
   params,
@@ -17,6 +21,37 @@ export default async function VocationTestAreaPage({
   const alreadyEnrolled = enrolled === "1";
   const area = getVocationArea(areaSlug);
   if (!area) notFound();
+
+  if (alreadyEnrolled) {
+    const session = await requireSubscriptionPage();
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { careerSegment: true },
+    });
+
+    if (
+      !hasFullAccessEmail(session.user.email) &&
+      normalizeCareerSegment(user?.careerSegment) !== "internship"
+    ) {
+      return <ToolAccessGate hasSegment={Boolean(user?.careerSegment)} />;
+    }
+
+    const lastResult = await prisma.vocationTestResult.findFirst({
+      where: { userId: session.user.id, areaSlug: area.slug },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const initialResult = lastResult ? (JSON.parse(lastResult.result) as VocationResult) : null;
+
+    return (
+      <VocationTestForm
+        area={area}
+        initialResult={initialResult}
+        alreadyEnrolled
+        loggedIn
+      />
+    );
+  }
 
   const session = await auth();
 
