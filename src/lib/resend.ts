@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { formatCentsToBRL } from "@/lib/pricing";
+import { prisma } from "@/lib/prisma";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -51,6 +52,29 @@ async function send(to: string, subject: string, bodyHtml: string) {
   } catch (err) {
     console.error(`Falha ao enviar e-mail "${subject}" para ${to}:`, err);
   }
+}
+
+/**
+ * Garante que um e-mail de um dado `type`/`dedupeKey` seja enviado uma única vez.
+ * Usa a tabela EmailLog como trava atômica: se a linha já existe, pula o envio.
+ * Serve tanto para os transacionais que disparam em caminho síncrono + webhook
+ * quanto para o scheduler de ciclo de vida, que roda várias vezes ao dia.
+ * Nunca lança para o chamador (fire-and-forget).
+ */
+export async function sendOnce(
+  type: string,
+  dedupeKey: string,
+  email: string,
+  send: () => Promise<void>
+): Promise<void> {
+  try {
+    // Reserva a chave antes de enviar: se outra execução já reservou, o unique
+    // constraint falha e não duplicamos o e-mail.
+    await prisma.emailLog.create({ data: { type, dedupeKey, email } });
+  } catch {
+    return; // já enviado (ou reservado) anteriormente
+  }
+  await send();
 }
 
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
@@ -118,6 +142,114 @@ export async function sendSubscriptionConfirmationEmail(
       <p>Tudo certo! Sua assinatura do ${BRAND} está ativa e você já tem acesso completo às análises, feed de vagas, preparação de entrevista e às ferramentas do plano.</p>
       <p>Próxima renovação em <strong>${renew}</strong>. Você pode gerenciar ou cancelar quando quiser em Configurações.</p>
       ${button(`${APP_URL}/dashboard`, "Acessar minha conta")}
+    `
+  );
+}
+
+export async function sendPaymentFailedEmail(
+  to: string,
+  opts: { kind: string; amountCents: number }
+) {
+  const isSubscription = opts.kind === "subscription";
+  const what = isSubscription ? "sua assinatura" : "seu pagamento";
+  const cta = isSubscription
+    ? { href: `${APP_URL}/settings`, label: "Tentar novamente" }
+    : { href: `${APP_URL}/analise`, label: "Tentar novamente" };
+
+  await send(
+    to,
+    "Não conseguimos processar seu pagamento",
+    `
+      <h2 style="font-size: 20px;">Seu pagamento não foi aprovado</h2>
+      <p>Tentamos processar ${what} no valor de <strong>${formatCentsToBRL(opts.amountCents)}</strong>, mas o pagamento não foi autorizado pela operadora do cartão.</p>
+      <p>Isso costuma acontecer por limite, dados divergentes ou uma trava de segurança do banco. Você pode tentar de novo com outro cartão ou via Pix:</p>
+      ${button(cta.href, cta.label)}
+      <p>Se precisar de ajuda, é só responder este e-mail.</p>
+    `
+  );
+}
+
+export async function sendSubscriptionCancelledEmail(to: string) {
+  await send(
+    to,
+    "Sua assinatura foi cancelada",
+    `
+      <h2 style="font-size: 20px;">Assinatura cancelada</h2>
+      <p>Confirmamos o cancelamento da sua assinatura do ${BRAND}. Não faremos novas cobranças.</p>
+      <p>Você continua com acesso até o fim do período já pago. Depois disso, sua conta volta ao plano gratuito, mas seus dados e análises ficam salvos.</p>
+      <p>Mudou de ideia? Você pode reativar a qualquer momento:</p>
+      ${button(`${APP_URL}/settings`, "Reativar assinatura")}
+      <p>Se puder, responda contando o que faltou pra gente, seu feedback ajuda muito.</p>
+    `
+  );
+}
+
+export async function sendRenewalReminderEmail(
+  to: string,
+  opts: { currentPeriodEnd: Date; autoRenews: boolean }
+) {
+  const date = opts.currentPeriodEnd.toLocaleDateString("pt-BR");
+  const body = opts.autoRenews
+    ? `
+      <h2 style="font-size: 20px;">Sua renovação está chegando</h2>
+      <p>Passando para lembrar que sua assinatura do ${BRAND} renova automaticamente em <strong>${date}</strong>. Você não precisa fazer nada, o acesso continua sem interrupção.</p>
+      <p>Se quiser revisar seu plano ou gerenciar a assinatura, é só acessar Configurações:</p>
+      ${button(`${APP_URL}/settings`, "Gerenciar assinatura")}
+    `
+    : `
+      <h2 style="font-size: 20px;">Seu acesso vai expirar em breve</h2>
+      <p>Seu acesso ao ${BRAND} vai até <strong>${date}</strong>. Como seu plano é pago de forma avulsa (sem débito automático), o acesso não renova sozinho.</p>
+      <p>Para continuar sem interrupção, renove seu plano em Configurações:</p>
+      ${button(`${APP_URL}/settings`, "Renovar meu acesso")}
+    `;
+  await send(to, opts.autoRenews ? "Sua assinatura renova em breve" : "Seu acesso expira em breve", body);
+}
+
+export async function sendSubscriptionExpiredEmail(to: string) {
+  await send(
+    to,
+    "Seu acesso expirou",
+    `
+      <h2 style="font-size: 20px;">Seu acesso ao ${BRAND} expirou</h2>
+      <p>Seu período de assinatura chegou ao fim e sua conta voltou ao plano gratuito. Seus dados e análises continuam salvos, mas os recursos completos (feed de vagas, preparação de entrevista e ferramentas do plano) ficam bloqueados.</p>
+      <p>Quer retomar de onde parou? Reative em poucos cliques:</p>
+      ${button(`${APP_URL}/settings`, "Reativar meu acesso")}
+    `
+  );
+}
+
+export async function sendLeadFollowUpEmail(
+  to: string,
+  opts: { name?: string | null }
+) {
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  await send(
+    to,
+    "Seu diagnóstico de carreira está esperando",
+    `
+      <h2 style="font-size: 20px;">${greeting}</h2>
+      <p>Você começou uma análise no ${BRAND} e ficou faltando pouco para ver o resultado completo: seu score de aderência, o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
+      <p>Leva menos de 2 minutos para desbloquear:</p>
+      ${button(`${APP_URL}/analise`, "Ver minha análise completa")}
+      <p>Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
+    `
+  );
+}
+
+export async function sendOnboardingNudgeEmail(
+  to: string,
+  opts: { name?: string | null }
+) {
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  await send(
+    to,
+    "Vamos fazer sua primeira análise?",
+    `
+      <h2 style="font-size: 20px;">${greeting}</h2>
+      <p>Você criou sua conta no ${BRAND} mas ainda não fez sua primeira análise. É o passo que mostra, com IA, o quanto seu currículo está aderente a uma vaga e exatamente o que melhorar.</p>
+      <p>Comece agora, leva menos de 2 minutos:</p>
+      ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
+      <p>Se tiver qualquer dúvida, é só responder este e-mail.</p>
     `
   );
 }

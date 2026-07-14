@@ -384,6 +384,20 @@ model SoftSkillTestResult {
   @@index([userId])
 }
 
+/// Registro de e-mails de ciclo de vida já enviados, para garantir idempotência
+/// (o scheduler roda várias vezes ao dia e os transacionais disparam em caminho
+/// síncrono + webhook). `dedupeKey` identifica unicamente o evento por tipo.
+model EmailLog {
+  id        String   @id @default(cuid())
+  type      String // "payment_failed" | "subscription_cancelled" | "renewal_reminder" | "subscription_expired" | "onboarding_nudge" | "lead_followup"
+  dedupeKey String
+  email     String
+  createdAt DateTime @default(now())
+
+  @@unique([type, dedupeKey])
+  @@index([email])
+}
+
 /// Configurações operacionais editáveis pela tela de admin (ex.: qual modelo da Groq usar).
 model AppSetting {
   key       String   @id

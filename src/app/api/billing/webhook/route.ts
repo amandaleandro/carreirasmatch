@@ -2,7 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPayment, getPreapproval } from "@/lib/mercadopago";
 import { isValidMercadoPagoSignature } from "@/lib/webhook-secret";
-import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail } from "@/lib/resend";
+import {
+  sendPaymentConfirmationEmail,
+  sendSubscriptionConfirmationEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCancelledEmail,
+  sendOnce,
+} from "@/lib/resend";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod } from "@/lib/billing-plans";
 
@@ -77,6 +83,16 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
+    // Transição para "cancelled" (Pix expirado/recusado): avisa o cliente uma vez.
+    if (status === "cancelled" && payment.status !== "cancelled" && payment.kind !== "subscription") {
+      const email = await userEmail(payment.userId);
+      if (email) {
+        void sendOnce("payment_failed", payment.mpPaymentId, email, () =>
+          sendPaymentFailedEmail(email, { kind: payment.kind, amountCents: payment.amount })
+        );
+      }
+    }
   } else if (type === "subscription_preapproval") {
     const payment = await prisma.payment.findUnique({ where: { mpPaymentId: dataId } });
     if (!payment) return NextResponse.json({ ok: true });
@@ -114,6 +130,19 @@ export async function POST(req: NextRequest) {
       if (!wasPaid) {
         const email = await userEmail(payment.userId);
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
+      }
+    } else if (status === "cancelled" && payment.status !== "cancelled") {
+      // Assinatura cancelada no Mercado Pago: reflete no nosso registro e avisa
+      // o cliente (uma vez). O acesso já concedido segue até currentPeriodEnd.
+      await prisma.subscription.updateMany({
+        where: { userId: payment.userId, status: { not: "cancelled" } },
+        data: { status: "cancelled" },
+      });
+      const email = await userEmail(payment.userId);
+      if (email) {
+        void sendOnce("subscription_cancelled", payment.mpPaymentId, email, () =>
+          sendSubscriptionCancelledEmail(email)
+        );
       }
     }
   }

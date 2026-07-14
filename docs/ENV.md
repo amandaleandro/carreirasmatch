@@ -69,6 +69,26 @@ tecnologia, estágio e jovem aprendiz.
 | `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) — crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
 | `RESEND_FROM_EMAIL` | Remetente do e-mail de redefinição de senha. Sem ela, usa `onboarding@resend.dev` (domínio de teste do Resend, funciona mas identifica menos a marca). Para usar um remetente `@carreirasmatch.com.br`, é preciso verificar o domínio no painel do Resend primeiro. |
 
+## E-mails transacionais e de ciclo de vida
+
+Todos os e-mails saem via Resend (`src/lib/resend.ts`) e exigem `RESEND_API_KEY`.
+São dois grupos:
+
+- **Transacionais (event-driven):** boas-vindas (cadastro), redefinir senha,
+  pagamento confirmado, assinatura ativada, **pagamento recusado** e
+  **assinatura cancelada**. Os dois últimos e os de confirmação disparam em
+  caminho síncrono + webhook do Mercado Pago; a idempotência é garantida pela
+  tabela `EmailLog` via `sendOnce` (chaveado pelo `mpPaymentId`).
+- **Ciclo de vida (scheduler in-process, `src/lib/email-scheduler.ts`):**
+  lembrete de renovação (~3 dias antes), aviso de acesso expirado, nudge de
+  onboarding (cadastrou e não fez análise) e follow-up de lead (deixou contato e
+  não virou conta). Rodam algumas vezes ao dia e usam `EmailLog` para não
+  duplicar.
+
+| Variável | Uso | Observação |
+|---|---|---|
+| `LIFECYCLE_EMAILS_ENABLED` | Liga/desliga o scheduler de e-mails de ciclo de vida (`src/instrumentation.ts` → `src/lib/email-scheduler.ts`) | default ligado; defina `"false"` para desligar. Não afeta os transacionais. |
+
 ## Opcionais (provedores de IA extras — multi-provedor com fallback)
 
 O sistema usa **Groq** por padrão (`GROQ_API_KEY` / `GROQ_MODEL`), mas a camada de

@@ -16,6 +16,11 @@ export async function register() {
     const { startJobFeedScheduler } = await import("@/lib/job-feed-scheduler");
     startJobFeedScheduler();
   }
+
+  if (process.env.LIFECYCLE_EMAILS_ENABLED !== "false") {
+    const { startEmailScheduler } = await import("@/lib/email-scheduler");
+    startEmailScheduler();
+  }
 }
 
 // Reporta erros de renderização/rotas server ao Sentry (no-op sem DSN).

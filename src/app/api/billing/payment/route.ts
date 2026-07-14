@@ -7,7 +7,12 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { isCareerSegment, normalizeCareerSegment } from "@/lib/career-segments";
 import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { applyCoupon, registerCouponUsage } from "@/lib/coupons";
-import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail } from "@/lib/resend";
+import {
+  sendPaymentConfirmationEmail,
+  sendSubscriptionConfirmationEmail,
+  sendPaymentFailedEmail,
+  sendOnce,
+} from "@/lib/resend";
 import {
   isPeriodPlanKind,
   periodPlanAmountCents,
@@ -188,6 +193,12 @@ export async function POST(req: NextRequest) {
     } else {
       void sendPaymentConfirmationEmail(email, { kind, amountCents });
     }
+  } else if (status === "cancelled") {
+    // Cartão recusado no caminho síncrono: avisa o cliente com uma via alternativa.
+    // sendOnce (chaveado pelo mpPaymentId) evita duplicar caso o webhook também dispare.
+    void sendOnce("payment_failed", payment.mpPaymentId, email, () =>
+      sendPaymentFailedEmail(email, { kind, amountCents })
+    );
   }
 
   return NextResponse.json({
