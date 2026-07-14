@@ -68,17 +68,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Erro ao cadastrar usuário:", error);
-    // TEMP DIAGNÓSTICO: remover após identificar a causa do 500 em produção.
-    if (req.nextUrl.searchParams.has("diag")) {
-      return NextResponse.json(
-        {
-          error: "Erro ao processar o cadastro. Tente novamente.",
-          diag: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack?.split("\n").slice(0, 4) : undefined,
-        },
-        { status: 500 }
-      );
-    }
     return NextResponse.json(
       { error: "Erro ao processar o cadastro. Tente novamente." },
       { status: 500 }
