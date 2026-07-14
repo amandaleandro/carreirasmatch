@@ -332,20 +332,92 @@ export function SimpleFitTeaser({
   result,
   children,
 }: {
-  result: Pick<Analysis, "overallScore">;
+  result: Pick<Analysis, "overallScore" | "keywordsMissing" | "weaknesses">;
   children?: React.ReactNode;
 }) {
   const level = fitLevelFromScore(result.overallScore);
   const config = FIT_CONFIG[level];
+  const previewKeywords = result.keywordsMissing.slice(0, 3);
+  const hiddenKeywords = Math.max(result.keywordsMissing.length - previewKeywords.length, 0);
+  const topWeakness = result.weaknesses[0];
+
   return (
     <section className="space-y-6">
       <div className={`rounded-2xl border p-6 md:p-8 text-center space-y-3 ${config.className}`}>
         <p className="text-4xl">{config.emoji}</p>
+        <div className="flex items-baseline justify-center gap-2">
+          <span className="text-4xl font-extrabold tracking-tight">{result.overallScore}%</span>
+          <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
+            de aderência
+          </span>
+        </div>
         <p className="font-bold text-lg md:text-xl">{config.label}</p>
         <p className="text-sm text-neutral-700 dark:text-neutral-300 max-w-md mx-auto">
           {config.message}
         </p>
       </div>
+
+      {previewKeywords.length > 0 && (
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
+          <h3 className="font-semibold mb-1">Palavras-chave que faltam no seu currículo</h3>
+          <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">
+            Sem elas, seu currículo pode ser barrado pelos filtros automáticos (ATS) antes de um
+            recrutador ver.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {previewKeywords.map((item, i) => (
+              <span
+                key={i}
+                className="text-xs rounded-full px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
+              >
+                {item}
+              </span>
+            ))}
+            {hiddenKeywords > 0 && (
+              <span className="text-xs rounded-full px-3 py-1 bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
+                +{hiddenKeywords} no diagnóstico completo
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {topWeakness && (
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
+          <h3 className="font-semibold mb-3">Um ponto que pode te tirar da vaga</h3>
+          <ul className="list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
+            <li>{topWeakness}</li>
+          </ul>
+          <div className="mt-3 flex items-center gap-2 rounded-lg border border-dashed border-blue-300 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/20 px-3 py-2.5">
+            <span aria-hidden>🔒</span>
+            <p className="text-sm text-blue-700 dark:text-blue-300">
+              O plano passo a passo para corrigir este e os demais pontos está no diagnóstico
+              completo.
+            </p>
+          </div>
+        </div>
+      )}
+
+      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
+        <h3 className="font-semibold mb-3">No diagnóstico completo você ainda recebe:</h3>
+        <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
+          {[
+            "Currículo reescrito e otimizado para esta vaga",
+            "Plano de estudo priorizado para fechar seus gaps",
+            "Perguntas de entrevista com respostas prontas",
+            "Mensagem pronta para enviar ao recrutador",
+            result.keywordsMissing.length > 0
+              ? `As ${result.keywordsMissing.length} palavras-chave que faltam, com onde encaixar cada uma`
+              : "Todas as palavras-chave da vaga, com onde encaixar cada uma",
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-2">
+              <span className="text-emerald-500 mt-0.5">✓</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       {children}
     </section>
   );
