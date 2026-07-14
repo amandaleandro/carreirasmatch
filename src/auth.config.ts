@@ -8,6 +8,7 @@ const PUBLIC_PATHS = [
   "/comece",
   "/curriculo-gratis",
   "/vagas-de-hoje",
+  "/vagas",
   "/analise",
   "/tools/vocation-test",
   "/sobre",
