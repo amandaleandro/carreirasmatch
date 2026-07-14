@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Briefcase, CalendarDays, ExternalLink, Filter, MapPin, Search } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
+import { PublicSiteHeader } from "@/components/public-site-header";
+import { SiteFooter } from "@/components/site-footer";
 
 export const dynamic = "force-dynamic";
 
@@ -200,25 +202,7 @@ export default async function JobsTodayPage({
 
   return (
     <main className="min-h-screen bg-neutral-50 dark:bg-[#070b12] text-neutral-950 dark:text-neutral-50">
-      <section className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#090d16]">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-4">
-          <Link href="/" className="font-bold text-lg tracking-tight">
-            CarreirasMatch
-          </Link>
-          <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-neutral-600 dark:text-neutral-300">
-            <Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Blog</Link>
-            <Link href="/comece" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">Como funciona</Link>
-          </nav>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-900">
-              Entrar
-            </Link>
-            <Link href="/register" className="rounded-md bg-blue-600 text-white px-3 py-2 text-sm font-semibold hover:bg-blue-700">
-              Criar conta
-            </Link>
-          </div>
-        </div>
-      </section>
+      <PublicSiteHeader />
 
       <section className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
@@ -298,7 +282,7 @@ export default async function JobsTodayPage({
               ))}
             </select>
           </label>
-          <button className="rounded-md bg-neutral-950 dark:bg-neutral-100 text-white dark:text-neutral-950 px-4 py-2 text-sm font-semibold">
+          <button className="rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition-colors">
             Filtrar
           </button>
           <label className="md:col-span-6 inline-flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
@@ -365,11 +349,13 @@ export default async function JobsTodayPage({
             <p className="font-semibold">Quer saber quais dessas vagas combinam com voce?</p>
             <p className="text-sm text-blue-100 mt-1">Crie uma conta e veja o feed ordenado por aderencia ao seu curriculo.</p>
           </div>
-          <Link href="/register" className="rounded-md bg-white text-blue-700 px-4 py-2 text-sm font-semibold text-center">
+          <Link href="/register" className="rounded-lg bg-white text-blue-700 px-4 py-2 text-sm font-semibold text-center">
             Ver meu feed personalizado
           </Link>
         </div>
       </section>
+
+      <SiteFooter />
     </main>
   );
 }
