@@ -70,7 +70,8 @@ async function fetchCompanyPostings(company: string): Promise<FetchedJob[]> {
 }
 
 export async function fetchLeverJobs(
-  companies: string[] = getLeverCompanies()
+  companies: string[] = getLeverCompanies(),
+  keywords?: string[]
 ): Promise<FetchedJob[]> {
   if (companies.length === 0) return [];
 
@@ -85,5 +86,10 @@ export async function fetchLeverJobs(
     }
   }
 
-  return [...jobsByUrl.values()];
+  const lowerKeywords = keywords?.map((keyword) => keyword.toLowerCase());
+  return [...jobsByUrl.values()].filter((job) => {
+    if (!lowerKeywords || lowerKeywords.length === 0) return true;
+    const haystack = `${job.jobTitle} ${job.jobText}`.toLowerCase();
+    return lowerKeywords.some((keyword) => haystack.includes(keyword));
+  });
 }

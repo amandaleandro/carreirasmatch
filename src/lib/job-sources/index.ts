@@ -16,6 +16,7 @@ import { fetchRemotiveJobs } from "./remotive";
 import { fetchGreenhouseJobs, isGreenhouseConfigured } from "./greenhouse";
 import { fetchLeverJobs, isLeverConfigured } from "./lever";
 import { FetchedJob, JobSearchTerms } from "./types";
+import { classifyJobForStorage } from "@/lib/feed-tags";
 
 export type RequestContext = {
   userIp: string;
@@ -30,6 +31,17 @@ function toSourceError(sourceName: string, reason: unknown): string {
   }
 
   return `${sourceName}: ${message}`;
+}
+
+function fingerprint(job: { jobTitle: string; company?: string; location?: string | null }): string {
+  return [job.jobTitle, job.company ?? "", job.location ?? ""]
+    .join("|")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 export async function fetchNewJobsFromAllSources(
@@ -63,10 +75,10 @@ export async function fetchNewJobsFromAllSources(
     sources.push({ name: "solides", fetch: () => fetchSolidesJobs() });
   }
   if (isGreenhouseConfigured()) {
-    sources.push({ name: "greenhouse", fetch: () => fetchGreenhouseJobs() });
+    sources.push({ name: "greenhouse", fetch: () => fetchGreenhouseJobs(undefined, filterKeywords) });
   }
   if (isLeverConfigured()) {
-    sources.push({ name: "lever", fetch: () => fetchLeverJobs() });
+    sources.push({ name: "lever", fetch: () => fetchLeverJobs(undefined, filterKeywords) });
   }
   if (isJoobleConfigured()) {
     sources.push({ name: "jooble", fetch: () => fetchJoobleJobs(searchTerms?.titlePt) });
@@ -101,13 +113,35 @@ export async function fetchNewJobsFromAllSources(
   });
   const existingUrls = new Set(existing.map((job) => job.url));
 
-  const newJobs = candidates.filter((job) => !existingUrls.has(job.url));
+  const activeExisting = await prisma.job.findMany({
+    where: { active: true },
+    select: { jobTitle: true, company: true, location: true },
+  });
+  const existingFingerprints = new Set(activeExisting.map(fingerprint));
+
+  const newJobs = candidates.filter((job) => {
+    if (existingUrls.has(job.url)) return false;
+    const tags = classifyJobForStorage(job);
+    const key = fingerprint({ ...job, company: tags.company });
+    if (existingFingerprints.has(key)) return false;
+    existingFingerprints.add(key);
+    return true;
+  });
 
   if (newJobs.length > 0) {
     await prisma.job.createMany({
-      data: newJobs,
+      data: newJobs.map((job) => ({
+        ...job,
+        ...classifyJobForStorage(job),
+        expiresAt: new Date(Date.now() + jobRetentionDays() * 24 * 60 * 60 * 1000),
+      })),
     });
   }
 
   return { added: newJobs.length, errors };
+}
+
+function jobRetentionDays(): number {
+  const raw = Number(process.env.JOB_RETENTION_DAYS);
+  return Number.isFinite(raw) && raw > 0 ? raw : 45;
 }

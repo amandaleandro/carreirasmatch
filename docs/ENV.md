@@ -55,6 +55,7 @@ quando as variáveis `GREENHOUSE_BOARDS` e `LEVER_COMPANIES` ficam vazias.
 | `JOB_FEED_RUN_TIMES` | Horários diários em `America/Sao_Paulo` | default `08:00,14:00,20:00` |
 | `JOB_FEED_QUERIES` | Termos em rodízio para a busca automática | formato `Título PT|Título EN|keyword1,keyword2;Outro PT|Outro EN|keyword` |
 | `FEED_MATCH_BATCH_SIZE` | Quantas vagas salvas são pontuadas por visita ao feed | default `20`; usa IA, então aumente com cuidado |
+| `JOB_RETENTION_DAYS` | Depois de quantos dias uma vaga expira automaticamente | default `45` |
 
 A lista padrão local cobre vagas sem experiência/primeiro emprego e áreas
 gerais: administrativo, atendimento, vendas, marketing, RH, financeiro,

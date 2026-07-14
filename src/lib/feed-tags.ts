@@ -160,6 +160,31 @@ export function isEntryLevelJob(job: {
   ].some((term) => haystack.includes(term));
 }
 
+export function classifyJobForStorage(job: {
+  jobTitle: string;
+  jobText: string;
+  url: string;
+  location?: string | null;
+}): {
+  company: string;
+  area: string;
+  seniority: string;
+  workModel: string;
+  entryLevel: boolean;
+  salaryMin?: number;
+} {
+  const tags = deriveJobTags(job);
+
+  return {
+    company: tags.company,
+    area: tags.area ?? "",
+    seniority: tags.seniority ?? "",
+    workModel: tags.workModel ?? "",
+    entryLevel: isEntryLevelJob(job),
+    salaryMin: tags.salaryValue ? Math.round(tags.salaryValue) : undefined,
+  };
+}
+
 export function bypassesLocationFilter(workModel?: string): boolean {
   return workModel === "Remoto" || workModel === "Hibrido";
 }

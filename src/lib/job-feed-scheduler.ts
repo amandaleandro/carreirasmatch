@@ -1,5 +1,6 @@
 import { getSetting, setSetting } from "@/lib/app-settings";
 import { fetchNewJobsFromAllSources } from "@/lib/job-sources";
+import { prisma } from "@/lib/prisma";
 import type { JobSearchTerms } from "@/lib/job-sources/types";
 
 const RUNS_SETTING_KEY = "job-feed:runs";
@@ -9,11 +10,19 @@ const INITIAL_DELAY_MS = 45 * 1000;
 const TIME_ZONE = "America/Sao_Paulo";
 const DEFAULT_RUN_TIMES = ["08:00", "14:00", "20:00"];
 const DEFAULT_QUERIES = [
-  "Desenvolvedor Backend|Backend Developer|Node.js,Python,SQL",
-  "Desenvolvedor Frontend|Frontend Developer|React,TypeScript,JavaScript",
+  "Sem experiencia|Entry Level|sem experiencia,primeiro emprego,nao exige experiencia",
+  "Primeiro emprego|First Job|primeiro emprego,sem experiencia,iniciante",
+  "Assistente Administrativo|Administrative Assistant|administrativo,escritorio,rotinas administrativas",
+  "Atendimento ao Cliente|Customer Support|atendimento,suporte,cliente",
+  "Vendedor Interno|Inside Sales|vendas,comercial,prospeccao",
+  "Marketing Digital|Digital Marketing|marketing,redes sociais,campanhas",
+  "Assistente Financeiro|Finance Assistant|financeiro,contas a pagar,Excel",
+  "Auxiliar de Logistica|Logistics Assistant|logistica,estoque,expedicao",
+  "Recepcionista|Receptionist|recepcao,atendimento,agenda",
+  "Estagio|Internship|estagio,estagiario,trainee",
+  "Jovem Aprendiz|Apprentice|jovem aprendiz,aprendiz,primeiro emprego",
   "Analista de Dados|Data Analyst|SQL,Python,Power BI",
-  "Desenvolvedor Full Stack|Full Stack Developer|React,Node.js,TypeScript",
-  "Estágio em Tecnologia|Technology Intern|estágio,trainee,tecnologia",
+  "Desenvolvedor Frontend|Frontend Developer|React,TypeScript,JavaScript",
 ];
 
 type RunLedger = {
@@ -94,10 +103,31 @@ async function nextSearchTerms(): Promise<JobSearchTerms> {
   await setSetting(CURSOR_SETTING_KEY, String((safeCursor + 1) % queries.length));
 
   return {
-    titlePt: titlePt || "Desenvolvedor",
-    titleEn: titleEn || titlePt || "Developer",
+    titlePt: titlePt || "Assistente Administrativo",
+    titleEn: titleEn || titlePt || "Administrative Assistant",
     keywords: keywordsRaw ? keywordsRaw.split(",").map((value) => value.trim()).filter(Boolean) : [],
   };
+}
+
+function jobRetentionDays(): number {
+  const raw = Number(process.env.JOB_RETENTION_DAYS);
+  return Number.isFinite(raw) && raw > 0 ? raw : 45;
+}
+
+async function deactivateExpiredJobs(): Promise<void> {
+  await prisma.job.updateMany({
+    where: {
+      active: true,
+      OR: [
+        { expiresAt: { lt: new Date() } },
+        {
+          expiresAt: null,
+          createdAt: { lt: new Date(Date.now() - jobRetentionDays() * 24 * 60 * 60 * 1000) },
+        },
+      ],
+    },
+    data: { active: false },
+  });
 }
 
 let running = false;
@@ -115,6 +145,7 @@ export async function runJobFeedTick(): Promise<void> {
 
   running = true;
   try {
+    await deactivateExpiredJobs();
     const searchTerms = await nextSearchTerms();
     const result = await fetchNewJobsFromAllSources(searchTerms, {
       userIp: "127.0.0.1",
@@ -122,9 +153,7 @@ export async function runJobFeedTick(): Promise<void> {
     });
 
     await setSetting(RUNS_SETTING_KEY, JSON.stringify({ date, slots: [...ledger.slots, slot] }));
-    console.log(
-      `job-feed-scheduler: slot=${slot} added=${result.added} errors=${result.errors.length}`
-    );
+    console.log(`job-feed-scheduler: slot=${slot} added=${result.added} errors=${result.errors.length}`);
   } catch (error) {
     console.error("job-feed-scheduler: failed to fetch jobs", error);
   } finally {

@@ -75,7 +75,8 @@ async function fetchBoardJobs(board: string): Promise<FetchedJob[]> {
 }
 
 export async function fetchGreenhouseJobs(
-  boards: string[] = getGreenhouseBoards()
+  boards: string[] = getGreenhouseBoards(),
+  keywords?: string[]
 ): Promise<FetchedJob[]> {
   if (boards.length === 0) return [];
 
@@ -90,5 +91,10 @@ export async function fetchGreenhouseJobs(
     }
   }
 
-  return [...jobsByUrl.values()];
+  const lowerKeywords = keywords?.map((keyword) => keyword.toLowerCase());
+  return [...jobsByUrl.values()].filter((job) => {
+    if (!lowerKeywords || lowerKeywords.length === 0) return true;
+    const haystack = `${job.jobTitle} ${job.jobText}`.toLowerCase();
+    return lowerKeywords.some((keyword) => haystack.includes(keyword));
+  });
 }
