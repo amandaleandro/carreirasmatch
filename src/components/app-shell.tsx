@@ -4,6 +4,7 @@ import { isAdminEmail } from "@/lib/admin";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { Topbar } from "@/components/topbar";
 import { GuidedTour } from "@/components/guided-tour";
+import { UpcomingFeaturesModal } from "@/components/upcoming-features-modal";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
@@ -34,6 +35,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1">{children}</main>
       </div>
       <GuidedTour segment={segment} />
+      <UpcomingFeaturesModal />
     </div>
   );
 }
