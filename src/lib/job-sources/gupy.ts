@@ -11,15 +11,37 @@ const USER_AGENT =
 // Gupy não tem busca agregada pública. Cada empresa expõe um feed de vagas
 // (voltado para indexação no Google for Jobs, referenciado no robots.txt de
 // {empresa}.gupy.io) que lista as URLs das vagas abertas daquela empresa.
+// Empresas brasileiras de grande porte que contratam em vários setores
+// (varejo, atendimento/call center, farmácia, logística, indústria, banco),
+// validadas contra o feed público da Gupy. Usadas quando `GUPY_COMPANIES`
+// está vazio, para o feed não ficar enviesado em vagas de tecnologia.
+const DEFAULT_GUPY_COMPANIES = [
+  "assai",
+  "localiza",
+  "lojasrenner",
+  "riachuelo",
+  "grupoboticario",
+  "cacaushow",
+  "atento",
+  "americanas",
+  "raiadrogasil",
+  "vibraenergia",
+  "suzano",
+  "c6bank",
+  "picpay",
+];
+
 export function isGupyConfigured(): boolean {
   return getGupyCompanies().length > 0;
 }
 
 export function getGupyCompanies(): string[] {
-  return (process.env.GUPY_COMPANIES ?? "")
+  const configured = (process.env.GUPY_COMPANIES ?? "")
     .split(",")
     .map((company) => company.trim())
     .filter(Boolean);
+
+  return configured.length > 0 ? configured : DEFAULT_GUPY_COMPANIES;
 }
 
 async function fetchCompanyJobUrls(subdomain: string): Promise<string[]> {

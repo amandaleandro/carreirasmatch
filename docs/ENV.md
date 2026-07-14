@@ -25,7 +25,7 @@ Revise esta lista manualmente antes de cada deploy.
 |---|---|
 | `ADZUNA_APP_ID` / `ADZUNA_APP_KEY` | Adzuna |
 | `JOOBLE_API_KEY` | Jooble |
-| `GUPY_COMPANIES` | Gupy (lista de subdomínios) |
+| `GUPY_COMPANIES` | Gupy (lista de subdomínios; usa lista padrão de grandes empregadores BR quando vazio) |
 | `SOLIDES_COMPANIES` | Sólides (lista de slugs) |
 | `GLASSDOOR_PARTNER_ID` / `GLASSDOOR_PARTNER_KEY` | Glassdoor (exige parceria homologada, doc ainda não confirmada — ver `src/lib/job-sources/glassdoor.ts`) |
 | `GREENHOUSE_BOARDS` | Greenhouse (lista de board tokens, ex.: `stripe,figma`) |
@@ -39,6 +39,9 @@ Jooble exige uma chave válida e ativa; 403 significa chave inválida/sem acesso
 segundo a documentação oficial da Jooble.
 Greenhouse e Lever usam listas padrão de empresas brasileiras/remote-friendly
 quando as variáveis `GREENHOUSE_BOARDS` e `LEVER_COMPANIES` ficam vazias.
+Gupy também roda por padrão com uma lista de grandes empregadores brasileiros
+(varejo, atendimento, farmácia, indústria, banco) para diversificar o feed além
+das vagas de tecnologia; defina `GUPY_COMPANIES` para sobrescrever a lista.
 
 ## Opcionais (blog automático)
 
