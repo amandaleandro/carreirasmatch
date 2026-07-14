@@ -129,7 +129,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8">
-      <div>
+      <div data-tour="dash-overview">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
           Visão geral
         </span>

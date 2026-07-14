@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { isAdminEmail } from "@/lib/admin";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { Topbar } from "@/components/topbar";
+import { GuidedTour } from "@/components/guided-tour";
+import { normalizeCareerSegment } from "@/lib/career-segments";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -14,7 +16,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const dbUser = session.user.id
     ? await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { name: true, image: true },
+        select: { name: true, image: true, careerSegment: true },
       })
     : null;
 
@@ -22,6 +24,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const userEmail = session.user.email ?? "";
   const userImage = dbUser?.image ?? null;
   const isAdmin = isAdminEmail(session.user.email);
+  const segment = normalizeCareerSegment(dbUser?.careerSegment);
 
   return (
     <div className="flex min-h-screen">
@@ -30,6 +33,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <Topbar userName={userName} userEmail={userEmail} userImage={userImage} />
         <main className="flex-1">{children}</main>
       </div>
+      <GuidedTour segment={segment} />
     </div>
   );
 }

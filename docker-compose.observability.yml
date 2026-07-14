@@ -1,0 +1,111 @@
+name: carreiras-match-observability
+
+# Stack de observabilidade separada do compose principal, para poder subir/reiniciar
+# sem tocar no app. Conecta-se à rede do app (carreiras-match_default, criada pelo
+# docker-compose.yml) para que o Prometheus alcance app e caddy pelos nomes dos
+# containers, e o Grafana seja alcançado pelo Caddy.
+#
+# Subir:   docker compose -f docker-compose.observability.yml up -d
+# Requer:  a stack principal já rodando (rede carreiras-match_default existente).
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: carreiras-match-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --web.enable-lifecycle
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    networks:
+      - app_net
+    # Sem ports: acessível só internamente. Ver via Grafana.
+
+  loki:
+    image: grafana/loki:3.4.1
+    container_name: carreiras-match-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki-config.yml
+    volumes:
+      - ./observability/loki/loki-config.yml:/etc/loki/loki-config.yml:ro
+      - loki-data:/loki
+    networks:
+      - app_net
+
+  promtail:
+    image: grafana/promtail:3.4.1
+    container_name: carreiras-match-promtail
+    restart: unless-stopped
+    command: -config.file=/etc/promtail/promtail-config.yml
+    volumes:
+      - ./observability/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - promtail-positions:/tmp
+    depends_on:
+      - loki
+    networks:
+      - app_net
+
+  grafana:
+    image: grafana/grafana:11.5.1
+    container_name: carreiras-match-grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:?defina GRAFANA_ADMIN_PASSWORD no .env}
+      - GF_SERVER_ROOT_URL=https://grafana.carreirasmatch.com.br
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - ./observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - loki
+    networks:
+      - app_net
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.49.1
+    container_name: carreiras-match-cadvisor
+    restart: unless-stopped
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    devices:
+      - /dev/kmsg
+    networks:
+      - app_net
+
+  node-exporter:
+    image: prom/node-exporter:v1.9.0
+    container_name: carreiras-match-node-exporter
+    restart: unless-stopped
+    command:
+      - --path.rootfs=/host
+      - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - app_net
+
+volumes:
+  prometheus-data:
+  loki-data:
+  grafana-data:
+  promtail-positions:
+
+networks:
+  # Rede criada pela stack principal (docker-compose.yml -> networks.default.name).
+  app_net:
+    external: true
+    name: carreiras-match_default

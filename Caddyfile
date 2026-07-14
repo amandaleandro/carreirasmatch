@@ -1,3 +1,27 @@
+{
+	# Habilita a coleta de métricas por servidor. Elas são publicadas num listener
+	# dedicado abaixo (:9180), sem precisar abrir a API admin do Caddy na rede.
+	servers {
+		metrics
+	}
+}
+
+# Listener interno só para o Prometheus fazer scrape (rede Docker, não publicado
+# na internet). O Prometheus acessa carreiras-match-caddy:9180/metrics.
+:9180 {
+	metrics /metrics
+}
+
 carreirasmatch.com.br, www.carreirasmatch.com.br {
+	# Bloqueia o endpoint de métricas do app vindo da internet. O Prometheus
+	# acessa direto o container (carreiras-match-app:3000/api/metrics), sem passar
+	# por aqui, então bloquear na borda não afeta a coleta.
+	@metrics path /api/metrics /api/metrics/*
+	respond @metrics 404
+
 	reverse_proxy carreiras-match-app:3000
+}
+
+grafana.carreirasmatch.com.br {
+	reverse_proxy carreiras-match-grafana:3000
 }

@@ -7,6 +7,7 @@ import { toAnalysisTeaser } from "@/lib/analysis-teaser";
 import { normalizeCareerSegment, tracksForSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { analysisTotal, analysisDuration } from "@/lib/metrics";
 
 import { PDFParse } from "pdf-parse";
 
@@ -22,6 +23,8 @@ const VALID_TRACKS: CareerTrack[] = [
 ];
 
 export async function POST(req: NextRequest) {
+  // Cronômetro do histograma; as labels são definidas ao observar (no fim).
+  const stopTimer = analysisDuration.startTimer();
   try {
     const session = await auth();
     const userId = session?.user?.id ?? null;
@@ -230,6 +233,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    stopTimer({ career_track: effectiveCareerTrack, outcome: "success" });
+    analysisTotal.inc({
+      career_track: effectiveCareerTrack,
+      logged_in: String(Boolean(userId)),
+      outcome: "success",
+    });
+
     const unlocked = userId ? await canViewFullDiagnostic(userId, saved.id) : false;
     const segment = normalizeCareerSegment(candidate?.careerSegment);
     const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$4,90";
@@ -242,6 +252,8 @@ export async function POST(req: NextRequest) {
       ...(unlocked ? analysis : toAnalysisTeaser(analysis)),
     });
   } catch (error) {
+    stopTimer({ outcome: "error" });
+    analysisTotal.inc({ outcome: "error" });
     console.error("Erro ao analisar currículo:", error);
 
     // 429 = rate limit por minuto; 413 = requisição grande demais para o TPM.

@@ -125,3 +125,17 @@ select option {
     transform: translateY(0);
   }
 }
+
+/* Guided tour highlight — a soft pulsing glow around the focused element. */
+@keyframes tourPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(37, 99, 235, 0.12);
+  }
+}
+.animate-tour-pulse {
+  animation: tourPulse 1.8s ease-in-out infinite;
+}

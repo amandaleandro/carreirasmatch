@@ -23,19 +23,20 @@ type NavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
+  tour?: string;
 };
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/analise", label: "Análise de Vaga", icon: Search },
-  { href: "/feed", label: "Feed de Vagas", icon: Rss },
-  { href: "/applications", label: "Candidaturas", icon: KanbanSquare },
-  { href: "/resume", label: "Meu Currículo", icon: FileText },
+  { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
+  { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
+  { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+  { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
   { href: "/profile", label: "Sugestões de Melhoria", icon: Sparkles },
   { href: "/action-plan", label: "Plano de Ação", icon: Target },
   { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
   { href: "/history", label: "Relatórios", icon: BarChart3 },
-  { href: "/tools", label: "Ferramentas", icon: Wrench },
+  { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
   { href: "/settings", label: "Perfil", icon: User },
 ];
 
@@ -61,6 +62,7 @@ export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
             <Link
               key={item.href}
               href={item.href}
+              data-tour={item.tour}
               className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
                 active
                   ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-950/40"

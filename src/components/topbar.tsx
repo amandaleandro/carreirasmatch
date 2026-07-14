@@ -52,7 +52,7 @@ export function Topbar({
           )}
         </button>
 
-        <form onSubmit={handleSearch} className="flex-1 max-w-xs md:max-w-md">
+        <form onSubmit={handleSearch} data-tour="topbar-search" className="flex-1 max-w-xs md:max-w-md">
           <div className="relative">
             <Search
               strokeWidth={1.75}
