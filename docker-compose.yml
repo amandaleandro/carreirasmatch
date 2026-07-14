@@ -29,6 +29,7 @@ services:
       - JOB_FEED_RUN_TIMES=${JOB_FEED_RUN_TIMES:-}
       - JOB_FEED_QUERIES=${JOB_FEED_QUERIES:-}
       - FEED_MATCH_BATCH_SIZE=${FEED_MATCH_BATCH_SIZE:-20}
+      - JOB_RETENTION_DAYS=${JOB_RETENTION_DAYS:-45}
       - GUPY_COMPANIES=${GUPY_COMPANIES:-}
       - SOLIDES_COMPANIES=${SOLIDES_COMPANIES:-}
       - GLASSDOOR_PARTNER_ID=${GLASSDOOR_PARTNER_ID:-}
@@ -48,6 +49,8 @@ services:
       - SENTRY_DSN=${SENTRY_DSN:-}
       - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN:-}
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0}
+      # Trava opcional do /api/metrics (vazia = sem trava; ver observability/README.md).
+      - METRICS_TOKEN=${METRICS_TOKEN:-}
       # Provedores de IA extras (multi-provedor com fallback) — ligam ao setar a chave.
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
       - CEREBRAS_MODEL=${CEREBRAS_MODEL:-}
