@@ -7,7 +7,14 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { isCareerSegment, normalizeCareerSegment } from "@/lib/career-segments";
 import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { applyCoupon, registerCouponUsage } from "@/lib/coupons";
-import { sendPaymentConfirmationEmail } from "@/lib/resend";
+import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail } from "@/lib/resend";
+import {
+  isPeriodPlanKind,
+  periodPlanAmountCents,
+  periodPlanProductName,
+  PERIOD_PLAN_DAYS,
+  grantSubscriptionPeriod,
+} from "@/lib/billing-plans";
 
 // Segmento default para pagamento avulso sem login. O preço do avulso
 // (first_analysis/diagnostic) é uniforme entre todos os segmentos, então esse
@@ -19,7 +26,8 @@ export async function POST(req: NextRequest) {
   const session = await auth();
   const { kind, analysisId, formData, couponCode, segment: requestedSegment } = await req.json();
 
-  if (kind !== "first_analysis" && kind !== "diagnostic") {
+  const isPeriodPlan = typeof kind === "string" && isPeriodPlanKind(kind);
+  if (kind !== "first_analysis" && kind !== "diagnostic" && !isPeriodPlan) {
     return NextResponse.json({ error: "Tipo de cobrança inválido." }, { status: 400 });
   }
   if (!formData || typeof formData !== "object") {
@@ -86,15 +94,26 @@ export async function POST(req: NextRequest) {
   }
 
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
-  const priceLabel = kind === "first_analysis" ? offer.firstAnalysisPrice : offer.diagnosticPrice;
-  const productName = kind === "first_analysis" ? "Primeira Análise" : offer.launchOffer;
-  const baseAmountCents = parseBRLToCents(priceLabel);
+  let baseAmountCents: number;
+  let productName: string;
+  if (isPeriodPlan) {
+    baseAmountCents = periodPlanAmountCents(segment, kind);
+    productName = periodPlanProductName(kind);
+  } else if (kind === "first_analysis") {
+    baseAmountCents = parseBRLToCents(offer.firstAnalysisPrice);
+    productName = "Primeira Análise";
+  } else {
+    baseAmountCents = parseBRLToCents(offer.diagnosticPrice);
+    productName = offer.launchOffer;
+  }
+  // Planos por período usam o desconto de assinatura do cupom.
+  const couponKind = isPeriodPlan ? "subscription" : kind;
 
   let amountCents = baseAmountCents;
   let couponId: string | null = null;
   if (typeof couponCode === "string" && couponCode.trim()) {
     try {
-      const result = await applyCoupon(couponCode, kind, baseAmountCents);
+      const result = await applyCoupon(couponCode, couponKind, baseAmountCents);
       amountCents = result.amountCents;
       couponId = result.couponId;
     } catch (err) {
@@ -139,7 +158,7 @@ export async function POST(req: NextRequest) {
 
   const status = result.status === "approved" ? "paid" : result.status === "rejected" ? "cancelled" : "pending";
 
-  await prisma.payment.create({
+  const payment = await prisma.payment.create({
     data: {
       userId,
       kind,
@@ -163,7 +182,12 @@ export async function POST(req: NextRequest) {
     }
     // E-mail de confirmação no caminho síncrono (cartão). No PIX o Payment nasce
     // "pending" e o e-mail sai no webhook, o guard de lá evita envio duplicado.
-    void sendPaymentConfirmationEmail(email, { kind, amountCents });
+    if (isPeriodPlan) {
+      const currentPeriodEnd = await grantSubscriptionPeriod(userId, segment, PERIOD_PLAN_DAYS[kind], payment.id);
+      void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
+    } else {
+      void sendPaymentConfirmationEmail(email, { kind, amountCents });
+    }
   }
 
   return NextResponse.json({

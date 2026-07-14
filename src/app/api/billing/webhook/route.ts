@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getPayment, getPreapproval } from "@/lib/mercadopago";
 import { isValidMercadoPagoSignature } from "@/lib/webhook-secret";
 import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail } from "@/lib/resend";
+import { normalizeCareerSegment } from "@/lib/career-segments";
+import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod } from "@/lib/billing-plans";
 
 async function userEmail(userId: string): Promise<string | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
@@ -48,17 +50,30 @@ export async function POST(req: NextRequest) {
     // Só age na transição para "paid" (o webhook pode reenviar o mesmo evento).
     if (status === "paid" && payment.status !== "paid" && payment.kind !== "subscription") {
       const email = await userEmail(payment.userId);
-      if (email) void sendPaymentConfirmationEmail(email, { kind: payment.kind, amountCents: payment.amount });
 
-      // PIX/confirmação assíncrona de avulso anônimo: reivindica a análise sem
-      // dono para o usuário criado no momento do pagamento (ver payment/route.ts).
-      if (payment.kind === "diagnostic" && payment.analysisId) {
-        const analysis = await prisma.analysis.findUnique({
-          where: { id: payment.analysisId },
-          select: { resumeId: true, resume: { select: { userId: true } } },
-        });
-        if (analysis && analysis.resume.userId == null) {
-          await prisma.resume.update({ where: { id: analysis.resumeId }, data: { userId: payment.userId } });
+      if (isPeriodPlanKind(payment.kind)) {
+        // Plano por período pago no PIX: concede/estende o acesso agora.
+        const segment = normalizeCareerSegment(payment.segment) ?? "career_pro";
+        const currentPeriodEnd = await grantSubscriptionPeriod(
+          payment.userId,
+          segment,
+          PERIOD_PLAN_DAYS[payment.kind],
+          payment.id
+        );
+        if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
+      } else {
+        if (email) void sendPaymentConfirmationEmail(email, { kind: payment.kind, amountCents: payment.amount });
+
+        // PIX/confirmação assíncrona de avulso anônimo: reivindica a análise sem
+        // dono para o usuário criado no momento do pagamento (ver payment/route.ts).
+        if (payment.kind === "diagnostic" && payment.analysisId) {
+          const analysis = await prisma.analysis.findUnique({
+            where: { id: payment.analysisId },
+            select: { resumeId: true, resume: { select: { userId: true } } },
+          });
+          if (analysis && analysis.resume.userId == null) {
+            await prisma.resume.update({ where: { id: analysis.resumeId }, data: { userId: payment.userId } });
+          }
         }
       }
     }

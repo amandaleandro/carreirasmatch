@@ -24,7 +24,7 @@ export function MercadoPagoPaymentBrick({
   onSuccess,
 }: {
   amount: number;
-  kind: "first_analysis" | "diagnostic";
+  kind: "first_analysis" | "diagnostic" | "subscription_monthly" | "subscription_annual";
   analysisId?: string;
   payerEmail?: string;
   couponCode?: string;
