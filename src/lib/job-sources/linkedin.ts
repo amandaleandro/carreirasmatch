@@ -4,10 +4,14 @@ import { FetchedJob, JobSearchTerms } from "./types";
 const SEARCH_URL = "https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search";
 const DETAIL_URL = "https://www.linkedin.com/jobs-guest/jobs/api/jobPosting";
 const MAX_JOB_TEXT_LENGTH = 12000;
-const RESULTS_PER_PAGE = 25;
-const MAX_PAGES = 3;
-const MAX_DETAIL_FETCHES = 25;
+// A API "seeMore" do LinkedIn devolve ~10 cards por chamada, então paginamos em
+// passos de 10 (o código antigo pulava resultados ao avançar de 25 em 25).
+const RESULTS_PER_PAGE = 10;
+const MAX_PAGES = 6;
+const MAX_DETAIL_FETCHES = 40;
 const DETAIL_CONCURRENCY = 5;
+// geoId público do Brasil no LinkedIn — mais estável que só a string "Brasil".
+const BRAZIL_GEO_ID = "106057199";
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
@@ -23,6 +27,7 @@ async function fetchSearchPage(
   const url = new URL(SEARCH_URL);
   if (keywords) url.searchParams.set("keywords", keywords);
   url.searchParams.set("location", location);
+  url.searchParams.set("geoId", BRAZIL_GEO_ID);
   url.searchParams.set("start", String(start));
 
   const response = await fetch(url.toString(), {

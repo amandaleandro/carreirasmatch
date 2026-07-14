@@ -6,9 +6,9 @@ chromium.use(StealthPlugin());
 
 const SEARCH_URL = "https://br.indeed.com/jobs";
 const MAX_JOB_TEXT_LENGTH = 12000;
-const MAX_PAGES = 2;
+const MAX_PAGES = 3;
 const RESULTS_PER_PAGE = 15;
-const MAX_DETAIL_FETCHES = 12;
+const MAX_DETAIL_FETCHES = 20;
 const NAVIGATION_TIMEOUT_MS = 20000;
 const CLICK_TIMEOUT_MS = 6000;
 const REQUEST_DELAY_MS = 1000;

@@ -16,19 +16,24 @@ const USER_AGENT =
 // validadas contra o feed público da Gupy. Usadas quando `GUPY_COMPANIES`
 // está vazio, para o feed não ficar enviesado em vagas de tecnologia.
 const DEFAULT_GUPY_COMPANIES = [
-  "assai",
-  "localiza",
-  "lojasrenner",
-  "riachuelo",
-  "grupoboticario",
-  "cacaushow",
-  "atento",
-  "americanas",
-  "raiadrogasil",
-  "vibraenergia",
-  "suzano",
-  "c6bank",
-  "picpay",
+  "assai", // atacado/varejo
+  "localiza", // serviços/locação
+  "petz", // varejo pet
+  "lojasrenner", // moda
+  "riachuelo", // moda
+  "grupoboticario", // cosméticos
+  "cacaushow", // alimentos/varejo
+  "tenda", // construção civil
+  "cyrela", // construção civil
+  "jsl", // logística/transporte
+  "atento", // atendimento/call center
+  "americanas", // varejo
+  "raiadrogasil", // farmácia
+  "mdiasbranco", // indústria alimentícia
+  "suzano", // indústria (papel/celulose)
+  "vibraenergia", // energia
+  "c6bank", // banco
+  "picpay", // fintech
 ];
 
 export function isGupyConfigured(): boolean {
