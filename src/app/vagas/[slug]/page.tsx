@@ -6,15 +6,12 @@ import { prisma } from "@/lib/prisma";
 import { findPublicJobCategory, PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { cleanJobSnippet } from "@/lib/job-snippet";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
 const PAGE_SIZE = 30;
-
-function cleanSnippet(text: string): string {
-  return text.replace(/\s+/g, " ").trim().slice(0, 220);
-}
 
 function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("pt-BR", {
@@ -203,7 +200,7 @@ export default async function PublicJobCategoryPage({
                   <ExternalLink className="h-4 w-4" />
                 </a>
               </div>
-              <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">{cleanSnippet(job.jobText)}...</p>
+              <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">{cleanJobSnippet(job.jobText)}...</p>
             </article>
           ))}
         </div>

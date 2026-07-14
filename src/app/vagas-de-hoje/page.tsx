@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { cleanJobSnippet } from "@/lib/job-snippet";
 
 export const dynamic = "force-dynamic";
 
@@ -51,10 +52,6 @@ function formatDateTime(date: Date): string {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
-}
-
-function cleanSnippet(text: string): string {
-  return text.replace(/\s+/g, " ").trim().slice(0, 220);
 }
 
 function interleaveByArea(jobs: PublicJob[]): PublicJob[] {
@@ -326,7 +323,7 @@ export default async function JobsTodayPage({
                     <ExternalLink className="h-4 w-4" />
                   </a>
                 </div>
-                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">{cleanSnippet(job.jobText)}...</p>
+                <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">{cleanJobSnippet(job.jobText)}...</p>
               </article>
             ))}
           </div>
