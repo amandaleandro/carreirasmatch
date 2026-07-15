@@ -1,6 +1,9 @@
 import type { NextAuthConfig } from "next-auth";
+import { FREE_TOOL_PATHS } from "@/lib/tools-catalog";
 
 const PUBLIC_PATHS = [
+  // Guias de conteúdo abertos, derivados do catálogo (flag `free`).
+  ...FREE_TOOL_PATHS,
   "/login",
   "/register",
   "/assinar",

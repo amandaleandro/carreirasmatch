@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentPage } from "@/components/content-page";
 import { BlogPostCard } from "@/components/blog-post-card";
+import { FreeTierAd } from "@/components/free-tier-ad";
+import { Pagination } from "@/components/Pagination";
 import { prisma } from "@/lib/prisma";
+
+const POSTS_PER_PAGE = 10;
 
 export const dynamic = "force-dynamic";
 
@@ -21,25 +25,38 @@ const FALLBACK_TOPICS = [
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{ area?: string; page?: string }>;
 }) {
-  const { area } = await searchParams;
+  const { area, page: pageParam } = await searchParams;
+
+  const where = area ? { areaSlug: area } : undefined;
+  const parsedPage = Number.parseInt(pageParam ?? "1", 10);
+
+  const total = await prisma.post.count({ where });
+  const totalPages = Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+  const page = Math.min(
+    Math.max(Number.isNaN(parsedPage) ? 1 : parsedPage, 1),
+    totalPages
+  );
 
   const posts = await prisma.post.findMany({
-    where: area ? { areaSlug: area } : undefined,
+    where,
     orderBy: { publishedAt: "desc" },
-    take: 30,
+    skip: (page - 1) * POSTS_PER_PAGE,
+    take: POSTS_PER_PAGE,
   });
 
-  const allPosts = area
-    ? await prisma.post.findMany({ orderBy: { publishedAt: "desc" }, take: 200 })
-    : posts;
+  const areaRows = await prisma.post.findMany({
+    distinct: ["areaSlug"],
+    select: { areaSlug: true, areaLabel: true },
+    orderBy: { areaSlug: "asc" },
+  });
 
-  const areaChips = Array.from(
-    new Map(allPosts.map((p) => [p.areaSlug, p.areaLabel])).entries()
-  ).sort((a, b) => a[1].localeCompare(b[1], "pt-BR"));
+  const areaChips = areaRows
+    .map((row) => [row.areaSlug, row.areaLabel] as const)
+    .sort((a, b) => a[1].localeCompare(b[1], "pt-BR"));
 
-  if (allPosts.length === 0) {
+  if (areaRows.length === 0) {
     return (
       <ContentPage
         eyebrow="Blog"
@@ -118,6 +135,19 @@ export default async function BlogPage({
           <BlogPostCard key={post.id} post={post} />
         ))}
       </div>
+
+      {posts.length > 0 && (
+        <div className="mt-8">
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            basePath="/blog"
+            searchParams={{ area }}
+          />
+        </div>
+      )}
+
+      {posts.length > 0 && <FreeTierAd name="blogList" className="mt-8" />}
 
       {posts.length === 0 && (
         <p className="mt-6 text-sm text-neutral-500 dark:text-neutral-400">

@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function PrivacidadePage() {
   return (
-    <ContentPage eyebrow="Última atualização: 09/07/2026" title="Política de Privacidade">
+    <ContentPage eyebrow="Última atualização: 15/07/2026" title="Política de Privacidade">
       <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
         Esta Política de Privacidade explica como o CarreirasMatch coleta, usa,
         armazena e protege dados pessoais, em conformidade com a Lei Geral de
@@ -66,12 +66,46 @@ export default function PrivacidadePage() {
         <p>
           Usamos armazenamento local do navegador (localStorage) para lembrar sua
           preferência de tema (claro/escuro) e cookies de sessão para manter você
-          autenticado. Não usamos cookies de rastreamento publicitário de
-          terceiros.
+          autenticado.
         </p>
       </ContentSection>
 
-      <ContentSection title="7. Alterações nesta política">
+      <ContentSection title="7. Publicidade">
+        <p>
+          Nas áreas públicas do site (blog e listagens de vagas) exibimos
+          anúncios do Google AdSense. As áreas logadas, as ferramentas e as
+          páginas de pagamento não exibem anúncios.
+        </p>
+        <p>
+          O Google, como fornecedor terceirizado, utiliza cookies para exibir
+          anúncios com base em visitas anteriores suas a este e a outros sites.
+          O uso de cookies de publicidade pelo Google permite que ele e seus
+          parceiros veiculem anúncios com base na sua navegação.
+        </p>
+        <p>
+          Você pode desativar a publicidade personalizada nas{" "}
+          <a
+            href="https://www.google.com/settings/ads"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            Configurações de anúncios do Google
+          </a>{" "}
+          ou gerenciar o uso de cookies por outros fornecedores em{" "}
+          <a
+            href="https://www.aboutads.info/choices/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            aboutads.info/choices
+          </a>
+          .
+        </p>
+      </ContentSection>
+
+      <ContentSection title="8. Alterações nesta política">
         <p>
           Podemos atualizar esta Política periodicamente. A data da última
           atualização está indicada no topo desta página.

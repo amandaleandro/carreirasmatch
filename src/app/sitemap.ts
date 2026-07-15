@@ -1,16 +1,19 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
+import { FREE_TOOL_PATHS } from "@/lib/tools-catalog";
 
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
 // Ferramentas realmente públicas (as demais /tools/* exigem assinatura por
 // design, não entram no sitemap para não apontar a crawler para páginas que
-// redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts.
+// redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts;
+// os guias abertos vêm da flag `free` do catálogo.
 const PUBLIC_TOOL_PATHS = [
   "/tools/vocation-test",
   "/tools/vocation-test/discover",
   "/tools/vocation-test/college",
+  ...FREE_TOOL_PATHS,
 ];
 
 /**

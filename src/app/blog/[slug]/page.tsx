@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ContentPage } from "@/components/content-page";
 import { BlogPostCard } from "@/components/blog-post-card";
+import { FreeTierAd } from "@/components/free-tier-ad";
 import { COVER_GRADIENTS, type ContentBlock } from "@/lib/blog-generator";
 import { prisma } from "@/lib/prisma";
 
@@ -92,6 +93,8 @@ export default async function BlogPostPage({
           return <p key={i}>{block.text}</p>;
         })}
       </article>
+
+      <FreeTierAd name="blogArticle" className="mt-8" format="fluid" />
 
       <p className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-900 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
         Quer ajuda prática nessa etapa da sua carreira?{" "}

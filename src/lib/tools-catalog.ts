@@ -17,6 +17,15 @@ export type ToolCatalogEntry = {
   segments: CareerSegment[];
   icon: ToolIcon;
   color: ToolColor;
+  /**
+   * Ferramenta aberta: sem login e sem assinatura, indexável pelo Google e com
+   * anúncio. São só as de conteúdo estático (guias), que não custam chamada de
+   * IA — as ferramentas de IA e as utilidades interativas seguem na assinatura.
+   *
+   * Esta flag é a fonte única de verdade: alimenta as rotas públicas do
+   * middleware (src/auth.config.ts), o sitemap e o selo "Grátis" no catálogo.
+   */
+  free?: true;
 };
 
 export const TOOLS_CATALOG: ToolCatalogEntry[] = [
@@ -35,6 +44,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
     icon: "compass",
     color: "indigo",
+    free: true,
   },
   {
     href: "/tools/behavioral-test",
@@ -51,6 +61,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["first_job"],
     icon: "compass",
     color: "amber",
+    free: true,
   },
   {
     href: "/tools/project-to-experience",
@@ -155,6 +166,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["student"],
     icon: "compass",
     color: "indigo",
+    free: true,
   },
   {
     href: "/tools/entrepreneurship-tips",
@@ -163,6 +175,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["student", "first_job", "apprentice"],
     icon: "sparkles",
     color: "emerald",
+    free: true,
   },
   {
     href: "/tools/internship-guide",
@@ -171,6 +184,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["internship"],
     icon: "compass",
     color: "indigo",
+    free: true,
   },
   {
     href: "/tools/apprentice-guide",
@@ -179,6 +193,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["apprentice"],
     icon: "scale",
     color: "indigo",
+    free: true,
   },
   {
     href: "/tools/apprentice-companies",
@@ -187,6 +202,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["apprentice"],
     icon: "compass",
     color: "blue",
+    free: true,
   },
   {
     href: "/tools/career-change-guide",
@@ -195,6 +211,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["career_change"],
     icon: "compass",
     color: "amber",
+    free: true,
   },
   {
     href: "/tools/apprentice-areas",
@@ -203,6 +220,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["apprentice"],
     icon: "filePlus",
     color: "amber",
+    free: true,
   },
   {
     href: "/tools/reemployment-guide",
@@ -211,6 +229,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["career_pro"],
     icon: "compass",
     color: "rose",
+    free: true,
   },
   {
     href: "/tools/career-growth-guide",
@@ -219,8 +238,17 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["career_pro"],
     icon: "compass",
     color: "emerald",
+    free: true,
   },
 ];
+
+/** Rotas das ferramentas abertas (ver `free` em ToolCatalogEntry). */
+export const FREE_TOOL_PATHS = TOOLS_CATALOG.filter((t) => t.free).map((t) => t.href);
+
+/** Se a rota é de uma ferramenta aberta (sem login nem assinatura). */
+export function isFreeTool(href: string): boolean {
+  return TOOLS_CATALOG.some((t) => t.href === href && t.free);
+}
 
 export function toolsForSegment(segment: string | CareerSegment | null | undefined) {
   const normalizedSegment = normalizeCareerSegment(segment);

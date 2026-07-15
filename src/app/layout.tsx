@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { Analytics } from "@/components/analytics";
+import { AdsenseScript } from "@/components/adsense-script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -36,6 +37,7 @@ export default function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();`,
           }}
         />
+        <AdsenseScript />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppShell>{children}</AppShell>

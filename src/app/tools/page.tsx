@@ -81,23 +81,29 @@ function ToolGrid({
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => {
+        // Guia aberto nunca aparece bloqueado: é público, então vale a pena
+        // mesmo para quem está fora do segmento recomendado.
+        const isLocked = Boolean(locked) && !tool.free;
         const content = (
           <>
-            {highlight && (
+            {tool.free ? (
+              <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 rounded-full px-2 py-0.5">
+                Grátis
+              </span>
+            ) : highlight ? (
               <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/50 rounded-full px-2 py-0.5">
                 Recomendada
               </span>
-            )}
-            {locked && (
+            ) : isLocked ? (
               <span className="absolute right-4 top-4 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2 py-0.5">
                 <LockIcon className="h-3 w-3" />
                 Bloqueada
               </span>
-            )}
-            <ToolIconBadge icon={tool.icon} color={tool.color} locked={locked} />
+            ) : null}
+            <ToolIconBadge icon={tool.icon} color={tool.color} locked={isLocked} />
             <h3 className="font-semibold mt-4 mb-1 pr-16">{tool.title}</h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400 flex-1">{tool.description}</p>
-            {locked ? (
+            {isLocked ? (
               <span className="mt-4 text-sm text-neutral-500">Não disponível para o seu perfil</span>
             ) : (
               <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400">
@@ -108,7 +114,7 @@ function ToolGrid({
           </>
         );
 
-        if (locked) {
+        if (isLocked) {
           return (
             <div
               key={tool.href}

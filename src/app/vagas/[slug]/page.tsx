@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { findPublicJobCategory, PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { FreeTierAd } from "@/components/free-tier-ad";
 import { cleanJobSnippet } from "@/lib/job-snippet";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -226,6 +227,8 @@ export default async function PublicJobCategoryPage({
             </Link>
           </nav>
         )}
+
+        <FreeTierAd name="jobsList" className="mt-8" />
       </section>
 
       <SiteFooter />

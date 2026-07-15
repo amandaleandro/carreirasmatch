@@ -123,6 +123,32 @@ com a API OpenAI.
 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | Monitoramento de erros server / client (`src/lib/sentry-init.ts`, `src/instrumentation.ts`, `src/instrumentation-client.ts`) | Sem elas, o Sentry fica inerte. Só envia em produção. Não usamos o plugin de build do Sentry, então source maps não sobem automaticamente (stack traces vêm minificadas). |
 | `SENTRY_TRACES_SAMPLE_RATE` | Amostragem de tracing de performance (0 a 1) | Default `0` (sem tracing, só erros). |
 
+## Opcionais (Google AdSense)
+
+| Variável | Uso | Observação |
+|---|---|---|
+| `NEXT_PUBLIC_ADSENSE_CLIENT` | Liga o AdSense (`src/lib/adsense.ts`). Formato `ca-pub-0000000000000000` | Chave mestra: sem ela nenhum script carrega, nenhum anúncio renderiza e `/ads.txt` responde 404. |
+| `NEXT_PUBLIC_ADSENSE_SLOT_BLOG_ARTICLE` | Id da unidade dentro do artigo do blog (`/blog/[slug]`) | Só o id numérico, sem `ca-pub-`. Sem ela, essa posição não renderiza. |
+| `NEXT_PUBLIC_ADSENSE_SLOT_BLOG_LIST` | Id da unidade na listagem do blog (`/blog`) | Idem. |
+| `NEXT_PUBLIC_ADSENSE_SLOT_JOBS_LIST` | Id da unidade nas listagens públicas de vagas (`/vagas-de-hoje`, `/vagas/[slug]`) | Idem. |
+| `NEXT_PUBLIC_ADSENSE_SLOT_TOOL_GUIDE` | Id da unidade nos guias abertos (ferramentas com `free` no catálogo) | Idem. |
+
+> Os slots vêm do painel do AdSense em **Anúncios > Por unidade de anúncio**.
+> Como cada posição é independente, dá para ligar uma de cada vez.
+>
+> `/ads.txt` é gerado por rota (`src/app/ads.txt/route.ts`) a partir do
+> `NEXT_PUBLIC_ADSENSE_CLIENT`, não é arquivo estático em `public/`. O Google
+> exige esse arquivo para autorizar a venda do inventário do domínio.
+>
+> Anúncios só aparecem nas páginas públicas de conteúdo (blog e vagas). Áreas
+> logadas, ferramentas e páginas de pagamento ficam sem anúncio, por política do
+> AdSense e para não degradar a experiência de quem paga.
+>
+> Diferente do Plausible, o AdSense **usa cookies de publicidade de terceiros** —
+> a Política de Privacidade (`src/app/privacidade/page.tsx`) já traz a divulgação
+> exigida pelo Google. Reavalie a necessidade de banner de consentimento se for
+> servir tráfego do EEE/Reino Unido.
+
 > SEO: `/sitemap.xml` e `/robots.txt` são gerados automaticamente
 > (`src/app/sitemap.ts`, `src/app/robots.ts`) usando `APP_URL` como base. Não
 > precisam de env var própria além de `APP_URL`.
