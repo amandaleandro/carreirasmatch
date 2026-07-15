@@ -210,7 +210,7 @@ export function FreeResumeBuilder() {
               </p>
               <h3 className="mt-2 text-2xl font-extrabold">Seu currículo está pronto para uma vaga real?</h3>
               <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-300">
-                Faça a primeira análise por apenas R$4,90 e veja score de aderência, palavras-chave faltantes e o que ajustar antes de aplicar.
+                Faça a análise e veja score de aderência, palavras-chave faltantes e o que ajustar antes de aplicar.
               </p>
               <Link
                 href="/?track=internship"

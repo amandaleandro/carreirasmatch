@@ -26,8 +26,14 @@ export function AdSlot({
 }: {
   name: AdSlotName;
   className?: string;
-  /** "auto" = responsivo; "fluid" para anúncio dentro do corpo do texto. */
-  format?: "auto" | "fluid";
+  /**
+   * Precisa bater com o tipo da unidade criada no painel do AdSense, senão o
+   * anúncio não preenche:
+   * - "auto": unidade de display responsiva.
+   * - "fluid": unidade "No artigo", que herda a tipografia do texto ao redor.
+   * - "autorelaxed": unidade multiplex (grade de recomendações).
+   */
+  format?: "auto" | "fluid" | "autorelaxed";
 }) {
   const slot = ADSENSE_SLOTS[name];
   const insRef = useRef<HTMLModElement>(null);
@@ -60,11 +66,14 @@ export function AdSlot({
         key={pathname}
         ref={insRef}
         className="adsbygoogle block"
-        style={{ display: "block" }}
+        style={format === "fluid" ? { display: "block", textAlign: "center" } : { display: "block" }}
         data-ad-client={ADSENSE_CLIENT}
         data-ad-slot={slot}
         data-ad-format={format}
-        data-full-width-responsive="true"
+        // Só a unidade "No artigo" leva layout; multiplex e display quebram se receberem.
+        {...(format === "fluid" ? { "data-ad-layout": "in-article" } : {})}
+        // O AdSense ignora full-width-responsive fora do display responsivo.
+        {...(format === "auto" ? { "data-full-width-responsive": "true" } : {})}
       />
     </div>
   );

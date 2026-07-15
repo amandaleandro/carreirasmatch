@@ -366,7 +366,7 @@ export const NICHES = {
     heroIcon: "🎓",
     heroImage: "/niche-hero/estudante.png",
     quickFeatures: ["Teste de afinidade profissional", "Área e carreiras compatíveis", "Faculdades e cursos recomendados", "Plano de estudo e ação"],
-    heroSecondaryCtaLabel: "Fazer primeira análise por R$4,90",
+    heroSecondaryCtaLabel: "Analisar meu currículo",
     socialProof: "Escolher caminho sem pressão fica mais fácil quando alguém organiza a bagunça junto com você.",
     samplePreview: {
       score: 85,
@@ -449,8 +449,9 @@ export function NicheLandingPage() {
   const isFirstJob = activeSlug === "primeiro-emprego";
   const firstJobGuide = FIRST_JOB_GUIDE_BY_PATH[firstJobPath];
   const painPoints = isFirstJob ? FIRST_JOB_PAIN_POINTS[firstJobPath] : niche.painPoints;
-  const heroSecondaryCtaLabel =
-    niche.heroSecondaryCtaLabel ?? `Fazer primeira análise por ${offer.firstAnalysisPrice}`;
+  // A CTA não cita preço: o valor da primeira análise aparece só no checkout,
+  // então mudar `firstAnalysisPrice` não exige revisar o texto do hero.
+  const heroSecondaryCtaLabel = niche.heroSecondaryCtaLabel ?? "Analisar meu currículo";
   const attentionCards = [
     {
       label: "Antes de aplicar",

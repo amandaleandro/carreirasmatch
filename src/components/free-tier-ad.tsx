@@ -20,7 +20,7 @@ export async function FreeTierAd({
 }: {
   name: AdSlotName;
   className?: string;
-  format?: "auto" | "fluid";
+  format?: "auto" | "fluid" | "autorelaxed";
 }) {
   // Evita o custo de auth()/consulta ao banco quando o AdSense nem está ligado.
   if (!isAdsEnabled()) return null;

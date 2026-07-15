@@ -147,7 +147,9 @@ export default async function BlogPage({
         </div>
       )}
 
-      {posts.length > 0 && <FreeTierAd name="blogList" className="mt-8" />}
+      {posts.length > 0 && (
+        <FreeTierAd name="blogList" className="mt-8" format="autorelaxed" />
+      )}
 
       {posts.length === 0 && (
         <p className="mt-6 text-sm text-neutral-500 dark:text-neutral-400">
