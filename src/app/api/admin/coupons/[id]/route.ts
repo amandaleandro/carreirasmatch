@@ -1,18 +1,38 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
+import { CouponInputError, parseCouponInput } from "@/lib/coupon-input";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { session, response } = await requireAdminApi();
   if (!session) return response!;
 
   const { id } = await params;
-  const { active } = await req.json();
-  if (typeof active !== "boolean") {
-    return NextResponse.json({ error: "Campo 'active' é obrigatório." }, { status: 400 });
+
+  let input;
+  try {
+    input = parseCouponInput(await req.json());
+  } catch (err) {
+    if (err instanceof CouponInputError) {
+      return NextResponse.json({ error: err.message }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Dados inválidos." }, { status: 400 });
   }
 
-  const coupon = await prisma.coupon.update({ where: { id }, data: { active } }).catch(() => null);
+  // O código já foi divulgado pelo influenciador quando o cupom existe; trocá-lo
+  // quebraria os links em circulação. Para mudar de código, crie outro cupom.
+  if (input.code !== undefined) {
+    return NextResponse.json(
+      { error: "O código do cupom não pode ser alterado depois de criado." },
+      { status: 400 }
+    );
+  }
+
+  if (Object.keys(input).length === 0) {
+    return NextResponse.json({ error: "Nenhum campo para atualizar." }, { status: 400 });
+  }
+
+  const coupon = await prisma.coupon.update({ where: { id }, data: input }).catch(() => null);
   if (!coupon) {
     return NextResponse.json({ error: "Cupom não encontrado." }, { status: 404 });
   }

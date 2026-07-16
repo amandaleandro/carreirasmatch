@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getPayment, getPreapproval } from "@/lib/mercadopago";
 import { isValidMercadoPagoSignature } from "@/lib/webhook-secret";
+import { registerCouponUsage } from "@/lib/coupons";
 import {
   sendPaymentConfirmationEmail,
   sendSubscriptionConfirmationEmail,
@@ -54,6 +55,13 @@ export async function POST(req: NextRequest) {
     });
 
     // Só age na transição para "paid" (o webhook pode reenviar o mesmo evento).
+    // O PIX nasce "pending" e só confirma aqui, então é este o ponto que conta o
+    // resgate do cupom para essas vendas. No cartão o Payment já nasce "paid" e a
+    // rota síncrona contou; a checagem de transição evita contar duas vezes.
+    if (status === "paid" && payment.status !== "paid") {
+      await registerCouponUsage(payment.couponId);
+    }
+
     if (status === "paid" && payment.status !== "paid" && payment.kind !== "subscription") {
       const email = await userEmail(payment.userId);
 
@@ -109,6 +117,8 @@ export async function POST(req: NextRequest) {
     });
 
     if (status === "paid") {
+      if (!wasPaid) await registerCouponUsage(payment.couponId);
+
       const currentPeriodEnd = new Date(Date.now() + SUBSCRIPTION_PERIOD_DAYS * 24 * 60 * 60 * 1000);
       await prisma.subscription.upsert({
         where: { userId: payment.userId },

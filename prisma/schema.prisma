@@ -250,6 +250,7 @@ model Payment {
   kind             String // "first_analysis" | "diagnostic" | "subscription"
   segment          String
   amount           Int // valor em centavos (já com desconto de cupom aplicado, se houver)
+  discountCents    Int       @default(0) // desconto concedido pelo cupom; amount + discountCents = preço cheio
   status           String    @default("pending") // pending | paid | expired | cancelled | refunded
   mpPaymentId      String    @unique
   analysisId       String? // set for "first_analysis" (consumed by) and "diagnostic" (unlocks) payments
@@ -268,16 +269,32 @@ model Payment {
 
 /// Cupons de desconto de influenciadores. Um código por influenciador para rastrear origem das vendas.
 model Coupon {
-  id                        String    @id @default(cuid())
-  code                      String    @unique
-  influencerName            String
-  active                    Boolean   @default(true)
-  oneOffDiscountCents       Int       @default(200) // desconto em "Primeira Análise" e "Diagnóstico"
-  subscriptionDiscountCents Int       @default(400) // desconto na assinatura
-  usageCount                Int       @default(0)
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
-  payments                  Payment[]
+  id             String  @id @default(cuid())
+  code           String  @unique
+  influencerName String
+  active         Boolean @default(true)
+
+  /// "fixed" = usa os campos *DiscountCents; "percent" = usa os campos *DiscountPercent.
+  discountType String @default("fixed")
+
+  oneOffDiscountCents       Int @default(200) // desconto em "Primeira Análise" e "Diagnóstico"
+  subscriptionDiscountCents Int @default(400) // desconto na assinatura
+  oneOffDiscountPercent     Int @default(0) // 0-100, usado quando discountType = "percent"
+  subscriptionDiscountPercent Int @default(0) // 0-100, usado quando discountType = "percent"
+
+  /// Percentual de comissão do influenciador sobre a receita líquida atribuída ao cupom.
+  commissionPercent Int @default(0)
+
+  /// null = sem data de expiração.
+  expiresAt DateTime?
+  /// null = usos ilimitados. Comparado contra usageCount (resgates pagos).
+  maxRedemptions Int?
+
+  /// Só é incrementado quando o pagamento confirma (cartão aprovado ou webhook do PIX).
+  usageCount Int       @default(0)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  payments   Payment[]
 
   @@index([active])
 }

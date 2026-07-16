@@ -53,11 +53,13 @@ export async function POST(req: NextRequest) {
   const baseAmountCents = parseBRLToCents(offer.monthlyPrice);
 
   let amountCents = baseAmountCents;
+  let discountCents = 0;
   let couponId: string | null = null;
   if (typeof couponCode === "string" && couponCode.trim()) {
     try {
       const result = await applyCoupon(couponCode, "subscription", baseAmountCents);
       amountCents = result.amountCents;
+      discountCents = result.discountCents;
       couponId = result.couponId;
     } catch (err) {
       return NextResponse.json({ error: err instanceof Error ? err.message : "Cupom inválido." }, { status: 400 });
@@ -91,6 +93,7 @@ export async function POST(req: NextRequest) {
       kind: "subscription",
       segment,
       amount: amountCents,
+      discountCents,
       status,
       mpPaymentId: result.id,
       couponId,

@@ -115,11 +115,13 @@ export async function POST(req: NextRequest) {
   const couponKind = isPeriodPlan ? "subscription" : kind;
 
   let amountCents = baseAmountCents;
+  let discountCents = 0;
   let couponId: string | null = null;
   if (typeof couponCode === "string" && couponCode.trim()) {
     try {
       const result = await applyCoupon(couponCode, couponKind, baseAmountCents);
       amountCents = result.amountCents;
+      discountCents = result.discountCents;
       couponId = result.couponId;
     } catch (err) {
       return NextResponse.json(
@@ -169,6 +171,7 @@ export async function POST(req: NextRequest) {
       kind,
       segment,
       amount: amountCents,
+      discountCents,
       status,
       mpPaymentId: String(result.id),
       analysisId: kind === "diagnostic" ? analysisId : null,
