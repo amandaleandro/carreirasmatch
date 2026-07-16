@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function PrivacidadePage() {
   return (
-    <ContentPage eyebrow="Última atualização: 15/07/2026" title="Política de Privacidade">
+    <ContentPage eyebrow="Última atualização: 16/07/2026" title="Política de Privacidade">
       <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
         Esta Política de Privacidade explica como o CarreirasMatch coleta, usa,
         armazena e protege dados pessoais, em conformidade com a Lei Geral de
@@ -72,15 +72,28 @@ export default function PrivacidadePage() {
 
       <ContentSection title="7. Publicidade">
         <p>
-          Nas áreas públicas do site (blog e listagens de vagas) exibimos
-          anúncios do Google AdSense. As áreas logadas, as ferramentas e as
-          páginas de pagamento não exibem anúncios.
+          Exibimos anúncios do Google AdSense nas páginas de conteúdo público:
+          o blog e os guias abertos. As listagens de vagas, as áreas logadas e
+          as páginas de pagamento não exibem anúncios, e quem tem assinatura
+          ativa não vê anúncio em nenhuma página.
         </p>
         <p>
           O Google, como fornecedor terceirizado, utiliza cookies para exibir
           anúncios com base em visitas anteriores suas a este e a outros sites.
           O uso de cookies de publicidade pelo Google permite que ele e seus
-          parceiros veiculem anúncios com base na sua navegação.
+          parceiros veiculem anúncios com base na sua navegação. Terceiros também
+          podem usar web beacons e o seu endereço IP para coletar informações
+          como resultado da veiculação de anúncios neste site. Para detalhes,
+          consulte{" "}
+          <a
+            href="https://policies.google.com/technologies/partner-sites"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            como o Google usa informações de sites que utilizam seus serviços
+          </a>
+          .
         </p>
         <p>
           Você pode desativar a publicidade personalizada nas{" "}

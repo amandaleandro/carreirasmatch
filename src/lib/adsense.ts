@@ -15,14 +15,16 @@ export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
  * (Anúncios > Por unidade de anúncio) e é um id numérico. Um slot sem env var
  * definida simplesmente não renderiza, então dá para ligar as posições aos
  * poucos.
+ *
+ * Só existe slot para blog e guias: é conteúdo escrito por nós. As listagens de
+ * vagas não entram porque são agregadas de fontes externas, e anúncio sobre
+ * conteúdo replicado é risco de suspensão da conta inteira — não só da página.
  */
 export const ADSENSE_SLOTS = {
   /** Dentro do artigo do blog, entre o conteúdo e os posts relacionados. */
   blogArticle: process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_ARTICLE,
   /** Listagem do blog, abaixo da grade de posts. */
   blogList: process.env.NEXT_PUBLIC_ADSENSE_SLOT_BLOG_LIST,
-  /** Listagens públicas de vagas (/vagas-de-hoje e /vagas/[slug]). */
-  jobsList: process.env.NEXT_PUBLIC_ADSENSE_SLOT_JOBS_LIST,
   /** Guias de conteúdo abertos (ferramentas com `free` no catálogo). */
   toolGuide: process.env.NEXT_PUBLIC_ADSENSE_SLOT_TOOL_GUIDE,
 } as const;

@@ -9,14 +9,16 @@ const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replac
  *
  * O Mediapartners-Google (rastreador do AdSense) recebe uma regra própria: ele
  * precisa ler as páginas onde há anúncio para escolher anúncios relevantes, e
- * regras de `*` não valem para ele quando existe um bloco específico.
+ * regras de `*` não valem para ele quando existe um bloco específico. A lista
+ * cobre só onde há anúncio de fato (blog e guias) — as vagas ficam de fora
+ * porque não exibem anúncio, ver src/lib/adsense.ts.
  */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: "Mediapartners-Google",
-        allow: ["/blog", "/vagas", "/vagas-de-hoje", ...FREE_TOOL_PATHS],
+        allow: ["/blog", ...FREE_TOOL_PATHS],
         disallow: "/",
       },
       {

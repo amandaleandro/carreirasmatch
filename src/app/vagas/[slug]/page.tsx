@@ -6,7 +6,6 @@ import { prisma } from "@/lib/prisma";
 import { findPublicJobCategory, PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { FreeTierAd } from "@/components/free-tier-ad";
 import { cleanJobSnippet } from "@/lib/job-snippet";
 import type { Prisma } from "@/generated/prisma/client";
 
@@ -137,6 +136,28 @@ export default async function PublicJobCategoryPage({
           </div>
         </div>
 
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 space-y-4">
+          <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+            {category.editorial.intro}
+          </p>
+
+          <div>
+            <h2 className="text-sm font-semibold">O que esperar destas vagas</h2>
+            <ul className="mt-2 space-y-1.5">
+              {category.editorial.expectations.map((item) => (
+                <li key={item} className="flex gap-2 text-sm text-neutral-600 dark:text-neutral-400">
+                  <span aria-hidden className="mt-2 h-1 w-1 shrink-0 rounded-full bg-blue-500" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="rounded-md border-l-2 border-blue-500 bg-blue-50/60 dark:bg-blue-950/20 py-2 pl-3 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+            {category.editorial.tip}
+          </p>
+        </div>
+
         <form className="grid gap-3 md:grid-cols-[1fr_auto] rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3">
           <label className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
@@ -167,6 +188,19 @@ export default async function PublicJobCategoryPage({
             </Link>
           ))}
         </div>
+
+        {jobs.length === 0 && (
+          <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-8 text-center">
+            <p className="font-semibold">Nenhuma vaga encontrada nesta categoria.</p>
+            <p className="mt-1 text-sm text-neutral-500">
+              Tente outra busca ou veja as{" "}
+              <Link href="/vagas-de-hoje" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                vagas de hoje
+              </Link>
+              .
+            </p>
+          </div>
+        )}
 
         <div className="grid gap-3">
           {jobs.map((job) => (
@@ -228,7 +262,6 @@ export default async function PublicJobCategoryPage({
           </nav>
         )}
 
-        <FreeTierAd name="jobsList" className="mt-8" />
       </section>
 
       <SiteFooter />

@@ -130,7 +130,6 @@ com a API OpenAI.
 | `NEXT_PUBLIC_ADSENSE_CLIENT` | Liga o AdSense (`src/lib/adsense.ts`). Formato `ca-pub-0000000000000000` | Chave mestra: sem ela nenhum script carrega, nenhum anúncio renderiza e `/ads.txt` responde 404. |
 | `NEXT_PUBLIC_ADSENSE_SLOT_BLOG_ARTICLE` | Id da unidade dentro do artigo do blog (`/blog/[slug]`) | Só o id numérico, sem `ca-pub-`. Sem ela, essa posição não renderiza. |
 | `NEXT_PUBLIC_ADSENSE_SLOT_BLOG_LIST` | Id da unidade na listagem do blog (`/blog`) | Idem. |
-| `NEXT_PUBLIC_ADSENSE_SLOT_JOBS_LIST` | Id da unidade nas listagens públicas de vagas (`/vagas-de-hoje`, `/vagas/[slug]`) | Idem. |
 | `NEXT_PUBLIC_ADSENSE_SLOT_TOOL_GUIDE` | Id da unidade nos guias abertos (ferramentas com `free` no catálogo) | Idem. |
 
 > Os slots vêm do painel do AdSense em **Anúncios > Por unidade de anúncio**.

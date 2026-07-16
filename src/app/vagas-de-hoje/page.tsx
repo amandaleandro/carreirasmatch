@@ -5,7 +5,6 @@ import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { FreeTierAd } from "@/components/free-tier-ad";
 import { cleanJobSnippet } from "@/lib/job-snippet";
 
 export const dynamic = "force-dynamic";
@@ -341,8 +340,6 @@ export default async function JobsTodayPage({
             </Link>
           </nav>
         )}
-
-        <FreeTierAd name="jobsList" className="mb-6" />
 
         <div className="rounded-lg bg-blue-600 p-5 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
