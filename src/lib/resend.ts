@@ -48,8 +48,14 @@ async function send(to: string, subject: string, bodyHtml: string) {
     return;
   }
   try {
-    await resend.emails.send({ from: FROM, to, subject, html: layout(bodyHtml) });
+    // O SDK NÃO lança em erro de API (chave inválida, domínio não verificado):
+    // devolve { data, error }. Sem checar `error` aqui, a falha some em silêncio.
+    const { error } = await resend.emails.send({ from: FROM, to, subject, html: layout(bodyHtml) });
+    if (error) {
+      console.error(`Resend recusou o e-mail "${subject}" para ${to}:`, error);
+    }
   } catch (err) {
+    // Só cai aqui em falha de rede/exceção inesperada.
     console.error(`Falha ao enviar e-mail "${subject}" para ${to}:`, err);
   }
 }
