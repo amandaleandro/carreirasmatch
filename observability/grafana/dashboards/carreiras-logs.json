@@ -2,7 +2,7 @@
   "annotations": { "list": [] },
   "editable": true,
   "graphTooltip": 0,
-  "title": "Carreiras Match — Logs",
+  "title": "Carreiras Match - Logs",
   "uid": "carreiras-logs",
   "tags": ["carreiras-match", "logs"],
   "timezone": "browser",

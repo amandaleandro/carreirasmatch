@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { Analytics } from "@/components/analytics";
 import { AdsenseScript } from "@/components/adsense-script";
+import { AccessTracker } from "@/components/access-tracker";
+import { DashSanitizer } from "@/components/dash-sanitizer";
+import { Suspense } from "react";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -42,6 +45,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppShell>{children}</AppShell>
         <Analytics />
+        <Suspense fallback={null}>
+          <AccessTracker />
+        </Suspense>
+        <DashSanitizer />
       </body>
     </html>
   );

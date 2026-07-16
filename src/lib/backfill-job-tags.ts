@@ -9,7 +9,7 @@ function jobRetentionDays(): number {
 /**
  * Cheap guard: how many active jobs were never tagged. `classifyJobForStorage`
  * always returns a non-empty `company` (falling back to "Empresa"), so an active
- * job with an empty company — or a null `expiresAt` — has never been processed.
+ * job with an empty company - or a null `expiresAt` - has never been processed.
  * Returns 0 once the backfill is complete, which makes the startup hook a no-op.
  */
 export function countJobsNeedingTags(): Promise<number> {
@@ -21,7 +21,7 @@ export function countJobsNeedingTags(): Promise<number> {
 /**
  * One-time backfill: derives area/seniority/workModel/entryLevel/company/salaryMin
  * (and fills a null expiresAt) for jobs ingested before the job-tags migration,
- * which have empty tag columns. Idempotent — only rows whose derived values still
+ * which have empty tag columns. Idempotent - only rows whose derived values still
  * differ from what is stored are written, so it is safe to run repeatedly.
  */
 export async function backfillJobTags(): Promise<{ scanned: number; updated: number }> {

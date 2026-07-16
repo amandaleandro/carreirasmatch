@@ -77,7 +77,7 @@ liberadas (`src/lib/tool-access.ts`, `src/lib/entitlements.ts`).
 
 - **`/report`**: lista cronológica de todas as análises do usuário
   (evolução ao longo do tempo).
-- **`/report/[id]`**: relatório detalhado de uma análise específica —
+- **`/report/[id]`**: relatório detalhado de uma análise específica -
   completo se desbloqueado, teaser + CTA de compra se não.
 - **`/report/[id]/map`**: visão adicional ("mapa de oportunidade") gated
   pela mesma regra de desbloqueio.
@@ -96,7 +96,7 @@ liberadas (`src/lib/tool-access.ts`, `src/lib/entitlements.ts`).
   (`pdf-lib` + template em `src/lib/resume-template.ts`) a partir do
   currículo estruturado + edições do usuário.
 - **`/curriculo-gratis`** (`free-resume-builder.tsx`): gerador de
-  currículo do zero, fora do fluxo de análise paga — usado como isca de
+  currículo do zero, fora do fluxo de análise paga - usado como isca de
   topo de funil.
 
 ### 3.4 Preparação de entrevistas
@@ -146,7 +146,7 @@ liberadas (`src/lib/tool-access.ts`, `src/lib/entitlements.ts`).
 ### 3.8 Sugestões de perfil
 
 - **`/profile`** (gated por assinatura): sugestões geradas por IA de
-  cursos, certificações e livros, cada uma com um `impactScore` (0–100)
+  cursos, certificações e livros, cada uma com um `impactScore` (0-100)
   estimando o ganho de empregabilidade (`profile-suggestions.tsx`,
   `POST/GET /api/profile-suggestions`).
 
@@ -204,7 +204,7 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
   assinatura): o visitante paga com e-mail, a conta é criada/recuperada por
   e-mail e ele é levado a `/register?email=…` para definir a senha. No
   diagnóstico anônimo, a análise só pode ser desbloqueada se estiver **sem
-  dono** (`resume.userId == null`) — e nesse caso é reivindicada para o
+  dono** (`resume.userId == null`) - e nesse caso é reivindicada para o
   usuário ao confirmar o pagamento (síncrono no cartão, via webhook no PIX);
   análise já pertencente a uma conta exige login. Preço do avulso é uniforme
   entre segmentos, então o segmento default do fluxo anônimo não altera o
@@ -265,14 +265,14 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
 ## 5. Requisitos não funcionais e limitações conhecidas
 
 - **Idioma**: produto 100% em pt-BR, sem i18n.
-- **Persistência**: SQLite em arquivo — adequado para baixo tráfego
+- **Persistência**: SQLite em arquivo - adequado para baixo tráfego
   inicial, **não escala para escrita concorrente**; sem backup
   automático hoje.
-- **Rate limiting**: em memória (não distribuído) — não sobrevive a
+- **Rate limiting**: em memória (não distribuído) - não sobrevive a
   múltiplas instâncias/reinícios; aplicado a análise anônima, login,
   cadastro e ações autenticadas.
 - **Confiabilidade da IA**: sem retry/backoff nem validação de schema
-  (zod) sobre a resposta da Groq — resposta truncada é só logada, não
+  (zod) sobre a resposta da Groq - resposta truncada é só logada, não
   reprocessada.
 - **Segurança de webhook**: validação HMAC falha fechado (rejeita se mal
   configurado), o que é seguro mas exige configuração correta antes de

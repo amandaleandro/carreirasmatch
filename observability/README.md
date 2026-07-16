@@ -1,12 +1,12 @@
-# Observabilidade — Prometheus + Loki + Grafana
+# Observabilidade - Prometheus + Loki + Grafana
 
 Stack de monitoramento self-hosted, complementar ao Sentry (erros) e Plausible (produto):
 
-- **Prometheus** — métricas (série temporal). Faz scrape do app, do Caddy, do host e dos containers.
-- **Loki + Promtail** — logs centralizados de todos os containers.
-- **Grafana** — dashboards e exploração, em `https://carreirasmatch.com.br/grafana`.
-- **cAdvisor** — métricas por container (CPU/memória/rede/IO).
-- **node-exporter** — métricas do host (CPU, memória, disco, rede).
+- **Prometheus** - métricas (série temporal). Faz scrape do app, do Caddy, do host e dos containers.
+- **Loki + Promtail** - logs centralizados de todos os containers.
+- **Grafana** - dashboards e exploração, em `https://carreirasmatch.com.br/grafana`.
+- **cAdvisor** - métricas por container (CPU/memória/rede/IO).
+- **node-exporter** - métricas do host (CPU, memória, disco, rede).
 
 Tudo roda num `docker-compose.observability.yml` separado, na mesma rede Docker do app
 (`carreiras-match_default`), então nada além do Grafana fica exposto na internet.
@@ -31,7 +31,7 @@ GRAFANA_ADMIN_PASSWORD=troque-esta-senha
 # Usuário admin do Grafana (opcional, padrão: admin)
 GRAFANA_ADMIN_USER=admin
 
-# Opcional — trava por token no /api/metrics do app (defesa em profundidade).
+# Opcional - trava por token no /api/metrics do app (defesa em profundidade).
 # Se setar, descomente o bloco authorization no observability/prometheus/prometheus.yml.
 # METRICS_TOKEN=um-token-aleatorio-longo
 ```
@@ -56,7 +56,7 @@ principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
 ## Acessar
 
 - Grafana: `https://carreirasmatch.com.br/grafana` (login com as credenciais acima).
-- O dashboard **"Carreiras Match — Visão Geral"** já vem provisionado, junto com os
+- O dashboard **"Carreiras Match - Visão Geral"** já vem provisionado, junto com os
   datasources Prometheus e Loki.
 
 ## Reiniciar só a observabilidade

@@ -1,6 +1,6 @@
 import { adsensePublisherId } from "@/lib/adsense";
 
-// Certificação do Google para o campo TAGID do ads.txt — valor fixo e público,
+// Certificação do Google para o campo TAGID do ads.txt - valor fixo e público,
 // igual para todos os publishers do AdSense.
 const GOOGLE_CERTIFICATION_AUTHORITY_ID = "f08c47fec0942fa0";
 
@@ -15,7 +15,7 @@ const GOOGLE_CERTIFICATION_AUTHORITY_ID = "f08c47fec0942fa0";
 export function GET() {
   const publisherId = adsensePublisherId();
 
-  // Sem AdSense configurado não existe ads.txt legítimo para servir — 404 é o
+  // Sem AdSense configurado não existe ads.txt legítimo para servir - 404 é o
   // que o crawler do Google espera nesse caso.
   if (!publisherId) {
     return new Response("Not found", { status: 404 });

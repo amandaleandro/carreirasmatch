@@ -44,7 +44,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Disponibilidade de horário costuma pesar mais do que qualquer item do currículo.",
         "Processos tendem a ser rápidos, com entrevista única ou dinâmica em grupo.",
       ],
-      tip: "Sem experiência formal, o currículo se sustenta em outras coisas: trabalho voluntário, projetos de curso, atividades de família e cursos livres contam. O que não conta é deixar a página quase em branco — descreva o que você fez, mesmo que não tenha sido um emprego.",
+      tip: "Sem experiência formal, o currículo se sustenta em outras coisas: trabalho voluntário, projetos de curso, atividades de família e cursos livres contam. O que não conta é deixar a página quase em branco - descreva o que você fez, mesmo que não tenha sido um emprego.",
     },
   },
   {
@@ -81,7 +81,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Jornada reduzida (em geral 4 a 6 horas), compatível com o horário de aula.",
         "Bolsa-auxílio e auxílio-transporte no lugar de salário CLT.",
       ],
-      tip: "Estágio não precisa ser na sua área dos sonhos para valer a pena, mas precisa ter relação com o curso — é o que a lei exige e é o que faz a experiência contar no currículo depois. Desconfie de vaga de estágio que descreve tarefas sem nenhum vínculo com a sua formação.",
+      tip: "Estágio não precisa ser na sua área dos sonhos para valer a pena, mas precisa ter relação com o curso - é o que a lei exige e é o que faz a experiência contar no currículo depois. Desconfie de vaga de estágio que descreve tarefas sem nenhum vínculo com a sua formação.",
     },
   },
   {
@@ -98,7 +98,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Contrato por prazo determinado, com registro em carteira e direitos de CLT.",
         "Parte da carga horária é curso teórico, geralmente em instituição parceira.",
       ],
-      tip: "A aprendizagem é uma das poucas entradas no mercado desenhadas para quem não tem currículo nenhum — a empresa já espera isso. O que ela avalia é frequência escolar e comprometimento, então leve o histórico escolar a sério no processo.",
+      tip: "A aprendizagem é uma das poucas entradas no mercado desenhadas para quem não tem currículo nenhum - a empresa já espera isso. O que ela avalia é frequência escolar e comprometimento, então leve o histórico escolar a sério no processo.",
     },
   },
   {
@@ -168,7 +168,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Metas claras e cobrança de números fazem parte da rotina.",
         "SDR e vendas internas costumam ser as portas de entrada da área.",
       ],
-      tip: "Confira sempre a proporção entre fixo e variável antes de aceitar. Uma vaga com fixo baixo e comissão alta é ótima em mês bom e difícil em mês ruim — e o anúncio raramente deixa isso claro, então pergunte na entrevista.",
+      tip: "Confira sempre a proporção entre fixo e variável antes de aceitar. Uma vaga com fixo baixo e comissão alta é ótima em mês bom e difícil em mês ruim - e o anúncio raramente deixa isso claro, então pergunte na entrevista.",
     },
   },
   {
@@ -185,7 +185,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Ferramentas aparecem nominalmente nos anúncios: Meta Ads, Google Ads, RD Station, Analytics.",
         "Funções de entrada comuns: assistente de marketing, social media, auxiliar de conteúdo.",
       ],
-      tip: "Em marketing você pode construir a experiência antes de ser contratada. Gerir a rede social de um negócio pequeno, criar um blog ou rodar uma campanha própria vira portfólio — e portfólio abre porta que currículo sozinho não abre.",
+      tip: "Em marketing você pode construir a experiência antes de ser contratada. Gerir a rede social de um negócio pequeno, criar um blog ou rodar uma campanha própria vira portfólio - e portfólio abre porta que currículo sozinho não abre.",
     },
   },
   {
@@ -219,7 +219,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Parte das funções exige esforço físico ou certificação específica, como empilhadeira.",
         "Progressão comum: auxiliar de estoque, conferente, líder, supervisor.",
       ],
-      tip: "Certificações curtas destravam vaga nessa área rápido. O curso de operador de empilhadeira é um exemplo: dura poucos dias e muda a faixa de vaga que você acessa — muito mais eficiente do que esperar experiência aparecer.",
+      tip: "Certificações curtas destravam vaga nessa área rápido. O curso de operador de empilhadeira é um exemplo: dura poucos dias e muda a faixa de vaga que você acessa - muito mais eficiente do que esperar experiência aparecer.",
     },
   },
   {
@@ -236,7 +236,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
         "Suporte técnico e help desk aceitam perfil de entrada com mais frequência.",
         "É a área com maior proporção de vagas remotas.",
       ],
-      tip: "Cuidado com a promessa de virar dev em três meses e dobrar de salário. A transição para tecnologia é real e acontece, mas costuma passar por suporte, estágio ou júnior antes — e quem vende atalho garantido está vendendo curso, não carreira.",
+      tip: "Cuidado com a promessa de virar dev em três meses e dobrar de salário. A transição para tecnologia é real e acontece, mas costuma passar por suporte, estágio ou júnior antes - e quem vende atalho garantido está vendendo curso, não carreira.",
     },
   },
 ];

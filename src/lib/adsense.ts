@@ -6,7 +6,7 @@
  * O client id é lido direto de `process.env` (e não via variável intermediária)
  * porque o Next só substitui `NEXT_PUBLIC_*` no bundle do cliente quando o
  * acesso é literal. Como são embutidas em build time, precisam estar presentes
- * como build args no Docker — ver Dockerfile e docs/ENV.md.
+ * como build args no Docker - ver Dockerfile e docs/ENV.md.
  */
 export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
 
@@ -18,7 +18,7 @@ export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
  *
  * Só existe slot para blog e guias: é conteúdo escrito por nós. As listagens de
  * vagas não entram porque são agregadas de fontes externas, e anúncio sobre
- * conteúdo replicado é risco de suspensão da conta inteira — não só da página.
+ * conteúdo replicado é risco de suspensão da conta inteira - não só da página.
  */
 export const ADSENSE_SLOTS = {
   /** Dentro do artigo do blog, entre o conteúdo e os posts relacionados. */

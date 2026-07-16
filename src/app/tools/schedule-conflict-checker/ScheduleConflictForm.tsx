@@ -168,7 +168,7 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
               className="flex items-center justify-between gap-3 rounded-xl border border-neutral-200 dark:border-neutral-800 p-3 text-sm hover:border-blue-300 dark:hover:border-blue-800 hover:shadow-sm transition-all"
             >
               <span>
-                <strong>{dayLabel(c.dayOfWeek)}</strong> {c.startTime}–{c.endTime} · {c.subject}
+                <strong>{dayLabel(c.dayOfWeek)}</strong> {c.startTime}-{c.endTime} · {c.subject}
               </span>
               <button
                 type="button"
@@ -256,8 +256,8 @@ export function ScheduleConflictForm({ initialClassItems }: { initialClassItems:
                 key={i}
                 className="text-sm rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/30 text-red-700 dark:text-red-400 p-4"
               >
-                {dayLabel(c.classBlock.dayOfWeek)} {c.classBlock.startTime}–{c.classBlock.endTime}
-                {" "}({c.classBlock.label}) colide com o estágio das {c.internshipBlock.startTime}–
+                {dayLabel(c.classBlock.dayOfWeek)} {c.classBlock.startTime}-{c.classBlock.endTime}
+                {" "}({c.classBlock.label}) colide com o estágio das {c.internshipBlock.startTime}-
                 {c.internshipBlock.endTime}.
               </p>
             ))}

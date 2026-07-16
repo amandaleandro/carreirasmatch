@@ -144,7 +144,7 @@ export async function runJsonAcrossProviders(
   }
 
   // Regra global de estilo: nada de travessão/meia-risca (cara de texto de IA).
-  const systemWithStyle = `${systemPrompt}\n\nESTILO: escreva em português natural. NUNCA use travessão (—) nem meia-risca (–); use vírgula, ponto, dois-pontos ou parênteses no lugar.`;
+  const systemWithStyle = `${systemPrompt}\n\nESTILO: escreva em português natural. Nunca use pontuação em forma de traço longo; use vírgula, ponto, dois-pontos ou parênteses no lugar.`;
 
   // Prioridade: tenta sempre na ordem do registro (Groq primeiro, que é o mais
   // rápido) e só cai para o próximo provedor se o atual falhar.

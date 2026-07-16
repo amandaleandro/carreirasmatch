@@ -83,7 +83,7 @@ export async function applyCoupon(
 }
 
 /**
- * Deve ser chamado apenas após confirmar que o pagamento foi pago — inclusive no
+ * Deve ser chamado apenas após confirmar que o pagamento foi pago - inclusive no
  * webhook, já que o PIX nasce "pending" e só confirma lá. É o contador comparado
  * contra maxRedemptions, então contar um pagamento não pago bloquearia o cupom à toa.
  */

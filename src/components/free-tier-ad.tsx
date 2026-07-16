@@ -5,7 +5,7 @@ import { AdSlot } from "@/components/ad-slot";
 
 /**
  * Anúncio para visitante anônimo e para usuário logado sem assinatura. Quem tem
- * assinatura ativa não vê anúncio — é parte do que ele está pagando.
+ * assinatura ativa não vê anúncio - é parte do que ele está pagando.
  *
  * Use este componente (e não o AdSlot direto) em qualquer página que um
  * assinante possa abrir. AdSlot puro só faz sentido onde assinante nunca chega.

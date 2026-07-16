@@ -34,7 +34,7 @@ type StepId =
 const BASE_STEPS: Record<StepId, TourStep> = {
   welcome: {
     title: "Bem-vindo(a)! 👋",
-    body: "Em 1 minuto eu te mostro por onde a mágica acontece. Pode continuar usando a tela normalmente — nada fica bloqueado.",
+    body: "Em 1 minuto eu te mostro por onde a mágica acontece. Pode continuar usando a tela normalmente - nada fica bloqueado.",
   },
   analise: {
     target: '[data-tour="nav-analise"]',
@@ -46,13 +46,13 @@ const BASE_STEPS: Record<StepId, TourStep> = {
   feed: {
     target: '[data-tour="nav-feed"]',
     title: "Feed de Vagas",
-    body: "Vagas selecionadas para o seu momento de carreira. Salve as interessantes com um clique — elas viram candidaturas.",
+    body: "Vagas selecionadas para o seu momento de carreira. Salve as interessantes com um clique - elas viram candidaturas.",
     placement: "right",
   },
   applications: {
     target: '[data-tour="nav-applications"]',
     title: "Candidaturas (Kanban)",
-    body: "Acompanhe cada processo — de “inscrito” até “oferta” — arrastando os cards pelas etapas. Nada mais se perde.",
+    body: "Acompanhe cada processo - de “inscrito” até “oferta” - arrastando os cards pelas etapas. Nada mais se perde.",
     placement: "right",
   },
   resume: {
@@ -64,7 +64,7 @@ const BASE_STEPS: Record<StepId, TourStep> = {
   tools: {
     target: '[data-tour="nav-tools"]',
     title: "Ferramentas",
-    body: "Carta de apresentação, simulador de entrevista, teste vocacional e muito mais — tudo pronto para acelerar sua busca.",
+    body: "Carta de apresentação, simulador de entrevista, teste vocacional e muito mais - tudo pronto para acelerar sua busca.",
     placement: "right",
   },
   search: {
@@ -146,7 +146,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
       },
       tools: {
         title: "Ferramentas do estagiário",
-        body: "Guia do estágio, calculadora de bolsa-auxílio, checklist de documentos e teste vocacional — tudo reunido aqui.",
+        body: "Guia do estágio, calculadora de bolsa-auxílio, checklist de documentos e teste vocacional - tudo reunido aqui.",
       },
     },
   },
@@ -365,7 +365,7 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
     setActive(true);
   }, []);
 
-  // O gatilho do tour mora na sidebar / menu mobile, não aqui — cada pedido de
+  // O gatilho do tour mora na sidebar / menu mobile, não aqui - cada pedido de
   // lá incrementa o nonce e reinicia o tour do primeiro passo.
   useEffect(() => {
     if (tourNonce > 0) start();
@@ -379,7 +379,7 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
     <>
       {active && (
         <>
-          {/* Highlight ring around the target — the page stays fully visible & clickable */}
+          {/* Highlight ring around the target - the page stays fully visible & clickable */}
           {rect && !centered && (
             <div
               className="fixed z-[58] pointer-events-none rounded-xl ring-2 ring-blue-500 animate-tour-pulse"

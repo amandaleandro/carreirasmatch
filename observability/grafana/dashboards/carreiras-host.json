@@ -2,7 +2,7 @@
   "annotations": { "list": [] },
   "editable": true,
   "graphTooltip": 1,
-  "title": "Carreiras Match — Host (VPS)",
+  "title": "Carreiras Match - Host (VPS)",
   "uid": "carreiras-host",
   "tags": ["carreiras-match", "host"],
   "timezone": "browser",

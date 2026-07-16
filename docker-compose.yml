@@ -60,7 +60,7 @@ services:
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0}
       # Trava opcional do /api/metrics (vazia = sem trava; ver observability/README.md).
       - METRICS_TOKEN=${METRICS_TOKEN:-}
-      # Provedores de IA extras (multi-provedor com fallback) — ligam ao setar a chave.
+      # Provedores de IA extras (multi-provedor com fallback) - ligam ao setar a chave.
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
       - CEREBRAS_MODEL=${CEREBRAS_MODEL:-}
       - GEMINI_API_KEY=${GEMINI_API_KEY:-}

@@ -1,6 +1,6 @@
 /**
  * Suporte: o usuário abre um ticket numa "área" e conversa com o admin dentro
- * do sistema. As áreas existem para o admin triar a fila — e para o usuário
+ * do sistema. As áreas existem para o admin triar a fila - e para o usuário
  * não precisar explicar do zero de que assunto se trata.
  */
 

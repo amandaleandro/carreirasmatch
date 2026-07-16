@@ -315,14 +315,14 @@ export function ResumeOptimizer({
   function buildPlainText() {
     const lines = [candidateName || "CANDIDATO", contactLine(), "", "RESUMO PROFISSIONAL", summary, "", "EXPERIÊNCIA PROFISSIONAL"];
     experiences.forEach((exp) => {
-      lines.push(`${exp.role} – ${exp.company}${exp.period ? ` (${exp.period})` : ""}`);
+      lines.push(`${exp.role} - ${exp.company}${exp.period ? ` (${exp.period})` : ""}`);
       lines.push(exp.description);
       lines.push("");
     });
     if (education.length > 0) {
       lines.push("FORMAÇÃO ACADÊMICA");
       education.forEach((ed) => {
-        lines.push(`${ed.degree} – ${ed.institution}${ed.period ? ` (${ed.period})` : ""}`);
+        lines.push(`${ed.degree} - ${ed.institution}${ed.period ? ` (${ed.period})` : ""}`);
       });
       lines.push("");
     }
@@ -333,7 +333,7 @@ export function ResumeOptimizer({
     }
     if (languages.length > 0) {
       lines.push("IDIOMAS");
-      languages.forEach((lg) => lines.push(`${lg.language} – ${lg.level}`));
+      languages.forEach((lg) => lines.push(`${lg.language} - ${lg.level}`));
       lines.push("");
     }
     if (certifications.length > 0) {
@@ -514,7 +514,7 @@ export function ResumeOptimizer({
       drawSectionTitle("Experiência Profissional");
       experiences.forEach((exp, i) => {
         ensureSpace(15);
-        page.drawText(`${exp.role} – ${exp.company}`, { x: margin, y, size: 11, font: bold, color: ink });
+        page.drawText(`${exp.role} - ${exp.company}`, { x: margin, y, size: 11, font: bold, color: ink });
         if (exp.period) {
           const label = exp.period;
           const w = font.widthOfTextAtSize(label, 9);
@@ -718,7 +718,7 @@ export function ResumeOptimizer({
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-medium">
-                      {exp.role} – {exp.company}
+                      {exp.role} - {exp.company}
                       {exp.period && <span className="text-neutral-400 font-normal"> · {exp.period}</span>}
                     </p>
                     {editingIndex === i ? (
@@ -935,7 +935,7 @@ export function ResumeOptimizer({
                 <p className="text-neutral-500 mt-1.5">Experiência profissional</p>
                 {experiences.slice(0, 2).map((exp, i) => (
                   <p key={i} className="mt-0.5 line-clamp-2">
-                    {exp.role} – {exp.company}
+                    {exp.role} - {exp.company}
                   </p>
                 ))}
               </div>

@@ -9,7 +9,7 @@ import { ADSENSE_CLIENT } from "@/lib/adsense";
  * É uma tag `<script>` crua, e não `next/script`: com a estratégia
  * afterInteractive o Next deixa no HTML só um <link rel="preload"> e injeta o
  * <script> via JS depois da hidratação, então o snippet não aparece no HTML
- * servido — que é onde a verificação do AdSense procura. `async` mantém o
+ * servido - que é onde a verificação do AdSense procura. `async` mantém o
  * carregamento fora do caminho crítico, igual ao snippet oficial.
  */
 export function AdsenseScript() {

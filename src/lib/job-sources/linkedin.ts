@@ -10,7 +10,7 @@ const RESULTS_PER_PAGE = 10;
 const MAX_PAGES = 6;
 const MAX_DETAIL_FETCHES = 40;
 const DETAIL_CONCURRENCY = 5;
-// geoId público do Brasil no LinkedIn — mais estável que só a string "Brasil".
+// geoId público do Brasil no LinkedIn - mais estável que só a string "Brasil".
 const BRAZIL_GEO_ID = "106057199";
 const USER_AGENT =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";

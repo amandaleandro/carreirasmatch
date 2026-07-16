@@ -1,6 +1,6 @@
 # Variáveis de ambiente
 
-Nenhuma validação de schema (zod ou similar) roda no boot — variáveis
+Nenhuma validação de schema (zod ou similar) roda no boot - variáveis
 ausentes ou com placeholder falham silenciosamente ou só no primeiro uso
 (ex.: `mercadopago.ts` lança erro apenas quando alguém tenta pagar).
 Revise esta lista manualmente antes de cada deploy.
@@ -19,7 +19,7 @@ Revise esta lista manualmente antes de cada deploy.
 | `MERCADOPAGO_WEBHOOK_SECRET` | Valida `x-signature` no webhook | **se estiver errado/placeholder, todo webhook real é rejeitado (401) e pagamentos ficam `pending` para sempre** |
 | `ADMIN_EMAILS` | Libera `/admin` e `requireAdminApi` | lista separada por vírgula |
 
-## Opcionais (fontes extra de vagas — puladas se ausentes)
+## Opcionais (fontes extra de vagas - puladas se ausentes)
 
 | Variável | Fonte |
 |---|---|
@@ -27,11 +27,11 @@ Revise esta lista manualmente antes de cada deploy.
 | `JOOBLE_API_KEY` | Jooble |
 | `GUPY_COMPANIES` | Gupy (lista de subdomínios; usa lista padrão de grandes empregadores BR quando vazio) |
 | `SOLIDES_COMPANIES` | Sólides (lista de slugs) |
-| `GLASSDOOR_PARTNER_ID` / `GLASSDOOR_PARTNER_KEY` | Glassdoor (exige parceria homologada, doc ainda não confirmada — ver `src/lib/job-sources/glassdoor.ts`) |
+| `GLASSDOOR_PARTNER_ID` / `GLASSDOOR_PARTNER_KEY` | Glassdoor (exige parceria homologada, doc ainda não confirmada - ver `src/lib/job-sources/glassdoor.ts`) |
 | `GREENHOUSE_BOARDS` | Greenhouse (lista de board tokens, ex.: `stripe,figma`) |
 | `LEVER_COMPANIES` | Lever (lista de slugs de empresa, ex.: `netflix,plaid`) |
 
-Jobicy e Remotive não precisam de configuração — rodam sempre, como
+Jobicy e Remotive não precisam de configuração - rodam sempre, como
 Arbeitnow/RemoteOK.
 Indeed roda por padrão via scraping com Playwright. Se houver bloqueio anti-bot
 temporário, a fonte falha sozinha e o feed continua com as demais.
@@ -69,15 +69,15 @@ tecnologia, estágio e jovem aprendiz.
 
 | Variável | Uso |
 |---|---|
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Login com Google — sem elas, só login por e-mail/senha fica disponível |
-| `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) — crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Login com Google - sem elas, só login por e-mail/senha fica disponível |
+| `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) - crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
 | `RESEND_FROM_EMAIL` | Remetente do e-mail de redefinição de senha. Sem ela, usa `onboarding@resend.dev` (domínio de teste do Resend, funciona mas identifica menos a marca). Para usar um remetente `@carreirasmatch.com.br`, é preciso verificar o domínio no painel do Resend primeiro. |
 
 ## Opcionais (análise de GitHub)
 
 | Variável | Uso | Observação |
 |---|---|---|
-| `GITHUB_TOKEN` | Busca do perfil público na API do GitHub a partir do link (`src/lib/github-profile.ts`) | Sem ela a busca funciona, mas o limite é de **60 requisições/hora por IP do servidor**, compartilhado entre todos os usuários — cada análise gasta 2. Com um personal access token (classic, **sem nenhum escopo marcado**; só dados públicos) o limite sobe para 5.000/h. Ao estourar, a ferramenta orienta o usuário a colar os repositórios à mão. |
+| `GITHUB_TOKEN` | Busca do perfil público na API do GitHub a partir do link (`src/lib/github-profile.ts`) | Sem ela a busca funciona, mas o limite é de **60 requisições/hora por IP do servidor**, compartilhado entre todos os usuários - cada análise gasta 2. Com um personal access token (classic, **sem nenhum escopo marcado**; só dados públicos) o limite sobe para 5.000/h. Ao estourar, a ferramenta orienta o usuário a colar os repositórios à mão. |
 
 ## E-mails transacionais e de ciclo de vida
 
@@ -99,11 +99,11 @@ São dois grupos:
 |---|---|---|
 | `LIFECYCLE_EMAILS_ENABLED` | Liga/desliga o scheduler de e-mails de ciclo de vida (`src/instrumentation.ts` → `src/lib/email-scheduler.ts`) | default ligado; defina `"false"` para desligar. Não afeta os transacionais. |
 
-## Opcionais (provedores de IA extras — multi-provedor com fallback)
+## Opcionais (provedores de IA extras - multi-provedor com fallback)
 
 O sistema usa **Groq** por padrão (`GROQ_API_KEY` / `GROQ_MODEL`), mas a camada de
 IA (`src/lib/ai-providers.ts`) é multi-provedor: qualquer provedor abaixo com
-chave setada entra numa **rotação com fallback automático** — se um bater no
+chave setada entra numa **rotação com fallback automático** - se um bater no
 limite ou falhar, a chamada tenta o próximo. Cada requisição loga
 `provider=… model=… ms=…` para comparar qual é o melhor. Todos são compatíveis
 com a API OpenAI.
@@ -116,7 +116,7 @@ com a API OpenAI.
 | `DEEPINFRA_API_KEY` / `DEEPINFRA_MODEL` | DeepInfra (barato) | deepinfra.com |
 | `OPENROUTER_API_KEY` / `OPENROUTER_MODEL` | OpenRouter (agrega vários) | openrouter.ai/keys |
 
-> `*_MODEL` é opcional — sobrescreve o modelo default de cada provedor. O
+> `*_MODEL` é opcional - sobrescreve o modelo default de cada provedor. O
 > `qwen/qwen3-32b` do Groq é ignorado no código por ter TPM baixo demais nesta
 > conta (ver `src/lib/groq.ts`).
 
@@ -149,7 +149,7 @@ com a API OpenAI.
 > logadas, ferramentas e páginas de pagamento ficam sem anúncio, por política do
 > AdSense e para não degradar a experiência de quem paga.
 >
-> Diferente do Plausible, o AdSense **usa cookies de publicidade de terceiros** —
+> Diferente do Plausible, o AdSense **usa cookies de publicidade de terceiros** -
 > a Política de Privacidade (`src/app/privacidade/page.tsx`) já traz a divulgação
 > exigida pelo Google. Reavalie a necessidade de banner de consentimento se for
 > servir tráfego do EEE/Reino Unido.

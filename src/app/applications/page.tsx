@@ -102,15 +102,15 @@ export default async function ApplicationsPage() {
   const journeyStats = [
     {
       label: "Dias em busca",
-      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "—",
+      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "-",
     },
     {
       label: "Taxa de resposta",
-      value: journey.responseRate !== null ? `${journey.responseRate}%` : "—",
+      value: journey.responseRate !== null ? `${journey.responseRate}%` : "-",
     },
     {
       label: "Taxa de rejeição",
-      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—",
+      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "-",
     },
     {
       label: "Candidaturas na semana",

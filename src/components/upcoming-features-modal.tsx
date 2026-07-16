@@ -19,7 +19,7 @@ import {
 // precisa ver o que saiu depois.
 const STORAGE_KEY = "upcoming-features-modal:v2:seen";
 
-/** Já está no ar — o que a pessoa pode usar agora. */
+/** Já está no ar - o que a pessoa pode usar agora. */
 const SHIPPED = [
   {
     title: "Simulador de entrevista",
@@ -41,7 +41,7 @@ const SHIPPED = [
   },
 ];
 
-/** Ainda não existe — o que estamos priorizando. */
+/** Ainda não existe - o que estamos priorizando. */
 const UPCOMING = [
   {
     title: "Lembretes de prazo e entrevista",

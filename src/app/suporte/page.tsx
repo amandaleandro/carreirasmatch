@@ -57,7 +57,7 @@ export default async function SupportPage() {
             <select id="category" name="category" defaultValue="other" className={INPUT_CLASS}>
               {SUPPORT_CATEGORIES.map((category) => (
                 <option key={category} value={category}>
-                  {SUPPORT_CATEGORY_LABELS[category]} — {SUPPORT_CATEGORY_DESCRIPTIONS[category]}
+                  {SUPPORT_CATEGORY_LABELS[category]} - {SUPPORT_CATEGORY_DESCRIPTIONS[category]}
                 </option>
               ))}
             </select>

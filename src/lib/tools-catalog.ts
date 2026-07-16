@@ -21,7 +21,7 @@ export type ToolCatalogEntry = {
   /**
    * Ferramenta aberta: sem login e sem assinatura, indexável pelo Google e com
    * anúncio. São só as de conteúdo estático (guias), que não custam chamada de
-   * IA — as ferramentas de IA e as utilidades interativas seguem na assinatura.
+   * IA - as ferramentas de IA e as utilidades interativas seguem na assinatura.
    *
    * Esta flag é a fonte única de verdade: alimenta as rotas públicas do
    * middleware (src/auth.config.ts), o sitemap e o selo "Grátis" no catálogo.

@@ -482,3 +482,22 @@ model SupportMessage {
 
   @@index([ticketId, createdAt])
 }
+
+/// Page views anonimos para medir aquisicao e campanhas sem armazenar IP ou dados pessoais.
+model PageView {
+  id           String   @id @default(cuid())
+  sessionId    String
+  path         String
+  referrerHost String   @default("")
+  source       String   @default("")
+  medium       String   @default("")
+  campaign     String   @default("")
+  content      String   @default("")
+  term         String   @default("")
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([sessionId, createdAt])
+  @@index([campaign, createdAt])
+  @@index([path, createdAt])
+}

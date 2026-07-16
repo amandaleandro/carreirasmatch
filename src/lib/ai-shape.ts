@@ -1,6 +1,6 @@
 /**
  * A resposta da IA passa por `JSON.parse(...) as T` (src/lib/groq.ts), que é um
- * cast — o tipo é uma promessa, não uma garantia. Em JSON-mode a resposta vem
+ * cast - o tipo é uma promessa, não uma garantia. Em JSON-mode a resposta vem
  * sintaticamente válida mesmo quando cortada por `max_tokens`, então um campo
  * pode simplesmente não existir e o `as T` não percebe. Sem estas coerções, um
  * `.map()` num array ausente derruba a página inteira no meio da ferramenta.

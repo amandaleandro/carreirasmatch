@@ -65,7 +65,7 @@ function formatCurrency(cents: number) {
 }
 
 function formatDate(iso: string | null) {
-  if (!iso) return "—";
+  if (!iso) return "-";
   return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", year: "numeric" }).format(new Date(iso));
 }
 
@@ -436,7 +436,7 @@ export function AdminCouponManager() {
                 <td colSpan={8} className="py-4">
                   <form onSubmit={handleEditSubmit} className="space-y-3 rounded-md bg-neutral-50 dark:bg-neutral-900/50 p-4">
                     <p className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
-                      Editando {editForm.code} — o código não pode ser alterado.
+                      Editando {editForm.code} - o código não pode ser alterado.
                     </p>
                     <CouponFields form={editForm} setForm={setEditForm} showCode={false} />
                     <button

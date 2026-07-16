@@ -7,7 +7,7 @@
 */
 
 /* Dark mode is opt-in via [data-theme="dark"] on <html> (see ThemeToggle),
-   not the OS preference — the app defaults to a light background. */
+   not the OS preference - the app defaults to a light background. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
@@ -126,7 +126,7 @@ select option {
   }
 }
 
-/* Guided tour highlight — a soft pulsing glow around the focused element. */
+/* Guided tour highlight - a soft pulsing glow around the focused element. */
 @keyframes tourPulse {
   0%,
   100% {
@@ -138,4 +138,146 @@ select option {
 }
 .animate-tour-pulse {
   animation: tourPulse 1.8s ease-in-out infinite;
+}
+
+/* Identidade compartilhada das ferramentas. As telas mantêm seus componentes,
+   enquanto este layout dá ritmo, profundidade e estados consistentes. */
+.tools-workspace {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.72) 0, rgba(248, 250, 252, 0.2) 28rem),
+    transparent;
+}
+
+[data-theme="dark"] .tools-workspace {
+  background:
+    linear-gradient(180deg, rgba(15, 42, 68, 0.42) 0, rgba(7, 24, 39, 0.08) 30rem),
+    transparent;
+}
+
+.tools-workspace-content {
+  position: relative;
+  z-index: 1;
+}
+
+.tools-workspace-glow {
+  position: absolute;
+  z-index: 0;
+  border-radius: 9999px;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.tools-workspace-glow-primary {
+  top: 2rem;
+  left: max(-12rem, calc(50% - 48rem));
+  width: 24rem;
+  height: 24rem;
+  background: radial-gradient(circle, rgba(37, 99, 235, 0.13), transparent 68%);
+}
+
+.tools-workspace-glow-accent {
+  top: 16rem;
+  right: max(-10rem, calc(50% - 46rem));
+  width: 21rem;
+  height: 21rem;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.1), transparent 68%);
+}
+
+.tools-workspace main {
+  position: relative;
+}
+
+.tools-workspace main > a:first-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+  box-shadow: 0 1px 2px rgba(7, 24, 39, 0.04);
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+}
+
+.tools-workspace main > header:not([class*="bg-gradient"]) {
+  position: relative;
+  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
+  border: 1px solid color-mix(in srgb, var(--border-color) 88%, #2563eb 12%);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  box-shadow: 0 18px 50px rgba(7, 24, 39, 0.07);
+  overflow: hidden;
+}
+
+.tools-workspace main > header:not([class*="bg-gradient"])::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.3rem;
+  background: linear-gradient(180deg, #2563eb, #60a5fa 60%, #f59e0b);
+}
+
+.tools-workspace main > header h1 {
+  color: var(--foreground);
+  letter-spacing: -0.035em;
+}
+
+.tools-workspace main > header[class*="bg-gradient"] h1 {
+  color: white;
+}
+
+.tools-workspace main > form {
+  padding: 1.25rem;
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  background: color-mix(in srgb, var(--surface) 96%, transparent);
+  box-shadow: 0 16px 45px rgba(7, 24, 39, 0.065);
+}
+
+.tools-workspace input:not([type="checkbox"]):not([type="radio"]),
+.tools-workspace textarea,
+.tools-workspace select {
+  border-color: color-mix(in srgb, var(--border-color) 86%, #64748b 14%);
+  background-color: var(--surface);
+  box-shadow: 0 1px 2px rgba(7, 24, 39, 0.035);
+}
+
+.tools-workspace input:not([type="checkbox"]):not([type="radio"]):focus,
+.tools-workspace textarea:focus,
+.tools-workspace select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.11);
+}
+
+.tools-workspace section[class*="rounded-2xl"],
+.tools-workspace div[class*="rounded-2xl"][class*="border"] {
+  box-shadow: 0 12px 36px rgba(7, 24, 39, 0.055);
+}
+
+.tools-workspace button,
+.tools-workspace a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 640px) {
+  .tools-workspace main {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .tools-workspace main > header:not([class*="bg-gradient"]) {
+    padding: 1.25rem 1.15rem 1.25rem 1.4rem;
+    border-radius: 1rem;
+  }
+
+  .tools-workspace main > form {
+    padding: 1rem;
+    border-radius: 1rem;
+  }
 }

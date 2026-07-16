@@ -4,6 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { AdminUserLookup } from "@/components/admin-user-lookup";
 import { AdminGroqModel } from "@/components/admin-groq-model";
 import { AdminCouponManager } from "@/components/admin-coupon-manager";
+import {
+  SUPPORT_CATEGORY_LABELS,
+  SUPPORT_STATUS_ADMIN_LABELS,
+  normalizeSupportCategory,
+  normalizeSupportStatus,
+  supportStatusBadgeClass,
+} from "@/lib/support";
 
 export const dynamic = "force-dynamic";
 
@@ -94,6 +101,12 @@ export default async function AdminPage() {
     applicationGroups,
     analysisStatusGroups,
     openSupportTickets,
+    pageViews30d,
+    pageViews24h,
+    sessions30d,
+    topCampaigns,
+    topLandingPages,
+    recentSupportTickets,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { createdAt: { gte: since24h } } }),
@@ -180,6 +193,34 @@ export default async function AdminPage() {
       _count: { _all: true },
     }),
     prisma.supportTicket.count({ where: { status: "open" } }),
+    prisma.pageView.count({ where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } } }),
+    prisma.pageView.count({ where: { createdAt: { gte: since24h } } }),
+    prisma.pageView.groupBy({
+      by: ["sessionId"],
+      where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } },
+    }),
+    prisma.pageView.groupBy({
+      by: ["campaign", "source", "medium"],
+      where: { campaign: { not: "" }, createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } },
+      _count: { _all: true },
+      orderBy: { _count: { campaign: "desc" } },
+      take: 8,
+    }),
+    prisma.pageView.groupBy({
+      by: ["path"],
+      where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } },
+      _count: { _all: true },
+      orderBy: { _count: { path: "desc" } },
+      take: 8,
+    }),
+    prisma.supportTicket.findMany({
+      orderBy: { updatedAt: "desc" },
+      take: 8,
+      include: {
+        user: { select: { name: true, email: true } },
+        messages: { orderBy: { createdAt: "desc" }, take: 1 },
+      },
+    }),
   ]);
 
   const revenueTotal = paidPayments._sum.amount ?? 0;
@@ -206,6 +247,44 @@ export default async function AdminPage() {
         </div>
       </header>
 
+      <section className="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
+        <div>
+          <h2 className="font-semibold">Tráfego e campanhas</h2>
+          <p className="mt-1 text-sm text-neutral-500">Últimos 30 dias · sessões expiram após 30 minutos sem atividade.</p>
+        </div>
+        <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <StatCard label="Acessos" value={pageViews30d} helper={`+${pageViews24h} nas últimas 24h`} />
+          <StatCard label="Sessões" value={sessions30d.length} helper="Visitas únicas no período" />
+          <StatCard label="Páginas por sessão" value={sessions30d.length ? (pageViews30d / sessions30d.length).toFixed(1) : "0"} helper="Profundidade média da visita" />
+        </div>
+        <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-semibold">Campanhas UTM</h3>
+            <div className="mt-3 space-y-2 text-sm">
+              {topCampaigns.length === 0 && <p className="text-neutral-500">Nenhuma campanha identificada ainda.</p>}
+              {topCampaigns.map((item) => (
+                <div key={`${item.campaign}-${item.source}-${item.medium}`} className="flex justify-between gap-3">
+                  <span className="truncate">{item.campaign} <span className="text-neutral-500">· {item.source || "direto"} / {item.medium || "-"}</span></span>
+                  <strong>{item._count._all}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Páginas mais acessadas</h3>
+            <div className="mt-3 space-y-2 text-sm">
+              {topLandingPages.length === 0 && <p className="text-neutral-500">Os acessos começarão a aparecer após a publicação.</p>}
+              {topLandingPages.map((item) => (
+                <div key={item.path} className="flex justify-between gap-3">
+                  <span className="truncate">{item.path}</span>
+                  <strong>{item._count._all}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard label="Usuários" value={totalUsers} helper={`+${users24h} nas últimas 24h`} />
         <StatCard label="Análises" value={totalAnalyses} helper={`+${analyses24h} nas últimas 24h`} />
@@ -216,6 +295,52 @@ export default async function AdminPage() {
         <StatCard label="Candidaturas" value={totalApplications} helper="Pipeline acompanhado pelos usuários" />
         <StatCard label="Receita 24h" value={formatCurrency(revenue24h)} helper={`${paid24hCount} pagamento(s) hoje`} />
         <StatCard label="Suporte" value={openSupportTickets} helper="Chamado(s) aguardando resposta" />
+      </section>
+
+      <section className="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="font-semibold">Chamados recentes</h2>
+            <p className="mt-1 text-sm text-neutral-500">Acompanhe e responda às solicitações dos usuários.</p>
+          </div>
+          <Link href="/admin/suporte" className="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400">
+            Ver todos os chamados
+          </Link>
+        </div>
+        {recentSupportTickets.length === 0 ? (
+          <p className="mt-5 text-sm text-neutral-500">Nenhum chamado recebido até agora.</p>
+        ) : (
+          <div className="mt-5 divide-y divide-neutral-100 dark:divide-neutral-900">
+            {recentSupportTickets.map((ticket) => {
+              const status = normalizeSupportStatus(ticket.status);
+              const lastMessage = ticket.messages[0];
+              return (
+                <Link
+                  key={ticket.id}
+                  href={`/admin/suporte/${ticket.id}`}
+                  className="block py-4 first:pt-0 last:pb-0 hover:bg-neutral-50 dark:hover:bg-neutral-900/50 sm:px-2"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{ticket.subject}</p>
+                      <p className="mt-1 truncate text-xs text-neutral-500">
+                        {ticket.user.name ?? ticket.user.email ?? "Usuário sem identificação"} · {SUPPORT_CATEGORY_LABELS[normalizeSupportCategory(ticket.category)]} · {formatDate(ticket.updatedAt)}
+                      </p>
+                    </div>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${supportStatusBadgeClass(status)}`}>
+                      {SUPPORT_STATUS_ADMIN_LABELS[status]}
+                    </span>
+                  </div>
+                  {lastMessage && (
+                    <p className="mt-2 line-clamp-2 text-xs text-neutral-600 dark:text-neutral-400">
+                      {lastMessage.fromAdmin ? "Suporte: " : "Usuário: "}{lastMessage.body}
+                    </p>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -137,7 +137,7 @@ export function InterviewSimulatorForm() {
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Simulador de entrevista</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           {TOTAL_QUESTIONS} perguntas reais do seu cargo, com nota e feedback a
-          cada resposta. Funciona para qualquer área — saúde, vendas, logística,
+          cada resposta. Funciona para qualquer área - saúde, vendas, logística,
           educação, tecnologia.
         </p>
       </header>
@@ -198,7 +198,7 @@ export function InterviewSimulatorForm() {
           <div className="flex items-center justify-between gap-4">
             <p className="text-sm text-neutral-500">
               {finished
-                ? `Entrevista concluída — ${turns.length} de ${TOTAL_QUESTIONS} perguntas`
+                ? `Entrevista concluída - ${turns.length} de ${TOTAL_QUESTIONS} perguntas`
                 : `Pergunta ${turns.length + 1} de ${TOTAL_QUESTIONS}`}
             </p>
             <button
@@ -294,7 +294,7 @@ export function InterviewSimulatorForm() {
               <p className="text-sm text-neutral-500">Média da entrevista</p>
               <p className="text-4xl font-bold text-blue-600 mt-1">{averageScore}/10</p>
               <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-3">
-                Revise os pontos que faltaram acima e refaça a simulação — as
+                Revise os pontos que faltaram acima e refaça a simulação - as
                 perguntas mudam a cada rodada.
               </p>
               <button

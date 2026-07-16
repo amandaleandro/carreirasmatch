@@ -60,7 +60,7 @@ function extractFromUrl(raw: string): string | null {
   return parsed.pathname.split("/").filter(Boolean)[0] ?? null;
 }
 
-// Sem token são 60 requisições/hora por IP — compartilhadas por todos os
+// Sem token são 60 requisições/hora por IP - compartilhadas por todos os
 // usuários do servidor. Com um token de leitura pública sobe para 5.000/h.
 function githubHeaders(): HeadersInit {
   const headers: Record<string, string> = {
@@ -126,7 +126,7 @@ function formatRepo(repo: GithubRepo): string {
 
 /**
  * Monta, a partir da API pública do GitHub, o mesmo tipo de texto que o
- * usuário colaria à mão — para ser entregue a `analyzeGithub`.
+ * usuário colaria à mão - para ser entregue a `analyzeGithub`.
  */
 export async function fetchGithubProfileText(username: string): Promise<string> {
   const user = await fetchFromGithub<GithubUser>(`/users/${username}`);

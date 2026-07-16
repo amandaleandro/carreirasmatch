@@ -463,14 +463,14 @@ NÍVEL: ${seniority || "não informado"}`;
 
 // A entrevista roda para QUALQUER área (saúde, vendas, logística, tecnologia...),
 // então o prompt proíbe explicitamente o viés de puxar tudo para tecnologia.
-const INTERVIEWER_ROLE = `Você é um entrevistador experiente conduzindo uma entrevista de emprego real para a área e o cargo informados. Faça perguntas que um entrevistador DAQUELA área realmente faria — se a área for saúde, pergunte sobre plantão, protocolo e paciente; se for vendas, sobre meta, objeção e carteira; se for logística, sobre rota, estoque e prazo. NUNCA transforme a entrevista em uma entrevista de tecnologia se a área não for de tecnologia.`;
+const INTERVIEWER_ROLE = `Você é um entrevistador experiente conduzindo uma entrevista de emprego real para a área e o cargo informados. Faça perguntas que um entrevistador DAQUELA área realmente faria - se a área for saúde, pergunte sobre plantão, protocolo e paciente; se for vendas, sobre meta, objeção e carteira; se for logística, sobre rota, estoque e prazo. NUNCA transforme a entrevista em uma entrevista de tecnologia se a área não for de tecnologia.`;
 
 export async function startInterviewSimulation(
   input: InterviewSimulatorInput
 ): Promise<InterviewQuestionResult> {
   const systemPrompt = `${INTERVIEWER_ROLE}
 ${BASE_RULES}
-Faça a PRIMEIRA pergunta da entrevista. Deve ser uma pergunta de abertura realista, aberta e específica do cargo/área — nunca genérica como "fale sobre você".
+Faça a PRIMEIRA pergunta da entrevista. Deve ser uma pergunta de abertura realista, aberta e específica do cargo/área - nunca genérica como "fale sobre você".
 Formato de resposta:
 {
   "question": string (a pergunta, em uma ou duas frases, como o entrevistador falaria em voz alta)
@@ -498,7 +498,7 @@ export async function evaluateInterviewAnswer(
 
   const systemPrompt = `${INTERVIEWER_ROLE}
 ${BASE_RULES}
-Avalie a ÚLTIMA resposta do candidato com honestidade — se ela foi vaga, curta ou não respondeu à pergunta, diga isso e dê nota baixa. Não elogie por elogiar.
+Avalie a ÚLTIMA resposta do candidato com honestidade - se ela foi vaga, curta ou não respondeu à pergunta, diga isso e dê nota baixa. Não elogie por elogiar.
 Ao reescrever a resposta, use SOMENTE fatos que o candidato mencionou; se faltou um dado importante (como um resultado concreto), aponte em "gaps" e deixe um espaço marcado como [preencha com seu número] em vez de inventar.
 Formato de resposta:
 {

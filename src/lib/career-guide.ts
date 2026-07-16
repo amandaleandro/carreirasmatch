@@ -14,7 +14,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Tecnologia da Informação",
     dayToDay:
       "O dia a dia varia bastante por trilha: desenvolvedores passam boa parte do tempo escrevendo e revisando código em squads pequenos, enquanto suporte e infraestrutura lidam mais com chamados, monitoramento e resolução de incidentes. Reuniões curtas diárias (dailies) são comuns em quase toda a área.",
-    salaryRange: "Estágio: R$ 1.200 – R$ 2.500 · Júnior: R$ 2.800 – R$ 5.500 · Pleno/Sênior: R$ 6.000 – R$ 18.000+",
+    salaryRange: "Estágio: R$ 1.200 - R$ 2.500 · Júnior: R$ 2.800 - R$ 5.500 · Pleno/Sênior: R$ 6.000 - R$ 18.000+",
     curiosities: [
       "Não existe um único caminho certo: muita gente entra por bootcamp ou curso livre, sem faculdade de Ciência da Computação.",
       "Portfólio no GitHub costuma pesar mais do que o diploma nas primeiras vagas.",
@@ -28,7 +28,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Medicina",
     dayToDay:
       "Rotina longa desde a graduação: aulas teóricas, estágios em hospital (internato) e plantões. Depois de formado, a maioria faz residência (2 a 5 anos) antes de atuar com mais autonomia. O trabalho envolve contato direto e constante com pacientes, decisões sob pressão e muita atualização constante.",
-    salaryRange: "Residente: R$ 4.100 (bolsa nacional) · Recém-formado (plantão): R$ 3.000 – R$ 8.000/plantão fixo · Especialista consolidado: R$ 15.000 – R$ 40.000+",
+    salaryRange: "Residente: R$ 4.100 (bolsa nacional) · Recém-formado (plantão): R$ 3.000 - R$ 8.000/plantão fixo · Especialista consolidado: R$ 15.000 - R$ 40.000+",
     curiosities: [
       "É um dos cursos mais concorridos do vestibular/ENEM, muita gente presta mais de uma vez.",
       "A escolha da especialidade só acontece depois de formado, na residência, dá para mudar de ideia pelo caminho.",
@@ -42,7 +42,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Direito",
     dayToDay:
       "Muda muito conforme a área: quem está no contencioso passa tempo em audiências e prazos processuais; quem está no consultivo foca em análise de contratos e pareceres. Estágio em escritório ou órgão público durante a faculdade é praticamente padrão para quem quer boas oportunidades depois.",
-    salaryRange: "Estágio: R$ 800 – R$ 2.000 · Recém-formado (OAB): R$ 2.200 – R$ 4.500 · Especialista/concursado: R$ 8.000 – R$ 30.000+",
+    salaryRange: "Estágio: R$ 800 - R$ 2.000 · Recém-formado (OAB): R$ 2.200 - R$ 4.500 · Especialista/concursado: R$ 8.000 - R$ 30.000+",
     curiosities: [
       "Passar na OAB é obrigatório para advogar, o curso sozinho não basta.",
       "Carreiras públicas (juiz, promotor, procurador) costumam ter os maiores salários da área, mas exigem concursos concorridos.",
@@ -56,7 +56,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Engenharia",
     dayToDay:
       "Depende muito do ramo: civil e mecânica costumam ter parte do tempo em campo/obra/planta, enquanto produção e software ficam mais em escritório com planejamento e ferramentas de gestão. Projetos costumam ter prazos e etapas bem definidas, com bastante trabalho em equipe multidisciplinar.",
-    salaryRange: "Estágio: R$ 1.200 – R$ 2.800 · Júnior: R$ 3.500 – R$ 6.500 · Pleno/Sênior: R$ 7.000 – R$ 20.000+",
+    salaryRange: "Estágio: R$ 1.200 - R$ 2.800 · Júnior: R$ 3.500 - R$ 6.500 · Pleno/Sênior: R$ 7.000 - R$ 20.000+",
     curiosities: [
       "O registro no CREA é necessário para assinar projetos como engenheiro em muitas frentes.",
       "Estágio técnico durante o curso pesa muito na hora da primeira vaga, mais do que nota de faculdade.",
@@ -70,7 +70,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Educação",
     dayToDay:
       "O centro da rotina é a sala de aula: planejamento de aulas, correção de atividades e o tempo em si com os alunos. Quem vai para gestão ou coordenação lida mais com organização pedagógica, reuniões com pais e times de professores do que com aula direta.",
-    salaryRange: "Estágio/monitoria: R$ 700 – R$ 1.500 · Professor iniciante: R$ 2.000 – R$ 3.800 · Coordenação/gestão: R$ 4.500 – R$ 10.000+",
+    salaryRange: "Estágio/monitoria: R$ 700 - R$ 1.500 · Professor iniciante: R$ 2.000 - R$ 3.800 · Coordenação/gestão: R$ 4.500 - R$ 10.000+",
     curiosities: [
       "Concursos públicos municipais e estaduais são uma das portas de entrada mais buscadas por estabilidade.",
       "Cada vez mais professores complementam a renda criando conteúdo educacional (vídeos, cursos, redes sociais).",
@@ -84,7 +84,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Marketing",
     dayToDay:
       "Rotina orientada a campanhas e métricas: planejar conteúdo, acompanhar performance de anúncios, reuniões com outras áreas (vendas, produto) e ajustes constantes baseados em dados. Prazos costumam ser curtos e a prioridade muda com frequência.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.200 · Júnior: R$ 2.500 – R$ 4.800 · Pleno/Sênior: R$ 5.500 – R$ 15.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.200 · Júnior: R$ 2.500 - R$ 4.800 · Pleno/Sênior: R$ 5.500 - R$ 15.000+",
     curiosities: [
       "É uma das áreas mais abertas a quem não fez faculdade da área, portfólio e resultado prático pesam muito.",
       "Boa parte das vagas júnior pede domínio de ferramentas (Meta Ads, Google Analytics) mais do que teoria de marketing.",
@@ -98,7 +98,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Design",
     dayToDay:
       "O trabalho gira em torno de projetos: entender um problema, criar alternativas visuais ou de produto, testar com usuários ou apresentar para o cliente, e refinar. Muitos designers trabalham em ciclos curtos (sprints) junto com times de produto e tecnologia.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.300 · Júnior: R$ 2.800 – R$ 5.000 · Pleno/Sênior: R$ 6.000 – R$ 16.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.300 · Júnior: R$ 2.800 - R$ 5.000 · Pleno/Sênior: R$ 6.000 - R$ 16.000+",
     curiosities: [
       "Portfólio (behance, site próprio) costuma valer mais do que diploma na hora da contratação.",
       "UX/UI Design cresceu muito nos últimos anos por causa da demanda de produtos digitais.",
@@ -112,7 +112,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Administração e Negócios",
     dayToDay:
       "É uma das áreas mais amplas: pode significar cuidar de operações do dia a dia, liderar pessoas, analisar números financeiros ou planejar estratégia. A rotina muda bastante conforme a frente escolhida, mas organização e reuniões fazem parte da maioria delas.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.200 · Júnior: R$ 2.500 – R$ 5.000 · Pleno/Sênior/Gestão: R$ 6.000 – R$ 18.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.200 · Júnior: R$ 2.500 - R$ 5.000 · Pleno/Sênior/Gestão: R$ 6.000 - R$ 18.000+",
     curiosities: [
       "É um curso comum para quem quer empreender, dá base para abrir e organizar o próprio negócio.",
       "Empresa júnior durante a faculdade é uma das formas mais valorizadas de ganhar experiência prática.",
@@ -126,7 +126,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Finanças e Contabilidade",
     dayToDay:
       "Trabalho concentrado em análise de números: fechamento contábil, relatórios financeiros, conferência de dados e, em níveis mais altos, decisões de investimento ou planejamento tributário. Prazos de fechamento (mensal, trimestral) marcam bastante a rotina.",
-    salaryRange: "Estágio: R$ 1.100 – R$ 2.400 · Júnior: R$ 2.800 – R$ 5.500 · Pleno/Sênior: R$ 6.500 – R$ 20.000+",
+    salaryRange: "Estágio: R$ 1.100 - R$ 2.400 · Júnior: R$ 2.800 - R$ 5.500 · Pleno/Sênior: R$ 6.500 - R$ 20.000+",
     curiosities: [
       "O registro no CRC é exigido para atuar como contador, mesmo com o diploma em mãos.",
       "É uma das áreas com maior estabilidade de demanda, toda empresa precisa de alguém cuidando das finanças.",
@@ -140,7 +140,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Comunicação e Jornalismo",
     dayToDay:
       "Rotina de apuração, escrita e edição, seja para uma matéria jornalística, um release de assessoria ou um conteúdo digital. Prazos apertados (deadlines) são constantes, e boa parte do trabalho é revisar e reescrever até o texto ficar redondo.",
-    salaryRange: "Estágio: R$ 900 – R$ 2.000 · Júnior: R$ 2.300 – R$ 4.500 · Pleno/Sênior: R$ 5.000 – R$ 14.000+",
+    salaryRange: "Estágio: R$ 900 - R$ 2.000 · Júnior: R$ 2.300 - R$ 4.500 · Pleno/Sênior: R$ 5.000 - R$ 14.000+",
     curiosities: [
       "Ter um blog, canal ou perfil próprio já funciona como portfólio real para a primeira vaga.",
       "A área se expandiu muito além da redação tradicional, hoje inclui podcast, conteúdo para redes e comunicação corporativa.",
@@ -154,7 +154,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Enfermagem",
     dayToDay:
       "Rotina de plantões (12h, 24h ou escalas fixas) com cuidado direto ao paciente: administrar medicação, curativos, monitorar sinais vitais e registrar tudo em prontuário. Trabalho em equipe constante com médicos, técnicos e outros enfermeiros, muitas vezes sob pressão de tempo.",
-    salaryRange: "Estágio/técnico: R$ 1.400 – R$ 2.500 · Enfermeiro júnior: R$ 3.000 – R$ 5.500 · Pleno/Sênior/gestão: R$ 6.000 – R$ 14.000+",
+    salaryRange: "Estágio/técnico: R$ 1.400 - R$ 2.500 · Enfermeiro júnior: R$ 3.000 - R$ 5.500 · Pleno/Sênior/gestão: R$ 6.000 - R$ 14.000+",
     curiosities: [
       "É uma das profissões de saúde com maior número de vagas abertas no país, inclusive em cidades pequenas.",
       "O curso técnico já permite atuar (como técnico de enfermagem) antes mesmo de cursar a graduação completa.",
@@ -168,7 +168,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Odontologia",
     dayToDay:
       "Grande parte do tempo é em consultório, atendendo pacientes em procedimentos que exigem precisão manual e paciência, muitos deles ansiosos ou com medo. Quem tem consultório próprio também lida com gestão de agenda, equipe e finanças do negócio.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.000 · Recém-formado: R$ 2.500 – R$ 5.000 · Especialista/consultório próprio: R$ 8.000 – R$ 25.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.000 · Recém-formado: R$ 2.500 - R$ 5.000 · Especialista/consultório próprio: R$ 8.000 - R$ 25.000+",
     curiosities: [
       "Boa parte dos dentistas abre consultório próprio nos primeiros anos de carreira, unindo técnica e gestão de negócio.",
       "Especializações (ortodontia, implantodontia) costumam elevar bastante a renda em relação à clínica geral.",
@@ -182,7 +182,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Farmácia",
     dayToDay:
       "Varia entre atendimento direto ao público (farmácia comunitária), rotina de bancada em laboratório (análises clínicas ou indústria) e conferência de processos regulatórios. Precisão e atenção a detalhes são constantes, já que erros afetam diretamente a saúde de quem usa os produtos.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.200 · Júnior: R$ 2.800 – R$ 5.000 · Pleno/Sênior (indústria): R$ 6.000 – R$ 15.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.200 · Júnior: R$ 2.800 - R$ 5.000 · Pleno/Sênior (indústria): R$ 6.000 - R$ 15.000+",
     curiosities: [
       "A indústria farmacêutica costuma pagar melhor do que a farmácia de bairro, mas exige mais especialização técnica.",
       "É uma das áreas de saúde com maior variedade de caminhos: clínica, indústria, laboratório e vigilância sanitária.",
@@ -196,7 +196,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Fisioterapia",
     dayToDay:
       "Atendimentos individuais com foco em reabilitação: avaliar o paciente, definir exercícios/técnicas e acompanhar a evolução ao longo de semanas ou meses. Quem atua no esporte também acompanha treinos e jogos para prevenção de lesões.",
-    salaryRange: "Estágio: R$ 900 – R$ 1.800 · Júnior: R$ 2.500 – R$ 4.500 · Pleno/Sênior/clínica própria: R$ 5.500 – R$ 14.000+",
+    salaryRange: "Estágio: R$ 900 - R$ 1.800 · Júnior: R$ 2.500 - R$ 4.500 · Pleno/Sênior/clínica própria: R$ 5.500 - R$ 14.000+",
     curiosities: [
       "É comum começar como autônomo, atendendo em clínicas parceiras ou domiciliar, antes de abrir consultório próprio.",
       "Fisioterapia esportiva cresceu muito com a profissionalização de academias e clubes.",
@@ -210,7 +210,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Nutrição",
     dayToDay:
       "Consultas para montar planos alimentares individuais, acompanhando exames e evolução do paciente ao longo do tempo. Quem trabalha em unidades de alimentação (escolas, hospitais, empresas) foca mais em gestão de cardápio, equipe e custos.",
-    salaryRange: "Estágio: R$ 900 – R$ 1.800 · Júnior: R$ 2.300 – R$ 4.200 · Pleno/Sênior/consultório: R$ 5.000 – R$ 12.000+",
+    salaryRange: "Estágio: R$ 900 - R$ 1.800 · Júnior: R$ 2.300 - R$ 4.200 · Pleno/Sênior/consultório: R$ 5.000 - R$ 12.000+",
     curiosities: [
       "Nutrição esportiva e estética cresceram muito com o aumento do interesse por saúde e performance física.",
       "Criar conteúdo em redes sociais virou uma forma comum de nutricionistas construírem clientela própria.",
@@ -224,7 +224,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Psicologia",
     dayToDay:
       "Sessões individuais (presenciais ou online) com escuta ativa e condução terapêutica ao longo de semanas ou anos, no caso clínico. Quem atua em RH ou escolas foca mais em processos seletivos, treinamentos ou acompanhamento pedagógico do que em terapia individual.",
-    salaryRange: "Estágio: R$ 800 – R$ 1.800 · Recém-formado (sessão avulsa): R$ 80 – R$ 200/sessão · Consultório consolidado: R$ 6.000 – R$ 15.000+",
+    salaryRange: "Estágio: R$ 800 - R$ 1.800 · Recém-formado (sessão avulsa): R$ 80 - R$ 200/sessão · Consultório consolidado: R$ 6.000 - R$ 15.000+",
     curiosities: [
       "A terapia online expandiu muito o alcance de psicólogos recém-formados, permitindo atender pacientes de outras cidades.",
       "É obrigatório registro no Conselho Regional de Psicologia (CRP) para atuar como psicólogo.",
@@ -238,7 +238,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Medicina Veterinária",
     dayToDay:
       "Em clínica de pets, o dia é de consultas, cirurgias e emergências com donos ansiosos pelo bem-estar do animal. Em produção animal/agropecuária, a rotina inclui visitas a fazendas, manejo de rebanho e questões sanitárias em maior escala.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.000 · Recém-formado: R$ 2.500 – R$ 5.000 · Especialista/clínica própria: R$ 7.000 – R$ 20.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.000 · Recém-formado: R$ 2.500 - R$ 5.000 · Especialista/clínica própria: R$ 7.000 - R$ 20.000+",
     curiosities: [
       "O mercado pet cresceu muito nos últimos anos, ampliando bastante as vagas em clínicas veterinárias urbanas.",
       "Plantões noturnos e emergenciais fazem parte da rotina de quem atua em clínicas 24h.",
@@ -252,7 +252,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Educação Física",
     dayToDay:
       "Em academia, o foco é montar e acompanhar treinos individuais ao longo do tempo. Na escola, a rotina é de aulas práticas com turmas, com bastante gestão de grupo e segurança. No esporte de alto rendimento, envolve planejamento de temporada e acompanhamento próximo de atletas.",
-    salaryRange: "Estágio: R$ 800 – R$ 1.600 · Personal/professor júnior: R$ 2.000 – R$ 4.000 · Pleno/Sênior/gestão esportiva: R$ 4.500 – R$ 12.000+",
+    salaryRange: "Estágio: R$ 800 - R$ 1.600 · Personal/professor júnior: R$ 2.000 - R$ 4.000 · Pleno/Sênior/gestão esportiva: R$ 4.500 - R$ 12.000+",
     curiosities: [
       "Personal trainer é uma das formas mais comuns de trabalho autônomo dentro da área, com renda variável conforme número de alunos.",
       "Concursos públicos para professor de educação física costumam ter boa estabilidade e carga horária definida.",
@@ -266,7 +266,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Arquitetura e Urbanismo",
     dayToDay:
       "Alterna entre tempo de escritório (desenhando projetos em software, reuniões com clientes) e visitas a obras para acompanhar execução. Prazos de entrega de projeto e aprovação em prefeitura fazem parte constante da rotina.",
-    salaryRange: "Estágio: R$ 1.100 – R$ 2.200 · Júnior: R$ 2.800 – R$ 5.000 · Pleno/Sênior/escritório próprio: R$ 6.000 – R$ 18.000+",
+    salaryRange: "Estágio: R$ 1.100 - R$ 2.200 · Júnior: R$ 2.800 - R$ 5.000 · Pleno/Sênior/escritório próprio: R$ 6.000 - R$ 18.000+",
     curiosities: [
       "O registro no CAU (Conselho de Arquitetura e Urbanismo) é obrigatório para assinar projetos.",
       "Muitos arquitetos combinam trabalho em escritório com projetos autônomos (freelas) desde cedo na carreira.",
@@ -280,7 +280,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Ciências Biológicas",
     dayToDay:
       "Quem está em pesquisa/academia divide o tempo entre laboratório, campo (coleta de dados) e escrita de artigos científicos. Quem dá aula foca em preparar e ministrar aulas; quem atua com meio ambiente participa de vistorias, laudos e projetos de conservação.",
-    salaryRange: "Estágio/IC: R$ 700 – R$ 1.500 · Júnior/professor: R$ 2.200 – R$ 4.000 · Pesquisador/consultor sênior: R$ 5.000 – R$ 14.000+",
+    salaryRange: "Estágio/IC: R$ 700 - R$ 1.500 · Júnior/professor: R$ 2.200 - R$ 4.000 · Pesquisador/consultor sênior: R$ 5.000 - R$ 14.000+",
     curiosities: [
       "Grande parte da carreira em pesquisa depende de bolsas (mestrado/doutorado) antes de chegar a um cargo estável.",
       "Biotecnologia é uma das frentes que mais cresceu dentro da área nos últimos anos.",
@@ -294,7 +294,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Agronomia e Ciências Agrárias",
     dayToDay:
       "Rotina de campo constante: visitas a propriedades, acompanhamento de safra, análise de solo e orientação técnica a produtores. Quem atua em gestão do agronegócio foca mais em planejamento, compras e resultado financeiro da produção.",
-    salaryRange: "Estágio: R$ 1.200 – R$ 2.500 · Júnior: R$ 3.000 – R$ 5.500 · Pleno/Sênior/consultoria: R$ 6.500 – R$ 16.000+",
+    salaryRange: "Estágio: R$ 1.200 - R$ 2.500 · Júnior: R$ 3.000 - R$ 5.500 · Pleno/Sênior/consultoria: R$ 6.500 - R$ 16.000+",
     curiosities: [
       "É uma das áreas com maior demanda em cidades do interior, muitas vezes com mais oportunidades do que nas capitais.",
       "Muitos agrônomos vêm de família produtora, mas não é pré-requisito, só ajuda a entender a rotina de campo.",
@@ -308,7 +308,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Matemática, Estatística e Física",
     dayToDay:
       "Quem dá aula foca em preparar e ministrar aulas de conceitos abstratos para diferentes níveis. Quem atua com dados/estatística passa boa parte do tempo analisando números e construindo modelos; pesquisadores dividem tempo entre estudo teórico e produção de artigos.",
-    salaryRange: "Estágio/monitoria: R$ 800 – R$ 1.600 · Professor/analista júnior: R$ 2.500 – R$ 5.000 · Sênior/atuário/pesquisador: R$ 6.000 – R$ 18.000+",
+    salaryRange: "Estágio/monitoria: R$ 800 - R$ 1.600 · Professor/analista júnior: R$ 2.500 - R$ 5.000 · Sênior/atuário/pesquisador: R$ 6.000 - R$ 18.000+",
     curiosities: [
       "Estatística e ciência de dados viraram uma das portas de entrada mais bem pagas para quem gosta de exatas, mesmo fora da academia.",
       "Atuária é uma das profissões menos conhecidas da área, mas com salários entre os mais altos do mercado.",
@@ -322,7 +322,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Letras, Tradução e Idiomas",
     dayToDay:
       "Quem traduz passa boa parte do tempo sozinho, em prazos por projeto/palavra. Quem ensina idiomas foca em aulas e preparação de material didático. Quem revisa textos trabalha com prazos editoriais, ajustando gramática, clareza e estilo de outros autores.",
-    salaryRange: "Estágio: R$ 700 – R$ 1.500 · Júnior (tradução/aulas): R$ 2.000 – R$ 4.000 · Pleno/Sênior (tradução especializada): R$ 4.500 – R$ 12.000+",
+    salaryRange: "Estágio: R$ 700 - R$ 1.500 · Júnior (tradução/aulas): R$ 2.000 - R$ 4.000 · Pleno/Sênior (tradução especializada): R$ 4.500 - R$ 12.000+",
     curiosities: [
       "Grande parte dos tradutores e revisores trabalha como freelancer, cobrando por palavra ou por projeto.",
       "Certificações internacionais de idioma (Cambridge, TOEFL) pesam tanto quanto o diploma em vagas de ensino.",
@@ -336,7 +336,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "História, Geografia e Ciências Sociais",
     dayToDay:
       "Quem dá aula foca em preparar e ministrar aulas para diferentes níveis. Pesquisadores dividem tempo entre arquivo/campo e escrita acadêmica. Quem atua com geoprocessamento trabalha com softwares de mapas e dados territoriais para projetos públicos ou privados.",
-    salaryRange: "Estágio/IC: R$ 700 – R$ 1.500 · Professor/analista júnior: R$ 2.200 – R$ 4.000 · Pesquisador/consultor sênior: R$ 5.000 – R$ 12.000+",
+    salaryRange: "Estágio/IC: R$ 700 - R$ 1.500 · Professor/analista júnior: R$ 2.200 - R$ 4.000 · Pesquisador/consultor sênior: R$ 5.000 - R$ 12.000+",
     curiosities: [
       "Concursos públicos (educação, órgãos de patrimônio, políticas públicas) são um dos principais caminhos de carreira estável na área.",
       "Geoprocessamento é uma das frentes mais técnicas e bem remuneradas dentro das ciências humanas.",
@@ -350,7 +350,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Serviço Social e Relações Internacionais",
     dayToDay:
       "No serviço social, a rotina envolve atendimento direto a famílias em vulnerabilidade, visitas domiciliares e articulação com a rede de assistência. Em relações internacionais, o trabalho varia entre análise de cenários geopolíticos, comércio exterior ou preparação para carreira diplomática.",
-    salaryRange: "Estágio: R$ 800 – R$ 1.800 · Júnior (assistente social/analista): R$ 2.500 – R$ 4.500 · Pleno/Sênior/diplomata: R$ 5.000 – R$ 15.000+",
+    salaryRange: "Estágio: R$ 800 - R$ 1.800 · Júnior (assistente social/analista): R$ 2.500 - R$ 4.500 · Pleno/Sênior/diplomata: R$ 5.000 - R$ 15.000+",
     curiosities: [
       "Assistente social é uma profissão regulamentada, com registro obrigatório no CRESS para atuar.",
       "A carreira diplomática (Instituto Rio Branco) é extremamente concorrida, mas relações internacionais abre portas em comércio exterior e ONGs também.",
@@ -364,7 +364,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Artes Visuais, Cênicas e Música",
     dayToDay:
       "Combina tempo de criação/ensaio individual ou em grupo com apresentações, mostras ou gravações. Muitos artistas dividem a rotina entre produção própria e aulas, freelas ou produção cultural para manter renda estável.",
-    salaryRange: "Cachês iniciais: R$ 100 – R$ 500/apresentação · Profissional estabelecido: R$ 2.500 – R$ 8.000/mês (renda variável) · Referência na área: R$ 10.000+",
+    salaryRange: "Cachês iniciais: R$ 100 - R$ 500/apresentação · Profissional estabelecido: R$ 2.500 - R$ 8.000/mês (renda variável) · Referência na área: R$ 10.000+",
     curiosities: [
       "A renda costuma ser bem variável e vir de múltiplas fontes: aulas, apresentações, encomendas e editais culturais.",
       "Editais de fomento cultural (municipais, estaduais, federais) são uma fonte importante de renda para muitos artistas.",
@@ -378,7 +378,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Moda",
     dayToDay:
       "Envolve pesquisa de tendências, criação de peças/coleções, prova e ajuste de modelagem, e acompanhamento de produção. Quem atua com consultoria de imagem foca em atendimento individual, entendendo o estilo e as necessidades do cliente.",
-    salaryRange: "Estágio: R$ 1.000 – R$ 2.000 · Júnior: R$ 2.300 – R$ 4.200 · Pleno/Sênior/marca própria: R$ 5.000 – R$ 15.000+",
+    salaryRange: "Estágio: R$ 1.000 - R$ 2.000 · Júnior: R$ 2.300 - R$ 4.200 · Pleno/Sênior/marca própria: R$ 5.000 - R$ 15.000+",
     curiosities: [
       "Muitos profissionais de moda começam com marca própria pequena antes de trabalhar em grandes empresas.",
       "Moda sustentável e upcycling cresceram como resposta à crítica ao consumo rápido de roupas.",
@@ -392,7 +392,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Gastronomia, Hotelaria e Turismo",
     dayToDay:
       "Na cozinha, a rotina é de preparo intenso em horário de pico (rush), com trabalho em pé e sob pressão de tempo. Em hotelaria e turismo, o foco é atendimento ao cliente, organização de reservas/roteiros e resolução de imprevistos no momento em que acontecem.",
-    salaryRange: "Estágio: R$ 900 – R$ 1.800 · Júnior (cozinheiro/recepcionista): R$ 1.800 – R$ 3.500 · Chef/gerente sênior: R$ 5.000 – R$ 15.000+",
+    salaryRange: "Estágio: R$ 900 - R$ 1.800 · Júnior (cozinheiro/recepcionista): R$ 1.800 - R$ 3.500 · Chef/gerente sênior: R$ 5.000 - R$ 15.000+",
     curiosities: [
       "É uma das áreas com rotina mais intensa em horários não convencionais: noites, fins de semana e feriados.",
       "Muitos chefs começam literalmente lavando louça e subindo posição por posição dentro da cozinha.",
@@ -406,7 +406,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Cinema, TV e Audiovisual",
     dayToDay:
       "Alterna entre fases bem distintas: pré-produção (roteiro, planejamento), produção (gravação, geralmente em equipe e com prazo apertado) e pós-produção (edição, longas horas sozinho ou em dupla). Prazos de entrega marcam praticamente todo o processo.",
-    salaryRange: "Estágio/freela iniciante: R$ 800 – R$ 2.000/projeto · Júnior: R$ 2.500 – R$ 4.500 · Pleno/Sênior/diretor: R$ 5.500 – R$ 15.000+",
+    salaryRange: "Estágio/freela iniciante: R$ 800 - R$ 2.000/projeto · Júnior: R$ 2.500 - R$ 4.500 · Pleno/Sênior/diretor: R$ 5.500 - R$ 15.000+",
     curiosities: [
       "Grande parte do mercado funciona por projeto (freelance), não por CLT fixa, a rede de contatos pesa muito.",
       "Criar conteúdo próprio (canal, curtas) é uma forma comum de construir portfólio antes da primeira produtora.",
@@ -420,7 +420,7 @@ export const CAREER_GUIDE: CareerGuideEntry[] = [
     label: "Segurança Pública e Carreiras Militares",
     dayToDay:
       "Rotina de escalas e plantões, com forte disciplina hierárquica e protocolos definidos. Envolve desde policiamento e atendimento de ocorrências até investigação, perícia ou atuação em operações específicas, dependendo da carreira escolhida.",
-    salaryRange: "Praça/soldado iniciante: R$ 3.000 – R$ 5.500 · Carreira consolidada: R$ 6.000 – R$ 12.000 · Oficial/delegado/perito: R$ 10.000 – R$ 25.000+",
+    salaryRange: "Praça/soldado iniciante: R$ 3.000 - R$ 5.500 · Carreira consolidada: R$ 6.000 - R$ 12.000 · Oficial/delegado/perito: R$ 10.000 - R$ 25.000+",
     curiosities: [
       "A entrada na maioria das carreiras é por concurso público, com preparação que costuma levar meses ou anos.",
       "Preparo físico é avaliado formalmente na maioria dos concursos, não só o conhecimento teórico.",

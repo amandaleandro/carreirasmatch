@@ -2,7 +2,7 @@
   "annotations": { "list": [] },
   "editable": true,
   "graphTooltip": 0,
-  "title": "Carreiras Match — Visão Geral",
+  "title": "Carreiras Match - Visão Geral",
   "uid": "carreiras-overview",
   "tags": ["carreiras-match"],
   "timezone": "browser",
@@ -51,7 +51,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Caddy — requests/s por status",
+      "title": "Caddy - requests/s por status",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "targets": [
@@ -60,7 +60,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Node.js — heap usado",
+      "title": "Node.js - heap usado",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "bytes" } },
@@ -71,7 +71,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Host — uso de CPU (%)",
+      "title": "Host - uso de CPU (%)",
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percent", "max": 100 } },
@@ -81,7 +81,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Host — memória usada (%)",
+      "title": "Host - memória usada (%)",
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percent", "max": 100 } },
@@ -91,7 +91,7 @@
     },
     {
       "type": "timeseries",
-      "title": "Containers — memória",
+      "title": "Containers - memória",
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "bytes" } },

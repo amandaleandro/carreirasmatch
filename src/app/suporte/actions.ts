@@ -11,7 +11,7 @@ import {
   normalizeSupportCategory,
 } from "@/lib/support";
 
-// Suporte é aberto a qualquer pessoa logada, inclusive quem não assina — quem
+// Suporte é aberto a qualquer pessoa logada, inclusive quem não assina - quem
 // tem problema de pagamento normalmente é exatamente quem ainda não conseguiu
 // assinar. Por ser texto livre, tem limite próprio contra flood.
 const TICKET_LIMIT = { limit: 5, windowMs: 10 * 60 * 1000 };

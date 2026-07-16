@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useMemo, useState } from "react
 /**
  * Novidades e Tour guiado eram botões `fixed` no rodapé da tela e viviam
  * cobrindo o menu e os botões das páginas. Agora os gatilhos moram na sidebar
- * (e no menu mobile), longe dos painéis que eles abrem — então o estado precisa
+ * (e no menu mobile), longe dos painéis que eles abrem - então o estado precisa
  * ser compartilhado por aqui, em vez de viver dentro de cada componente.
  */
 type UiPanels = {
