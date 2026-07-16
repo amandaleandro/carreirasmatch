@@ -73,6 +73,12 @@ tecnologia, estágio e jovem aprendiz.
 | `RESEND_API_KEY` | Envio do e-mail de "esqueci minha senha" (`src/lib/resend.ts`) — crie uma conta grátis em resend.com. **Sem ela, o link de redefinição não é enviado** (só loga um erro no servidor). |
 | `RESEND_FROM_EMAIL` | Remetente do e-mail de redefinição de senha. Sem ela, usa `onboarding@resend.dev` (domínio de teste do Resend, funciona mas identifica menos a marca). Para usar um remetente `@carreirasmatch.com.br`, é preciso verificar o domínio no painel do Resend primeiro. |
 
+## Opcionais (análise de GitHub)
+
+| Variável | Uso | Observação |
+|---|---|---|
+| `GITHUB_TOKEN` | Busca do perfil público na API do GitHub a partir do link (`src/lib/github-profile.ts`) | Sem ela a busca funciona, mas o limite é de **60 requisições/hora por IP do servidor**, compartilhado entre todos os usuários — cada análise gasta 2. Com um personal access token (classic, **sem nenhum escopo marcado**; só dados públicos) o limite sobe para 5.000/h. Ao estourar, a ferramenta orienta o usuário a colar os repositórios à mão. |
+
 ## E-mails transacionais e de ciclo de vida
 
 Todos os e-mails saem via Resend (`src/lib/resend.ts`) e exigem `RESEND_API_KEY`.
@@ -153,6 +159,35 @@ com a API OpenAI.
 > precisam de env var própria além de `APP_URL`.
 
 ## Docker Compose
+
+### Backup diário do SQLite
+
+O serviço `sqlite-backup` cria uma cópia consistente com o comando `.backup` do
+SQLite assim que sobe e depois a cada 24 horas. Antes de publicar o arquivo, roda
+`PRAGMA integrity_check`. Por padrão os backups ficam em `./backups` no host e
+são retidos por 14 dias.
+
+| Variável | Default | Uso |
+|---|---:|---|
+| `SQLITE_BACKUP_HOST_DIR` | `./backups` | Diretório no host; em produção prefira um disco/diretório fora da pasta da aplicação |
+| `BACKUP_INTERVAL_SECONDS` | `86400` | Intervalo entre backups |
+| `BACKUP_RETENTION_DAYS` | `14` | Retenção local |
+
+Teste de restauração recomendado: copie o backup para um arquivo temporário e
+execute `sqlite3 copia.db "PRAGMA integrity_check;"`. Um backup no mesmo servidor
+protege contra corrupção/erro operacional, mas não contra perda total da VPS;
+sincronize esse diretório com armazenamento externo.
+
+### Resiliência da IA
+
+As respostas principais de análise, extração de currículo e sugestões são
+validadas com schemas Zod antes de serem aceitas. Resposta truncada, JSON inválido
+ou fora do schema é tratada como falha e aciona retry/backoff e depois fallback.
+
+| Variável | Default | Uso |
+|---|---:|---|
+| `AI_MAX_RETRIES` | `2` | Repetições por provedor (máximo aceito: 3) |
+| `AI_REQUEST_TIMEOUT_MS` | `45000` | Timeout de cada tentativa (mínimo: 5s) |
 
 `docker-compose.yml` hoje repassa: `GROQ_API_KEY`, `DATABASE_URL`,
 `AUTH_SECRET`, `AUTH_TRUST_HOST`, `AUTH_URL`, `GOOGLE_CLIENT_ID/SECRET`,

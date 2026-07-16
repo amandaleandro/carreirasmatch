@@ -15,9 +15,12 @@ import {
   CalendarDays,
   BarChart3,
   Wrench,
+  LifeBuoy,
   ShieldCheck,
+  HelpCircle,
   type LucideIcon,
 } from "lucide-react";
+import { useUiPanels } from "@/components/ui-panels";
 
 type NavItem = {
   href: string;
@@ -37,6 +40,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
   { href: "/history", label: "Relatórios", icon: BarChart3 },
   { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
+  { href: "/suporte", label: "Suporte", icon: LifeBuoy },
   { href: "/settings", label: "Perfil", icon: User },
 ];
 
@@ -46,6 +50,7 @@ const ADMIN_NAV_ITEM: NavItem = { href: "/admin", label: "Admin", icon: ShieldCh
 
 export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const pathname = usePathname();
+  const { openNews, openTour } = useUiPanels();
   const navItems = isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
 
   return (
@@ -54,7 +59,7 @@ export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
         <BrandLogo heightClassName="h-10" onDark />
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1">
         {navItems.map((item) => {
           const active = pathname.startsWith(item.href);
           const Icon = item.icon;
@@ -93,7 +98,27 @@ export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
         })}
       </nav>
 
-      <div className="p-4">
+      <div className="p-4 space-y-3">
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={openNews}
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+            aria-haspopup="dialog"
+          >
+            <Sparkles className="h-4 w-4 shrink-0" strokeWidth={1.9} />
+            Novidades
+          </button>
+          <button
+            type="button"
+            onClick={openTour}
+            className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-slate-200 transition-colors hover:bg-white/10 hover:text-white"
+          >
+            <HelpCircle className="h-4 w-4 shrink-0" strokeWidth={1.9} />
+            Tour
+          </button>
+        </div>
+
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 p-4 shadow-lg shadow-blue-950/40">
           <div className="absolute -right-4 -top-6 h-20 w-20 rounded-full bg-amber-400/20 blur-xl" />
           <p className="text-sm font-semibold flex items-center gap-1.5 relative">

@@ -91,6 +91,21 @@ function statusOf(err: unknown): string {
   return err instanceof Error ? err.message.slice(0, 80) : "erro";
 }
 
+function numericStatus(err: unknown): number | null {
+  if (!err || typeof err !== "object" || !("status" in err)) return null;
+  const value = Number((err as { status: unknown }).status);
+  return Number.isFinite(value) ? value : null;
+}
+
+function isRetryable(err: unknown): boolean {
+  const status = numericStatus(err);
+  return status === null || status === 408 || status === 409 || status === 429 || status >= 500;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Normaliza a resposta para JSON puro. Alguns provedores/modelos ignoram o
  * response_format e devolvem o JSON dentro de cerca de código markdown
@@ -120,7 +135,8 @@ export async function runJsonAcrossProviders(
   userMessage: string,
   temperature: number,
   maxTokens: number,
-  groqModel: string
+  groqModel: string,
+  validate?: (value: unknown) => void
 ): Promise<string> {
   const endpoints = getConfiguredEndpoints(groqModel);
   if (endpoints.length === 0) {
@@ -134,33 +150,40 @@ export async function runJsonAcrossProviders(
   // rápido) e só cai para o próximo provedor se o atual falhar.
   const ordered = endpoints;
 
+  const retries = Math.max(0, Math.min(3, Number(process.env.AI_MAX_RETRIES ?? 2) || 0));
+  const timeout = Math.max(5_000, Number(process.env.AI_REQUEST_TIMEOUT_MS ?? 45_000) || 45_000);
   let lastErr: unknown;
   for (const e of ordered) {
-    const t0 = Date.now();
-    try {
-      const completion = await clientFor(e).chat.completions.create({
-        model: e.model,
-        temperature,
-        max_tokens: maxTokens,
-        response_format: { type: "json_object" },
-        messages: [
-          { role: "system", content: systemWithStyle },
-          { role: "user", content: userMessage },
-        ],
-      });
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      const t0 = Date.now();
+      try {
+        const completion = await clientFor(e).chat.completions.create({
+          model: e.model,
+          temperature,
+          max_tokens: maxTokens,
+          response_format: { type: "json_object" },
+          messages: [
+            { role: "system", content: systemWithStyle },
+            { role: "user", content: userMessage },
+          ],
+        }, { timeout, maxRetries: 0 });
 
-      const choice = completion.choices[0];
-      const content = choice?.message?.content;
-      if (!content) throw new Error("resposta vazia do provedor");
-      if (choice.finish_reason === "length") {
-        console.error(`[AI] ${e.id}/${e.model} resposta truncada por max_tokens; campos podem faltar.`);
+        const choice = completion.choices[0];
+        const content = choice?.message?.content;
+        if (!content) throw new Error("resposta vazia do provedor");
+        if (choice.finish_reason === "length") throw new Error("resposta truncada por max_tokens");
+        const json = extractJson(content);
+        const parsed: unknown = JSON.parse(json);
+        validate?.(parsed);
+        console.log(`[AI] ok provider=${e.id} model=${e.model} attempt=${attempt + 1} ms=${Date.now() - t0}`);
+        return json;
+      } catch (err) {
+        lastErr = err;
+        const retry = attempt < retries && isRetryable(err);
+        console.warn(`[AI] falha provider=${e.id} model=${e.model} attempt=${attempt + 1} ms=${Date.now() - t0} status=${statusOf(err)}${retry ? ", repetindo" : ", tentando próximo"}`);
+        if (!retry) break;
+        await sleep(500 * 2 ** attempt + Math.floor(Math.random() * 250));
       }
-      console.log(`[AI] ok provider=${e.id} model=${e.model} ms=${Date.now() - t0}`);
-      return extractJson(content);
-    } catch (err) {
-      lastErr = err;
-      console.warn(`[AI] falha provider=${e.id} model=${e.model} ms=${Date.now() - t0} status=${statusOf(err)}, tentando próximo`);
-      continue;
     }
   }
   throw lastErr;

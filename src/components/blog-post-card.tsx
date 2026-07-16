@@ -13,7 +13,7 @@ export type BlogPostCardData = {
 };
 
 function formatDate(date: Date) {
-  return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "long", year: "numeric" }).format(date);
+  return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "long", year: "numeric" }).format(date);
 }
 
 export function BlogPostCard({ post }: { post: BlogPostCardData }) {

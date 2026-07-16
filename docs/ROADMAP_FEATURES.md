@@ -23,7 +23,7 @@ ajuste manual.
 
 | Feature / iniciativa | Por que fazer | Resultado esperado | Prioridade |
 |---|---|---|---|
-| Teste real de pagamento ponta a ponta | Confirma Mercado Pago, webhook e liberacao de acesso | Pagamento aprovado ativa diagnostico/assinatura automaticamente | P0 |
+| ✅ Teste real de pagamento ponta a ponta (validado em 16/07/2026) | Confirma Mercado Pago, webhook e liberacao de acesso | Pagamento aprovado ativa diagnostico/assinatura automaticamente | Concluido |
 | Confirmar `ADMIN_EMAILS` em producao | Garante suporte e concessao manual em caso de problema | Admin acessivel no ambiente real | P0 |
 | Plano simples de backup do SQLite | Evita perda total de dados no inicio | Backup diario do arquivo do banco | P0 |
 | Ativar Plausible e Sentry em producao | Permite medir funil e enxergar erros reais | Eventos e erros visiveis desde o dia 1 | P1 |
@@ -110,10 +110,10 @@ operacao menos fragil.
 
 ### Agora
 
-1. Testar pagamento real em producao.
-2. Garantir backup do banco.
-3. Ativar analytics e Sentry.
-4. Melhorar a tela de teaser/checkout do diagnostico completo.
+1. ✅ Pagamento real em producao validado em 16/07/2026.
+2. ✅ Backup diario do banco configurado.
+3. Ativar analytics em producao e confirmar eventos no painel; Sentry ja esta configurado.
+4. Acompanhar a conversao do teaser/checkout e iterar com dados reais.
 
 ### Proximas 2 semanas
 
@@ -155,4 +155,3 @@ Se a resposta for "nao" para todos, provavelmente nao e a proxima feature.
 | Assinante -> uso semanal | Mede valor recorrente |
 | Candidaturas criadas por usuario | Mede uso do produto como rotina |
 | Erros por analise/pagamento | Mede confiabilidade operacional |
-

@@ -46,7 +46,7 @@ passando, build de produção completo).
 > Verificado: type-check limpo, lint só com os warnings pré-existentes,
 > 60/60 testes e build de produção completos.
 
-## 🔴 Só o usuário pode resolver — bloqueia aceitar pagamento real
+## Validações externas de produção
 
 - [x] **`MERCADOPAGO_WEBHOOK_SECRET` preenchido** no `.env` local com um
   valor real (64 hex, não é mais o placeholder `"..."`). Falta apenas
@@ -56,11 +56,9 @@ passando, build de produção completo).
   compartilhada com outro site, cada integração tem uma assinatura
   diferente. Com valor errado, `src/lib/webhook-secret.ts` rejeita (401)
   todo webhook e nenhum pagamento é confirmado automaticamente.
-- [ ] **Testar o fluxo completo de pagamento em produção** (Payment Brick
-  → webhook → ativação de assinatura) antes de divulgar o link
-  publicamente, idealmente com uma cobrança real pequena de teste, já que
-  o token não é sandbox. Este é o único passo que ainda não dá para dar
-  como concluído sem uma transação real.
+- [x] **Fluxo de pagamento real validado em produção em 16/07/2026**.
+  Cobrança realizada com sucesso e funcionamento confirmado pela responsável
+  pelo produto no ambiente real.
 - [ ] Confirmar que `ADMIN_EMAILS` está definido corretamente no ambiente
   de produção (não só local) — não consigo verificar isso de dentro do
   código sem ver o `.env` de produção.
@@ -73,8 +71,10 @@ passando, build de produção completo).
 
 ## 🟡 Importante, mas não impede o lançamento de amanhã
 
-- [ ] Ter um plano de backup do `dev.db` (SQLite em arquivo) — não há
-  backup automático hoje; um volume Docker perdido = dados perdidos.
+- [x] Backup automático do `dev.db`: serviço `sqlite-backup` cria cópia
+  consistente diariamente, valida integridade e retém 14 dias no diretório do
+  host configurado por `SQLITE_BACKUP_HOST_DIR`. Ainda é recomendado replicar
+  esse diretório para fora da VPS.
 - [ ] Revisar o texto dos Termos/Privacidade com um advogado antes de
   operar em maior escala — o conteúdo criado é uma base sólida e honesta,
   mas não substitui revisão jurídica formal.
@@ -87,8 +87,8 @@ passando, build de produção completo).
   análise Groq (hoje só as libs de suporte têm teste, não as rotas).
 - [ ] Plano de migração para Postgres quando o tráfego/concorrência de
   escrita crescer além do que SQLite aguenta confortavelmente.
-- [ ] Retry/backoff nas chamadas à Groq e validação de schema da
-  resposta (hoje é `JSON.parse` direto, sem schema).
+- [x] Retry/backoff por provedor, timeout, fallback multi-provedor e validação
+  Zod das respostas principais de análise, extração e sugestões.
 - [ ] Homologação da integração com Glassdoor (hoje incompleta/sem
   confirmação de contrato de API).
 - [ ] Limpar warnings de lint restantes (variáveis não usadas em

@@ -160,7 +160,7 @@ export function AdminUserLookup() {
             <h3 className="font-semibold text-sm">Assinatura</h3>
             <p className="text-sm text-neutral-600 dark:text-neutral-400">
               {result.subscription?.status === "active"
-                ? `Ativa até ${result.subscription.currentPeriodEnd ? new Date(result.subscription.currentPeriodEnd).toLocaleDateString("pt-BR") : "-"}`
+                ? `Ativa até ${result.subscription.currentPeriodEnd ? new Date(result.subscription.currentPeriodEnd).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" }) : "-"}`
                 : "Sem assinatura ativa"}
             </p>
             <div className="flex gap-2 flex-wrap">
@@ -200,7 +200,7 @@ export function AdminUserLookup() {
                   <li key={a.id} className="flex items-center justify-between gap-3 text-sm">
                     <div className="min-w-0">
                       <p className="truncate font-medium">{a.jobTitle}</p>
-                      <p className="text-xs text-neutral-400">{new Date(a.createdAt).toLocaleDateString("pt-BR")}</p>
+                      <p className="text-xs text-neutral-400">{new Date(a.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
                     </div>
                     {a.unlocked ? (
                       <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium shrink-0">
@@ -230,7 +230,7 @@ export function AdminUserLookup() {
               <ul className="space-y-1 text-xs text-neutral-500">
                 {result.payments.map((p) => (
                   <li key={p.id}>
-                    {new Date(p.createdAt).toLocaleDateString("pt-BR")} · {p.kind} · {formatAmount(p.amount)} ·{" "}
+                    {new Date(p.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })} · {p.kind} · {formatAmount(p.amount)} ·{" "}
                     {p.status}
                   </li>
                 ))}

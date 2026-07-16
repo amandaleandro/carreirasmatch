@@ -1,6 +1,8 @@
 import { getSetting } from "@/lib/app-settings";
 import { GROQ_MODEL_SETTING_KEY } from "@/lib/groq-model-options";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
+import { profileSuggestionsSchema, resumeAnalysisSchema, structuredResumeSchema } from "@/lib/ai-schemas";
+import type { ZodType } from "zod";
 
 const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
 
@@ -38,7 +40,8 @@ export async function runJsonPrompt<T>(
   userMessage: string,
   temperature = 0.2,
   maxCompletionTokens = 3500,
-  model?: string
+  model?: string,
+  schema?: ZodType<T>
 ): Promise<T> {
   // `model` (quando passado, ex.: extração) define o modelo do endpoint Groq;
   // os demais provedores usam seus próprios modelos. A camada multi-provedor
@@ -49,11 +52,13 @@ export async function runJsonPrompt<T>(
     userMessage,
     temperature,
     maxCompletionTokens,
-    groqModel
+    groqModel,
+    schema ? (value) => { schema.parse(value); } : undefined
   );
   // A resposta em JSON-mode é fechada em JSON sintaticamente válido mesmo quando
   // cortada por max_tokens, então um corte é logado na camada de provedores.
-  return JSON.parse(content) as T;
+  const parsed: unknown = JSON.parse(content);
+  return schema ? schema.parse(parsed) : parsed as T;
 }
 
 export type ApplicationStatus = "apply_now" | "adjust_first" | "deprioritize";
@@ -441,7 +446,7 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
 
   const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
-  return runJsonPrompt<ResumeAnalysis>(systemPrompt, userMessage, 0.15, 6000);
+  return runJsonPrompt<ResumeAnalysis>(systemPrompt, userMessage, 0.15, 6000, undefined, resumeAnalysisSchema);
 }
 
 const STRUCTURED_RESUME_JSON_TEMPLATE = `{
@@ -463,7 +468,8 @@ export async function extractStructuredResume(resumeText: string): Promise<Struc
     userMessage,
     0.1,
     6000,
-    EXTRACTION_MODEL
+    EXTRACTION_MODEL,
+    structuredResumeSchema
   );
 }
 
@@ -552,6 +558,9 @@ export async function generateProfileSuggestions(input: {
   return runJsonPrompt<ProfileSuggestionsResult>(
     PROFILE_SUGGESTIONS_SYSTEM_PROMPT,
     userMessage,
-    0.3
+    0.3,
+    undefined,
+    undefined,
+    profileSuggestionsSchema
   );
 }

@@ -7,7 +7,8 @@ export type ToolIcon =
   | "linkedin"
   | "github"
   | "scale"
-  | "pen";
+  | "pen"
+  | "mic";
 export type ToolColor = "blue" | "amber" | "emerald" | "indigo" | "violet" | "rose";
 
 export type ToolCatalogEntry = {
@@ -45,6 +46,14 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     icon: "compass",
     color: "indigo",
     free: true,
+  },
+  {
+    href: "/tools/interview-simulator",
+    title: "Simulador de entrevista",
+    description: "Responda 5 perguntas reais do seu cargo e receba nota e feedback em cada uma.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "mic",
+    color: "rose",
   },
   {
     href: "/tools/behavioral-test",

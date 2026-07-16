@@ -7,6 +7,7 @@ import { TRACK_LABELS, CareerTrack } from "@/components/analysis-display";
 import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segments";
 import { toolsForSegment } from "@/lib/tools-catalog";
 import { computeJourneyMetrics } from "@/lib/applications";
+import { formatBrazilDate, formatBrazilDateTime } from "@/lib/brazil";
 
 export const dynamic = "force-dynamic";
 
@@ -244,7 +245,7 @@ export default async function DashboardPage() {
           </p>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 flex-1">
             Última análise com base em &quot;{latestResume.fileName}&quot;, em{" "}
-            {latest.createdAt.toLocaleDateString("pt-BR")}.
+            {formatBrazilDate(latest.createdAt)}.
           </p>
           <Link
             href={`/report/${latest.id}`}
@@ -309,7 +310,7 @@ export default async function DashboardPage() {
                   {item.company && <p className="text-xs text-neutral-500">{item.company}</p>}
                 </div>
                 <span className="text-xs font-semibold rounded-full px-2.5 py-1 shrink-0 bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400">
-                  {item.interviewAt!.toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}
+                  {formatBrazilDateTime(item.interviewAt!, { year: undefined })}
                 </span>
               </Link>
             ))}

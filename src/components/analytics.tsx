@@ -10,7 +10,7 @@ import Script from "next/script";
  */
 export function Analytics() {
   const domain = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN;
-  const src = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC ?? "https://plausible.io/js/script.tagged-events.js";
+  const src = process.env.NEXT_PUBLIC_PLAUSIBLE_SRC || "https://plausible.io/js/script.tagged-events.js";
 
   if (!domain) return null;
 

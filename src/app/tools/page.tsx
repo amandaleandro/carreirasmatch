@@ -190,6 +190,13 @@ function ToolSvgIcon({ icon, className }: { icon: ToolIcon; className?: string }
           <path d="m14.5 9.5-1.5 5-5 1.5 1.5-5 5-1.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
         </svg>
       );
+    case "mic":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" className={className}>
+          <rect x="9" y="2.5" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.6" />
+          <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21.5M8.5 21.5h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+      );
     case "filePlus":
       return (
         <svg viewBox="0 0 24 24" fill="none" className={className}>

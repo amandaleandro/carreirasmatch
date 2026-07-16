@@ -71,7 +71,7 @@ export default async function ApplicationInterviewPage({
             >
               {analyses.map((a) => (
                 <option key={a.id} value={a.id}>
-                  {a.jobTitle}, {a.createdAt.toLocaleDateString("pt-BR")}
+                  {a.jobTitle}, {a.createdAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                 </option>
               ))}
             </select>

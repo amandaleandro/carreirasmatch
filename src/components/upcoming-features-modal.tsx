@@ -1,26 +1,48 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId } from "react";
 import Link from "next/link";
+import { useUiPanels } from "@/components/ui-panels";
 import {
   Bell,
-  CalendarClock,
+  BookMarked,
   CheckCircle2,
-  Clock3,
+  FolderGit2,
+  LifeBuoy,
+  Mic,
   RefreshCw,
   Sparkles,
   X,
 } from "lucide-react";
 
-const STORAGE_KEY = "upcoming-features-modal:v1:seen";
+// Sobe a versão sempre que a lista muda de verdade: quem já fechou a modal
+// precisa ver o que saiu depois.
+const STORAGE_KEY = "upcoming-features-modal:v2:seen";
 
-const FEATURES = [
+/** Já está no ar — o que a pessoa pode usar agora. */
+const SHIPPED = [
   {
-    title: "Dashboard de jornada",
-    description: "Uma visão clara do seu score, próximas ações, prazos, entrevistas e candidaturas.",
-    status: "Em planejamento",
-    icon: CalendarClock,
+    title: "Simulador de entrevista",
+    description: "5 perguntas reais do seu cargo, com nota e feedback a cada resposta. Funciona para qualquer área, não só tecnologia.",
+    href: "/tools/interview-simulator",
+    icon: Mic,
   },
+  {
+    title: "Suporte dentro do sistema",
+    description: "Abra um chamado por área e converse direto com nosso time, sem sair da plataforma.",
+    href: "/suporte",
+    icon: LifeBuoy,
+  },
+  {
+    title: "Análise de GitHub por link",
+    description: "Agora basta colar o link do seu perfil: buscamos seus repositórios públicos automaticamente.",
+    href: "/tools/github-review",
+    icon: FolderGit2,
+  },
+];
+
+/** Ainda não existe — o que estamos priorizando. */
+const UPCOMING = [
   {
     title: "Lembretes de prazo e entrevista",
     description: "Avisos por e-mail para não perder data de candidatura, teste técnico ou entrevista.",
@@ -34,16 +56,16 @@ const FEATURES = [
     icon: RefreshCw,
   },
   {
-    title: "Recuperação de leads",
-    description: "Sequência curta para quem fez uma análise ou teste e ainda não desbloqueou o diagnóstico.",
+    title: "Glossário de termos por área",
+    description: "O que cada termo que aparece nas vagas da sua área realmente significa.",
     status: "Depois",
-    icon: Clock3,
+    icon: BookMarked,
   },
 ];
 
 export function UpcomingFeaturesModal() {
   const titleId = useId();
-  const [open, setOpen] = useState(false);
+  const { newsOpen: open, openNews, closeNews } = useUiPanels();
 
   useEffect(() => {
     try {
@@ -52,18 +74,18 @@ export function UpcomingFeaturesModal() {
       return;
     }
 
-    const timer = window.setTimeout(() => setOpen(true), 1200);
+    const timer = window.setTimeout(() => openNews(), 1200);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [openNews]);
 
   const close = useCallback(() => {
-    setOpen(false);
+    closeNews();
     try {
       window.localStorage.setItem(STORAGE_KEY, "1");
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [closeNews]);
 
   useEffect(() => {
     if (!open) return;
@@ -78,17 +100,6 @@ export function UpcomingFeaturesModal() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="fixed bottom-5 left-5 z-[55] inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3.5 py-2.5 text-sm font-semibold text-blue-700 shadow-lg shadow-slate-900/10 transition hover:border-blue-300 hover:bg-blue-50 dark:border-blue-900/70 dark:bg-neutral-950 dark:text-blue-300 dark:hover:bg-blue-950/40"
-        aria-haspopup="dialog"
-        aria-expanded={open}
-      >
-        <Sparkles className="h-4 w-4" strokeWidth={1.9} />
-        <span className="hidden sm:inline">Novidades</span>
-      </button>
-
       {open && (
         <div className="fixed inset-0 z-[70] flex items-center justify-center px-4 py-6">
           <button
@@ -109,10 +120,10 @@ export function UpcomingFeaturesModal() {
                 <div>
                   <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">
                     <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-                    Próximas novidades
+                    Novidades
                   </p>
                   <h2 id={titleId} className="mt-2 text-xl font-bold tracking-tight text-neutral-950 dark:text-white">
-                    O que está chegando no CarreirasMatch
+                    O que acabou de chegar no CarreirasMatch
                   </h2>
                   <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
                     Estamos priorizando recursos que ajudam você a voltar com clareza, acompanhar oportunidades e transformar análise em ação.
@@ -130,8 +141,49 @@ export function UpcomingFeaturesModal() {
             </div>
 
             <div className="max-h-[70vh] overflow-y-auto px-5 py-5 sm:px-6">
+              <h3 className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
+                Já disponível
+              </h3>
               <div className="grid gap-3">
-                {FEATURES.map((feature) => {
+                {SHIPPED.map((feature) => {
+                  const Icon = feature.icon;
+                  return (
+                    <Link
+                      key={feature.title}
+                      href={feature.href}
+                      onClick={close}
+                      className="block rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40"
+                    >
+                      <div className="flex gap-3">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
+                          <Icon className="h-5 w-5" strokeWidth={1.9} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <h4 className="text-sm font-bold text-neutral-950 dark:text-white">
+                              {feature.title}
+                            </h4>
+                            <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                              Testar agora →
+                            </span>
+                          </div>
+                          <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+                            {feature.description}
+                          </p>
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <h3 className="mb-3 mt-6 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
+                Em construção
+              </h3>
+              <div className="grid gap-3">
+                {UPCOMING.map((feature) => {
                   const Icon = feature.icon;
                   return (
                     <article
@@ -144,11 +196,10 @@ export function UpcomingFeaturesModal() {
                         </span>
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-start justify-between gap-2">
-                            <h3 className="text-sm font-bold text-neutral-950 dark:text-white">
+                            <h4 className="text-sm font-bold text-neutral-950 dark:text-white">
                               {feature.title}
-                            </h3>
+                            </h4>
                             <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                              <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
                               {feature.status}
                             </span>
                           </div>

@@ -3,8 +3,8 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { isCareerSegment } from "@/lib/career-segments";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { sendWelcomeEmail } from "@/lib/resend";
+import { validateContact } from "@/lib/contact-validation";
 
 const REGISTER_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
@@ -18,10 +18,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, password, careerSegment, professionalArea } = await req.json();
-    const normalizedEmail = normalizeEmail(email);
+    const { name, email, phone, password, careerSegment, professionalArea } = await req.json();
+    const contact = validateContact({ name, email, phone });
+    const { name: normalizedName, email: normalizedEmail, phone: normalizedPhone } = contact.data;
 
-    if (!isValidEmail(normalizedEmail) || !password || password.length < 8) {
+    if (!contact.success) {
+      return NextResponse.json({ error: contact.errors[0], errors: contact.errors }, { status: 400 });
+    }
+
+    if (typeof password !== "string" || password.length < 8) {
       return NextResponse.json(
         { error: "Informe um e-mail válido e uma senha com pelo menos 8 caracteres." },
         { status: 400 }
@@ -49,7 +54,8 @@ export async function POST(req: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     const data = {
-      name: name ?? null,
+      name: normalizedName,
+      phone: normalizedPhone,
       passwordHash,
       careerSegment,
       professionalArea: typeof professionalArea === "string" && professionalArea.trim()
@@ -64,6 +70,10 @@ export async function POST(req: NextRequest) {
       // Fire-and-forget: nunca bloqueia o cadastro se o e-mail falhar.
       void sendWelcomeEmail(normalizedEmail, data.name);
     }
+
+    await prisma.lead.create({
+      data: { name: normalizedName, email: normalizedEmail, phone: normalizedPhone, source: "registration" },
+    });
 
     return NextResponse.json({ ok: true });
   } catch (error) {

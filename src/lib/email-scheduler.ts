@@ -106,17 +106,30 @@ async function sendLeadFollowUps(now: Date): Promise<void> {
 
   const leads = await prisma.lead.findMany({
     where: { createdAt: { gte: from, lte: to } },
-    select: { id: true, name: true, email: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      analyses: { orderBy: { createdAt: "desc" }, take: 1, select: { id: true } },
+    },
   });
 
   for (const lead of leads) {
     if (!lead.email) continue;
     // Se o e-mail já virou conta, não é mais um lead frio.
     const user = await prisma.user.findUnique({ where: { email: lead.email }, select: { id: true } });
-    if (user) continue;
+    // A payment attempt creates an account before approval, so an account by
+    // itself is not a conversion. Stop recovery only after a paid payment.
+    if (user) {
+      const paid = await prisma.payment.count({ where: { userId: user.id, status: "paid" } });
+      if (paid > 0) continue;
+    }
+
+    const analysisId = lead.analyses[0]?.id;
+    const checkoutUrl = analysisId ? `/report/${analysisId}` : "/analise";
 
     await sendOnce("lead_followup", lead.id, lead.email, () =>
-      sendLeadFollowUpEmail(lead.email, { name: lead.name })
+      sendLeadFollowUpEmail(lead.email, { name: lead.name, checkoutUrl })
     );
   }
 }

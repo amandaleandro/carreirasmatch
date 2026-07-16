@@ -1,4 +1,5 @@
 import { runJsonPrompt, type StructuredResume } from "@/lib/groq";
+import { asOptionalText, asScore, asStringArray, asText } from "@/lib/ai-shape";
 import { VOCATION_AREAS, type VocationAreaConfig } from "@/lib/vocation-areas";
 import {
   SOFT_SKILL_LABELS,
@@ -403,7 +404,7 @@ export async function analyzeLinkedIn(
   linkedInText: string,
   targetRole: string
 ): Promise<LinkedInReviewResult> {
-  const systemPrompt = `Você é um especialista em otimização de perfis do LinkedIn para busca de emprego em tecnologia.
+  const systemPrompt = `Você é um especialista em otimização de perfis do LinkedIn para busca de emprego. Adapte a linguagem à área do cargo-alvo (saúde, vendas, logística, educação, tecnologia...) e nunca assuma que a pessoa é da área de tecnologia.
 ${BASE_RULES}
 Formato de resposta:
 {
@@ -418,10 +419,122 @@ Formato de resposta:
 CONTEÚDO ATUAL DO PERFIL DO LINKEDIN (headline, sobre, experiências, colado pelo usuário):
 ${linkedInText}`;
 
-  return runJsonPrompt<LinkedInReviewResult>(systemPrompt, userMessage);
+  const result = await runJsonPrompt<LinkedInReviewResult>(systemPrompt, userMessage);
+
+  return {
+    overallImpression: asText(result?.overallImpression),
+    suggestedHeadline: asText(result?.suggestedHeadline),
+    suggestedAbout: asText(result?.suggestedAbout),
+    fixes: asStringArray(result?.fixes, 6),
+  };
 }
 
 // --- Análise de GitHub ---
+
+// --- Simulador de entrevista ---
+
+/** Perguntas por simulação. Curto o bastante para a pessoa terminar numa sentada. */
+export const INTERVIEW_SIMULATION_QUESTIONS = 5;
+
+export type InterviewTurn = { question: string; answer: string };
+
+export type InterviewSimulatorInput = {
+  targetRole: string;
+  area: string;
+  seniority: string;
+  history: InterviewTurn[];
+};
+
+export type InterviewQuestionResult = { question: string };
+
+export type InterviewAnswerResult = {
+  score: number;
+  strengths: string[];
+  gaps: string[];
+  improvedAnswer: string;
+  nextQuestion: string | null;
+};
+
+function interviewContext({ targetRole, area, seniority }: InterviewSimulatorInput): string {
+  return `CARGO-ALVO: ${targetRole}
+ÁREA: ${area || "não informada"}
+NÍVEL: ${seniority || "não informado"}`;
+}
+
+// A entrevista roda para QUALQUER área (saúde, vendas, logística, tecnologia...),
+// então o prompt proíbe explicitamente o viés de puxar tudo para tecnologia.
+const INTERVIEWER_ROLE = `Você é um entrevistador experiente conduzindo uma entrevista de emprego real para a área e o cargo informados. Faça perguntas que um entrevistador DAQUELA área realmente faria — se a área for saúde, pergunte sobre plantão, protocolo e paciente; se for vendas, sobre meta, objeção e carteira; se for logística, sobre rota, estoque e prazo. NUNCA transforme a entrevista em uma entrevista de tecnologia se a área não for de tecnologia.`;
+
+export async function startInterviewSimulation(
+  input: InterviewSimulatorInput
+): Promise<InterviewQuestionResult> {
+  const systemPrompt = `${INTERVIEWER_ROLE}
+${BASE_RULES}
+Faça a PRIMEIRA pergunta da entrevista. Deve ser uma pergunta de abertura realista, aberta e específica do cargo/área — nunca genérica como "fale sobre você".
+Formato de resposta:
+{
+  "question": string (a pergunta, em uma ou duas frases, como o entrevistador falaria em voz alta)
+}`;
+
+  const result = await runJsonPrompt<InterviewQuestionResult>(
+    systemPrompt,
+    interviewContext(input),
+    0.7
+  );
+
+  const question = asText(result?.question);
+  if (!question) {
+    throw new Error("A IA não devolveu a primeira pergunta da entrevista.");
+  }
+
+  return { question };
+}
+
+export async function evaluateInterviewAnswer(
+  input: InterviewSimulatorInput
+): Promise<InterviewAnswerResult> {
+  const answered = input.history.length;
+  const isLast = answered >= INTERVIEW_SIMULATION_QUESTIONS;
+
+  const systemPrompt = `${INTERVIEWER_ROLE}
+${BASE_RULES}
+Avalie a ÚLTIMA resposta do candidato com honestidade — se ela foi vaga, curta ou não respondeu à pergunta, diga isso e dê nota baixa. Não elogie por elogiar.
+Ao reescrever a resposta, use SOMENTE fatos que o candidato mencionou; se faltou um dado importante (como um resultado concreto), aponte em "gaps" e deixe um espaço marcado como [preencha com seu número] em vez de inventar.
+Formato de resposta:
+{
+  "score": number (0 a 10 para a última resposta),
+  "strengths": string[] (1 a 3 pontos concretos que a resposta acertou; array vazio se não houver),
+  "gaps": string[] (1 a 3 pontos concretos que faltaram),
+  "improvedAnswer": string (a resposta do candidato reescrita de forma mais forte, mantendo os fatos dele),
+  "nextQuestion": ${isLast ? "null (a entrevista terminou; use exatamente null)" : "string (a próxima pergunta da entrevista, seguindo o fio do que ele respondeu)"}
+}`;
+
+  const transcript = input.history
+    .map((turn, index) => `PERGUNTA ${index + 1}: ${turn.question}\nRESPOSTA ${index + 1}: ${turn.answer}`)
+    .join("\n\n");
+
+  const userMessage = `${interviewContext(input)}
+
+TRANSCRIÇÃO DA ENTREVISTA ATÉ AQUI (avalie apenas a RESPOSTA ${answered}):
+${transcript}`;
+
+  const result = await runJsonPrompt<InterviewAnswerResult>(systemPrompt, userMessage, 0.6);
+
+  const nextQuestion = asOptionalText(result?.nextQuestion);
+  if (!isLast && !nextQuestion) {
+    throw new Error("A IA não devolveu a próxima pergunta da entrevista.");
+  }
+
+  return {
+    score: asScore(result?.score, 0, 10),
+    strengths: asStringArray(result?.strengths, 3),
+    gaps: asStringArray(result?.gaps, 3),
+    improvedAnswer: asText(result?.improvedAnswer),
+    // O modelo às vezes devolve uma pergunta mesmo no último turno; a contagem
+    // de perguntas é decisão nossa, não dele.
+    nextQuestion: isLast ? null : nextQuestion,
+  };
+}
 
 export type GithubReviewResult = {
   overallImpression: string;
@@ -447,7 +560,13 @@ Formato de resposta:
 CONTEÚDO DO GITHUB (lista de repositórios, descrições, READMEs, colado pelo usuário):
 ${githubText}`;
 
-  return runJsonPrompt<GithubReviewResult>(systemPrompt, userMessage);
+  const result = await runJsonPrompt<GithubReviewResult>(systemPrompt, userMessage);
+
+  return {
+    overallImpression: asText(result?.overallImpression),
+    strongestRepos: asStringArray(result?.strongestRepos, 10),
+    fixes: asStringArray(result?.fixes, 6),
+  };
 }
 
 // --- Perfil do zero (LinkedIn/GitHub para quem ainda não tem) ---

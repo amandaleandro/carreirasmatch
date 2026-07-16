@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { formatBrazilPhone, validateContact } from "@/lib/contact-validation";
 
 const LEAD_STORAGE_KEY = "carreiramatch:lead-contact";
 
@@ -46,8 +47,9 @@ export function LeadGate({
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || !email.trim() || !phone.trim()) {
-      setError("Preencha nome, email e telefone para continuar.");
+    const contact = validateContact({ name, email, phone });
+    if (!contact.success) {
+      setError(contact.errors[0]);
       return;
     }
 
@@ -57,9 +59,7 @@ export function LeadGate({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
+          ...contact.data,
           source,
           analysisId,
           vocationTestResultId,
@@ -68,7 +68,7 @@ export function LeadGate({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar seus dados.");
 
-      storeLeadContact({ name: name.trim(), email: email.trim(), phone: phone.trim() });
+      storeLeadContact(contact.data);
       track(ANALYTICS_EVENTS.LEAD_CAPTURED, { source });
       onUnlocked();
     } catch (err) {
@@ -92,6 +92,10 @@ export function LeadGate({
           </label>
           <input
             type="text"
+            name="name"
+            autoComplete="name"
+            required
+            minLength={5}
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Seu nome completo"
@@ -104,6 +108,9 @@ export function LeadGate({
           </label>
           <input
             type="email"
+            name="email"
+            autoComplete="email"
+            required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="seuemail@exemplo.com"
@@ -116,8 +123,14 @@ export function LeadGate({
           </label>
           <input
             type="tel"
+            name="phone"
+            autoComplete="tel-national"
+            inputMode="numeric"
+            required
+            minLength={14}
+            maxLength={15}
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(formatBrazilPhone(e.target.value))}
             placeholder="(11) 99999-9999"
             className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
           />

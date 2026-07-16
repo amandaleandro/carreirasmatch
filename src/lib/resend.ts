@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import { formatCentsToBRL } from "@/lib/pricing";
 import { prisma } from "@/lib/prisma";
+import { formatBrazilDate } from "@/lib/brazil";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -139,7 +140,7 @@ export async function sendSubscriptionConfirmationEmail(
   to: string,
   opts: { currentPeriodEnd: Date }
 ) {
-  const renew = opts.currentPeriodEnd.toLocaleDateString("pt-BR");
+  const renew = formatBrazilDate(opts.currentPeriodEnd);
   await send(
     to,
     "Assinatura ativada 🚀",
@@ -194,7 +195,7 @@ export async function sendRenewalReminderEmail(
   to: string,
   opts: { currentPeriodEnd: Date; autoRenews: boolean }
 ) {
-  const date = opts.currentPeriodEnd.toLocaleDateString("pt-BR");
+  const date = formatBrazilDate(opts.currentPeriodEnd);
   const body = opts.autoRenews
     ? `
       <h2 style="font-size: 20px;">Sua renovação está chegando</h2>
@@ -226,9 +227,10 @@ export async function sendSubscriptionExpiredEmail(to: string) {
 
 export async function sendLeadFollowUpEmail(
   to: string,
-  opts: { name?: string | null }
+  opts: { name?: string | null; checkoutUrl?: string }
 ) {
   const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  const checkoutUrl = opts.checkoutUrl?.startsWith("/") ? opts.checkoutUrl : "/analise";
   await send(
     to,
     "Seu diagnóstico de carreira está esperando",
@@ -236,7 +238,7 @@ export async function sendLeadFollowUpEmail(
       <h2 style="font-size: 20px;">${greeting}</h2>
       <p>Você começou uma análise no ${BRAND} e ficou faltando pouco para ver o resultado completo: seu score de aderência, o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
       <p>Leva menos de 2 minutos para desbloquear:</p>
-      ${button(`${APP_URL}/analise`, "Ver minha análise completa")}
+      ${button(`${APP_URL}${checkoutUrl}`, "Ver minha análise completa")}
       <p>Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
     `
   );

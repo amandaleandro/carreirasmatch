@@ -28,6 +28,7 @@ const paymentStatusClasses: Record<string, string> = {
 function formatDate(date: Date | null | undefined) {
   if (!date) return "-";
   return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
@@ -92,6 +93,7 @@ export default async function AdminPage() {
     recentApplications,
     applicationGroups,
     analysisStatusGroups,
+    openSupportTickets,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { createdAt: { gte: since24h } } }),
@@ -177,6 +179,7 @@ export default async function AdminPage() {
       by: ["applicationStatus"],
       _count: { _all: true },
     }),
+    prisma.supportTicket.count({ where: { status: "open" } }),
   ]);
 
   const revenueTotal = paidPayments._sum.amount ?? 0;
@@ -212,6 +215,7 @@ export default async function AdminPage() {
         <StatCard label="Vagas" value={totalJobs} helper={`${activeJobs} ativas, ${jobCoverage}% do feed`} />
         <StatCard label="Candidaturas" value={totalApplications} helper="Pipeline acompanhado pelos usuários" />
         <StatCard label="Receita 24h" value={formatCurrency(revenue24h)} helper={`${paid24hCount} pagamento(s) hoje`} />
+        <StatCard label="Suporte" value={openSupportTickets} helper="Chamado(s) aguardando resposta" />
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -413,6 +417,9 @@ export default async function AdminPage() {
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
           <h2 className="font-semibold">Atalhos de operação</h2>
           <div className="mt-4 grid gap-2">
+            <Link className="rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900" href="/admin/suporte">
+              Responder suporte{openSupportTickets > 0 ? ` (${openSupportTickets})` : ""}
+            </Link>
             <Link className="rounded-md border border-neutral-200 dark:border-neutral-800 px-3 py-2 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-900" href="/feed">
               Ver feed de vagas
             </Link>

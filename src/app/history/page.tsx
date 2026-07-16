@@ -142,7 +142,7 @@ export default async function HistoryPage({
             {seniorityTimeline.map((a) => (
               <div
                 key={a.id}
-                title={`${a.jobTitle}, ${a.seniorityScore}/100 (${new Date(a.createdAt).toLocaleDateString("pt-BR")})`}
+                title={`${a.jobTitle}, ${a.seniorityScore}/100 (${new Date(a.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })})`}
                 className="flex-1 min-w-[6px] rounded-t bg-blue-500/80 dark:bg-blue-500/70 hover:bg-blue-600 transition-colors"
                 style={{ height: `${Math.max(4, a.seniorityScore)}%` }}
               />
@@ -231,6 +231,7 @@ export default async function HistoryPage({
             const parsedKeywordsFound: string[] = JSON.parse(a.keywordsFound || "[]");
             const parsedKeywordsMissing: string[] = JSON.parse(a.keywordsMissing || "[]");
             const dateStr = new Date(a.createdAt).toLocaleDateString("pt-BR", {
+              timeZone: "America/Sao_Paulo",
               day: "2-digit",
               month: "short",
               year: "numeric",

@@ -5,6 +5,7 @@ import { SidebarNav } from "@/components/sidebar-nav";
 import { Topbar } from "@/components/topbar";
 import { GuidedTour } from "@/components/guided-tour";
 import { UpcomingFeaturesModal } from "@/components/upcoming-features-modal";
+import { UiPanelsProvider } from "@/components/ui-panels";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
@@ -28,14 +29,16 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const segment = normalizeCareerSegment(dbUser?.careerSegment);
 
   return (
-    <div className="flex min-h-screen">
-      <SidebarNav isAdmin={isAdmin} />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar userName={userName} userEmail={userEmail} userImage={userImage} />
-        <main className="flex-1">{children}</main>
+    <UiPanelsProvider>
+      <div className="flex min-h-screen">
+        <SidebarNav isAdmin={isAdmin} />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Topbar userName={userName} userEmail={userEmail} userImage={userImage} />
+          <main className="flex-1">{children}</main>
+        </div>
+        <GuidedTour segment={segment} />
+        <UpcomingFeaturesModal />
       </div>
-      <GuidedTour segment={segment} />
-      <UpcomingFeaturesModal />
-    </div>
+    </UiPanelsProvider>
   );
 }

@@ -153,6 +153,7 @@ export async function saveFeedMatchAsApplication(matchId: string) {
       where: { id: existing.id },
       data: {
         jobId: match.jobId,
+        company: match.job.company,
         fitScore: match.fitScore,
         notes: match.reason,
       },
@@ -163,6 +164,7 @@ export async function saveFeedMatchAsApplication(matchId: string) {
         userId,
         jobId: match.jobId,
         jobTitle: match.job.jobTitle,
+        company: match.job.company,
         jobUrl: match.job.url,
         fitScore: match.fitScore,
         status: match.fitScore >= 75 ? "saved" : "tailor_resume",

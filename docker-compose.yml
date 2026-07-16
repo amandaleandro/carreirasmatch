@@ -40,6 +40,7 @@ services:
       - GLASSDOOR_PARTNER_KEY=${GLASSDOOR_PARTNER_KEY:-}
       - GREENHOUSE_BOARDS=${GREENHOUSE_BOARDS:-}
       - LEVER_COMPANIES=${LEVER_COMPANIES:-}
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
       - MERCADOPAGO_ACCESS_TOKEN=${MERCADOPAGO_ACCESS_TOKEN}
       - NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=${NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY}
       - MERCADOPAGO_WEBHOOK_SECRET=${MERCADOPAGO_WEBHOOK_SECRET}
@@ -70,6 +71,9 @@ services:
       - DEEPINFRA_MODEL=${DEEPINFRA_MODEL:-}
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_MODEL=${OPENROUTER_MODEL:-}
+      - AI_MAX_RETRIES=${AI_MAX_RETRIES:-2}
+      - AI_REQUEST_TIMEOUT_MS=${AI_REQUEST_TIMEOUT_MS:-45000}
+      - LIFECYCLE_EMAILS_ENABLED=${LIFECYCLE_EMAILS_ENABLED:-true}
     volumes:
       - sqlite-data:/app/data
     networks:
@@ -88,6 +92,25 @@ services:
     networks:
       - default
       - edge_net
+
+  sqlite-backup:
+    image: alpine:3.22
+    container_name: carreiras-match-sqlite-backup
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      - DB_PATH=/data/dev.db
+      - BACKUP_DIR=/backups
+      - BACKUP_INTERVAL_SECONDS=${BACKUP_INTERVAL_SECONDS:-86400}
+      - BACKUP_RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-14}
+    volumes:
+      - sqlite-data:/data:ro
+      - ${SQLITE_BACKUP_HOST_DIR:-./backups}:/backups
+      - ./scripts/backup-sqlite.sh:/usr/local/bin/backup-sqlite.sh:ro
+    command: ["/bin/sh", "-c", "apk add --no-cache sqlite && exec /bin/sh /usr/local/bin/backup-sqlite.sh"]
+    networks:
+      - default
 
 volumes:
   sqlite-data:

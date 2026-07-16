@@ -12,7 +12,7 @@ async function scoreUnscoredJobs(resumeId: string, resumeText: string) {
   const unscoredJobs = await prisma.job.findMany({
     where: { active: true, matches: { none: { resumeId } } },
     take: jobsPerBatch(),
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: "desc" },
   });
 
   if (unscoredJobs.length === 0) return;
@@ -81,7 +81,10 @@ export async function getOrCreateFeedMatches(userId: string, resumeId: string, r
     deduped.push(match);
   }
 
-  deduped.sort((a, b) => b.fitScore - a.fitScore);
+  deduped.sort(
+    (a, b) =>
+      b.fitScore - a.fitScore || b.job.createdAt.getTime() - a.job.createdAt.getTime()
+  );
 
   return deduped;
 }

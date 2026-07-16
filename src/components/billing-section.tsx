@@ -55,7 +55,7 @@ export function BillingSection({
     <div className="space-y-4">
       {isActive && (
         <p className="text-sm text-emerald-600 dark:text-emerald-400">
-          Assinatura ativa{currentPeriodEnd ? ` até ${new Date(currentPeriodEnd).toLocaleDateString("pt-BR")}` : ""}.
+          Assinatura ativa{currentPeriodEnd ? ` até ${new Date(currentPeriodEnd).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}` : ""}.
         </p>
       )}
 

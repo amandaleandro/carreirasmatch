@@ -272,7 +272,7 @@ export default async function GeneralReportDashboardPage() {
                     {a.jobTitle}
                   </p>
                   <p className="text-xs text-neutral-500 mt-0.5">
-                    {TRACK_LABELS[a.careerTrack as CareerTrack]} · {new Date(a.createdAt).toLocaleDateString("pt-BR")}
+                    {TRACK_LABELS[a.careerTrack as CareerTrack]} · {new Date(a.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
                   </p>
                 </Link>
                 <div className="flex items-center gap-3">

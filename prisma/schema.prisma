@@ -16,6 +16,7 @@ model User {
   id                 String    @id @default(cuid())
   name               String?
   email              String?   @unique
+  phone              String?
   emailVerified      DateTime?
   image              String?
   passwordHash       String?
@@ -41,6 +42,7 @@ model User {
   classScheduleItems ClassScheduleItem[]
   softSkillTestResults SoftSkillTestResult[]
   passwordResetTokens PasswordResetToken[]
+  supportTickets     SupportTicket[]
 }
 
 model Account {
@@ -349,7 +351,7 @@ model Lead {
   name                String
   email               String
   phone               String
-  source              String // "vocation_test" | "resume_analysis"
+  source              String // "vocation_test" | "resume_analysis" | "registration"
   createdAt           DateTime             @default(now())
   vocationTestResults VocationTestResult[]
   analyses            Analysis[]
@@ -449,4 +451,34 @@ model Post {
 
   @@index([publishedAt])
   @@index([areaSlug])
+}
+
+/// Ticket de suporte: uma conversa entre um usuário e o admin, dentro do sistema.
+model SupportTicket {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  category  String   @default("other")
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  messages  SupportMessage[]
+
+  @@index([userId, updatedAt])
+  @@index([status, updatedAt])
+}
+
+/// Mensagem dentro de um ticket. `fromAdmin` diz de que lado veio.
+model SupportMessage {
+  id          String        @id @default(cuid())
+  ticketId    String
+  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromAdmin   Boolean       @default(false)
+  body        String
+  readByUser  Boolean       @default(false)
+  readByAdmin Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+
+  @@index([ticketId, createdAt])
 }

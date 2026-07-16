@@ -6,7 +6,8 @@ import { LogoutButton } from "@/components/logout-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { BrandLogo } from "@/components/brand-logo";
 import Link from "next/link";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, Search, Sparkles, HelpCircle } from "lucide-react";
+import { useUiPanels } from "@/components/ui-panels";
 
 export function Topbar({
   userName,
@@ -18,6 +19,7 @@ export function Topbar({
   userImage?: string | null;
 }) {
   const router = useRouter();
+  const { openNews, openTour } = useUiPanels();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -132,8 +134,35 @@ export function Topbar({
                 <Link href="/interviews" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Entrevistas</Link>
                 <Link href="/history" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Relatórios</Link>
                 <Link href="/tools" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Ferramentas</Link>
+                <Link href="/suporte" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Suporte</Link>
                 <Link href="/settings" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Perfil</Link>
               </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  openNews();
+                }}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white"
+                aria-haspopup="dialog"
+              >
+                <Sparkles className="h-4 w-4 shrink-0" strokeWidth={1.9} />
+                Novidades
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileNavOpen(false);
+                  openTour();
+                }}
+                className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white"
+              >
+                <HelpCircle className="h-4 w-4 shrink-0" strokeWidth={1.9} />
+                Tour
+              </button>
             </div>
 
             <div className="rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 p-4">

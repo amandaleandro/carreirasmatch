@@ -10,6 +10,7 @@ type Result = {
 };
 
 export function GithubReviewForm() {
+  const [githubUrl, setGithubUrl] = useState("");
   const [githubText, setGithubText] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [loading, setLoading] = useState(false);
@@ -20,8 +21,8 @@ export function GithubReviewForm() {
     e.preventDefault();
     setError(null);
 
-    if (!githubText.trim()) {
-      setError("Cole a lista de repositórios/descrições do seu GitHub.");
+    if (!githubUrl.trim() && !githubText.trim()) {
+      setError("Informe o link do seu perfil ou cole a lista de repositórios.");
       return;
     }
 
@@ -32,7 +33,7 @@ export function GithubReviewForm() {
       const res = await fetch("/api/tools/github-review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ githubText, targetRole }),
+        body: JSON.stringify({ githubUrl, githubText, targetRole }),
       });
       const data = await res.json();
 
@@ -57,8 +58,8 @@ export function GithubReviewForm() {
         </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Análise de GitHub</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Cole os nomes e descrições dos seus repositórios (ou o conteúdo dos
-          READMEs) para receber uma avaliação de recrutador técnico.
+          Informe o link do seu perfil e buscamos seus repositórios públicos
+          automaticamente, para receber uma avaliação de recrutador técnico.
         </p>
       </header>
 
@@ -75,14 +76,29 @@ export function GithubReviewForm() {
         </div>
 
         <div>
+          <label className="block text-sm font-medium mb-1">Link do seu GitHub</label>
+          <input
+            type="text"
+            value={githubUrl}
+            onChange={(e) => setGithubUrl(e.target.value)}
+            placeholder="https://github.com/seu-usuario"
+            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
+          />
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5">
+            Buscamos seus repositórios públicos direto no GitHub. O perfil
+            precisa estar público.
+          </p>
+        </div>
+
+        <div>
           <label className="block text-sm font-medium mb-1">
-            Repositórios (nome + descrição/README de cada um)
+            Ou cole os repositórios à mão (nome + descrição/README de cada um)
           </label>
           <textarea
             value={githubText}
             onChange={(e) => setGithubText(e.target.value)}
-            rows={10}
-            placeholder="Ex: 'todo-app' - Aplicação de lista de tarefas em React e Node.js. 'scripts-python' - Scripts de automação..."
+            rows={8}
+            placeholder="Só é necessário se você preferir não informar o link. Ex: 'todo-app' - Aplicação de lista de tarefas em React e Node.js..."
             className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
           />
         </div>

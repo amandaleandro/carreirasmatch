@@ -11,7 +11,7 @@ type StudyScheduleItem = {
 };
 
 function formatWeekStart(date: Date): string {
-  return new Date(date).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" });
+  return new Date(date).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" });
 }
 
 export function StudyCalendarView({ items }: { items: StudyScheduleItem[] }) {

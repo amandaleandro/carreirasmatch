@@ -8,6 +8,7 @@ import { AuthShell } from "@/components/auth-shell";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS } from "@/lib/course-catalog";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { formatBrazilPhone } from "@/lib/contact-validation";
 
 const AREA_PROMPT_SEGMENTS: CareerSegment[] = ["internship", "student"];
 
@@ -16,6 +17,7 @@ export default function RegisterPage() {
   const searchParams = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [careerSegment, setCareerSegment] = useState<CareerSegment | "">("");
   const [professionalArea, setProfessionalArea] = useState("");
@@ -36,6 +38,7 @@ export default function RegisterPage() {
         body: JSON.stringify({
           name,
           email,
+          phone,
           password,
           careerSegment: careerSegment || null,
           professionalArea: showAreaField && professionalArea ? professionalArea : null,
@@ -91,6 +94,10 @@ export default function RegisterPage() {
               </label>
               <input
                 type="text"
+                name="name"
+                autoComplete="name"
+                required
+                minLength={5}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
@@ -98,10 +105,31 @@ export default function RegisterPage() {
             </div>
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
+                Celular com DDD
+              </label>
+              <input
+                type="tel"
+                name="phone"
+                autoComplete="tel-national"
+                inputMode="numeric"
+                value={phone}
+                onChange={(e) => setPhone(formatBrazilPhone(e.target.value))}
+                required
+                minLength={15}
+                maxLength={15}
+                placeholder="(11) 99999-9999"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
+              />
+              <p className="text-xs text-neutral-500">Contato para comunicações sobre sua carreira e sua conta.</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
                 E-mail
               </label>
               <input
                 type="email"
+                name="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
@@ -114,6 +142,8 @@ export default function RegisterPage() {
               </label>
               <input
                 type="password"
+                name="password"
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required

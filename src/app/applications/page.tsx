@@ -102,15 +102,15 @@ export default async function ApplicationsPage() {
   const journeyStats = [
     {
       label: "Dias em busca",
-      value: journey.daysSearching !== null ? `${journey.daysSearching}` : ", ",
+      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "—",
     },
     {
       label: "Taxa de resposta",
-      value: journey.responseRate !== null ? `${journey.responseRate}%` : ", ",
+      value: journey.responseRate !== null ? `${journey.responseRate}%` : "—",
     },
     {
       label: "Taxa de rejeição",
-      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : ", ",
+      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—",
     },
     {
       label: "Candidaturas na semana",
@@ -239,7 +239,7 @@ export default async function ApplicationsPage() {
           <div>
             <h2 className="font-semibold">Metas da semana</h2>
             <p className="text-sm text-neutral-500 mt-1">
-              Semana iniciada em {weekStart.toLocaleDateString("pt-BR")}.
+              Semana iniciada em {weekStart.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}.
             </p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -267,18 +267,16 @@ export default async function ApplicationsPage() {
           const config = APPLICATION_STATUS_CONFIG[status];
           const items = applications.filter((item) => item.status === status);
           return (
-            <div key={status} className={`rounded-2xl border p-3 min-h-72 shadow-sm shadow-slate-900/5 ${config.column}`}>
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <div>
-                  <h2 className="text-sm font-semibold flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${config.dot}`} />
-                    {config.label}
-                  </h2>
-                  <p className="text-xs text-neutral-500 mt-1">{config.description}</p>
+            <div key={status} className={`rounded-2xl border p-3 min-h-72 min-w-0 shadow-sm shadow-slate-900/5 ${config.column}`}>
+              <div className="mb-3">
+                <div className="flex items-start gap-2">
+                  <span className={`h-2 w-2 mt-[5px] rounded-full shrink-0 ${config.dot}`} />
+                  <h2 className="min-w-0 text-sm font-semibold leading-tight">{config.label}</h2>
+                  <span className="ml-auto shrink-0 text-xs font-semibold rounded-full bg-white/70 dark:bg-neutral-950/70 px-2 py-0.5">
+                    {items.length}
+                  </span>
                 </div>
-                <span className="text-xs font-semibold rounded-full bg-white/70 dark:bg-neutral-950/70 px-2 py-1">
-                  {items.length}
-                </span>
+                <p className="text-xs text-neutral-500 mt-1.5 line-clamp-2">{config.description}</p>
               </div>
               <div className="space-y-3">
                 {items.map((item) => (
@@ -350,7 +348,7 @@ export default async function ApplicationsPage() {
                                 ? `${APPLICATION_STATUS_CONFIG[activity.fromStatus as keyof typeof APPLICATION_STATUS_CONFIG]?.label ?? activity.fromStatus} → `
                                 : ""}
                               {APPLICATION_STATUS_CONFIG[activity.toStatus as keyof typeof APPLICATION_STATUS_CONFIG]?.label ?? activity.toStatus}
-                              <span className="text-neutral-400"> · {activity.createdAt.toLocaleDateString("pt-BR")}</span>
+                              <span className="text-neutral-400"> · {activity.createdAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</span>
                             </li>
                           ))}
                         </ul>

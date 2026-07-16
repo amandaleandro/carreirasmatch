@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { HelpCircle, X, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { X, ArrowRight, ArrowLeft, Sparkles } from "lucide-react";
+import { useUiPanels } from "@/components/ui-panels";
 
 type Placement = "auto" | "right" | "left" | "top" | "bottom";
 
@@ -215,6 +216,7 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [cardPos, setCardPos] = useState<{ top: number; left: number } | null>(null);
   const waitingForTarget = useRef(false);
+  const { tourNonce } = useUiPanels();
 
   const steps = useMemo(() => buildSteps(segment), [segment]);
   const step = steps[index];
@@ -363,25 +365,18 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
     setActive(true);
   }, []);
 
+  // O gatilho do tour mora na sidebar / menu mobile, não aqui — cada pedido de
+  // lá incrementa o nonce e reinicia o tour do primeiro passo.
+  useEffect(() => {
+    if (tourNonce > 0) start();
+  }, [tourNonce, start]);
+
   // Steps without a target render as a centered welcome/closing card.
   // Targeted steps stay hidden (offscreen) until their rect is measured.
   const centered = !step?.target;
 
   return (
     <>
-      {/* Floating help launcher — always available to replay the tour */}
-      {!active && (
-        <button
-          type="button"
-          onClick={start}
-          className="fixed bottom-5 right-5 z-[60] flex items-center gap-2 rounded-full bg-blue-600 text-white pl-3 pr-4 py-2.5 shadow-lg shadow-blue-600/30 hover:bg-blue-700 transition-all group"
-          aria-label="Abrir tour guiado"
-        >
-          <HelpCircle className="h-5 w-5" strokeWidth={2} />
-          <span className="text-sm font-semibold hidden sm:inline">Tour guiado</span>
-        </button>
-      )}
-
       {active && (
         <>
           {/* Highlight ring around the target — the page stays fully visible & clickable */}

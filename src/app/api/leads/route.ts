@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { validateContact } from "@/lib/contact-validation";
 
 const LEAD_LIMIT = { limit: 20, windowMs: 60 * 60 * 1000 };
 const VALID_SOURCES = ["vocation_test", "resume_analysis"] as const;
@@ -16,23 +17,22 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json().catch(() => null);
-  const name = typeof body?.name === "string" ? body.name.trim() : "";
-  const email = typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
-  const phone = typeof body?.phone === "string" ? body.phone.trim() : "";
+  const contact = validateContact({ name: body?.name, email: body?.email, phone: body?.phone });
+  const { name, email, phone } = contact.data;
   const source = body?.source as LeadSource | undefined;
   const analysisId = typeof body?.analysisId === "string" ? body.analysisId : null;
   const vocationTestResultId =
     typeof body?.vocationTestResultId === "string" ? body.vocationTestResultId : null;
 
-  if (!name || !email || !phone || !source || !VALID_SOURCES.includes(source)) {
+  if (!source || !VALID_SOURCES.includes(source)) {
     return NextResponse.json(
       { error: "Preencha nome, email e telefone." },
       { status: 400 }
     );
   }
 
-  if (!/^\S+@\S+\.\S+$/.test(email)) {
-    return NextResponse.json({ error: "Informe um email válido." }, { status: 400 });
+  if (!contact.success) {
+    return NextResponse.json({ error: contact.errors[0], errors: contact.errors }, { status: 400 });
   }
 
   const lead = await prisma.lead.create({
