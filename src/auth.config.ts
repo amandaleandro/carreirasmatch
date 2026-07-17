@@ -1,16 +1,17 @@
 import type { NextAuthConfig } from "next-auth";
-import { FREE_TOOL_PATHS } from "@/lib/tools-catalog";
-
 const PUBLIC_PATHS = [
-  // Guias de conteúdo abertos, derivados do catálogo (flag `free`).
-  ...FREE_TOOL_PATHS,
   "/login",
   "/register",
+  "/gratuito",
   "/assinar",
   "/report",
   "/comece",
   "/curriculo-gratis",
   "/vagas-de-hoje",
+  "/vagas-publicas",
+  "/cursos-gratuitos",
+  "/mercado-de-trabalho",
+  "/parceiros",
   "/vagas",
   "/analise",
   "/tools/vocation-test",
@@ -34,7 +35,7 @@ export const authConfig: NextAuthConfig = {
       const isLoggedIn = Boolean(auth?.user);
       const pathname = request.nextUrl.pathname;
       const isPublic =
-        pathname === "/" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+        pathname === "/" || pathname === "/tools" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
       if (isPublic) return true;
       return isLoggedIn;
     },

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { authorizeFreeAiTool, releaseFreeAiToolUsage } from "@/lib/free-tool-access";
 import { generateBehavioralSummary } from "@/lib/tools";
 import {
   BEHAVIORAL_QUESTIONS,
@@ -10,9 +10,11 @@ import {
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
+  let freeUserId: string | null = null;
   try {
-    const { session, response } = await requireToolAccess("/tools/behavioral-test");
+    const { session, response, subscriber } = await authorizeFreeAiTool("behavioral-test", true);
     if (!session) return response!;
+    if (!subscriber) freeUserId = session.user.id;
 
     const { answers, targetRole } = (await req.json()) as {
       answers: BehavioralAnswers;
@@ -53,6 +55,7 @@ export async function POST(req: NextRequest) {
       ...summary,
     });
   } catch (error) {
+    if (freeUserId) await releaseFreeAiToolUsage(freeUserId, "behavioral-test");
     console.error("Erro ao processar teste comportamental:", error);
     return NextResponse.json(
       { error: "Erro ao processar. Tente novamente." },

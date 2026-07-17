@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS } from "@/lib/course-catalog";
@@ -9,10 +9,14 @@ export function SettingsForm({
   initialSegment,
   initialArea,
   initialHasFormalEducation,
+  initialCity,
+  initialState,
 }: {
   initialSegment: CareerSegment | null;
   initialArea: string | null;
   initialHasFormalEducation: boolean | null;
+  initialCity: string | null;
+  initialState: string | null;
 }) {
   const router = useRouter();
   const [segment, setSegment] = useState<CareerSegment | "">(initialSegment ?? "");
@@ -20,9 +24,26 @@ export function SettingsForm({
   const [hasFormalEducation, setHasFormalEducation] = useState<boolean | null>(
     initialHasFormalEducation
   );
+  const [state, setState] = useState(initialState ?? "");
+  const [city, setCity] = useState(initialCity ?? "");
+  const [cities, setCities] = useState<string[]>(initialCity ? [initialCity] : []);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (!state) {
+      return;
+    }
+    let active = true;
+    fetch(`/api/locations/cities?state=${encodeURIComponent(state)}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (active && Array.isArray(data.cities)) setCities(data.cities.map((item: { name: string }) => item.name));
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [state]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,6 +59,8 @@ export function SettingsForm({
           careerSegment: segment || null,
           professionalArea: area || null,
           hasFormalEducation,
+          state: state || null,
+          city: city || null,
         }),
       });
       const data = await res.json();
@@ -85,6 +108,21 @@ export function SettingsForm({
             <option key={option} value={option} />
           ))}
         </datalist>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-[120px_1fr]">
+        <label className="text-sm font-medium">Estado
+          <select value={state} onChange={(event) => { setState(event.target.value); setCity(""); setCities([]); }} className="mt-1 w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm dark:border-white/10 dark:bg-neutral-900">
+            <option value="">UF</option>
+            {"AC AL AP AM BA CE DF ES GO MA MT MS MG PA PB PR PE PI RJ RN RS RO RR SC SP SE TO".split(" ").map((uf) => <option key={uf} value={uf}>{uf}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-medium">Cidade
+          <select value={city} onChange={(event) => setCity(event.target.value)} disabled={!state} className="mt-1 w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2.5 text-sm disabled:opacity-50 dark:border-white/10 dark:bg-neutral-900">
+            <option value="">Selecione a cidade</option>
+            {cities.map((name) => <option key={name} value={name}>{name}</option>)}
+          </select>
+        </label>
       </div>
 
       <div>

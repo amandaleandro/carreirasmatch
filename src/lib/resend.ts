@@ -261,3 +261,27 @@ export async function sendOnboardingNudgeEmail(
     `
   );
 }
+
+export async function sendJobAlertEmail(
+  to: string,
+  opts: { query: string; location: string; jobs: Array<{ title: string; url: string; source: string }> }
+) {
+  const rows = opts.jobs.slice(0, 10).map((job) => `
+    <div style="border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:10px 0;">
+      <strong>${job.title}</strong>
+      <p style="font-size:13px;color:#64748b;margin:5px 0;">${job.source}</p>
+      <a href="${job.url}" style="color:#2563eb;">Ver oportunidade</a>
+    </div>
+  `).join("");
+  await send(
+    to,
+    `Novas vagas${opts.location ? ` em ${opts.location}` : ""}`,
+    `
+      <h2 style="font-size:20px;">Encontramos novas oportunidades</h2>
+      <p>${opts.query ? `Busca: <strong>${opts.query}</strong>. ` : ""}${opts.location ? `Local: <strong>${opts.location}</strong>.` : ""}</p>
+      ${rows}
+      ${button(`${APP_URL}/vagas-publicas`, "Ver todas as vagas")}
+      <p>Você pode alterar seus alertas nas configurações da sua conta.</p>
+    `,
+  );
+}

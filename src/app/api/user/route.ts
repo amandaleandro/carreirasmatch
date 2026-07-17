@@ -16,6 +16,8 @@ export async function PATCH(req: NextRequest) {
     hasFormalEducation?: boolean | null;
     interestedRoles?: string;
     themePreference?: string;
+    city?: string | null;
+    state?: string | null;
   } = {};
 
   if ("name" in body) {
@@ -66,6 +68,18 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Valor inválido para formação formal." }, { status: 400 });
     }
     data.hasFormalEducation = hasFormalEducation;
+  }
+
+  if ("state" in body) {
+    const state = typeof body.state === "string" ? body.state.trim().toUpperCase() : "";
+    if (state && !/^[A-Z]{2}$/.test(state)) return NextResponse.json({ error: "UF inválida." }, { status: 400 });
+    data.state = state || null;
+  }
+
+  if ("city" in body) {
+    const city = typeof body.city === "string" ? body.city.trim() : "";
+    if (city.length > 120) return NextResponse.json({ error: "Cidade inválida." }, { status: 400 });
+    data.city = city || null;
   }
 
   if ("interestedRoles" in body) {

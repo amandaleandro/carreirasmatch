@@ -20,16 +20,52 @@ export type ToolCatalogEntry = {
   color: ToolColor;
   /**
    * Ferramenta aberta: sem login e sem assinatura, indexável pelo Google e com
-   * anúncio. São só as de conteúdo estático (guias), que não custam chamada de
-   * IA - as ferramentas de IA e as utilidades interativas seguem na assinatura.
+   * anúncio. Inclui guias e utilidades locais que não custam chamada de IA.
    *
    * Esta flag é a fonte única de verdade: alimenta as rotas públicas do
    * middleware (src/auth.config.ts), o sitemap e o selo "Grátis" no catálogo.
    */
   free?: true;
+  accountFree?: true;
 };
 
 export const TOOLS_CATALOG: ToolCatalogEntry[] = [
+  {
+    href: "/tools/ats-checklist",
+    title: "Checklist de currículo ATS",
+    description: "Revise estrutura, palavras-chave e legibilidade antes de enviar seu currículo.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "filePlus",
+    color: "emerald",
+    free: true,
+  },
+  {
+    href: "/tools/salary-calculator",
+    title: "Calculadora de salário e benefícios",
+    description: "Compare o valor mensal da proposta, benefícios e valor estimado por hora.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "scale",
+    color: "amber",
+    free: true,
+  },
+  {
+    href: "/tools/interview-questions",
+    title: "Perguntas de entrevista por cargo",
+    description: "Treine perguntas comuns de entrevista com orientações para estruturar respostas.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "mic",
+    color: "blue",
+    free: true,
+  },
+  {
+    href: "/tools/resume-templates",
+    title: "Modelos de currículo por perfil",
+    description: "Veja estruturas recomendadas para primeiro emprego, estágio e profissionais experientes.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "filePlus",
+    color: "violet",
+    free: true,
+  },
   {
     href: "/tools/cover-letter",
     title: "Carta de apresentação",
@@ -37,6 +73,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
     icon: "pen",
     color: "blue",
+    accountFree: true,
   },
   {
     href: "/tools/interview-guide",
@@ -54,6 +91,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
     icon: "mic",
     color: "rose",
+    accountFree: true,
   },
   {
     href: "/tools/behavioral-test",
@@ -62,6 +100,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
     icon: "sparkles",
     color: "violet",
+    accountFree: true,
   },
   {
     href: "/tools/first-job-guide",
@@ -127,6 +166,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["internship", "student", "apprentice"],
     icon: "compass",
     color: "violet",
+    accountFree: true,
   },
   {
     href: "/tools/internship-checklist",
@@ -135,6 +175,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["internship", "apprentice"],
     icon: "filePlus",
     color: "amber",
+    accountFree: true,
   },
   {
     href: "/tools/profile-from-scratch",
@@ -151,6 +192,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["internship", "student", "apprentice"],
     icon: "scale",
     color: "emerald",
+    free: true,
   },
   {
     href: "/tools/essay-grader",
@@ -167,6 +209,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["student"],
     icon: "pen",
     color: "rose",
+    free: true,
   },
   {
     href: "/tools/career-guide",

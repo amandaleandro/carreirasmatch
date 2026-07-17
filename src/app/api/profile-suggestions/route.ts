@@ -22,7 +22,7 @@ export async function POST() {
 
   const userId = session.user.id;
 
-  const [user, analyses, courses] = await Promise.all([
+  const [user, analyses, courses, externalCourses] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { professionalArea: true, careerSegment: true, hasFormalEducation: true },
@@ -32,6 +32,7 @@ export async function POST() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.userCourse.findMany({ where: { userId }, select: { title: true } }),
+    prisma.externalCourse.findMany({ where: { active: true }, orderBy: { lastSeenAt: "desc" }, take: 500 }),
   ]);
 
   const gapCounts = new Map<string, number>();
@@ -57,11 +58,16 @@ export async function POST() {
 
   const completedCourses = courses.map((c) => c.title);
 
-  const curatedOptions = getCoursesForArea(user?.professionalArea).map((c) => ({
+  const normalizedArea = (user?.professionalArea ?? "").toLowerCase();
+  const liveOptions = externalCourses
+    .filter((course) => !normalizedArea || course.area.toLowerCase().includes(normalizedArea) || course.title.toLowerCase().includes(normalizedArea))
+    .slice(0, 30)
+    .map((course) => ({ title: course.title, provider: course.provider, free: course.free }));
+  const curatedOptions = [...getCoursesForArea(user?.professionalArea).map((c) => ({
     title: c.title,
     provider: c.provider,
     free: c.free,
-  }));
+  })), ...liveOptions];
 
   const result = await generateProfileSuggestions({
     professionalArea: user?.professionalArea,

@@ -17,6 +17,11 @@ export async function register() {
     startJobFeedScheduler();
   }
 
+  if (process.env.EXTERNAL_SOURCES_SYNC_ENABLED !== "false") {
+    const { startExternalSourceScheduler } = await import("@/lib/external-source-scheduler");
+    startExternalSourceScheduler();
+  }
+
   if (process.env.LIFECYCLE_EMAILS_ENABLED !== "false") {
     const { startEmailScheduler } = await import("@/lib/email-scheduler");
     startEmailScheduler();

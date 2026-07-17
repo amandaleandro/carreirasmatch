@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 
-const TOOL_HREF = "/tools/schedule-conflict-checker";
-
 export async function GET() {
-  const { session, response } = await requireToolAccess(TOOL_HREF);
+  const { session, response } = await requireAuth();
   if (!session) return response!;
 
   const items = await prisma.classScheduleItem.findMany({
@@ -18,7 +16,7 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { session, response } = await requireToolAccess(TOOL_HREF);
+    const { session, response } = await requireAuth();
     if (!session) return response!;
 
     const { dayOfWeek, startTime, endTime, subject } = await req.json();

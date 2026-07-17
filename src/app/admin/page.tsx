@@ -4,6 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { AdminUserLookup } from "@/components/admin-user-lookup";
 import { AdminGroqModel } from "@/components/admin-groq-model";
 import { AdminCouponManager } from "@/components/admin-coupon-manager";
+import { AdminExternalSources } from "@/components/admin-external-sources";
+import { AdminOpportunityReports } from "@/components/admin-opportunity-reports";
 import {
   SUPPORT_CATEGORY_LABELS,
   SUPPORT_STATUS_ADMIN_LABELS,
@@ -107,6 +109,12 @@ export default async function AdminPage() {
     topCampaigns,
     topLandingPages,
     recentSupportTickets,
+    activePublicOpportunities,
+    opportunityClicks30d,
+    openOpportunityReports,
+    activeJobAlerts,
+    topOpportunityCities,
+    opportunityCampaigns,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.user.count({ where: { createdAt: { gte: since24h } } }),
@@ -221,6 +229,24 @@ export default async function AdminPage() {
         messages: { orderBy: { createdAt: "desc" }, take: 1 },
       },
     }),
+    prisma.publicOpportunity.count({ where: { active: true } }),
+    prisma.opportunityClick.count({ where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } } }),
+    prisma.opportunityReport.count({ where: { status: "open" } }),
+    prisma.jobAlert.count({ where: { active: true } }),
+    prisma.publicOpportunity.groupBy({
+      by: ["state", "city"],
+      where: { active: true },
+      _count: { _all: true },
+      orderBy: { _count: { city: "desc" } },
+      take: 8,
+    }),
+    prisma.opportunityClick.groupBy({
+      by: ["campaign"],
+      where: { campaign: { not: "" }, createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } },
+      _count: { _all: true },
+      orderBy: { _count: { campaign: "desc" } },
+      take: 8,
+    }),
   ]);
 
   const revenueTotal = paidPayments._sum.amount ?? 0;
@@ -277,6 +303,42 @@ export default async function AdminPage() {
               {topLandingPages.map((item) => (
                 <div key={item.path} className="flex justify-between gap-3">
                   <span className="truncate">{item.path}</span>
+                  <strong>{item._count._all}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
+        <h2 className="font-semibold">Oportunidades públicas</h2>
+        <p className="mt-1 text-sm text-neutral-500">Qualidade das fontes e interesse dos visitantes nos últimos 30 dias.</p>
+        <div className="mt-5 grid gap-4 sm:grid-cols-4">
+          <StatCard label="Oportunidades ativas" value={activePublicOpportunities} helper="SINEs e portais oficiais" />
+          <StatCard label="Cliques para candidatar" value={opportunityClicks30d} helper="Acessos às fontes oficiais" />
+          <StatCard label="Alertas ativos" value={activeJobAlerts} helper="Usuários acompanhando vagas" />
+          <StatCard label="Denúncias abertas" value={openOpportunityReports} helper="Itens que precisam de revisão" />
+        </div>
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-semibold">Cidades com mais vagas</h3>
+            <div className="mt-3 space-y-2 text-sm">
+              {topOpportunityCities.map((item) => (
+                <div key={`${item.state}:${item.city}`} className="flex justify-between">
+                  <span>{item.city || "Local não informado"}{item.state ? `, ${item.state}` : ""}</span>
+                  <strong>{item._count._all}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Campanhas que geraram cliques</h3>
+            <div className="mt-3 space-y-2 text-sm">
+              {opportunityCampaigns.length === 0 && <p className="text-neutral-500">Nenhum clique com campanha identificado.</p>}
+              {opportunityCampaigns.map((item) => (
+                <div key={item.campaign} className="flex justify-between">
+                  <span>{item.campaign}</span>
                   <strong>{item._count._all}</strong>
                 </div>
               ))}
@@ -517,6 +579,18 @@ export default async function AdminPage() {
       </section>
 
       <section className="grid grid-cols-1 gap-6">
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+          <h2 className="font-semibold">Cursos e oportunidades públicas</h2>
+          <p className="mt-1 text-sm text-neutral-500">
+            Atualize o catálogo do Aprenda Mais MEC e os boletins oficiais cadastrados.
+          </p>
+          <div className="mt-5"><AdminExternalSources /></div>
+        </div>
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+          <h2 className="font-semibold">Denúncias de oportunidades</h2>
+          <p className="mt-1 text-sm text-neutral-500">Revise avisos de vaga encerrada, informação incorreta ou link suspeito.</p>
+          <div className="mt-5"><AdminOpportunityReports /></div>
+        </div>
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
           <h2 className="font-semibold">Cupons de influenciadores</h2>
           <p className="mt-1 text-sm text-neutral-500">

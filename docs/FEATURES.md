@@ -283,7 +283,17 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
 - Ver [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) para o levantamento
   completo de débito técnico e bloqueadores de lançamento.
 
-## 6. Referências cruzadas
+## 6. Oportunidades públicas e cursos externos
+
+- `/vagas-publicas` pesquisa oportunidades oficiais por cargo, estado e cidade.
+- As páginas locais de vagas e cursos são indexáveis por estado e cidade.
+- `/cursos-gratuitos` oferece um catálogo pesquisável por área e instituição.
+- Usuários podem criar alertas diários ou semanais por cargo e localização.
+- O administrador cadastra e pausa fontes, acompanha erros e resolve denúncias.
+- A coleta consolida links repetidos, desativa itens antigos e registra acessos.
+- A sincronização padrão ocorre às 08:00, 14:00 e 20:00 em São Paulo.
+
+## 7. Referências cruzadas
 
 | Assunto | Documento |
 |---|---|

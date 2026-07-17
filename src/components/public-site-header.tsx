@@ -16,8 +16,20 @@ export function PublicSiteHeader() {
           <Link href="/vagas-de-hoje" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Vagas de hoje
           </Link>
+          <Link href="/vagas-publicas" className="hidden lg:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            SINE e prefeituras
+          </Link>
+          <Link href="/cursos-gratuitos" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Cursos gratuitos
+          </Link>
+          <Link href="/mercado-de-trabalho" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Mercado
+          </Link>
           <Link href="/blog" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             Blog
+          </Link>
+          <Link href="/gratuito" className="hidden md:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Ferramentas grátis
           </Link>
           <Link href="/comece" className="hidden sm:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Como funciona

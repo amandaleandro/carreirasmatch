@@ -83,12 +83,16 @@ function ToolGrid({
       {tools.map((tool) => {
         // Guia aberto nunca aparece bloqueado: é público, então vale a pena
         // mesmo para quem está fora do segmento recomendado.
-        const isLocked = Boolean(locked) && !tool.free;
+        const isLocked = Boolean(locked) && !tool.free && !tool.accountFree;
         const content = (
           <>
             {tool.free ? (
               <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 rounded-full px-2 py-0.5">
-                Grátis
+                Cadastro grátis
+              </span>
+            ) : tool.accountFree ? (
+              <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/50 rounded-full px-2 py-0.5">
+                Cadastro grátis
               </span>
             ) : highlight ? (
               <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/50 rounded-full px-2 py-0.5">

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
-
-const TOOL_HREF = "/tools/schedule-conflict-checker";
 
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { session, response } = await requireToolAccess(TOOL_HREF);
+    const { session, response } = await requireAuth();
     if (!session) return response!;
 
     const { id } = await params;

@@ -143,6 +143,17 @@ Use esta ordem de decisao:
 
 Se a resposta for "nao" para todos, provavelmente nao e a proxima feature.
 
+## Entregue na expansão de oportunidades públicas
+
+1. Cadastro administrativo de fontes oficiais.
+2. Busca pública por cargo, cidade e estado.
+3. Leitura de informações disponíveis em boletins PDF.
+4. Alertas diários e semanais por e-mail.
+5. Páginas indexáveis de vagas e cursos por cidade.
+6. Recomendações baseadas no perfil e nos cargos de interesse.
+7. Métricas de cliques, campanhas, cidades e denúncias.
+8. Consolidação de duplicados, expiração e revisão administrativa.
+
 ## Metricas para acompanhar
 
 | Metrica | Por que importa |

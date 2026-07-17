@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { authorizeFreeAiTool, releaseFreeAiToolUsage } from "@/lib/free-tool-access";
 import {
   INTERVIEW_SIMULATION_QUESTIONS,
   evaluateInterviewAnswer,
@@ -33,10 +33,8 @@ function parseHistory(raw: unknown): InterviewTurn[] | null {
 }
 
 export async function POST(req: NextRequest) {
+  let freeStartUserId: string | null = null;
   try {
-    const { session, response } = await requireToolAccess("/tools/interview-simulator");
-    if (!session) return response!;
-
     const body = await req.json();
     const targetRole = String(body.targetRole ?? "").trim();
 
@@ -52,6 +50,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const isStart = history.length === 0;
+    const { session, response, subscriber } = await authorizeFreeAiTool("interview-simulator", isStart);
+    if (!session) return response!;
+    if (isStart && !subscriber) freeStartUserId = session.user.id;
+
     const input: InterviewSimulatorInput = {
       targetRole: targetRole.slice(0, MAX_FIELD_LENGTH),
       area: String(body.area ?? "").trim().slice(0, MAX_FIELD_LENGTH),
@@ -65,6 +68,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(await evaluateInterviewAnswer(input));
   } catch (error) {
+    if (freeStartUserId) await releaseFreeAiToolUsage(freeStartUserId, "interview-simulator");
     console.error("Erro no simulador de entrevista:", error);
     return NextResponse.json(
       { error: "Erro ao processar. Tente novamente." },

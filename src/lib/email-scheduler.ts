@@ -5,6 +5,7 @@ import {
   sendSubscriptionExpiredEmail,
   sendOnboardingNudgeEmail,
   sendLeadFollowUpEmail,
+  sendJobAlertEmail,
 } from "@/lib/resend";
 
 // O scheduler roda algumas vezes ao dia; a idempotência (sendOnce + EmailLog)
@@ -134,6 +135,42 @@ async function sendLeadFollowUps(now: Date): Promise<void> {
   }
 }
 
+async function sendJobAlerts(now: Date): Promise<void> {
+  const alerts = await prisma.jobAlert.findMany({
+    where: { active: true, user: { email: { not: null } } },
+    include: { user: { select: { email: true } } },
+  });
+  for (const alert of alerts) {
+    if (!alert.user.email) continue;
+    const days = alert.frequency === "weekly" ? 7 : 1;
+    const jobs = await prisma.publicOpportunity.findMany({
+      where: {
+        active: true,
+        createdAt: { gte: new Date(now.getTime() - days * DAY_MS) },
+        ...(alert.state ? { state: alert.state } : {}),
+        ...(alert.city ? { city: { contains: alert.city } } : {}),
+        ...(alert.query
+          ? { OR: [{ title: { contains: alert.query } }, { area: { contains: alert.query } }, { description: { contains: alert.query } }] }
+          : {}),
+      },
+      include: { source: { select: { name: true } } },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    });
+    if (jobs.length === 0) continue;
+    const period = alert.frequency === "weekly"
+      ? `${now.getUTCFullYear()}-W${Math.ceil(now.getUTCDate() / 7)}-${now.getUTCMonth()}`
+      : now.toISOString().slice(0, 10);
+    await sendOnce("job_alert", `${alert.id}:${period}`, alert.user.email, () =>
+      sendJobAlertEmail(alert.user.email!, {
+        query: alert.query,
+        location: [alert.city, alert.state].filter(Boolean).join(", "),
+        jobs: jobs.map((job) => ({ title: job.title, url: job.url, source: job.source.name })),
+      }),
+    );
+  }
+}
+
 export async function runLifecycleEmailTick(): Promise<void> {
   const now = new Date();
   const steps: Array<[string, () => Promise<void>]> = [
@@ -141,6 +178,7 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["expire_subscriptions", () => expireLapsedSubscriptions(now)],
     ["onboarding_nudges", () => sendOnboardingNudges(now)],
     ["lead_followups", () => sendLeadFollowUps(now)],
+    ["job_alerts", () => sendJobAlerts(now)],
   ];
   for (const [name, step] of steps) {
     try {

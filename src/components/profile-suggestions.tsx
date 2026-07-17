@@ -35,8 +35,10 @@ const TYPE_CONFIG: Record<ProfileSuggestionType, { label: string; icon: string; 
 
 export function ProfileSuggestions({
   initialSuggestions,
+  externalCourses,
 }: {
   initialSuggestions: ProfileSuggestion[];
+  externalCourses: { id: string; title: string; provider: string; url: string; area: string; free: boolean; certificate: boolean; modality: string }[];
 }) {
   const [suggestions, setSuggestions] = useState<ProfileSuggestion[]>(initialSuggestions);
   const [loading, setLoading] = useState(false);
@@ -154,6 +156,25 @@ export function ProfileSuggestions({
             })}
           </div>
         </>
+      )}
+
+      {externalCourses.length > 0 && (
+        <section className="pt-4">
+          <h2 className="text-xl font-bold">Cursos verificados recentemente</h2>
+          <p className="mt-1 text-sm text-neutral-500">Ofertas coletadas de fontes oficiais e relacionadas à sua área.</p>
+          <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            {externalCourses.map((course) => (
+              <a key={course.id} href={course.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl border border-neutral-200 bg-white p-5 hover:border-blue-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950">
+                <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
+                  {course.free ? "Gratuito" : "Consulte o valor"} · {course.modality}
+                </span>
+                <h3 className="mt-2 font-semibold">{course.title}</h3>
+                <p className="mt-1 text-xs text-neutral-500">{course.provider} · {course.area}</p>
+                {course.certificate && <p className="mt-3 text-xs font-medium text-blue-600 dark:text-blue-400">Certificado disponível</p>}
+              </a>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );

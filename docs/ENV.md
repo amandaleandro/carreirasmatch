@@ -65,6 +65,18 @@ gerais: administrativo, atendimento, vendas, marketing, RH, financeiro,
 logística, operações, saúde, educação, jurídico, engenharia, produto, design,
 tecnologia, estágio e jovem aprendiz.
 
+## Opcionais (cursos e boletins públicos)
+
+| Variável | Uso | Observação |
+| --- | --- | --- |
+| `EXTERNAL_SOURCES_SYNC_ENABLED` | Liga ou desliga a busca automática de cursos e boletins públicos | default `true`; defina `"false"` para desligar |
+| `EXTERNAL_SOURCES_RUN_TIMES` | Horários diários da busca em `America/Sao_Paulo` | default `08:00,14:00,20:00`; horários separados por vírgula |
+
+A rotina consulta as fontes cadastradas em `src/lib/external-source-sync.ts`.
+Cada horário é registrado no banco para impedir repetição no mesmo dia. Se uma
+fonte falhar, o horário não é marcado como concluído e uma nova tentativa ocorre
+na próxima verificação.
+
 ## Opcionais (auth)
 
 | Variável | Uso |

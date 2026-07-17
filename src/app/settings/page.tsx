@@ -7,6 +7,7 @@ import { ProfileForm } from "@/components/profile-form";
 import { InterestedRolesForm } from "@/components/interested-roles-form";
 import { CourseListForm } from "@/components/course-list-form";
 import { BillingSection } from "@/components/billing-section";
+import { JobAlertManager } from "@/components/job-alert-manager";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 
@@ -22,7 +23,7 @@ export default async function SettingsPage({
 
   const { upgrade } = await searchParams;
 
-  const [user, courses, subscription] = await Promise.all([
+  const [user, courses, subscription, jobAlerts] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -30,6 +31,8 @@ export default async function SettingsPage({
         image: true,
         careerSegment: true,
         professionalArea: true,
+        city: true,
+        state: true,
         hasFormalEducation: true,
         interestedRoles: true,
       },
@@ -42,6 +45,11 @@ export default async function SettingsPage({
     prisma.subscription.findUnique({
       where: { userId: session.user.id },
       select: { status: true, currentPeriodEnd: true },
+    }),
+    prisma.jobAlert.findMany({
+      where: { userId: session.user.id, active: true },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, query: true, city: true, state: true, frequency: true },
     }),
   ]);
 
@@ -91,6 +99,8 @@ export default async function SettingsPage({
           initialSegment={normalizeCareerSegment(user?.careerSegment)}
           initialArea={user?.professionalArea ?? null}
           initialHasFormalEducation={user?.hasFormalEducation ?? null}
+          initialCity={user?.city ?? null}
+          initialState={user?.state ?? null}
         />
       </section>
 
@@ -113,6 +123,10 @@ export default async function SettingsPage({
 
       <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <CourseListForm courses={courses} professionalArea={user?.professionalArea ?? null} />
+      </section>
+
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <JobAlertManager initialAlerts={jobAlerts} />
       </section>
     </main>
   );
