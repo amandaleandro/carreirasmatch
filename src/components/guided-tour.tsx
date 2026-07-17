@@ -216,7 +216,7 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [cardPos, setCardPos] = useState<{ top: number; left: number } | null>(null);
   const waitingForTarget = useRef(false);
-  const { tourNonce } = useUiPanels();
+  const { registerTourStart } = useUiPanels();
 
   const steps = useMemo(() => buildSteps(segment), [segment]);
   const step = steps[index];
@@ -365,11 +365,11 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
     setActive(true);
   }, []);
 
-  // O gatilho do tour mora na sidebar / menu mobile, não aqui - cada pedido de
-  // lá incrementa o nonce e reinicia o tour do primeiro passo.
+  // O gatilho do tour mora na sidebar / menu mobile. Registramos `start` no
+  // contexto para eles chamarem direto - sem effect disparando setState.
   useEffect(() => {
-    if (tourNonce > 0) start();
-  }, [tourNonce, start]);
+    registerTourStart(start);
+  }, [registerTourStart, start]);
 
   // Steps without a target render as a centered welcome/closing card.
   // Targeted steps stay hidden (offscreen) until their rect is measured.

@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 
 /**
  * Novidades e Tour guiado eram botões `fixed` no rodapé da tela e viviam
@@ -12,24 +12,31 @@ type UiPanels = {
   newsOpen: boolean;
   openNews: () => void;
   closeNews: () => void;
-  /** Muda a cada pedido de tour; o GuidedTour observa e reinicia a partir disso. */
-  tourNonce: number;
+  /**
+   * O GuidedTour registra aqui a própria função de iniciar; a sidebar/menu
+   * chamam `openTour()`, que a dispara. Registrar uma ref (em vez de um nonce
+   * observado por effect) evita setState síncrono dentro de useEffect.
+   */
   openTour: () => void;
+  registerTourStart: (fn: () => void) => void;
 };
 
 const UiPanelsContext = createContext<UiPanels | null>(null);
 
 export function UiPanelsProvider({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = useState(false);
-  const [tourNonce, setTourNonce] = useState(0);
+  const tourStartRef = useRef<(() => void) | null>(null);
 
   const openNews = useCallback(() => setNewsOpen(true), []);
   const closeNews = useCallback(() => setNewsOpen(false), []);
-  const openTour = useCallback(() => setTourNonce((nonce) => nonce + 1), []);
+  const registerTourStart = useCallback((fn: () => void) => {
+    tourStartRef.current = fn;
+  }, []);
+  const openTour = useCallback(() => tourStartRef.current?.(), []);
 
   const value = useMemo(
-    () => ({ newsOpen, openNews, closeNews, tourNonce, openTour }),
-    [newsOpen, openNews, closeNews, tourNonce, openTour]
+    () => ({ newsOpen, openNews, closeNews, openTour, registerTourStart }),
+    [newsOpen, openNews, closeNews, openTour, registerTourStart]
   );
 
   return <UiPanelsContext.Provider value={value}>{children}</UiPanelsContext.Provider>;
