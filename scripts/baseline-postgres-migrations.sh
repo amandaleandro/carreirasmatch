@@ -9,4 +9,4 @@ docker run --rm \
   -e DATABASE_URL="$DATABASE_URL" \
   --entrypoint sh \
   carreiras-match-app \
-  -c 'for path in prisma/migrations/*; do name="$(basename "$path")"; npx prisma migrate resolve --applied "$name"; done'
+  -c 'for path in prisma/migrations/*; do test -d "$path" || continue; name="$(basename "$path")"; npx prisma migrate resolve --applied "$name"; done'
