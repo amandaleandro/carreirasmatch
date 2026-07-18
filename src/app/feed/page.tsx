@@ -93,8 +93,8 @@ export default async function FeedPage({
       <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center">
         <h1 className="text-2xl font-bold tracking-tight">Feed de vagas</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Você ainda não enviou um currículo. Faça seu primeiro diagnóstico
-          para começarmos a recomendar vagas aderentes ao seu perfil.
+          Você ainda não enviou um currículo. Faça seu primeiro diagnóstico que
+          a gente já começa a te mostrar vagas com a sua cara.
         </p>
         <Link
           href="/"
@@ -173,8 +173,8 @@ export default async function FeedPage({
           </span>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Feed de vagas</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Vagas recomendadas com base no seu currículo mais recente e ordenadas pela
-            aderência ao seu perfil.
+            Escolhemos essas vagas a partir do seu currículo mais recente e
+            colocamos primeiro as que mais combinam com você.
           </p>
         </div>
         <span className="text-sm text-neutral-500 flex items-center gap-1.5 pt-1">
@@ -192,9 +192,9 @@ export default async function FeedPage({
               <LinkIcon className="h-4.5 w-4.5" />
             </span>
             <div>
-              <p className="font-semibold">Adicionar vaga ao feed</p>
+              <p className="font-semibold">Achou uma vaga por aí?</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                Cole o link da vaga para adicioná-la à sua lista.
+                Cole o link aqui que a gente coloca na sua lista.
               </p>
             </div>
           </div>
@@ -207,9 +207,9 @@ export default async function FeedPage({
               <SparkleIcon className="h-4.5 w-4.5" />
             </span>
             <div>
-              <p className="font-semibold">Busca automática</p>
+              <p className="font-semibold">Deixe com a gente</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                Encontramos novas vagas alinhadas ao seu perfil.
+                Buscamos vagas novas que têm tudo a ver com o seu perfil.
               </p>
             </div>
           </div>

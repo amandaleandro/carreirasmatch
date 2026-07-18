@@ -14,20 +14,20 @@ export function FetchJobsButton() {
     try {
       const res = await fetch("/api/feed/fetch-jobs", { method: "POST" });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao buscar novas vagas.");
+      if (!res.ok) throw new Error(data.error ?? "Não conseguimos buscar vagas novas agora. Tente de novo em instantes.");
 
       const summary =
         data.added > 0
-          ? `${data.added} nova(s) vaga(s) adicionada(s) ao feed.`
-          : "Nenhuma vaga nova encontrada no momento.";
+          ? `Prontinho! Encontramos ${data.added} vaga(s) nova(s) pra você.`
+          : "Por enquanto não achamos nada novo. Volte mais tarde que a lista está sempre mudando.";
       const errorNote =
         data.errors?.length > 0
-          ? " Algumas fontes externas ficaram indisponíveis e foram puladas."
+          ? " Algumas fontes não responderam agora, então pulamos elas."
           : "";
       setMessage(summary + errorNote);
       router.refresh();
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Erro inesperado.");
+      setMessage(err instanceof Error ? err.message : "Algo deu errado. Tente de novo.");
     } finally {
       setLoading(false);
     }

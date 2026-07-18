@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { getWeekStart, normalizeApplicationStatus } from "@/lib/applications";
+import { getWeekStart, normalizeApplicationStatus, type ApplicationStatus } from "@/lib/applications";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 
 async function requireUserId() {
@@ -135,7 +135,10 @@ export async function updateWeeklyGoal(formData: FormData) {
   revalidatePath("/dashboard");
 }
 
-export async function saveFeedMatchAsApplication(matchId: string) {
+export async function saveFeedMatchAsApplication(
+  matchId: string,
+  requestedStatus: ApplicationStatus | null = null
+) {
   const userId = await requireUserId();
   const match = await prisma.jobMatch.findFirst({
     where: { id: matchId, resume: { userId } },
@@ -144,11 +147,23 @@ export async function saveFeedMatchAsApplication(matchId: string) {
 
   if (!match) return;
 
+  // Status explícito vindo dos botões rápidos do feed; senão decide pela aderência.
+  const status = requestedStatus
+    ? normalizeApplicationStatus(requestedStatus)
+    : match.fitScore >= 75
+      ? "saved"
+      : "tailor_resume";
+
   const existing = await prisma.application.findFirst({
     where: { userId, jobUrl: match.job.url },
   });
 
   if (existing) {
+    if (existing.status !== status) {
+      await prisma.applicationActivity.create({
+        data: { applicationId: existing.id, fromStatus: existing.status, toStatus: status },
+      });
+    }
     await prisma.application.update({
       where: { id: existing.id },
       data: {
@@ -156,6 +171,8 @@ export async function saveFeedMatchAsApplication(matchId: string) {
         company: match.job.company,
         fitScore: match.fitScore,
         notes: match.reason,
+        status,
+        appliedAt: status === "applied" ? existing.appliedAt ?? new Date() : existing.appliedAt,
       },
     });
   } else {
@@ -167,7 +184,8 @@ export async function saveFeedMatchAsApplication(matchId: string) {
         company: match.job.company,
         jobUrl: match.job.url,
         fitScore: match.fitScore,
-        status: match.fitScore >= 75 ? "saved" : "tailor_resume",
+        status,
+        appliedAt: status === "applied" ? new Date() : null,
         notes: match.reason,
       },
     });

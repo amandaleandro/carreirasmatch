@@ -14,7 +14,7 @@ export function AddJobForm() {
     setError(null);
 
     if (!url.trim()) {
-      setError("Informe o link da vaga.");
+      setError("Cole o link da vaga pra gente adicionar.");
       return;
     }
 
@@ -26,12 +26,12 @@ export function AddJobForm() {
         body: JSON.stringify({ url: url.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao adicionar a vaga.");
+      if (!res.ok) throw new Error(data.error ?? "Não conseguimos adicionar essa vaga. Confira o link e tente de novo.");
 
       setUrl("");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      setError(err instanceof Error ? err.message : "Algo deu errado. Tente de novo.");
     } finally {
       setLoading(false);
     }

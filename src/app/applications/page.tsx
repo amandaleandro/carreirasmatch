@@ -127,7 +127,7 @@ export default async function ApplicationsPage() {
           </span>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Candidaturas</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Acompanhe vagas salvas, aplicações, entrevistas, testes e ofertas em um único fluxo.
+            Acompanhe suas vagas salvas, candidaturas, entrevistas, testes e propostas tudo em um lugar só.
           </p>
         </div>
         <Link
@@ -194,7 +194,7 @@ export default async function ApplicationsPage() {
             })}
           </div>
           <p className="text-xs text-neutral-500 mt-3">
-            Confira sempre no site da empresa, não enviamos lembrete automático por e-mail.
+            Fique de olho no site da empresa: a gente não envia lembrete por e-mail.
           </p>
         </section>
       )}
@@ -207,7 +207,7 @@ export default async function ApplicationsPage() {
           <div>
             <h2 className="font-semibold">Adicionar candidatura</h2>
             <p className="text-sm text-neutral-500 mt-1">
-              Use para vagas encontradas fora do feed ou processos já iniciados.
+              Use para registrar vagas que você achou fora do feed ou processos que já começou.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">

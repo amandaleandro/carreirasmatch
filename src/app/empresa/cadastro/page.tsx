@@ -54,7 +54,7 @@ export default function CompanyRegisterPage() {
     <AuthShell
       eyebrow="Para empresas"
       headline="Encontre os candidatos certos, ranqueados por IA."
-      description="Cadastre sua empresa e ranqueie os currículos que você recebe pela aderência real à vaga — em minutos, não dias."
+      description="Cadastre sua empresa e ranqueie os currículos que você recebe pela aderência real à vaga, em minutos e não em dias."
       highlights={[
         "Triagem automática de currículos",
         "Ranking por aderência à vaga",

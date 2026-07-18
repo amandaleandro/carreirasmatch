@@ -77,7 +77,7 @@ export function FeedList({
     return (
       <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 text-center">
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          Nenhuma vaga encontrada para os filtros selecionados.
+          Não achamos nenhuma vaga com esses filtros. Que tal ajustar as opções acima?
         </p>
       </div>
     );
@@ -128,11 +128,11 @@ function FeedCard({
 
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Erro ao gerar a análise completa.");
+      if (!res.ok) throw new Error(data.error ?? "Não conseguimos gerar sua análise completa agora. Tente de novo em instantes.");
 
       router.push(`/report/${data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      setError(err instanceof Error ? err.message : "Algo deu errado. Tente de novo.");
       setLoading(false);
     }
   }
@@ -221,7 +221,7 @@ function FeedCard({
             </svg>
           )}
         </button>
-        <form action={saveFeedMatchAsApplication.bind(null, match.id)}>
+        <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
           <button
             type="submit"
             className="w-full rounded-xl bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-950 font-semibold px-4 py-2.5 text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
@@ -232,6 +232,25 @@ function FeedCard({
             Salvar no Kanban
           </button>
         </form>
+
+        <div className="flex gap-2">
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")} className="flex-1">
+            <button
+              type="submit"
+              className="w-full rounded-xl border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-semibold px-3 py-2 text-xs hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
+            >
+              Ajustar currículo
+            </button>
+          </form>
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")} className="flex-1">
+            <button
+              type="submit"
+              className="w-full rounded-xl border border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400 font-semibold px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
+            >
+              Aplicada
+            </button>
+          </form>
+        </div>
 
         <div className="flex items-center justify-between text-xs pt-1">
           <a

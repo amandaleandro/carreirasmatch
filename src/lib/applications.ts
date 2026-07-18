@@ -16,19 +16,19 @@ export const APPLICATION_STATUS_CONFIG: Record<
 > = {
   saved: {
     label: "Salvas",
-    description: "Vagas boas para acompanhar.",
+    description: "Vagas boas pra você ficar de olho.",
     dot: "bg-sky-500",
     column: "border-sky-200 bg-sky-50/60 dark:border-sky-900/60 dark:bg-sky-950/20",
   },
   tailor_resume: {
     label: "Ajustar currículo",
-    description: "Precisa adaptar antes de aplicar.",
+    description: "Adapte seu currículo antes de se candidatar.",
     dot: "bg-amber-500",
     column: "border-amber-200 bg-amber-50/60 dark:border-amber-900/60 dark:bg-amber-950/20",
   },
   applied: {
     label: "Aplicadas",
-    description: "Candidaturas enviadas.",
+    description: "Vagas em que você já se candidatou.",
     dot: "bg-blue-500",
     column: "border-blue-200 bg-blue-50/60 dark:border-blue-900/60 dark:bg-blue-950/20",
   },
@@ -46,7 +46,7 @@ export const APPLICATION_STATUS_CONFIG: Record<
   },
   offer: {
     label: "Ofertas",
-    description: "Propostas recebidas.",
+    description: "Propostas que você recebeu.",
     dot: "bg-emerald-500",
     column: "border-emerald-200 bg-emerald-50/60 dark:border-emerald-900/60 dark:bg-emerald-950/20",
   },
