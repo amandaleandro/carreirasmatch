@@ -21,9 +21,12 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (company.screeningCount >= FREE_SCREENING_LIMIT) {
+  // Permitido se ainda há triagem gratuita OU crédito comprado.
+  const hasFreeScreening = company.screeningCount < FREE_SCREENING_LIMIT;
+  const usesPaidCredit = !hasFreeScreening && company.screeningCredits > 0;
+  if (!hasFreeScreening && !usesPaidCredit) {
     return NextResponse.json(
-      { error: "Você atingiu o limite de triagens gratuitas. Fale com a gente para liberar mais." },
+      { error: "Seus créditos de triagem acabaram. Compre um pacote para continuar.", code: "no_credits" },
       { status: 402 }
     );
   }
@@ -87,8 +90,12 @@ export async function POST(req: NextRequest) {
 
   const scoreById = new Map(ranking.ranking.map((r) => [r.candidateId, r]));
 
-  // Grava a triagem + candidatos e incrementa o contador de forma atômica.
-  const job = await prisma.$transaction(async (tx) => {
+  // Grava a triagem + candidatos e consome uma triagem (gratuita ou paga) de
+  // forma atômica. Se usa crédito pago, decrementa com guarda de saldo > 0 para
+  // evitar corrida que zere abaixo de zero.
+  let job;
+  try {
+    job = await prisma.$transaction(async (tx) => {
     const created = await tx.companyJob.create({
       data: {
         companyId: company.id,
@@ -108,12 +115,31 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    await tx.company.update({
-      where: { id: company.id },
-      data: { screeningCount: { increment: 1 } },
-    });
+    if (hasFreeScreening) {
+      await tx.company.update({
+        where: { id: company.id },
+        data: { screeningCount: { increment: 1 } },
+      });
+    } else {
+      const consumed = await tx.company.updateMany({
+        where: { id: company.id, screeningCredits: { gt: 0 } },
+        data: { screeningCredits: { decrement: 1 } },
+      });
+      if (consumed.count === 0) {
+        throw new Error("no_credits");
+      }
+    }
     return created;
-  });
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "no_credits") {
+      return NextResponse.json(
+        { error: "Seus créditos de triagem acabaram. Compre um pacote para continuar.", code: "no_credits" },
+        { status: 402 }
+      );
+    }
+    throw error;
+  }
 
   return NextResponse.json({ id: job.id });
 }

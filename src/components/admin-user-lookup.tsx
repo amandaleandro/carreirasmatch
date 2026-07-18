@@ -48,12 +48,14 @@ export function AdminUserLookup() {
   const [result, setResult] = useState<LookupResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   async function search(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setSuccess(null);
     setResult(null);
     try {
       const res = await fetch(`/api/admin/user?email=${encodeURIComponent(email.trim())}`);
@@ -75,8 +77,10 @@ export function AdminUserLookup() {
   }
 
   async function grantAnalysisCredit() {
-    if (!result) return;
+    if (!result || actionLoading !== null) return;
     setActionLoading("credit");
+    setError(null);
+    setSuccess(null);
     try {
       const res = await fetch("/api/admin/grant-analysis-credit", {
         method: "POST",
@@ -85,6 +89,7 @@ export function AdminUserLookup() {
       });
       if (!res.ok) throw new Error((await res.json()).error);
       await refresh();
+      setSuccess("Crédito de primeira análise concedido.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
@@ -93,7 +98,10 @@ export function AdminUserLookup() {
   }
 
   async function grantDiagnostic(analysisId: string) {
+    if (actionLoading !== null) return;
     setActionLoading(`diagnostic-${analysisId}`);
+    setError(null);
+    setSuccess(null);
     try {
       const res = await fetch("/api/admin/grant-diagnostic", {
         method: "POST",
@@ -102,6 +110,7 @@ export function AdminUserLookup() {
       });
       if (!res.ok) throw new Error((await res.json()).error);
       await refresh();
+      setSuccess("Diagnóstico liberado.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
@@ -110,16 +119,23 @@ export function AdminUserLookup() {
   }
 
   async function grantSubscription(days: number) {
-    if (!result) return;
+    if (!result || actionLoading !== null) return;
     setActionLoading(`subscription-${days}`);
+    setError(null);
+    setSuccess(null);
     try {
       const res = await fetch("/api/admin/grant-subscription", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: result.user.id, days }),
       });
-      if (!res.ok) throw new Error((await res.json()).error);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
       await refresh();
+      const until = data.currentPeriodEnd
+        ? new Date(data.currentPeriodEnd).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })
+        : null;
+      setSuccess(`Assinatura concedida por ${days} dias${until ? `, ativa até ${until}` : ""}.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
@@ -147,6 +163,11 @@ export function AdminUserLookup() {
       </form>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
+      {success && (
+        <p className="rounded-md border border-emerald-200 dark:border-emerald-900 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+          ✓ {success}
+        </p>
+      )}
 
       {result && (
         <div className="space-y-6">

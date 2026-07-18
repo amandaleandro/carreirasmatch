@@ -15,7 +15,8 @@ export default async function CompanyDashboardPage() {
     include: { _count: { select: { candidates: true } } },
   });
 
-  const remaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount);
+  const freeRemaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount);
+  const remaining = freeRemaining + company.screeningCredits;
 
   return (
     <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
@@ -50,12 +51,15 @@ export default async function CompanyDashboardPage() {
           </Link>
         </div>
 
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">
           {remaining > 0 ? (
-            <>Você tem <strong className="text-neutral-900 dark:text-white">{remaining}</strong> {remaining === 1 ? "triagem gratuita" : "triagens gratuitas"} restantes.</>
+            <span>Você tem <strong className="text-neutral-900 dark:text-white">{remaining}</strong> {remaining === 1 ? "triagem" : "triagens"} disponíveis{freeRemaining > 0 && company.screeningCredits > 0 ? ` (${freeRemaining} gratuita(s) + ${company.screeningCredits} compradas)` : ""}.</span>
           ) : (
-            <>Você usou suas triagens gratuitas. Fale com a gente para liberar mais.</>
+            <span>Seus créditos de triagem acabaram.</span>
           )}
+          <Link href="/empresa/billing" className="shrink-0 font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+            Comprar créditos
+          </Link>
         </div>
 
         <Link

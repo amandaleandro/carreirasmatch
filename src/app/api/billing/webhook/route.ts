@@ -12,6 +12,7 @@ import {
 } from "@/lib/resend";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod } from "@/lib/billing-plans";
+import { grantScreeningCredits } from "@/lib/company-billing";
 
 async function userEmail(userId: string): Promise<string | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
@@ -37,7 +38,26 @@ export async function POST(req: NextRequest) {
 
   if (type === "payment") {
     const payment = await prisma.payment.findUnique({ where: { mpPaymentId: dataId } });
-    if (!payment) return NextResponse.json({ ok: true });
+    if (!payment) {
+      // Pode ser um pagamento de empresa (compra de créditos de triagem).
+      const companyPayment = await prisma.companyPayment.findUnique({ where: { mpPaymentId: dataId } });
+      if (companyPayment) {
+        const mpPayment = await getPayment(dataId);
+        if (mpPayment.status === "approved") {
+          // Idempotente: grantScreeningCredits só credita na primeira transição.
+          await grantScreeningCredits(companyPayment.id);
+        } else if (
+          (mpPayment.status === "rejected" || mpPayment.status === "cancelled") &&
+          companyPayment.status === "pending"
+        ) {
+          await prisma.companyPayment.update({
+            where: { id: companyPayment.id },
+            data: { status: "cancelled" },
+          });
+        }
+      }
+      return NextResponse.json({ ok: true });
+    }
 
     const mpPayment = await getPayment(dataId);
     const status =

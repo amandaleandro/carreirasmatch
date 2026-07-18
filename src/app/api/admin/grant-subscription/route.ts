@@ -40,5 +40,5 @@ export async function POST(req: NextRequest) {
     update: { segment, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
   });
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, currentPeriodEnd: currentPeriodEnd.toISOString() });
 }

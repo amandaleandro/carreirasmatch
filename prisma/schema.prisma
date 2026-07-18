@@ -723,14 +723,37 @@ model Company {
   logoUrl        String       @default("")
   city           String       @default("")
   state          String       @default("")
-  /// Quantas triagens já rodou; usado para o limite do plano gratuito.
+  /// Quantas triagens gratuitas já usou; conta contra FREE_SCREENING_LIMIT.
   screeningCount Int          @default(0)
+  /// Créditos de triagem comprados; consumidos quando o teto gratuito acaba.
+  screeningCredits Int        @default(0)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   jobs           CompanyJob[]
   contactRequests TalentContactRequest[]
+  payments       CompanyPayment[]
 
   @@index([email])
+}
+
+/// Pagamento de empresa (compra de pacote de créditos de triagem). Espelha o
+/// fluxo do Payment do candidato, mas escopado à Company e com concessão de
+/// créditos em vez de assinatura.
+model CompanyPayment {
+  id          String    @id @default(cuid())
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  kind        String // "screening_pack"
+  credits     Int // créditos concedidos ao confirmar o pagamento
+  amount      Int // valor em centavos
+  status      String    @default("pending") // pending | paid | cancelled | refunded
+  mpPaymentId String    @unique
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([companyId])
+  @@index([status])
 }
 
 /// Uma triagem: a vaga que a empresa descreveu para ranquear currículos.

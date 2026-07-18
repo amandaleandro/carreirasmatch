@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NewScreeningPage() {
   const { company } = await requireCompanyPage();
-  const remaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount);
+  const remaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount) + company.screeningCredits;
 
   return (
     <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
@@ -25,7 +25,11 @@ export default async function NewScreeningPage() {
           <NewScreeningForm />
         ) : (
           <div className="rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30 p-6 text-sm text-amber-900 dark:text-amber-200">
-            Você usou suas {FREE_SCREENING_LIMIT} triagens gratuitas. Fale com a gente para liberar mais triagens.
+            Seus créditos de triagem acabaram.{" "}
+            <Link href="/empresa/billing" className="font-semibold underline">
+              Compre um pacote
+            </Link>{" "}
+            para continuar.
           </div>
         )}
       </div>

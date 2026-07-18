@@ -1,16 +1,18 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-const { prismaMock, hasFullAccessUserIdMock } = vi.hoisted(() => ({
+const { prismaMock, hasFullAccessUserIdMock, isInfluencerUserMock } = vi.hoisted(() => ({
   prismaMock: {
     subscription: { findUnique: vi.fn(), upsert: vi.fn() },
     payment: { findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
     analysis: { count: vi.fn() },
   },
   hasFullAccessUserIdMock: vi.fn(),
+  isInfluencerUserMock: vi.fn(),
 }));
 
 vi.mock("@/lib/prisma", () => ({ prisma: prismaMock }));
 vi.mock("@/lib/full-access-users", () => ({ hasFullAccessUserId: hasFullAccessUserIdMock }));
+vi.mock("@/lib/influencer", () => ({ isInfluencerUser: isInfluencerUserMock }));
 
 import {
   hasActiveSubscriptionAccess,
@@ -26,6 +28,7 @@ function resetMocks() {
   prismaMock.payment.count.mockReset();
   prismaMock.analysis.count.mockReset();
   hasFullAccessUserIdMock.mockReset().mockResolvedValue(false);
+  isInfluencerUserMock.mockReset().mockResolvedValue(false);
 }
 
 describe("hasActiveSubscriptionAccess", () => {
@@ -35,6 +38,12 @@ describe("hasActiveSubscriptionAccess", () => {
     hasFullAccessUserIdMock.mockResolvedValue(true);
     expect(await hasActiveSubscriptionAccess("user-1")).toBe(true);
     expect(prismaMock.subscription.findUnique).not.toHaveBeenCalled();
+  });
+
+  it("grants access to influencer users without an active subscription", async () => {
+    isInfluencerUserMock.mockResolvedValue(true);
+    prismaMock.subscription.findUnique.mockResolvedValue(null);
+    expect(await hasActiveSubscriptionAccess("user-inf")).toBe(true);
   });
 
   it("grants access when the subscription is active and not expired", async () => {
