@@ -25,6 +25,10 @@ export type Niche = {
   ctaLabel: string;
   /** Overrides the default "/analise" destination for the hero/final CTA buttons. */
   primaryCtaHref?: string;
+  /** Overrides the default "Criar currículo grátis" primary action (hero, banner, sticky, final CTA).
+   * Used by study niches (concurso/OAB) to send people to the study hub instead of the resume flow. */
+  heroPrimaryCtaLabel?: string;
+  heroPrimaryCtaHref?: string;
   /** Overrides the default funnel section heading. */
   funnelHeadline?: string;
   /** Overrides the default "envie currículo + vaga" 3-step "Como funciona" explainer. */
@@ -393,6 +397,116 @@ export const NICHES = {
     ],
     funnelHeadline: "Do grátis à assinatura: veja o que cada etapa libera na sua direção acadêmica",
   },
+  concurseiro: {
+    slug: "concurseiro",
+    track: "growth",
+    segment: "concurseiro",
+    tabLabel: "Concurseiro",
+    eyebrow: "Para quem estuda para concurso",
+    headline: "Edital gigante e pouco tempo? Estude pelo que realmente cai.",
+    subheadline:
+      "Cole o edital e o cargo que você quer e receba um ciclo de estudos por peso das matérias, simulados no estilo da banca e uma estimativa de nota de corte, para focar no que aumenta sua chance de aprovação.",
+    painPoints: [
+      "Edital enorme e a sensação de não saber por onde começar",
+      "Estudar muita teoria e travar na hora de resolver questão",
+      "Não saber se o seu ritmo dá para chegar pronto até a prova",
+    ],
+    benefits: [
+      { title: "Plano por peso das matérias", description: "Um ciclo de estudos que prioriza o que mais cai e vale mais ponto, não a ordem do edital." },
+      { title: "Simulados no estilo da banca", description: "Questões no formato da sua banca (CESPE, FGV, FCC) com gabarito comentado." },
+      { title: "Estimativa de nota de corte", description: "Uma referência realista de onde você precisa chegar para o seu cargo." },
+      { title: "Cronograma até a prova", description: "Um plano semanal que cabe na sua rotina e se ajusta conforme você avança." },
+    ],
+    ctaLabel: "Montar meu plano de estudo →",
+    primaryCtaHref: "/tools/concurso",
+    themeAccent: "indigo",
+    heroIcon: "📚",
+    heroImage: "/niche-hero/concurso.png",
+    quickFeatures: ["Plano de estudo por edital", "Simulados por banca", "Estimativa de nota de corte", "Cronograma até a prova"],
+    heroPrimaryCtaLabel: "Montar meu plano de estudo",
+    heroPrimaryCtaHref: "/tools/concurso",
+    heroSecondaryCtaLabel: "Fazer um simulado grátis",
+    socialProof: "Concurso não premia quem estuda mais horas, e sim quem estuda o que cai e resolve questão de verdade.",
+    samplePreview: {
+      score: 68,
+      scoreLabel: "Aproveitamento no simulado de Direito Constitucional",
+      strengths: [
+        "Bom desempenho em Controle de Constitucionalidade, tema de alta incidência",
+        "Ritmo de estudo compatível com a data da prova",
+      ],
+      gaps: [
+        "Baixo acerto em Direito Administrativo, disciplina de peso alto no edital",
+        "Poucas questões resolvidas em relação ao tempo de teoria",
+      ],
+      sampleQuestion: "Segundo a CF/88, compete privativamente à União legislar sobre direito do trabalho. (Certo/Errado)",
+    },
+    simpleTierLabel: "Plano Inicial",
+    simpleTierDescription: "Gere um primeiro ciclo de estudos e faça um simulado para medir seu ponto de partida.",
+    completeTierLabel: "Diagnóstico de Preparação",
+    completeTierDescription: "Plano por peso das matérias, simulados por banca e estimativa de nota de corte para o seu cargo.",
+    completeTierCta: "Montar meu plano",
+    howItWorks: [
+      { title: "Cole o edital e o cargo", description: "Informe banca, disciplinas e a data da prova que você vai prestar." },
+      { title: "Receba o ciclo de estudos", description: "Um plano semanal por peso das matérias, com simulados no estilo da banca." },
+      { title: "Acompanhe até a prova", description: "Resolva questões, veja sua estimativa de nota de corte e ajuste o ritmo." },
+    ],
+    funnelHeadline: "Do grátis à assinatura: veja o que cada etapa libera na sua preparação",
+  },
+  oab: {
+    slug: "oab",
+    track: "growth",
+    segment: "oab",
+    tabLabel: "OAB",
+    eyebrow: "Para quem estuda para a OAB",
+    headline: "1ª e 2ª fase da OAB: estude pelo estilo da FGV, não no escuro.",
+    subheadline:
+      "Faça simulados da 1ª fase no formato FGV, treine peças e questões discursivas da 2ª fase com correção por critério e monte um plano de estudo até o dia do exame.",
+    painPoints: [
+      "Conteúdo enorme e dúvida sobre o que a FGV mais cobra",
+      "Insegurança na 2ª fase: estrutura da peça e fundamentação legal",
+      "Estudar sem simular o exame e chegar cru na prova",
+    ],
+    benefits: [
+      { title: "Simulado 1ª fase estilo FGV", description: "Questões no formato do exame, com gabarito comentado e foco na incidência da FGV." },
+      { title: "Corretor de peça da 2ª fase", description: "Cole sua peça prático-profissional e receba correção por estrutura, fundamentação e técnica." },
+      { title: "Correção de discursivas", description: "Treine as questões discursivas da sua área e veja onde ganhar e perder ponto." },
+      { title: "Plano por fase", description: "Um cronograma que separa 1ª e 2ª fase e cabe na sua rotina até o exame." },
+    ],
+    ctaLabel: "Começar minha preparação OAB →",
+    primaryCtaHref: "/tools/oab",
+    themeAccent: "purple",
+    heroIcon: "⚖️",
+    heroImage: "/niche-hero/oab.png",
+    quickFeatures: ["Simulado 1ª fase (FGV)", "Corretor de peça 2ª fase", "Correção de discursivas", "Plano por fase"],
+    heroPrimaryCtaLabel: "Começar minha preparação",
+    heroPrimaryCtaHref: "/tools/oab",
+    heroSecondaryCtaLabel: "Fazer um simulado da 1ª fase",
+    socialProof: "A FGV é previsível: quem treina no estilo do exame e domina a estrutura da peça larga na frente.",
+    samplePreview: {
+      score: 72,
+      scoreLabel: "Aproveitamento no simulado da 1ª fase",
+      strengths: [
+        "Bom desempenho em Ética e Estatuto da OAB, tema de alta incidência",
+        "Constitucional dentro da média necessária para aprovação",
+      ],
+      gaps: [
+        "Baixo acerto em Direito Civil, uma das disciplinas mais cobradas",
+        "Peça da 2ª fase sem endereçamento e pedidos completos",
+      ],
+      sampleQuestion: "Na peça de Direito do Trabalho, qual a ação cabível e o juízo competente para o pedido do enunciado?",
+    },
+    simpleTierLabel: "Plano Inicial",
+    simpleTierDescription: "Faça um simulado da 1ª fase e gere um primeiro plano de estudo até o exame.",
+    completeTierLabel: "Diagnóstico de Preparação OAB",
+    completeTierDescription: "Simulados FGV, corretor de peça e discursivas da 2ª fase e plano por fase.",
+    completeTierCta: "Começar preparação",
+    howItWorks: [
+      { title: "Escolha a fase", description: "Comece pela 1ª fase com simulado FGV ou pela 2ª fase com peça e discursivas." },
+      { title: "Treine e corrija", description: "Resolva questões e receba correção por critério da FGV, com feedback item a item." },
+      { title: "Siga o plano até o exame", description: "Um cronograma por fase que se ajusta ao seu desempenho." },
+    ],
+    funnelHeadline: "Do grátis à assinatura: veja o que cada etapa libera na sua aprovação",
+  },
 } as const satisfies Record<string, Niche>;
 
 export type NicheSlug = keyof typeof NICHES;
@@ -452,15 +566,20 @@ export function NicheLandingPage() {
   // A CTA não cita preço: o valor da primeira análise aparece só no checkout,
   // então mudar `firstAnalysisPrice` não exige revisar o texto do hero.
   const heroSecondaryCtaLabel = niche.heroSecondaryCtaLabel ?? "Analisar meu currículo";
+  // Nichos de estudo (concurso/OAB) não usam o fluxo de currículo: a ação primária
+  // leva ao hub de estudo e a copy troca de "currículo" para "plano de estudo".
+  const isStudyNiche = Boolean(niche.heroPrimaryCtaHref);
+  const primaryActionHref = niche.heroPrimaryCtaHref ?? freeResumeHref;
+  const primaryActionLabel = niche.heroPrimaryCtaLabel ?? "Criar currículo grátis";
   const attentionCards = [
     {
-      label: "Antes de aplicar",
-      title: `${niche.samplePreview.score} de aderência`,
+      label: isStudyNiche ? "Onde você está" : "Antes de aplicar",
+      title: isStudyNiche ? `${niche.samplePreview.score}% de aproveitamento` : `${niche.samplePreview.score} de aderência`,
       description: niche.samplePreview.scoreLabel,
     },
     {
-      label: "Onde mexer",
-      title: "Lacunas claras, sem achismo",
+      label: isStudyNiche ? "Onde focar" : "Onde mexer",
+      title: isStudyNiche ? "Prioridades claras, sem achismo" : "Lacunas claras, sem achismo",
       description: niche.samplePreview.gaps[0],
     },
     {
@@ -543,13 +662,13 @@ export function NicheLandingPage() {
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <Link
-                  href={freeResumeHref}
+                  href={primaryActionHref}
                   className={`inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
                 >
-                  Criar currículo grátis
+                  {primaryActionLabel}
                 </Link>
                 <Link
-                  href={firstAnalysisHref}
+                  href={isStudyNiche ? completeTierHref : firstAnalysisHref}
                   className={`inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all ${theme.btnGhost}`}
                 >
                   {heroSecondaryCtaLabel}
@@ -562,15 +681,15 @@ export function NicheLandingPage() {
               <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl">
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
                   <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 1</p>
-                  <p className="mt-1 text-sm font-semibold text-white">Score claro de aderência</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Plano por peso das matérias" : "Score claro de aderência"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
                   <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 2</p>
-                  <p className="mt-1 text-sm font-semibold text-white">Lacunas e palavras-chave</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Simulados no estilo da banca" : "Lacunas e palavras-chave"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
                   <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 3</p>
-                  <p className="mt-1 text-sm font-semibold text-white">Pergunta provável de entrevista</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Estimativa de nota de corte" : "Pergunta provável de entrevista"}</p>
                 </div>
               </div>
 
@@ -703,7 +822,7 @@ export function NicheLandingPage() {
               </div>
             )}
             <h2 className="font-bold text-sm text-neutral-500 uppercase tracking-wider">
-              O que normalmente trava a sua candidatura
+              {isStudyNiche ? "O que normalmente trava o seu estudo" : "O que normalmente trava a sua candidatura"}
             </h2>
             <ul className="space-y-3">
               {painPoints.map((point) => (
@@ -737,7 +856,7 @@ export function NicheLandingPage() {
               </div>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
-                  Score de aderência (exemplo)
+                  {isStudyNiche ? "Aproveitamento (exemplo)" : "Score de aderência (exemplo)"}
                 </p>
                 <p className="text-sm md:text-base font-bold mt-0.5">{niche.samplePreview.scoreLabel}</p>
               </div>
@@ -832,23 +951,27 @@ export function NicheLandingPage() {
             Comece de graça hoje mesmo
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2 max-w-md mx-auto text-sm">
-            Crie seu currículo grátis e dê o primeiro passo para o seu futuro.
+            {isStudyNiche
+              ? "Monte seu plano de estudo grátis e dê o primeiro passo rumo à aprovação."
+              : "Crie seu currículo grátis e dê o primeiro passo para o seu futuro."}
           </p>
           <Link
-            href={freeResumeHref}
+            href={primaryActionHref}
             className={`mt-5 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
           >
-            Criar currículo grátis
+            {primaryActionLabel}
           </Link>
           <p className="mt-3 text-[11px] text-neutral-400">
             Não precisa de cartão de crédito.
           </p>
-          <p className="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
-            Ainda não tem currículo nenhum?{" "}
-            <Link href={freeResumeHref} className={`font-semibold hover:underline ${theme.accentText}`}>
-              Monte um do zero, grátis
-            </Link>
-          </p>
+          {!isStudyNiche && (
+            <p className="mt-4 text-xs text-neutral-500 dark:text-neutral-400">
+              Ainda não tem currículo nenhum?{" "}
+              <Link href={freeResumeHref} className={`font-semibold hover:underline ${theme.accentText}`}>
+                Monte um do zero, grátis
+              </Link>
+            </p>
+          )}
         </section>
 
         {/* Pricing: grátis, pagamento único e assinatura mensal, valor específico do nicho */}
@@ -870,7 +993,7 @@ export function NicheLandingPage() {
                 {niche.simpleTierDescription ?? "Score básico, pontos fortes e de atenção, e as palavras-chave que faltam no currículo."}
               </p>
               <Link
-                href={freeResumeHref}
+                href={primaryActionHref}
                 className="mt-6 inline-flex items-center justify-center rounded-lg font-semibold px-5 py-3 text-sm border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
               >
                 Começar grátis
@@ -996,7 +1119,7 @@ export function NicheLandingPage() {
         {/* Benefits */}
         <section className="py-12 border-t border-neutral-100 dark:border-neutral-900">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-center">
-            O que você recebe na análise
+            {isStudyNiche ? "O que a sua preparação inclui" : "O que você recebe na análise"}
           </h2>
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {niche.benefits.map((item) => (
@@ -1047,16 +1170,18 @@ export function NicheLandingPage() {
         {/* Final CTA */}
         <section className="py-14 pb-24 sm:pb-14 border-t border-neutral-100 dark:border-neutral-900 text-center">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-            Pronto para montar seu currículo?
+            {isStudyNiche ? "Pronto para começar a estudar certo?" : "Pronto para montar seu currículo?"}
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2 max-w-md mx-auto text-sm">
-            Comece pelo fluxo grátis e, depois, use a análise completa quando quiser comparar com uma vaga real.
+            {isStudyNiche
+              ? "Comece pelo fluxo grátis e, quando quiser, destrave o plano completo e os simulados."
+              : "Comece pelo fluxo grátis e, depois, use a análise completa quando quiser comparar com uma vaga real."}
           </p>
           <Link
-            href={freeResumeHref}
+            href={primaryActionHref}
             className={`mt-6 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
           >
-            Criar currículo grátis
+            {primaryActionLabel}
           </Link>
         </section>
       </main>
@@ -1064,10 +1189,10 @@ export function NicheLandingPage() {
       {/* Sticky mobile CTA */}
       <div className="sm:hidden fixed bottom-0 inset-x-0 z-20 border-t border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur px-4 py-3">
         <Link
-          href={freeResumeHref}
+          href={primaryActionHref}
           className={`flex items-center justify-center rounded-xl font-semibold px-6 py-3 text-sm transition-all shadow-md ${theme.btnPrimary}`}
         >
-          Criar currículo grátis
+          {primaryActionLabel}
         </Link>
       </div>
 

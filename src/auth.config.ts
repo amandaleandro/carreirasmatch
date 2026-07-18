@@ -15,6 +15,8 @@ const PUBLIC_PATHS = [
   "/vagas",
   "/analise",
   "/tools/vocation-test",
+  "/tools/concurso",
+  "/tools/oab",
   "/sobre",
   "/blog",
   "/contato",

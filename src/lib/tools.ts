@@ -936,3 +936,179 @@ ${examText}`;
 
   return runJsonPrompt<MockExamResult>(systemPrompt, userMessage, 0.7);
 }
+
+// --- Concurso público / OAB: plano de estudo por edital ---
+
+export type ConcursoStudyPlanInput = {
+  cargo: string;
+  banca: string;
+  disciplinas: string;
+  weeklyStudyHours: string;
+  timeUntilExam: string;
+};
+
+export type ConcursoStudyPlanResult = {
+  bancaProfile: string;
+  studyPlan: {
+    essential: string[];
+    niceToHave: string[];
+    later: string[];
+  };
+  weeklySchedule: WeeklyScheduleBlock[];
+  reviewTips: string[];
+  cutoffNote: string;
+  motivationalNote: string;
+};
+
+const CONCURSO_SCHEDULE_WEEKS = 6;
+
+export async function generateConcursoStudyPlan(
+  input: ConcursoStudyPlanInput
+): Promise<ConcursoStudyPlanResult> {
+  const systemPrompt = `Você é um orientador de estudos especializado em concursos públicos e no Exame da OAB no Brasil. A partir do cargo/exame, da banca e das disciplinas do edital, monte um plano de estudo realista, priorizando por PESO e INCIDÊNCIA das matérias (o que mais cai e vale mais ponto), não pela ordem do edital.
+${BASE_RULES}
+Formato de resposta:
+{
+  "bancaProfile": string (2-3 frases sobre o estilo da banca informada e como isso muda a forma de estudar, ex: CESPE/Cebraspe usa certo/errado com pegadinhas; FGV cobra literalidade e jurisprudência; FCC é detalhista em lei seca),
+  "studyPlan": {
+    "essential": string[] (2-4 disciplinas/tópicos indispensáveis para priorizar AGORA, pelo peso típico e pela banca),
+    "niceToHave": string[] (1-3 disciplinas/tópicos importantes mas que podem vir depois),
+    "later": string[] (0-2 disciplinas/tópicos de menor peso, para o final)
+  },
+  "weeklySchedule": [
+    { "week": number (1 a ${CONCURSO_SCHEDULE_WEEKS}), "focus": string (disciplina/tema principal da semana), "tasks": string[] (2-4 tarefas concretas: teoria, lei seca, resolução de questões, revisão) }
+  ] (exatamente ${CONCURSO_SCHEDULE_WEEKS} semanas, priorizando as disciplinas de maior peso primeiro e distribuindo conforme as horas semanais disponíveis, sempre incluindo resolução de questões e revisão),
+  "reviewTips": string[] (3-4 dicas práticas de revisão e resolução de questões específicas para a banca informada),
+  "cutoffNote": string (2-3 frases, honestas e aproximadas, sobre nível de concorrência/nota de corte que esse cargo/exame costuma exigir, deixando claro que varia por edital e região),
+  "motivationalNote": string (1-2 frases encorajadoras e realistas, reconhecendo o tempo até a prova informado)
+}`;
+
+  const userMessage = `CARGO/EXAME-ALVO: ${input.cargo || "não informado"}
+BANCA: ${input.banca || "não informada"}
+DISCIPLINAS DO EDITAL (com pesos, se informados):
+${input.disciplinas || "não informado"}
+TEMPO ATÉ A PROVA: ${input.timeUntilExam || "não informado"}
+HORAS DE ESTUDO POR SEMANA: ${input.weeklyStudyHours || "não informado"}`;
+
+  return runJsonPrompt<ConcursoStudyPlanResult>(systemPrompt, userMessage);
+}
+
+// --- Concurso público / OAB 1ª fase: simulado por banca e disciplina ---
+
+export type ConcursoMockExamInput = {
+  cargo: string;
+  banca: string;
+  disciplina: string;
+};
+
+export async function generateConcursoMockExam(
+  input: ConcursoMockExamInput
+): Promise<MockExamResult> {
+  const systemPrompt = `Você é um professor de cursos preparatórios que cria simulados de concurso público e do Exame da OAB, no estilo da banca informada.
+${BASE_RULES}
+Adapte o FORMATO das questões à banca informada:
+- CESPE/Cebraspe: itens de certo/errado. Nesse caso, "options" deve ter EXATAMENTE 2 alternativas: ["Certo", "Errado"].
+- FGV (inclui o Exame da OAB): múltipla escolha com EXATAMENTE 4 alternativas (A a D), estilo literal e com jurisprudência quando couber.
+- FCC, Vunesp, Cesgranrio e demais: múltipla escolha com EXATAMENTE 5 alternativas (A a E), detalhista em lei seca.
+Crie questões ORIGINAIS, no nível de dificuldade e nos assuntos típicos da disciplina e da banca informadas.
+Formato de resposta:
+{
+  "questions": [
+    {
+      "question": string (enunciado completo e autocontido, sem depender de imagens),
+      "options": string[] (2, 4 ou 5 alternativas conforme a banca, sem prefixo de letra),
+      "correctIndex": number (índice 0-based da alternativa correta),
+      "explanation": string (1-2 frases com a fundamentação legal/doutrinária da resposta correta)
+    }
+  ] (6 a 8 questões, cobrindo assuntos variados da disciplina)
+}`;
+
+  const userMessage = `CARGO/EXAME: ${input.cargo || "não informado"}
+BANCA: ${input.banca || "não informada"}
+DISCIPLINA: ${input.disciplina || "não informada"}`;
+
+  return runJsonPrompt<MockExamResult>(systemPrompt, userMessage, 0.7);
+}
+
+// --- Concurso público: estimativa de nota de corte ---
+
+export type ConcursoCutoffInput = {
+  cargo: string;
+  banca: string;
+  regiao: string;
+  userScore: number;
+};
+
+export async function estimateConcursoCutoff(
+  input: ConcursoCutoffInput
+): Promise<CutoffEstimateResult> {
+  const systemPrompt = `Você é um orientador especializado em concursos públicos brasileiros. Com base no cargo/concurso, na banca, na região e na pontuação estimada informada (percentual de acerto ou nota), dê uma estimativa APROXIMADA e honesta de chance de aprovação, deixando claro que notas de corte variam muito por edital, número de vagas, região e ano, e que isso é só uma referência (não uma garantia).
+${BASE_RULES}
+Formato de resposta:
+{
+  "estimateLabel": string (frase curta classificando a chance, ex: "Chance boa para ampla concorrência", "Abaixo do corte típico nos concursos mais disputados"),
+  "reasoning": string (2-3 frases explicando o raciocínio, considerando cargo, banca e região),
+  "typicalCutoffRange": string (1-2 frases sobre a faixa de nota de corte que esse tipo de cargo costuma exigir),
+  "gapAnalysis": string (1-2 frases sobre quantos pontos aproximadamente faltam ou sobram em relação à faixa típica),
+  "improvementTips": string[] (2-4 sugestões práticas: se abaixo do típico, como subir a nota; se já bem posicionado, como não perder a vaga)
+}`;
+
+  const userMessage = `CARGO/CONCURSO-ALVO: ${input.cargo || "não informado"}
+BANCA: ${input.banca || "não informada"}
+REGIÃO/ESTADO: ${input.regiao || "não informado"}
+PONTUAÇÃO ESTIMADA DO CANDIDATO (percentual de acerto ou nota): ${input.userScore}`;
+
+  return runJsonPrompt<CutoffEstimateResult>(systemPrompt, userMessage);
+}
+
+// --- OAB 2ª fase: corretor de peça prático-profissional e discursivas ---
+
+export type OabSecondPhaseCriterionScore = {
+  criterion: string;
+  score: number;
+  maxScore: number;
+  feedback: string;
+};
+
+export type OabSecondPhaseResult = {
+  criterionScores: OabSecondPhaseCriterionScore[];
+  totalScore: number;
+  generalFeedback: string;
+  missingArguments: string[];
+  topFixes: string[];
+};
+
+const OAB_SECOND_PHASE_CRITERIA = [
+  "Cabimento e estrutura da peça (endereçamento, tipo de peça, requisitos formais)",
+  "Fundamentação jurídica (dispositivos legais, súmulas e jurisprudência corretos)",
+  "Análise do caso concreto (uso dos fatos do enunciado, teses adequadas)",
+  "Pedidos (completos, corretos e coerentes com a peça)",
+  "Técnica e linguagem jurídica (clareza, coesão, norma culta)",
+];
+
+export async function gradeOabSecondPhase(
+  area: string,
+  pecaText: string
+): Promise<OabSecondPhaseResult> {
+  const systemPrompt = `Você é um examinador experiente da 2ª fase do Exame da OAB (banca FGV), especializado em ${area || "Direito"}. Avalie a peça prático-profissional ou a resposta discursiva abaixo com o rigor da FGV. A peça vale até 5,0 pontos no total; distribua a pontuação entre os 5 critérios oficiais abaixo, sem inflar notas.
+${BASE_RULES}
+Os 5 critérios, na ordem exata em que devem aparecer no array "criterionScores":
+${OAB_SECOND_PHASE_CRITERIA.map((c, i) => `${i + 1}. ${c}`).join("\n")}
+Formato de resposta:
+{
+  "criterionScores": [
+    { "criterion": string (nome do critério), "score": number (nota atribuída, uma casa decimal), "maxScore": number (pontuação máxima do critério), "feedback": string (2-3 frases específicas citando trechos ou omissões reais do texto) }
+  ] (exatamente 5 itens, na ordem acima; a soma dos maxScore deve ser 5.0),
+  "totalScore": number (soma dos "score", 0 a 5.0, uma casa decimal),
+  "generalFeedback": string (3-4 frases resumindo o principal acerto e a principal falha da peça),
+  "missingArguments": string[] (2-5 teses, dispositivos legais, súmulas ou pedidos que faltaram e a FGV costuma exigir para este tipo de peça),
+  "topFixes": string[] (3-5 correções prioritárias e concretas para a próxima tentativa)
+}`;
+
+  const userMessage = `ÁREA DA 2ª FASE: ${area || "não informada"}
+
+TEXTO DA PEÇA / RESPOSTA DISCURSIVA DO CANDIDATO:
+${pecaText}`;
+
+  return runJsonPrompt<OabSecondPhaseResult>(systemPrompt, userMessage);
+}

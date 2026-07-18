@@ -292,6 +292,38 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     color: "emerald",
     free: true,
   },
+  {
+    href: "/tools/concurso/plano-de-estudo",
+    title: "Plano de estudo por edital",
+    description: "Cole o edital e receba um ciclo de estudos por peso das matérias, no estilo da sua banca.",
+    segments: ["concurseiro", "oab"],
+    icon: "compass",
+    color: "indigo",
+  },
+  {
+    href: "/tools/concurso/simulado",
+    title: "Simulado por banca e disciplina",
+    description: "Gere questões no formato da sua banca (CESPE, FGV, FCC) com gabarito comentado.",
+    segments: ["concurseiro", "oab"],
+    icon: "pen",
+    color: "blue",
+  },
+  {
+    href: "/tools/concurso/nota-de-corte",
+    title: "Estimativa de nota de corte",
+    description: "Uma referência realista de onde você precisa chegar para o seu cargo e concurso.",
+    segments: ["concurseiro"],
+    icon: "scale",
+    color: "amber",
+  },
+  {
+    href: "/tools/oab/segunda-fase",
+    title: "Corretor de peça e discursivas (OAB 2ª fase)",
+    description: "Cole sua peça prático-profissional e receba correção pelos critérios da FGV.",
+    segments: ["oab"],
+    icon: "pen",
+    color: "violet",
+  },
 ];
 
 /** Rotas das ferramentas abertas (ver `free` em ToolCatalogEntry). */

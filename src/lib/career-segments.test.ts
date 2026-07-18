@@ -5,6 +5,8 @@ describe("isCareerSegment", () => {
   it("accepts known segments", () => {
     expect(isCareerSegment("student")).toBe(true);
     expect(isCareerSegment("career_pro")).toBe(true);
+    expect(isCareerSegment("concurseiro")).toBe(true);
+    expect(isCareerSegment("oab")).toBe(true);
   });
 
   it("rejects unknown values", () => {
