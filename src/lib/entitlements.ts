@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { hasFullAccessUserId } from "@/lib/full-access-users";
+import { isInfluencerUser } from "@/lib/influencer";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 
@@ -17,6 +18,8 @@ async function getActiveSubscription(userId: string) {
 /** Whether the user has an active, non-expired subscription. Also unlocks the rest of the app's paid tools. */
 export async function hasActiveSubscriptionAccess(userId: string): Promise<boolean> {
   if (await hasFullAccessUserId(userId)) return true;
+  // Influenciadores (donos de cupom) têm acesso total ao sistema sem pagar.
+  if (await isInfluencerUser(userId)) return true;
   return !!(await getActiveSubscription(userId));
 }
 
@@ -33,6 +36,7 @@ export async function hasAnalysisCredit(): Promise<boolean> {
  */
 export async function canViewFullDiagnostic(userId: string, analysisId: string): Promise<boolean> {
   if (await hasFullAccessUserId(userId)) return true;
+  if (await isInfluencerUser(userId)) return true;
 
   const subscription = await getActiveSubscription(userId);
   if (subscription) {

@@ -1,0 +1,30 @@
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/lib/require-auth";
+import { prisma } from "@/lib/prisma";
+
+// Candidato aceita ou recusa um pedido de contato de empresa.
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { session, response } = await requireAuth();
+  if (!session) return response;
+
+  const { id } = await params;
+  const body = await req.json();
+  const action = body.action;
+  if (action !== "accept" && action !== "decline") {
+    return NextResponse.json({ error: "Ação inválida." }, { status: 400 });
+  }
+
+  // Só o dono do pedido pode responder, e só enquanto estiver pendente.
+  const request = await prisma.talentContactRequest.findFirst({
+    where: { id, userId: session.user.id, status: "pending" },
+    select: { id: true },
+  });
+  if (!request) {
+    return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 });
+  }
+
+  const status = action === "accept" ? "accepted" : "declined";
+  await prisma.talentContactRequest.update({ where: { id: request.id }, data: { status } });
+
+  return NextResponse.json({ status });
+}

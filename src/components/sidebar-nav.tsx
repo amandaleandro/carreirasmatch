@@ -18,6 +18,7 @@ import {
   LifeBuoy,
   ShieldCheck,
   HelpCircle,
+  TrendingUp,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -47,11 +48,22 @@ const NAV_ITEMS: NavItem[] = [
 const COMING_SOON_ITEMS: { label: string; icon: NavItem["icon"] }[] = [];
 
 const ADMIN_NAV_ITEM: NavItem = { href: "/admin", label: "Admin", icon: ShieldCheck };
+const INFLUENCER_NAV_ITEM: NavItem = { href: "/influencer", label: "Influencer", icon: TrendingUp };
 
-export function SidebarNav({ isAdmin = false }: { isAdmin?: boolean }) {
+export function SidebarNav({
+  isAdmin = false,
+  isInfluencer = false,
+}: {
+  isAdmin?: boolean;
+  isInfluencer?: boolean;
+}) {
   const pathname = usePathname();
   const { openNews, openTour } = useUiPanels();
-  const navItems = isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
+  const navItems = [
+    ...NAV_ITEMS,
+    ...(isInfluencer ? [INFLUENCER_NAV_ITEM] : []),
+    ...(isAdmin ? [ADMIN_NAV_ITEM] : []),
+  ];
 
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col bg-gradient-to-b from-[#0d1830] via-[#0b1526] to-[#080e1c] text-white h-screen sticky top-0 border-r border-white/5">

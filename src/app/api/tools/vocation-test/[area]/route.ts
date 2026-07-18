@@ -3,12 +3,10 @@ import { auth } from "@/auth";
 import { analyzeVocationTest, VocationAnswers } from "@/lib/tools";
 import { getVocationArea } from "@/lib/vocation-areas";
 import { prisma } from "@/lib/prisma";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { PDFParse } from "pdf-parse";
 import { requireToolAccess } from "@/lib/require-auth";
 
 const MAX_RESUME_FILE_SIZE_BYTES = 5 * 1024 * 1024;
-const ANONYMOUS_LIMIT = { limit: 15, windowMs: 60 * 60 * 1000 };
 
 export async function POST(
   req: NextRequest,
@@ -25,13 +23,7 @@ export async function POST(
     const userId = session?.user?.id ?? null;
 
     if (!userId) {
-      const rateLimit = checkRateLimit(`anon-vocation:${getClientIp(req)}`, ANONYMOUS_LIMIT);
-      if (!rateLimit.allowed) {
-        return NextResponse.json(
-          { error: "Muitas tentativas por aqui. Tente novamente mais tarde." },
-          { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
-        );
-      }
+      return NextResponse.json({ error: "É necessário estar logado." }, { status: 401 });
     }
 
     const formData = await req.formData();
@@ -81,7 +73,7 @@ export async function POST(
 
     const saved = await prisma.vocationTestResult.create({
       data: {
-        userId: userId ?? undefined,
+        userId,
         areaSlug: area.slug,
         answers: JSON.stringify({ ...answers, alreadyEnrolled }),
         result: JSON.stringify(result),

@@ -8,6 +8,8 @@ import { InterestedRolesForm } from "@/components/interested-roles-form";
 import { CourseListForm } from "@/components/course-list-form";
 import { BillingSection } from "@/components/billing-section";
 import { JobAlertManager } from "@/components/job-alert-manager";
+import { DiscoverableToggle } from "@/components/discoverable-toggle";
+import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 
@@ -23,7 +25,7 @@ export default async function SettingsPage({
 
   const { upgrade } = await searchParams;
 
-  const [user, courses, subscription, jobAlerts] = await Promise.all([
+  const [user, courses, subscription, jobAlerts, contactRequests] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -35,6 +37,7 @@ export default async function SettingsPage({
         state: true,
         hasFormalEducation: true,
         interestedRoles: true,
+        discoverable: true,
       },
     }),
     prisma.userCourse.findMany({
@@ -50,6 +53,18 @@ export default async function SettingsPage({
       where: { userId: session.user.id, active: true },
       orderBy: { createdAt: "desc" },
       select: { id: true, query: true, city: true, state: true, frequency: true },
+    }),
+    prisma.talentContactRequest.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        jobTitle: true,
+        message: true,
+        status: true,
+        createdAt: true,
+        company: { select: { name: true } },
+      },
     }),
   ]);
 
@@ -128,6 +143,25 @@ export default async function SettingsPage({
       <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <JobAlertManager initialAlerts={jobAlerts} />
       </section>
+
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <DiscoverableToggle initialValue={user?.discoverable ?? false} />
+      </section>
+
+      {(user?.discoverable || contactRequests.length > 0) && (
+        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+          <ContactRequestsInbox
+            initialRequests={contactRequests.map((r) => ({
+              id: r.id,
+              companyName: r.company.name,
+              jobTitle: r.jobTitle,
+              message: r.message,
+              status: r.status,
+              createdAt: r.createdAt.toISOString(),
+            }))}
+          />
+        </section>
+      )}
     </main>
   );
 }

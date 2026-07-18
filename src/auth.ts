@@ -47,16 +47,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return { id: user.id, name: user.name, email: user.email };
       },
     }),
+    Credentials({
+      id: "company-credentials",
+      name: "Empresa",
+      credentials: {
+        email: { label: "E-mail", type: "email" },
+        password: { label: "Senha", type: "password" },
+      },
+      async authorize(credentials, request) {
+        const email = normalizeEmail(credentials?.email);
+        const password = credentials?.password as string | undefined;
+
+        if (!email || !password) return null;
+
+        const ip = getClientIp(request);
+        const rateLimit = checkRateLimit(`company-login:${ip}:${email}`, LOGIN_LIMIT);
+        if (!rateLimit.allowed) return null;
+
+        const company = await prisma.company.findUnique({ where: { email } });
+        if (!company?.passwordHash) return null;
+
+        const valid = await bcrypt.compare(password, company.passwordHash);
+        if (!valid) return null;
+
+        // O `accountType` marca esta sessão como de empresa; propagado no callback jwt.
+        return { id: company.id, name: company.name, email: company.email, accountType: "company" as const };
+      },
+    }),
   ],
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        const accountType = (user as { accountType?: "company" }).accountType;
+        if (accountType === "company") {
+          token.accountType = "company";
+          token.companyId = user.id;
+        } else {
+          token.accountType = "candidate";
+          token.companyId = undefined;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
+        session.user.accountType = (token.accountType as "candidate" | "company") ?? "candidate";
+        session.user.companyId = token.companyId as string | undefined;
       }
       return session;
     },

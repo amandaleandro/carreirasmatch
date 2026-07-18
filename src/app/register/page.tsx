@@ -21,6 +21,8 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [careerSegment, setCareerSegment] = useState<CareerSegment | "">("");
   const [professionalArea, setProfessionalArea] = useState("");
+  // Cupom de indicação: preenchido pelo link (?cupom=CODE) ou digitado manualmente.
+  const [coupon, setCoupon] = useState((searchParams.get("cupom") ?? "").toUpperCase());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -42,6 +44,7 @@ export default function RegisterPage() {
           password,
           careerSegment: careerSegment || null,
           professionalArea: showAreaField && professionalArea ? professionalArea : null,
+          coupon: coupon.trim() || null,
         }),
       });
       const data = await res.json();
@@ -196,6 +199,21 @@ export default function RegisterPage() {
                 </datalist>
               </div>
             )}
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
+                Cupom (opcional)
+              </label>
+              <input
+                type="text"
+                name="coupon"
+                value={coupon}
+                onChange={(e) => setCoupon(e.target.value.toUpperCase())}
+                placeholder="Código de indicação"
+                className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm uppercase outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
+              />
+              <p className="text-xs text-neutral-500">Se veio pela indicação de alguém, coloque o código aqui.</p>
+            </div>
 
             {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 

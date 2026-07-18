@@ -43,5 +43,9 @@ export const profileSuggestionsSchema = z.object({
   suggestions: z.array(z.object({
     type: z.enum(["course", "certification", "book"]), title: text, provider: text,
     priceLabel: text, impactScore: score, impactReason: text, url: z.string().optional(),
+    // Qual lacuna/objetivo específico o item resolve (para explicar o porquê ao usuário).
+    gapAddressed: z.string().optional(),
+    // Só faz sentido para "course": "online" | "presencial" | "híbrido". Livre para a IA omitir.
+    modality: z.string().optional(),
   })).min(1),
 });

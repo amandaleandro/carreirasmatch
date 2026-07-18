@@ -25,6 +25,7 @@ model User {
   city               String?
   state              String?
   hasFormalEducation Boolean?
+  discoverable       Boolean   @default(false)
   interestedRoles    String    @default("[]")
   themePreference    String    @default("system")
   internshipChecklistProgress String @default("[]")
@@ -48,6 +49,16 @@ model User {
   freeToolUsages     FreeToolUsage[]
   jobAlerts          JobAlert[]
   opportunityReports OpportunityReport[]
+  contactRequests    TalentContactRequest[]
+
+  /// Cupom usado no cadastro (link de indicação ou campo manual). Serve para o
+  /// influenciador dono do cupom rastrear quem se cadastrou por indicação dele.
+  signupCouponId     String?
+  signupCoupon       Coupon?   @relation("SignupCoupon", fields: [signupCouponId], references: [id], onDelete: SetNull)
+  /// Cupom que este usuário é dono (perfil de influenciador). null para usuários comuns.
+  ownedCoupon        Coupon?   @relation("InfluencerCoupon")
+
+  @@index([signupCouponId])
 }
 
 model Account {
@@ -303,6 +314,13 @@ model Coupon {
   updatedAt  DateTime  @updatedAt
   payments   Payment[]
 
+  /// Usuário influenciador dono deste cupom. Ele loga com conta normal e ganha
+  /// acesso total ao sistema + o painel /influencer. Um cupom por influenciador.
+  ownerUserId String?  @unique
+  owner       User?    @relation("InfluencerCoupon", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  /// Usuários que se cadastraram usando este cupom (indicação), pagos ou não.
+  signups     User[]   @relation("SignupCoupon")
+
   @@index([active])
 }
 
@@ -329,6 +347,9 @@ model ProfileSuggestion {
   priceLabel   String   @default("") // ex: "Gratuito", "R$ 150 - R$ 300"
   impactScore  Int // 0-100, estimativa de impacto no perfil
   impactReason String   @default("")
+  gapAddressed String   @default("") // lacuna/objetivo que o item resolve (explica o porquê)
+  modality     String   @default("") // só para course: "online" | "presencial" | "híbrido"
+  city         String   @default("") // cidade quando presencial
   createdAt    DateTime @default(now())
 
   @@index([userId])
@@ -688,4 +709,75 @@ model PartnerSubmission {
 
   @@index([status, createdAt])
   @@index([state, city])
+}
+
+/// Conta de empresa (empregador). Autenticação própria, isolada da conta de
+/// candidato (User): senha própria em `passwordHash`, login via provider
+/// "company-credentials" do NextAuth.
+model Company {
+  id             String       @id @default(cuid())
+  name           String
+  cnpj           String       @default("")
+  email          String       @unique
+  passwordHash   String
+  logoUrl        String       @default("")
+  city           String       @default("")
+  state          String       @default("")
+  /// Quantas triagens já rodou; usado para o limite do plano gratuito.
+  screeningCount Int          @default(0)
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  jobs           CompanyJob[]
+  contactRequests TalentContactRequest[]
+
+  @@index([email])
+}
+
+/// Uma triagem: a vaga que a empresa descreveu para ranquear currículos.
+model CompanyJob {
+  id             String             @id @default(cuid())
+  companyId      String
+  company        Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  recommendation String             @default("")
+  createdAt      DateTime           @default(now())
+  candidates     CompanyCandidate[]
+
+  @@index([companyId, createdAt])
+}
+
+/// Um currículo enviado numa triagem, já pontuado contra a vaga.
+model CompanyCandidate {
+  id            String     @id @default(cuid())
+  jobId         String
+  job           CompanyJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  fileName      String
+  candidateName String     @default("")
+  rawText       String
+  fitScore      Int        @default(0)
+  reason        String     @default("")
+  createdAt     DateTime   @default(now())
+
+  @@index([jobId, fitScore])
+}
+
+/// Pedido de contato de uma empresa a um candidato do banco de talentos.
+/// O contato do candidato só é liberado para a empresa quando o candidato aceita
+/// (status "accepted") — dupla proteção de consentimento (opt-in + aceite).
+model TalentContactRequest {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle  String   @default("")
+  message   String   @default("")
+  status    String   @default("pending") // pending | accepted | declined
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, userId])
+  @@index([userId, status])
+  @@index([companyId, status])
 }

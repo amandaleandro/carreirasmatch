@@ -5,6 +5,7 @@ import { isCareerSegment } from "@/lib/career-segments";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendWelcomeEmail } from "@/lib/resend";
 import { validateContact } from "@/lib/contact-validation";
+import { normalizeCouponCode } from "@/lib/coupons";
 
 const REGISTER_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, phone, password, careerSegment, professionalArea } = await req.json();
+    const { name, email, phone, password, careerSegment, professionalArea, coupon } = await req.json();
     const contact = validateContact({ name, email, phone });
     const { name: normalizedName, email: normalizedEmail, phone: normalizedPhone } = contact.data;
 
@@ -53,6 +54,18 @@ export async function POST(req: NextRequest) {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    // Cupom de indicação (link ou campo manual): grava só se for um cupom válido e
+    // ativo, para o influenciador dono rastrear o cadastro. Cupom inválido é
+    // silenciosamente ignorado, nunca bloqueia o cadastro.
+    let signupCouponId: string | null = null;
+    if (typeof coupon === "string" && coupon.trim()) {
+      const matched = await prisma.coupon.findUnique({
+        where: { code: normalizeCouponCode(coupon) },
+        select: { id: true, active: true },
+      });
+      if (matched?.active) signupCouponId = matched.id;
+    }
+
     const data = {
       name: normalizedName,
       phone: normalizedPhone,
@@ -61,6 +74,9 @@ export async function POST(req: NextRequest) {
       professionalArea: typeof professionalArea === "string" && professionalArea.trim()
         ? professionalArea.trim()
         : null,
+      // Só define a atribuição de cadastro quando há cupom válido; não sobrescreve
+      // uma atribuição anterior com null (caso de conta pré-existente sem senha).
+      ...(signupCouponId ? { signupCouponId } : {}),
     };
 
     if (existing) {

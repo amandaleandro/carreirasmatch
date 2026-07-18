@@ -18,6 +18,7 @@ export async function PATCH(req: NextRequest) {
     themePreference?: string;
     city?: string | null;
     state?: string | null;
+    discoverable?: boolean;
   } = {};
 
   if ("name" in body) {
@@ -93,6 +94,14 @@ export async function PATCH(req: NextRequest) {
     }
     const cleaned = [...new Set(interestedRoles.map((role: string) => role.trim()))];
     data.interestedRoles = JSON.stringify(cleaned);
+  }
+
+  if ("discoverable" in body) {
+    const { discoverable } = body;
+    if (typeof discoverable !== "boolean") {
+      return NextResponse.json({ error: "Valor inválido." }, { status: 400 });
+    }
+    data.discoverable = discoverable;
   }
 
   if ("themePreference" in body) {

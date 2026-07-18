@@ -683,6 +683,53 @@ Formato de resposta:
   return runJsonPrompt<JobComparisonResult>(systemPrompt, userMessage);
 }
 
+// --- Triagem de candidatos (uma vaga × muitos currículos) ---
+
+export type CandidateInput = {
+  id: string;
+  label: string; // nome ou nome do arquivo, para o modelo repetir na resposta
+  resumeText: string;
+};
+
+export type CandidateRankingResult = {
+  ranking: {
+    candidateId: string;
+    fitScore: number;
+    reason: string;
+  }[];
+  recommendation: string;
+};
+
+/**
+ * Inverso do compareJobs: dada UMA vaga, ranqueia MÚLTIPLOS currículos por
+ * aderência. Uma única chamada de IA para o lote todo.
+ */
+export async function rankCandidates(
+  jobTitle: string,
+  jobText: string,
+  candidates: CandidateInput[]
+): Promise<CandidateRankingResult> {
+  const systemPrompt = `Você é um recrutador técnico sênior. Avalie MÚLTIPLOS candidatos para UMA vaga e ranqueie-os pela aderência real do currículo aos requisitos.
+${BASE_RULES}
+No campo "candidateId" da resposta, repita EXATAMENTE o valor de "ID DO CANDIDATO" fornecido, sem prefixos, numeração ou texto extra. Baseie a nota apenas no que o currículo demonstra frente aos requisitos da vaga; não invente qualificações.
+Formato de resposta:
+{
+  "ranking": [ { "candidateId": string, "fitScore": number (0-100), "reason": string (1-2 frases explicando a nota, citando pontos fortes e lacunas frente à vaga) } ] (uma entrada por candidato informado, ordenadas da maior para a menor aderência),
+  "recommendation": string (2-4 frases dizendo quais candidatos chamar primeiro para entrevista e por quê)
+}`;
+
+  const candidatesBlock = candidates
+    .map(
+      (c) =>
+        `ID DO CANDIDATO: ${c.id}\nIDENTIFICAÇÃO: ${c.label}\nCURRÍCULO:\n${truncate(c.resumeText, MAX_RESUME_CHARS)}`
+    )
+    .join("\n\n---\n\n");
+
+  const userMessage = `VAGA: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${truncate(jobText, MAX_JOB_TEXT_CHARS)}\n\nCANDIDATOS:\n\n${candidatesBlock}`;
+
+  return runJsonPrompt<CandidateRankingResult>(systemPrompt, userMessage);
+}
+
 // --- Palavras-chave de busca de vaga (a partir do currículo) ---
 
 export type JobSearchKeywords = {

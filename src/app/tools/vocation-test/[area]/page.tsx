@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getVocationArea } from "@/lib/vocation-areas";
@@ -54,22 +54,16 @@ export default async function VocationTestAreaPage({
   }
 
   const session = await auth();
+  if (!session?.user?.id) redirect("/login");
 
-  const lastResult = session?.user?.id
-    ? await prisma.vocationTestResult.findFirst({
-        where: { userId: session.user.id, areaSlug: area.slug },
-        orderBy: { createdAt: "desc" },
-      })
-    : null;
+  const lastResult = await prisma.vocationTestResult.findFirst({
+    where: { userId: session.user.id, areaSlug: area.slug },
+    orderBy: { createdAt: "desc" },
+  });
 
   const initialResult = lastResult ? (JSON.parse(lastResult.result) as VocationResult) : null;
 
   return (
-    <VocationTestForm
-      area={area}
-      initialResult={initialResult}
-      alreadyEnrolled={alreadyEnrolled}
-      loggedIn={Boolean(session?.user?.id)}
-    />
+    <VocationTestForm area={area} initialResult={initialResult} alreadyEnrolled={alreadyEnrolled} />
   );
 }

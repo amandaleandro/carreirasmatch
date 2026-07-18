@@ -2,6 +2,11 @@ import { getSetting } from "@/lib/app-settings";
 import { GROQ_MODEL_SETTING_KEY } from "@/lib/groq-model-options";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import { profileSuggestionsSchema, resumeAnalysisSchema, structuredResumeSchema } from "@/lib/ai-schemas";
+import {
+  CAREER_SEGMENT_LABELS,
+  normalizeCareerSegment,
+  suggestionGuidanceForSegment,
+} from "@/lib/career-segments";
 import type { ZodType } from "zod";
 
 const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
@@ -483,6 +488,10 @@ export type ProfileSuggestionItem = {
   impactScore: number;
   impactReason: string;
   url?: string;
+  /** Lacuna/objetivo específico que o item resolve, para explicar o porquê ao usuário. */
+  gapAddressed?: string;
+  /** Só para "course": "online" | "presencial" | "híbrido". */
+  modality?: string;
 };
 
 export type ProfileSuggestionsResult = {
@@ -494,12 +503,15 @@ const PROFILE_SUGGESTIONS_SYSTEM_PROMPT = `Orientador de carreira brasileiro, ex
 REGRAS:
 1. Gere 6 a 10 sugestões, misturando "course", "certification" e "book" (quantidade livre, priorize o que fizer mais sentido).
 2. Baseie-se nas lacunas técnicas (LACUNAS_PRIORITARIAS) e na área/momento profissional. Não repita SKILLS_COMPROVADAS ou CURSOS_JA_FEITOS.
-3. Priorize OPCOES_CURADAS compatíveis com a área (provedores reais e confiáveis no Brasil, como SENAI, SENAC, Sebrae). Fora isso, use provedores reais e reconhecidos (ex: Coursera, Alura, Udemy, Fundação Bradesco, Microsoft Learn, editoras conhecidas para livros).
-4. "priceLabel": faixa estimada em reais (ex: "R$ 150 - R$ 300") ou "Gratuito". É uma ESTIMATIVA, não invente precisão que não tem.
-5. "impactScore" (0-100): quanto o item, concluído, aumenta a aderência/empregabilidade nas lacunas identificadas. >80 só para itens que atacam diretamente uma lacuna prioritária e frequente.
-6. "impactReason": 1 frase curta e específica citando a lacuna/objetivo que o item resolve. Nunca genérico como "melhora seu currículo".
-7. Ordene "suggestions" por impactScore decrescente.
-8. Responda apenas em português do Brasil.`;
+3. Calibre as sugestões pelo MOMENTO_PROFISSIONAL (ORIENTACAO_DO_MOMENTO): tipo de item, faixa de preço e nível devem casar com aquele momento. Um aprendiz não recebe a mesma receita de quem busca recolocação sênior.
+4. Priorize OPCOES_CURADAS compatíveis com a área (provedores reais e confiáveis no Brasil, como SENAI, SENAC, Sebrae). Fora isso, use provedores reais e reconhecidos (ex: Coursera, Alura, Udemy, Fundação Bradesco, Microsoft Learn, editoras conhecidas para livros).
+5. "priceLabel": faixa estimada em reais (ex: "R$ 150 - R$ 300") ou "Gratuito". É uma ESTIMATIVA, não invente precisão que não tem.
+6. "impactScore" (0-100): quanto o item, concluído, aumenta a aderência/empregabilidade nas lacunas identificadas. >80 só para itens que atacam diretamente uma lacuna prioritária e frequente.
+7. "impactReason": 1 frase curta e específica citando a lacuna/objetivo que o item resolve. Nunca genérico como "melhora seu currículo".
+8. "gapAddressed": nome curto da lacuna ou objetivo concreto que o item resolve (ex: "Excel avançado", "Inglês técnico", "Base em contabilidade"). Use, quando possível, um termo de LACUNAS_PRIORITARIAS.
+9. "modality" (apenas para "course"): "online", "presencial" ou "híbrido". Respeite a modalidade indicada em OPCOES_CURADAS quando usar uma delas; para os demais, use "online" se não tiver certeza.
+10. Ordene "suggestions" por impactScore decrescente.
+11. Responda apenas em português do Brasil.`;
 
 export async function generateProfileSuggestions(input: {
   professionalArea?: string | null;
@@ -508,7 +520,14 @@ export async function generateProfileSuggestions(input: {
   topSkillGaps: string[];
   knownSkills: string[];
   completedCourses: string[];
-  curatedOptions: { title: string; provider: string; free: boolean }[];
+  curatedOptions: {
+    title: string;
+    provider: string;
+    free: boolean;
+    modality?: string;
+    city?: string;
+    certificate?: boolean;
+  }[];
 }): Promise<ProfileSuggestionsResult> {
   const jsonTemplate = `{
   "suggestions": [
@@ -519,16 +538,27 @@ export async function generateProfileSuggestions(input: {
       "priceLabel": string (faixa estimada em reais ou "Gratuito"),
       "impactScore": number (0-100),
       "impactReason": string (1 frase curta e específica),
+      "gapAddressed": string (lacuna/objetivo curto que o item resolve),
+      "modality": string (só para course: "online" | "presencial" | "híbrido"),
       "url": string (opcional, só se você tiver certeza de que é uma URL real e estável, senão omita o campo)
     }
   ]
 }`;
 
+  const segmentLabel = input.careerSegment
+    ? CAREER_SEGMENT_LABELS[normalizeCareerSegment(input.careerSegment) ?? "first_job"] ??
+      input.careerSegment
+    : null;
+  const segmentGuidance = suggestionGuidanceForSegment(input.careerSegment);
+
   const areaBlock = input.professionalArea
     ? `\n\nÁREA DE ATUAÇÃO DO CANDIDATO: ${input.professionalArea}`
     : "";
-  const segmentBlock = input.careerSegment
-    ? `\n\nMOMENTO PROFISSIONAL: ${input.careerSegment}`
+  const segmentBlock = segmentLabel
+    ? `\n\nMOMENTO_PROFISSIONAL: ${segmentLabel}`
+    : "";
+  const guidanceBlock = segmentGuidance
+    ? `\n\nORIENTACAO_DO_MOMENTO: ${segmentGuidance}`
     : "";
   const educationBlock =
     input.hasFormalEducation === false
@@ -549,11 +579,19 @@ export async function generateProfileSuggestions(input: {
   const curatedBlock =
     input.curatedOptions.length > 0
       ? `\n\nOPCOES_CURADAS (provedores reais para a área do candidato, priorize quando fizer sentido):\n- ${input.curatedOptions
-          .map((c) => `${c.title} (${c.provider}${c.free ? ", gratuito" : ""})`)
+          .map((c) => {
+            const tags = [
+              c.free ? "gratuito" : null,
+              c.modality || null,
+              c.certificate ? "com certificado" : null,
+              c.city ? `em ${c.city}` : null,
+            ].filter(Boolean);
+            return `${c.title} (${c.provider}${tags.length ? ", " + tags.join(", ") : ""})`;
+          })
           .join("\n- ")}`
       : "";
 
-  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
+  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${guidanceBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
   return runJsonPrompt<ProfileSuggestionsResult>(
     PROFILE_SUGGESTIONS_SYSTEM_PROMPT,

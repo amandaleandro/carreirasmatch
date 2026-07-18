@@ -300,11 +300,164 @@ export async function syncRegisteredOpportunitySources() {
   return { opportunities, errors };
 }
 
+// Página de DETALHE de um curso: /curso/... ou /cursos/... . Preciso o bastante para não
+// pegar links de categoria (/cursosTecnicos), hotsites ou PDFs que sujam a listagem.
+const COURSE_PATH = /\/cursos?\//i;
+const FREE_TERMS = /gratuit|gr[aá]tis|sem custo|bolsa integral|100% gratu/i;
+
+/**
+ * Deriva um título limpo a partir do slug da URL do curso. O texto âncora desses portais vem
+ * poluído (badges "PRESENCIAL", categoria, "Matrículas abertas" grudados no nome), enquanto o
+ * slug é estruturado: /cursos/app1153-administracao-de-materiais/ → "Administracao De Materiais".
+ * Remove o código de prefixo (app1153-, tec0063-) e capitaliza palavras longas.
+ */
+export function courseTitleFromUrl(href: string): string {
+  try {
+    const parts = new URL(href).pathname.split("/").filter(Boolean);
+    const marker = parts.findIndex((p) => /^cursos?$/i.test(p));
+    const raw = (marker >= 0 && parts[marker + 1]) || parts[parts.length - 1] || "";
+    const slug = raw.replace(/^[a-z]{1,4}\d{2,6}-/i, "");
+    const hadCode = slug !== raw;
+    const words = slug.split(/[-_]+/).filter(Boolean);
+    if (words.length === 0) return "";
+    // Rejeita páginas de CATEGORIA (/cursos/tecnico/, /cursos/graduacao/): slug de 1 palavra,
+    // sem código e sem segmentos extras (uuid). Cursos reais têm código, ≥2 palavras ou uuids.
+    if (!hadCode && words.length < 2 && parts.length < 3) return "";
+    return words.map((w) => (w.length <= 2 ? w : w[0].toUpperCase() + w.slice(1))).join(" ");
+  } catch {
+    return "";
+  }
+}
+
+/**
+ * Fontes de curso presencial verificadas (SSR, cursos como links reais). Semeadas como
+ * OpportunitySource kind="course" para aparecerem no admin, onde podem ser editadas/pausadas.
+ * Novas fontes regionais podem ser cadastradas pelo admin sem tocar no código.
+ */
+const DEFAULT_COURSE_SOURCES: { name: string; url: string; state: string; city: string }[] = [
+  { name: "SENAI-RS", url: "https://cursos.senairs.org.br/", state: "RS", city: "" },
+  { name: "SENAC-RS", url: "https://www.senacrs.com.br/cursosLivres", state: "RS", city: "" },
+];
+
+export async function ensureDefaultCourseSources() {
+  for (const source of DEFAULT_COURSE_SOURCES) {
+    await prisma.opportunitySource.upsert({
+      where: { url: source.url },
+      create: { ...source, kind: "course", parser: "links", official: true },
+      update: { name: source.name, kind: "course", official: true },
+    });
+  }
+}
+
+/**
+ * Fonte de cursos cadastrada no admin (OpportunitySource kind="course"). Raspa os links
+ * de curso da página e grava em ExternalCourse. Usada principalmente para cursos
+ * PRESENCIAIS por cidade/estado (SENAI/SENAC regionais, Escola do Trabalhador etc.),
+ * já que os online federais vêm do Aprenda Mais MEC.
+ */
+async function syncCourseSource(source: {
+  id: string;
+  name: string;
+  url: string;
+  state: string;
+  city: string;
+}) {
+  const startedAt = new Date();
+  await prisma.opportunitySource.update({ where: { id: source.id }, data: { lastRunAt: startedAt } });
+  try {
+    await assertPublicHttpUrl(source.url);
+    const $ = cheerio.load(await fetchHtml(source.url));
+    const items = new Map<string, string>();
+    $("a[href]").each((_, element) => {
+      const href = absoluteUrl($(element).attr("href") ?? "", source.url);
+      if (!href || href === source.url || !COURSE_PATH.test(href)) return;
+      const title = courseTitleFromUrl(href);
+      if (title.length < 5) return;
+      items.set(href, title);
+    });
+
+    // Presencial quando a fonte tem localização; caso contrário assume online.
+    const modality = source.city || source.state ? "presencial" : "online";
+    const seenAt = new Date();
+    let count = 0;
+    for (const [url, title] of [...items].slice(0, 150)) {
+      const free = FREE_TERMS.test(title);
+      await prisma.externalCourse.upsert({
+        where: { url },
+        create: {
+          title: title.slice(0, 240),
+          provider: source.name,
+          url,
+          area: "",
+          city: source.city,
+          state: source.state,
+          modality,
+          free,
+          certificate: false,
+          source: `opp:${source.id}`,
+          lastSeenAt: seenAt,
+        },
+        update: {
+          title: title.slice(0, 240),
+          provider: source.name,
+          city: source.city,
+          state: source.state,
+          modality,
+          free,
+          active: true,
+          lastSeenAt: seenAt,
+        },
+      });
+      count += 1;
+    }
+
+    await prisma.opportunitySource.update({
+      where: { id: source.id },
+      data: { lastSuccessAt: new Date(), lastError: "", itemCount: count },
+    });
+    return count;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Erro desconhecido";
+    await prisma.opportunitySource.update({
+      where: { id: source.id },
+      data: { lastError: message.slice(0, 1000) },
+    });
+    throw error;
+  }
+}
+
+export async function syncRegisteredCourseSources() {
+  await ensureDefaultCourseSources();
+  const sources = await prisma.opportunitySource.findMany({ where: { active: true, kind: "course" } });
+  const results = await Promise.allSettled(sources.map(syncCourseSource));
+  const courses = results.reduce(
+    (total, result) => total + (result.status === "fulfilled" ? result.value : 0),
+    0,
+  );
+  const errors = results.flatMap((result) =>
+    result.status === "rejected"
+      ? [result.reason instanceof Error ? result.reason.message : String(result.reason)]
+      : [],
+  );
+
+  // Desativa cursos cadastrados que sumiram da fonte há mais de 45 dias.
+  await prisma.externalCourse.updateMany({
+    where: {
+      source: { startsWith: "opp:" },
+      active: true,
+      lastSeenAt: { lt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000) },
+    },
+    data: { active: false },
+  });
+  return { courses, errors };
+}
+
 export async function syncAllExternalSources() {
   const results = await Promise.allSettled([
     syncAprendaMaisCourses(),
     syncSinePiBulletins(),
     syncRegisteredOpportunitySources(),
+    syncRegisteredCourseSources(),
   ]);
   const errors = results.flatMap((result) =>
     result.status === "rejected"
@@ -313,8 +466,12 @@ export async function syncAllExternalSources() {
         ? result.value.errors
         : [],
   );
+  const registeredCourses =
+    results[3].status === "fulfilled" && typeof results[3].value === "object"
+      ? results[3].value.courses
+      : 0;
   return {
-    courses: results[0].status === "fulfilled" ? results[0].value : 0,
+    courses: (results[0].status === "fulfilled" ? results[0].value : 0) + registeredCourses,
     bulletins: results[1].status === "fulfilled" ? results[1].value : 0,
     opportunities:
       results[2].status === "fulfilled" && typeof results[2].value === "object"

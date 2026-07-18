@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { ProfileSuggestions, ProfileSuggestionType } from "@/components/profile-suggestions";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
+import { rankCourses } from "@/lib/course-match";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +13,10 @@ export default async function ProfilePage() {
     prisma.user.findUnique({ where: { id: session.user.id }, select: { professionalArea: true } }),
     prisma.externalCourse.findMany({ where: { active: true }, orderBy: { lastSeenAt: "desc" }, take: 100 }),
   ]);
-  const area = (user?.professionalArea ?? "").toLowerCase();
-  const relevantCourses = externalCourses
-    .filter((course) => !area || course.area.toLowerCase().includes(area) || course.title.toLowerCase().includes(area))
-    .slice(0, 12);
+  // Com área definida, ranqueia por relevância (descarta os sem match); sem área, mostra
+  // os mais recentes como fallback para a página não ficar vazia.
+  const area = user?.professionalArea ?? "";
+  const relevantCourses = (area.trim() ? rankCourses(externalCourses, { area }) : externalCourses).slice(0, 12);
 
   return (
     <ProfileSuggestions

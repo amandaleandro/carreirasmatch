@@ -13,6 +13,9 @@ type ProfileSuggestion = {
   priceLabel: string;
   impactScore: number;
   impactReason: string;
+  gapAddressed: string;
+  modality: string;
+  city: string;
 };
 
 const TYPE_CONFIG: Record<ProfileSuggestionType, { label: string; icon: string; chip: string }> = {
@@ -38,11 +41,26 @@ export function ProfileSuggestions({
   externalCourses,
 }: {
   initialSuggestions: ProfileSuggestion[];
-  externalCourses: { id: string; title: string; provider: string; url: string; area: string; free: boolean; certificate: boolean; modality: string }[];
+  externalCourses: { id: string; title: string; provider: string; url: string; area: string; free: boolean; certificate: boolean; modality: string; city: string }[];
 }) {
   const [suggestions, setSuggestions] = useState<ProfileSuggestion[]>(initialSuggestions);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<"all" | ProfileSuggestionType>("all");
+  const [modalityFilter, setModalityFilter] = useState<"all" | "online" | "presencial">("all");
+  const [freeOnly, setFreeOnly] = useState(false);
+
+  const isFree = (s: ProfileSuggestion) => /gratuito|grátis|gratis|r\$\s*0/i.test(s.priceLabel);
+  const filtered = suggestions.filter((s) => {
+    if (typeFilter !== "all" && s.type !== typeFilter) return false;
+    if (modalityFilter !== "all") {
+      const m = s.modality.toLowerCase();
+      if (modalityFilter === "online" && m === "presencial") return false;
+      if (modalityFilter === "presencial" && m !== "presencial") return false;
+    }
+    if (freeOnly && !isFree(s)) return false;
+    return true;
+  });
 
   async function generate() {
     setLoading(true);
@@ -103,11 +121,48 @@ export function ProfileSuggestions({
 
       {suggestions.length > 0 && (
         <>
+          <div className="flex flex-wrap items-center gap-2">
+            <FilterGroup
+              value={typeFilter}
+              onChange={setTypeFilter}
+              options={[
+                { value: "all", label: "Todos" },
+                { value: "course", label: "Cursos" },
+                { value: "certification", label: "Certificações" },
+                { value: "book", label: "Livros" },
+              ]}
+            />
+            <FilterGroup
+              value={modalityFilter}
+              onChange={setModalityFilter}
+              options={[
+                { value: "all", label: "Toda modalidade" },
+                { value: "online", label: "Online" },
+                { value: "presencial", label: "Presencial" },
+              ]}
+            />
+            <button
+              type="button"
+              onClick={() => setFreeOnly((v) => !v)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                freeOnly
+                  ? "border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+                  : "border-neutral-200 text-neutral-600 hover:border-neutral-300 dark:border-neutral-800 dark:text-neutral-400"
+              }`}
+            >
+              Só gratuitos
+            </button>
+          </div>
           <p className="text-xs text-neutral-500">
             💡 Preço e impacto são estimativas geradas por IA, não valores em tempo real.
           </p>
+          {filtered.length === 0 ? (
+            <p className="rounded-xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-6 text-center text-sm text-neutral-500">
+              Nenhuma sugestão com esses filtros. Ajuste os filtros acima.
+            </p>
+          ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {suggestions.map((s) => {
+            {filtered.map((s) => {
               const config = TYPE_CONFIG[s.type];
               return (
                 <div
@@ -116,11 +171,19 @@ export function ProfileSuggestions({
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <span
-                        className={`inline-flex items-center gap-1 text-[10px] font-medium rounded-full border px-2 py-0.5 ${config.chip}`}
-                      >
-                        {config.icon} {config.label}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span
+                          className={`inline-flex items-center gap-1 text-[10px] font-medium rounded-full border px-2 py-0.5 ${config.chip}`}
+                        >
+                          {config.icon} {config.label}
+                        </span>
+                        {s.type === "course" && s.modality && (
+                          <span className="inline-flex items-center gap-1 text-[10px] font-medium rounded-full border border-neutral-200 text-neutral-600 px-2 py-0.5 dark:border-neutral-800 dark:text-neutral-400">
+                            {s.modality.toLowerCase() === "presencial" ? "📍" : "💻"} {s.modality}
+                            {s.city ? ` · ${s.city}` : ""}
+                          </span>
+                        )}
+                      </div>
                       <p className="font-semibold mt-2 leading-snug">
                         {s.url ? (
                           <a href={s.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
@@ -139,6 +202,13 @@ export function ProfileSuggestions({
 
                   <p className="text-sm text-neutral-600 dark:text-neutral-400">{s.impactReason}</p>
 
+                  {s.gapAddressed && (
+                    <p className="text-xs text-neutral-500">
+                      <span className="font-medium text-neutral-700 dark:text-neutral-300">Resolve:</span>{" "}
+                      {s.gapAddressed}
+                    </p>
+                  )}
+
                   <div>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-neutral-500">Impacto estimado</span>
@@ -155,6 +225,7 @@ export function ProfileSuggestions({
               );
             })}
           </div>
+          )}
         </>
       )}
 
@@ -167,6 +238,7 @@ export function ProfileSuggestions({
               <a key={course.id} href={course.url} target="_blank" rel="noopener noreferrer" className="rounded-2xl border border-neutral-200 bg-white p-5 hover:border-blue-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-950">
                 <span className="text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
                   {course.free ? "Gratuito" : "Consulte o valor"} · {course.modality}
+                  {course.modality?.toLowerCase() === "presencial" && course.city ? ` · ${course.city}` : ""}
                 </span>
                 <h3 className="mt-2 font-semibold">{course.title}</h3>
                 <p className="mt-1 text-xs text-neutral-500">{course.provider} · {course.area}</p>
@@ -176,6 +248,35 @@ export function ProfileSuggestions({
           </div>
         </section>
       )}
+    </div>
+  );
+}
+
+function FilterGroup<T extends string>({
+  value,
+  onChange,
+  options,
+}: {
+  value: T;
+  onChange: (value: T) => void;
+  options: { value: T; label: string }[];
+}) {
+  return (
+    <div className="inline-flex rounded-full border border-neutral-200 p-0.5 dark:border-neutral-800">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+            value === opt.value
+              ? "bg-blue-600 text-white"
+              : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
     </div>
   );
 }

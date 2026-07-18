@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { isAdminEmail } from "@/lib/admin";
+import { isInfluencerUser } from "@/lib/influencer";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { Topbar } from "@/components/topbar";
 import { GuidedTour } from "@/components/guided-tour";
@@ -26,12 +27,13 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const userEmail = session.user.email ?? "";
   const userImage = dbUser?.image ?? null;
   const isAdmin = isAdminEmail(session.user.email);
+  const isInfluencer = await isInfluencerUser(session.user.id);
   const segment = normalizeCareerSegment(dbUser?.careerSegment);
 
   return (
     <UiPanelsProvider>
       <div className="flex min-h-screen">
-        <SidebarNav isAdmin={isAdmin} />
+        <SidebarNav isAdmin={isAdmin} isInfluencer={isInfluencer} />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar userName={userName} userEmail={userEmail} userImage={userImage} />
           <main className="flex-1">{children}</main>

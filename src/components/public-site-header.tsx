@@ -34,6 +34,9 @@ export function PublicSiteHeader() {
           <Link href="/comece" className="hidden sm:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Como funciona
           </Link>
+          <Link href="/empresa/cadastro" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Para empresas
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <Link

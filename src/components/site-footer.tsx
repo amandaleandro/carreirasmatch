@@ -19,6 +19,7 @@ export function SiteFooter() {
             <li><Link href="/#como-funciona" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Como funciona</Link></li>
             <li><Link href="/#recursos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Recursos</Link></li>
             <li><Link href="/#planos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Planos</Link></li>
+            <li><Link href="/empresa/cadastro" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Para empresas</Link></li>
           </ul>
         </div>
         <div>

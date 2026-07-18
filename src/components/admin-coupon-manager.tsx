@@ -6,6 +6,7 @@ type Coupon = {
   id: string;
   code: string;
   influencerName: string;
+  ownerEmail: string | null;
   active: boolean;
   discountType: "fixed" | "percent";
   oneOffDiscountCents: number;
@@ -34,6 +35,7 @@ type ReportRow = {
 type FormState = {
   code: string;
   influencerName: string;
+  ownerEmail: string;
   discountType: "fixed" | "percent";
   oneOffDiscount: string;
   subscriptionDiscount: string;
@@ -47,6 +49,7 @@ type FormState = {
 const EMPTY_FORM: FormState = {
   code: "",
   influencerName: "",
+  ownerEmail: "",
   discountType: "fixed",
   oneOffDiscount: "2,00",
   subscriptionDiscount: "4,00",
@@ -102,6 +105,7 @@ function couponToForm(coupon: Coupon): FormState {
   return {
     code: coupon.code,
     influencerName: coupon.influencerName,
+    ownerEmail: coupon.ownerEmail ?? "",
     discountType: coupon.discountType,
     oneOffDiscount: centsToReais(coupon.oneOffDiscountCents),
     subscriptionDiscount: centsToReais(coupon.subscriptionDiscountCents),
@@ -117,6 +121,7 @@ function formToPayload(form: FormState, options: { includeCode: boolean }) {
   return {
     ...(options.includeCode ? { code: form.code } : {}),
     influencerName: form.influencerName,
+    ownerEmail: form.ownerEmail.trim(),
     discountType: form.discountType,
     oneOffDiscountCents: reaisToCents(form.oneOffDiscount),
     subscriptionDiscountCents: reaisToCents(form.subscriptionDiscount),
@@ -194,6 +199,18 @@ function CouponFields({
           required
           className={inputClass}
         />
+      </label>
+
+      <label className="flex flex-col gap-1">
+        <span className="text-xs font-medium text-neutral-600 dark:text-neutral-400">E-mail do influencer</span>
+        <input
+          type="email"
+          value={form.ownerEmail}
+          onChange={(e) => update({ ownerEmail: e.target.value })}
+          placeholder="maria@email.com"
+          className={inputClass}
+        />
+        <span className="text-[11px] text-neutral-500">Dá acesso total + painel. A conta precisa já existir.</span>
       </label>
 
       <label className="flex flex-col gap-1">
@@ -397,7 +414,12 @@ export function AdminCouponManager() {
               return (
                 <tr key={coupon.id} className="align-top">
                   <td className="py-3 pr-4 font-mono font-semibold">{coupon.code}</td>
-                  <td className="py-3 pr-4">{coupon.influencerName}</td>
+                  <td className="py-3 pr-4">
+                    {coupon.influencerName}
+                    <span className="block text-[11px] text-neutral-500">
+                      {coupon.ownerEmail ? `👤 ${coupon.ownerEmail}` : "sem login vinculado"}
+                    </span>
+                  </td>
                   <td className="py-3 pr-4 text-xs text-neutral-500">{describeDiscount(coupon)}</td>
                   <td className="py-3 pr-4 text-xs text-neutral-500">{coupon.commissionPercent}%</td>
                   <td className="py-3 pr-4">

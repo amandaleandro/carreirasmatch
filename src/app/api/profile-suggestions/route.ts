@@ -3,6 +3,7 @@ import { requireAuth, requireActiveSubscription } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { generateProfileSuggestions } from "@/lib/groq";
 import { getCoursesForArea } from "@/lib/course-catalog";
+import { rankCourses } from "@/lib/course-match";
 
 export async function GET() {
   const { session, response } = await requireAuth();
@@ -58,11 +59,21 @@ export async function POST() {
 
   const completedCourses = courses.map((c) => c.title);
 
-  const normalizedArea = (user?.professionalArea ?? "").toLowerCase();
-  const liveOptions = externalCourses
-    .filter((course) => !normalizedArea || course.area.toLowerCase().includes(normalizedArea) || course.title.toLowerCase().includes(normalizedArea))
+  // Relevância por sobreposição de tokens contra área + lacunas (substitui o `includes`),
+  // priorizando cursos que atacam as lacunas mais frequentes das análises do candidato.
+  const liveOptions = rankCourses(externalCourses, {
+    area: user?.professionalArea,
+    skillGaps: topSkillGaps,
+  })
     .slice(0, 30)
-    .map((course) => ({ title: course.title, provider: course.provider, free: course.free }));
+    .map((course) => ({
+      title: course.title,
+      provider: course.provider,
+      free: course.free,
+      modality: course.modality,
+      city: course.city,
+      certificate: course.certificate,
+    }));
   const curatedOptions = [...getCoursesForArea(user?.professionalArea).map((c) => ({
     title: c.title,
     provider: c.provider,
@@ -91,6 +102,9 @@ export async function POST() {
         priceLabel: s.priceLabel,
         impactScore: s.impactScore,
         impactReason: s.impactReason,
+        gapAddressed: s.gapAddressed ?? "",
+        modality: s.type === "course" ? (s.modality ?? "") : "",
+        city: "",
       })),
     }),
   ]);

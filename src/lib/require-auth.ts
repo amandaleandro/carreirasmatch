@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { hasToolAccess } from "@/lib/tool-access";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { hasFullAccessEmail } from "@/lib/full-access-users";
+import { isInfluencerUser } from "@/lib/influencer";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { normalizeCareerSegment, type CareerSegment } from "@/lib/career-segments";
 
@@ -65,7 +66,9 @@ export async function requireToolAccess(toolHref: string, requiredSegment?: Care
     select: { careerSegment: true, email: true },
   });
 
-  if (hasFullAccessEmail(user?.email ?? session.user.email)) {
+  // Full-access (admin) e influenciadores enxergam todas as ferramentas,
+  // independentemente do segmento de carreira.
+  if (hasFullAccessEmail(user?.email ?? session.user.email) || (await isInfluencerUser(session.user.id))) {
     return { session, response: null };
   }
 
