@@ -4,7 +4,16 @@ import { useEffect } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 
 const SESSION_KEY = "cm_analytics_session";
+const OPT_OUT_KEY = "cm_analytics_opt_out";
 const SESSION_TIMEOUT_MS = 30 * 60 * 1000;
+
+function isOptedOut() {
+  try {
+    return localStorage.getItem(OPT_OUT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
 
 function getSessionId() {
   const now = Date.now();
@@ -29,7 +38,21 @@ export function AccessTracker() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!pathname || pathname.startsWith("/admin")) return;
+    if (!pathname) return;
+
+    // Ao acessar o painel admin (so o dono acessa), marca este navegador para
+    // nunca mais entrar na contagem de visitas.
+    if (pathname.startsWith("/admin")) {
+      try {
+        localStorage.setItem(OPT_OUT_KEY, "1");
+      } catch {
+        // ignora indisponibilidade de storage
+      }
+      return;
+    }
+
+    // Navegadores marcados (dono/equipe) nao contam.
+    if (isOptedOut()) return;
 
     const body = JSON.stringify({
       sessionId: getSessionId(),
