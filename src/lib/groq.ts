@@ -7,6 +7,7 @@ import {
   normalizeCareerSegment,
   suggestionGuidanceForSegment,
 } from "@/lib/career-segments";
+import { randomUUID } from "node:crypto";
 import type { ZodType } from "zod";
 
 const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
@@ -601,7 +602,13 @@ export async function generateProfileSuggestions(input: {
           .join("\n- ")}`
       : "";
 
-  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${guidanceBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
+  // "Atualizar sugestões" é uma ação explícita de refresh do usuário: o prompt é
+  // montado só a partir dos dados salvos, então sem variação ele seria idêntico a
+  // cada clique e a camada de IA devolveria a resposta em cache (temp <= 0.3, TTL 5min),
+  // fazendo parecer que o botão não pesquisa. O nonce muda a chave de cache (garante
+  // resposta nova) e ainda instrui o modelo a variar a seleção.
+  const varietyBlock = `\n\nID_DESTA_SOLICITACAO: ${randomUUID()} (varie a seleção em relação a gerações anteriores; não repita exatamente as mesmas sugestões).`;
+  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${guidanceBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}${varietyBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
   return runJsonPrompt<ProfileSuggestionsResult>(
     PROFILE_SUGGESTIONS_SYSTEM_PROMPT,
