@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
+import { PublicNav } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 import type { CareerTrack } from "@/components/analysis-display";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
@@ -819,16 +820,9 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
         </div>
         <header className="relative max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
-            <BrandLogo heightClassName="h-11" onDark />
+            <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
-          <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-white/70">
-            <a href="#como-funciona" className="nav-underline hidden sm:inline hover:text-white transition-colors">Como funciona</a>
-            <a href="#recursos" className="nav-underline hidden sm:inline hover:text-white transition-colors">Recursos</a>
-            <a href="#planos" className="nav-underline hidden sm:inline hover:text-white transition-colors">Planos</a>
-            <Link href="/gratuito" className="nav-underline hidden lg:inline hover:text-white transition-colors whitespace-nowrap">Ferramentas grátis</Link>
-            <Link href="/vagas-de-hoje" className="nav-underline hover:text-white transition-colors whitespace-nowrap">Vagas de hoje</Link>
-            <Link href="/blog" className="nav-underline hover:text-white transition-colors">Blog</Link>
-          </nav>
+          <PublicNav onDark />
           <div className="flex items-center gap-2">
             <Link
               href="/login"

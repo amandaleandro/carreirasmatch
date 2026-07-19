@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { PublicNav } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 
 export function ContentPage({
@@ -29,18 +30,25 @@ export function ContentPage({
       <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950">
         <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
-            <BrandLogo heightClassName="h-11" onDark />
+            <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
-          <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-white/70">
-            <Link href="/vagas-de-hoje" className="hover:text-white transition-colors whitespace-nowrap">Vagas de hoje</Link>
-            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
-          </nav>
-          <Link
-            href={backHref ?? "/login"}
-            className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors"
-          >
-            {backLabel ?? "Entrar"}
-          </Link>
+          <PublicNav onDark />
+          <div className="flex items-center gap-2">
+            <Link
+              href={backHref ?? "/login"}
+              className="rounded-lg border border-white/20 px-4 py-1.5 text-sm font-semibold text-white hover:bg-white/10 transition-colors whitespace-nowrap"
+            >
+              {backLabel ?? "Entrar"}
+            </Link>
+            {!backHref && (
+              <Link
+                href="/register"
+                className="rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-slate-950 hover:bg-blue-50 transition-colors whitespace-nowrap"
+              >
+                Criar conta
+              </Link>
+            )}
+          </div>
         </header>
 
         <div className={`${maxWidthClassName} mx-auto px-4 md:px-8 pt-6 pb-14 md:pt-10 md:pb-20`}>
