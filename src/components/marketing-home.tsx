@@ -10,7 +10,6 @@ import {
   RefreshCw,
   Scale,
   ShieldCheck,
-  Sparkles,
   Target,
   UserRoundSearch,
 } from "lucide-react";
@@ -142,8 +141,7 @@ export function MarketingHome() {
 
         <div className="relative mx-auto grid max-w-6xl gap-12 px-4 pb-20 pt-12 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:pb-28 lg:pt-20">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-blue-300/20 bg-blue-400/10 px-3 py-1.5 text-xs font-semibold text-blue-100">
-              <Sparkles className="h-3.5 w-3.5" />
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/90">
               Candidaturas mais estratégicas
             </span>
             <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight md:text-6xl">
@@ -170,7 +168,6 @@ export function MarketingHome() {
             </div>
             <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Resultado inicial gratuito</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Diagnóstico a partir de R$ 4,90</span>
               <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Sem promessa de contratação</span>
             </div>
           </div>

@@ -31,7 +31,7 @@ export function UnlockFirstAnalysisButton({ price }: { price?: string }) {
       onClick={() => setShowBrick(true)}
       className="rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 text-sm hover:bg-blue-700 transition-colors"
     >
-      {`Fazer minha primeira análise${price ? ` (${price})` : ""}`}
+      Fazer minha primeira análise
     </button>
   );
 }
