@@ -5,44 +5,57 @@ import Link from "next/link";
 import { useUiPanels } from "@/components/ui-panels";
 import {
   Bell,
-  BookMarked,
   CheckCircle2,
-  FolderGit2,
-  LifeBuoy,
-  Mic,
+  GraduationCap,
+  Landmark,
+  Mail,
   RefreshCw,
+  Rss,
+  ScrollText,
   Sparkles,
   X,
 } from "lucide-react";
 
 // Sobe a versão sempre que a lista muda de verdade: quem já fechou a modal
 // precisa ver o que saiu depois.
-const STORAGE_KEY = "upcoming-features-modal:v2:seen";
+const STORAGE_KEY = "upcoming-features-modal:v3:seen";
 
 /** Já está no ar - o que a pessoa pode usar agora. */
 const SHIPPED = [
   {
-    title: "Simulador de entrevista",
-    description: "5 perguntas reais do seu cargo, com nota e feedback a cada resposta. Funciona para qualquer área, não só tecnologia.",
-    href: "/tools/interview-simulator",
-    icon: Mic,
+    title: "Radar de concursos",
+    description: "Novos editais, inscrições e provas de concursos públicos reunidos e atualizados ao longo do dia.",
+    href: "/concursos",
+    icon: Landmark,
   },
   {
-    title: "Suporte dentro do sistema",
-    description: "Abra um chamado por área e converse direto com nosso time, sem sair da plataforma.",
-    href: "/suporte",
-    icon: LifeBuoy,
+    title: "Radar de vestibulares",
+    description: "Vestibulares, ENEM, Sisu, ProUni e bolsas mais recentes, tudo num lugar só.",
+    href: "/vestibulares",
+    icon: ScrollText,
   },
   {
-    title: "Análise de GitHub por link",
-    description: "Agora basta colar o link do seu perfil: buscamos seus repositórios públicos automaticamente.",
-    href: "/tools/github-review",
-    icon: FolderGit2,
+    title: "Mentorias em vídeo",
+    description: "Mentorias e cursos gratuitos de carreira, entrevista e currículo, selecionados do YouTube.",
+    href: "/mentorias",
+    icon: GraduationCap,
+  },
+  {
+    title: "Feed aberto a todos",
+    description: "Agora dá para ver todas as vagas disponíveis mesmo antes de enviar o currículo.",
+    href: "/feed",
+    icon: Rss,
   },
 ];
 
 /** Ainda não existe - o que estamos priorizando. */
 const UPCOMING = [
+  {
+    title: "Alertas de concursos e vestibulares",
+    description: "Escolha seus temas e receba um aviso por e-mail assim que surgir um edital novo no radar.",
+    status: "Próximo",
+    icon: Mail,
+  },
   {
     title: "Lembretes de prazo e entrevista",
     description: "Avisos por e-mail para não perder data de candidatura, teste técnico ou entrevista.",
@@ -52,14 +65,8 @@ const UPCOMING = [
   {
     title: "Reanálise rápida do currículo",
     description: "Depois de editar o currículo, comparar de novo com a mesma vaga sem refazer tudo.",
-    status: "Próximo",
-    icon: RefreshCw,
-  },
-  {
-    title: "Glossário de termos por área",
-    description: "O que cada termo que aparece nas vagas da sua área realmente significa.",
     status: "Depois",
-    icon: BookMarked,
+    icon: RefreshCw,
   },
 ];
 
@@ -126,7 +133,7 @@ export function UpcomingFeaturesModal() {
                     O que acabou de chegar no CarreirasMatch
                   </h2>
                   <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                    Estamos priorizando recursos que ajudam você a voltar com clareza, acompanhar oportunidades e transformar análise em ação.
+                    Agora você acompanha vagas, concursos e vestibulares e ainda estuda de graça — tudo num lugar só.
                   </p>
                 </div>
                 <button
