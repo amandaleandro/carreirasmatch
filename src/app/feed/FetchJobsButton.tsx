@@ -18,13 +18,9 @@ export function FetchJobsButton() {
 
       const summary =
         data.added > 0
-          ? `Prontinho! Encontramos ${data.added} vaga(s) nova(s) pra você.`
+          ? `Prontinho! ${data.added} ${data.added === 1 ? "vaga nova" : "vagas novas"} pra você.`
           : "Por enquanto não achamos nada novo. Volte mais tarde que a lista está sempre mudando.";
-      const errorNote =
-        data.errors?.length > 0
-          ? " Algumas fontes não responderam agora, então pulamos elas."
-          : "";
-      setMessage(summary + errorNote);
+      setMessage(summary);
       router.refresh();
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Algo deu errado. Tente de novo.");
