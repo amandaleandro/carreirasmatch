@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   HelpCircle,
   TrendingUp,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -41,6 +42,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
   { href: "/history", label: "Relatórios", icon: BarChart3 },
   { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
+  { href: "/mentorias", label: "Mentorias", icon: GraduationCap },
   { href: "/suporte", label: "Suporte", icon: LifeBuoy },
   { href: "/settings", label: "Perfil", icon: User },
 ];

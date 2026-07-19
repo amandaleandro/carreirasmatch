@@ -6,6 +6,7 @@ import { getOrCreateFeedMatches, FEED_PAGE_SIZE } from "@/lib/job-feed";
 import { CareerTrack } from "@/components/analysis-display";
 import { deriveJobTags, tierFromScore, bypassesLocationFilter, isEntryLevelJob } from "@/lib/feed-tags";
 import { FeedList } from "./FeedList";
+import { AllJobsList } from "./AllJobsList";
 import { AddJobForm } from "./AddJobForm";
 import { FetchJobsButton } from "./FetchJobsButton";
 import { Pagination } from "./Pagination";
@@ -89,19 +90,48 @@ export default async function FeedPage({
   });
 
   if (!resume) {
+    // Sem currículo ainda: mostra TODAS as vagas disponíveis (sem score de match),
+    // com um convite para o diagnóstico, que destrava o ranking personalizado.
+    const [jobs, totalJobs] = await Promise.all([
+      prisma.job.findMany({
+        where: { active: true },
+        orderBy: { createdAt: "desc" },
+        skip: (page - 1) * FEED_PAGE_SIZE,
+        take: FEED_PAGE_SIZE,
+      }),
+      prisma.job.count({ where: { active: true } }),
+    ]);
+    const totalPages = Math.max(1, Math.ceil(totalJobs / FEED_PAGE_SIZE));
+
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center">
-        <h1 className="text-2xl font-bold tracking-tight">Feed de vagas</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Você ainda não enviou um currículo. Faça seu primeiro diagnóstico que
-          a gente já começa a te mostrar vagas com a sua cara.
-        </p>
-        <Link
-          href="/"
-          className="inline-block mt-6 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
-        >
-          Fazer meu primeiro diagnóstico
-        </Link>
+      <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Feed de vagas</h1>
+          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
+            Explore todas as vagas disponíveis. Envie seu currículo para vermos o
+            quanto cada uma combina com você e destravar a análise completa.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 p-5 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+          <div>
+            <p className="font-semibold">Quer ver o quanto cada vaga combina com você?</p>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              Faça seu diagnóstico gratuito: a gente ordena as vagas pela sua cara e
+              libera a análise completa de cada uma.
+            </p>
+          </div>
+          <Link
+            href="/"
+            className="shrink-0 rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all text-center"
+          >
+            Fazer meu diagnóstico
+          </Link>
+        </div>
+
+        <p className="text-sm text-neutral-500">{totalJobs} vaga(s) disponível(is).</p>
+        <AllJobsList jobs={jobs} />
+        <Pagination page={page} totalPages={totalPages} searchParams={params} />
       </div>
     );
   }
