@@ -17,7 +17,7 @@ Revise esta lista manualmente antes de cada deploy.
 | `MERCADOPAGO_ACCESS_TOKEN` | Backend: cria pagamentos/assinaturas | `APP_USR-...` = **produção real**, `TEST-...` = sandbox |
 | `NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY` | Client: inicializa os Bricks | exposta no bundle, isso é esperado |
 | `MERCADOPAGO_WEBHOOK_SECRET` | Valida `x-signature` no webhook | **se estiver errado/placeholder, todo webhook real é rejeitado (401) e pagamentos ficam `pending` para sempre** |
-| `ADMIN_EMAILS` | Libera `/admin` e `requireAdminApi` | lista separada por vírgula |
+| `ADMIN_EMAILS` | Libera `/admin` e `requireAdminApi`; também recebe as notificações internas de novo cadastro e de venda (via Resend) | lista separada por vírgula. Sem ela, as notificações não são enviadas (só logam) |
 
 ## Opcionais (fontes extra de vagas - puladas se ausentes)
 

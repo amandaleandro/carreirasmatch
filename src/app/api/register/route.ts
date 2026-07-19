@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { isCareerSegment } from "@/lib/career-segments";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { sendWelcomeEmail } from "@/lib/resend";
+import { sendWelcomeEmail, notifyAdminNewSignup } from "@/lib/resend";
 import { validateContact } from "@/lib/contact-validation";
 import { normalizeCouponCode } from "@/lib/coupons";
 
@@ -85,6 +85,12 @@ export async function POST(req: NextRequest) {
       await prisma.user.create({ data: { ...data, email: normalizedEmail } });
       // Fire-and-forget: nunca bloqueia o cadastro se o e-mail falhar.
       void sendWelcomeEmail(normalizedEmail, data.name);
+      void notifyAdminNewSignup({
+        name: normalizedName,
+        email: normalizedEmail,
+        phone: normalizedPhone,
+        segment: careerSegment,
+      });
     }
 
     await prisma.lead.create({

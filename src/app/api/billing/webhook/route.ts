@@ -9,9 +9,10 @@ import {
   sendPaymentFailedEmail,
   sendSubscriptionCancelledEmail,
   sendOnce,
+  notifyAdminPurchase,
 } from "@/lib/resend";
 import { normalizeCareerSegment } from "@/lib/career-segments";
-import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod } from "@/lib/billing-plans";
+import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod, periodPlanProductName } from "@/lib/billing-plans";
 import { grantScreeningCredits } from "@/lib/company-billing";
 
 async function userEmail(userId: string): Promise<string | null> {
@@ -44,8 +45,17 @@ export async function POST(req: NextRequest) {
       if (companyPayment) {
         const mpPayment = await getPayment(dataId);
         if (mpPayment.status === "approved") {
-          // Idempotente: grantScreeningCredits só credita na primeira transição.
-          await grantScreeningCredits(companyPayment.id);
+          // Idempotente: grantScreeningCredits só credita na primeira transição
+          // (retorna o novo saldo; null se já estava pago). Avisa o admin só na
+          // primeira vez, para não duplicar em reenvios do webhook.
+          const balance = await grantScreeningCredits(companyPayment.id);
+          if (balance !== null) {
+            void notifyAdminPurchase({
+              product: `${companyPayment.credits} triagens (empresa)`,
+              amountCents: companyPayment.amount,
+              email: null,
+            });
+          }
         } else if (
           (mpPayment.status === "rejected" || mpPayment.status === "cancelled") &&
           companyPayment.status === "pending"
@@ -95,8 +105,14 @@ export async function POST(req: NextRequest) {
           payment.id
         );
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
+        void notifyAdminPurchase({ product: periodPlanProductName(payment.kind), amountCents: payment.amount, email });
       } else {
         if (email) void sendPaymentConfirmationEmail(email, { kind: payment.kind, amountCents: payment.amount });
+        void notifyAdminPurchase({
+          product: payment.kind === "diagnostic" ? "Diagnóstico completo" : "Primeira análise",
+          amountCents: payment.amount,
+          email,
+        });
 
         // PIX/confirmação assíncrona de avulso anônimo: reivindica a análise sem
         // dono para o usuário criado no momento do pagamento (ver payment/route.ts).
@@ -160,6 +176,7 @@ export async function POST(req: NextRequest) {
       if (!wasPaid) {
         const email = await userEmail(payment.userId);
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
+        void notifyAdminPurchase({ product: "Assinatura mensal", amountCents: payment.amount, email });
       }
     } else if (status === "cancelled" && payment.status !== "cancelled") {
       // Assinatura cancelada no Mercado Pago: reflete no nosso registro e avisa

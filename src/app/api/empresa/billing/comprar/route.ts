@@ -3,6 +3,7 @@ import { requireCompanyApi } from "@/lib/company-auth";
 import { prisma } from "@/lib/prisma";
 import { createPayment } from "@/lib/mercadopago";
 import { findScreeningPack, grantScreeningCredits } from "@/lib/company-billing";
+import { notifyAdminPurchase } from "@/lib/resend";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 const BUY_LIMIT = { limit: 10, windowMs: 10 * 60 * 1000 };
@@ -76,6 +77,13 @@ export async function POST(req: NextRequest) {
     // Cartão aprovado no caminho síncrono: credita agora. No PIX (pending), o
     // webhook chama grantScreeningCredits quando confirmar.
     balance = await grantScreeningCredits(payment.id);
+    if (balance !== null) {
+      void notifyAdminPurchase({
+        product: `${pack.credits} triagens (empresa)`,
+        amountCents: pack.priceCents,
+        email: company.email,
+      });
+    }
   }
 
   return NextResponse.json({ status: result.status, pix: result.pix, credits: pack.credits, balance });

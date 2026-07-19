@@ -9,12 +9,20 @@ export async function GET() {
   const { session, response } = await requireAuth();
   if (!session) return response!;
 
-  const suggestions = await prisma.profileSuggestion.findMany({
-    where: { userId: session.user.id },
-    orderBy: { impactScore: "desc" },
-  });
+  try {
+    const suggestions = await prisma.profileSuggestion.findMany({
+      where: { userId: session.user.id },
+      orderBy: { impactScore: "desc" },
+    });
 
-  return NextResponse.json({ suggestions });
+    return NextResponse.json({ suggestions });
+  } catch (err) {
+    console.error("[profile-suggestions][GET]", err);
+    return NextResponse.json(
+      { error: "Não foi possível carregar as sugestões agora." },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST() {
@@ -23,6 +31,18 @@ export async function POST() {
 
   const userId = session.user.id;
 
+  try {
+    return await generateSuggestions(userId);
+  } catch (err) {
+    console.error("[profile-suggestions][POST]", err);
+    return NextResponse.json(
+      { error: "Não foi possível gerar as sugestões agora. Tente novamente em instantes." },
+      { status: 502 },
+    );
+  }
+}
+
+async function generateSuggestions(userId: string) {
   const [user, analyses, courses, externalCourses] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },

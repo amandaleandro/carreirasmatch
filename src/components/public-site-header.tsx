@@ -22,6 +22,9 @@ export function PublicSiteHeader() {
           <Link href="/cursos-gratuitos" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Cursos gratuitos
           </Link>
+          <Link href="/mentorias" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Mentorias
+          </Link>
           <Link href="/mercado-de-trabalho" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Mercado
           </Link>

@@ -84,6 +84,82 @@ export async function sendOnce(
   await send();
 }
 
+/**
+ * Destinatários das notificações internas (novos cadastros e vendas).
+ * Reaproveita ADMIN_EMAILS, a mesma lista que libera o /admin. Sem ela, nada é
+ * enviado (só loga), então habilitar as notificações é só definir a env.
+ */
+const ADMIN_RECIPIENTS = (process.env.ADMIN_EMAILS ?? "")
+  .split(",")
+  .map((e) => e.trim())
+  .filter(Boolean);
+
+/**
+ * E-mail interno para o(s) admin(s): layout enxuto (sem o rodapé voltado ao
+ * cliente) montado a partir de pares rótulo/valor. Fire-and-forget, nunca lança
+ * para o chamador, igual aos transacionais.
+ */
+async function sendAdmin(subject: string, rows: Array<[string, string]>) {
+  if (!resend) {
+    console.error(`RESEND_API_KEY não configurada, notificação admin "${subject}" não enviada.`);
+    return;
+  }
+  if (ADMIN_RECIPIENTS.length === 0) {
+    console.warn(`ADMIN_EMAILS não configurada, notificação admin "${subject}" não enviada.`);
+    return;
+  }
+  const body = `
+    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #0f172a;">
+      <h2 style="font-size: 18px; margin: 0 0 12px;">${subject}</h2>
+      <table style="border-collapse: collapse; font-size: 14px;">
+        ${rows
+          .map(
+            ([k, v]) => `<tr>
+              <td style="padding: 4px 12px 4px 0; color: #64748b; vertical-align: top;">${k}</td>
+              <td style="padding: 4px 0;"><strong>${v}</strong></td>
+            </tr>`
+          )
+          .join("")}
+      </table>
+    </div>
+  `;
+  try {
+    const { error } = await resend.emails.send({ from: FROM, to: ADMIN_RECIPIENTS, subject, html: body });
+    if (error) console.error(`Resend recusou a notificação admin "${subject}":`, error);
+  } catch (err) {
+    console.error(`Falha ao enviar notificação admin "${subject}":`, err);
+  }
+}
+
+/** Avisa o admin de um novo cadastro. Chame com fire-and-forget (void). */
+export async function notifyAdminNewSignup(opts: {
+  name?: string | null;
+  email: string;
+  phone?: string | null;
+  segment?: string | null;
+}) {
+  const rows: Array<[string, string]> = [
+    ["Nome", opts.name?.trim() || "—"],
+    ["E-mail", opts.email],
+  ];
+  if (opts.phone?.trim()) rows.push(["Telefone", opts.phone.trim()]);
+  if (opts.segment?.trim()) rows.push(["Momento de carreira", opts.segment.trim()]);
+  await sendAdmin("Novo cadastro 🎉", rows);
+}
+
+/** Avisa o admin de uma venda confirmada. Chame com fire-and-forget (void). */
+export async function notifyAdminPurchase(opts: {
+  product: string;
+  amountCents: number;
+  email?: string | null;
+}) {
+  await sendAdmin("Nova venda 💰", [
+    ["Produto", opts.product],
+    ["Valor", formatCentsToBRL(opts.amountCents)],
+    ["Cliente", opts.email?.trim() || "—"],
+  ]);
+}
+
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   await send(
     to,

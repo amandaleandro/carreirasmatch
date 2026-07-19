@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
@@ -542,6 +542,163 @@ function isNicheSlug(value: string | null): value is NicheSlug {
   return !!value && value in NICHES;
 }
 
+function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+/** Conta de 0 até `value` quando entra na tela. Cai para o valor final direto
+ *  se o usuário pediu menos movimento ou o navegador não suporta observer. */
+function CountUp({ value, className }: { value: number; className?: string }) {
+  const [display, setDisplay] = useState(value);
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (
+      !el ||
+      prefersReducedMotion() ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      setDisplay(value);
+      return;
+    }
+
+    let raf = 0;
+    let start = 0;
+    const duration = 950;
+    const run = (t: number) => {
+      if (!start) start = t;
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      setDisplay(Math.round(value * eased));
+      if (p < 1) raf = requestAnimationFrame(run);
+    };
+
+    setDisplay(0);
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          raf = requestAnimationFrame(run);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [value]);
+
+  return (
+    <span ref={ref} className={className}>
+      {display}
+    </span>
+  );
+}
+
+/** Barra fina no topo que reflete o quanto da página já foi lido. */
+function ReadingProgress({ className }: { className: string }) {
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const doc = document.documentElement;
+      const max = doc.scrollHeight - doc.clientHeight;
+      setProgress(max > 0 ? Math.min(1, doc.scrollTop / max) : 0);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  return (
+    <div className="fixed inset-x-0 top-0 z-50 h-0.5 bg-transparent" aria-hidden>
+      <div
+        className={`h-full origin-left ${className}`}
+        style={{ transform: `scaleX(${progress})`, transition: "transform 0.1s linear" }}
+      />
+    </div>
+  );
+}
+
+/** Anel de progresso desenhado ao redor do score, que preenche ao entrar na tela.
+ *  A cor vem do texto (stroke-current), então o container define o tom do tema. */
+function ScoreRing({ value }: { value: number }) {
+  const ref = useRef<SVGSVGElement>(null);
+  const [inView, setInView] = useState(false);
+  const size = 100;
+  const stroke = 8;
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const clamped = Math.max(0, Math.min(100, value));
+  const offset = circ * (1 - clamped / 100);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || prefersReducedMotion() || typeof IntersectionObserver === "undefined") {
+      setInView(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setInView(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.5 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <svg
+      ref={ref}
+      viewBox={`0 0 ${size} ${size}`}
+      className="score-ring h-full w-full -rotate-90"
+      style={
+        {
+          "--ring-circumference": `${circ}`,
+          "--ring-offset": `${offset}`,
+        } as CSSProperties
+      }
+    >
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" strokeWidth={stroke} className="stroke-current opacity-15" />
+      {inView && (
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          className="score-ring-value stroke-current"
+          strokeDasharray={circ}
+          strokeDashoffset={offset}
+        />
+      )}
+    </svg>
+  );
+}
+
 export function NicheLandingPage() {
   const [activeSlug, setActiveSlug] = useState<NicheSlug>(() => {
     if (typeof window === "undefined") return "estagiarios";
@@ -550,6 +707,63 @@ export function NicheLandingPage() {
   });
   const [activeResourceTab, setActiveResourceTab] = useState<ResourceTab>("curiosities");
   const [firstJobPath, setFirstJobPath] = useState<FirstJobPath>("sem_formacao");
+  const rootRef = useRef<HTMLDivElement>(null);
+  const heroVisualRef = useRef<HTMLDivElement>(null);
+
+  // Reveal ao rolar: qualquer .reveal dentro da página aparece ao entrar na tela.
+  // Re-roda quando o conteúdo condicional muda (troca de nicho / primeiro emprego)
+  // para observar nós recém-montados. Nós já visíveis mantêm a classe.
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const els = Array.from(root.querySelectorAll<HTMLElement>(".reveal"));
+    if (prefersReducedMotion() || typeof IntersectionObserver === "undefined") {
+      els.forEach((el) => el.classList.add("is-visible"));
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+            io.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -8% 0px" },
+    );
+    els.forEach((el) => {
+      if (!el.classList.contains("is-visible")) io.observe(el);
+    });
+    return () => io.disconnect();
+  }, [activeSlug, firstJobPath]);
+
+  // Parallax de ponteiro: o cartão do hero inclina de leve seguindo o mouse.
+  // Só no desktop (ponteiro fino) e quando o usuário aceita movimento.
+  useEffect(() => {
+    const el = heroVisualRef.current;
+    if (!el || prefersReducedMotion()) return;
+    if (typeof window.matchMedia === "function" && !window.matchMedia("(pointer: fine)").matches) {
+      return;
+    }
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const cx = (e.clientX - r.left) / r.width - 0.5;
+      const cy = (e.clientY - r.top) / r.height - 0.5;
+      el.style.setProperty("--rx", `${(-cy * 6).toFixed(2)}deg`);
+      el.style.setProperty("--ry", `${(cx * 8).toFixed(2)}deg`);
+    };
+    const reset = () => {
+      el.style.setProperty("--rx", "0deg");
+      el.style.setProperty("--ry", "0deg");
+    };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", reset);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", reset);
+    };
+  }, []);
 
   const niche: Niche = NICHES[activeSlug];
   const theme = THEME_PALETTE[niche.themeAccent];
@@ -590,19 +804,29 @@ export function NicheLandingPage() {
   ];
 
   return (
-    <div className="w-full">
-      <div className={`bg-gradient-to-br ${theme.heroBg}`}>
-        <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
+    <div ref={rootRef} className="w-full">
+      <ReadingProgress className={theme.numberBg} />
+      <div className={`relative overflow-hidden bg-gradient-to-br ${theme.heroBg}`}>
+        {/* Aurora: dois glows grandes driftando devagar atrás de todo o hero. */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className={`animate-aurora absolute -top-32 -left-24 h-[26rem] w-[26rem] rounded-full bg-gradient-to-br ${theme.blob} opacity-30 blur-3xl`}
+          />
+          <div
+            className={`animate-aurora-delayed absolute -bottom-40 right-[-6rem] h-[30rem] w-[30rem] rounded-full bg-gradient-to-br ${theme.blob} opacity-20 blur-3xl`}
+          />
+        </div>
+        <header className="relative max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-11" onDark />
           </Link>
           <nav className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm font-medium text-white/70">
-            <a href="#como-funciona" className="hidden sm:inline hover:text-white transition-colors">Como funciona</a>
-            <a href="#recursos" className="hidden sm:inline hover:text-white transition-colors">Recursos</a>
-            <a href="#planos" className="hidden sm:inline hover:text-white transition-colors">Planos</a>
-            <Link href="/gratuito" className="hidden lg:inline hover:text-white transition-colors whitespace-nowrap">Ferramentas grátis</Link>
-            <Link href="/vagas-de-hoje" className="hover:text-white transition-colors whitespace-nowrap">Vagas de hoje</Link>
-            <Link href="/blog" className="hover:text-white transition-colors">Blog</Link>
+            <a href="#como-funciona" className="nav-underline hidden sm:inline hover:text-white transition-colors">Como funciona</a>
+            <a href="#recursos" className="nav-underline hidden sm:inline hover:text-white transition-colors">Recursos</a>
+            <a href="#planos" className="nav-underline hidden sm:inline hover:text-white transition-colors">Planos</a>
+            <Link href="/gratuito" className="nav-underline hidden lg:inline hover:text-white transition-colors whitespace-nowrap">Ferramentas grátis</Link>
+            <Link href="/vagas-de-hoje" className="nav-underline hover:text-white transition-colors whitespace-nowrap">Vagas de hoje</Link>
+            <Link href="/blog" className="nav-underline hover:text-white transition-colors">Blog</Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link
@@ -620,7 +844,7 @@ export function NicheLandingPage() {
           </div>
         </header>
 
-        <div className="max-w-6xl mx-auto px-4 md:px-8">
+        <div className="relative max-w-6xl mx-auto px-4 md:px-8">
           {/* Niche selector */}
           <section className="pt-2 md:pt-4">
             <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-3">
@@ -648,22 +872,22 @@ export function NicheLandingPage() {
             </div>
           </section>
 
-          {/* Hero */}
-          <section className="py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 items-center">
+          {/* Hero — remonta ao trocar de nicho para reproduzir a entrada escalonada */}
+          <section key={activeSlug} className="py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 items-center">
             <div>
-              <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 ${theme.badge}`}>
+              <span className={`animate-rise inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 ${theme.badge}`}>
                 {niche.eyebrow}
               </span>
-              <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight">
+              <h1 className="animate-rise text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight" style={{ animationDelay: "80ms" }}>
                 {niche.headline}
               </h1>
-              <p className="text-white/70 mt-5 max-w-xl text-base md:text-lg">
+              <p className="animate-rise text-white/70 mt-5 max-w-xl text-base md:text-lg" style={{ animationDelay: "160ms" }}>
                 {niche.subheadline}
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="animate-rise mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3" style={{ animationDelay: "240ms" }}>
                 <Link
                   href={primaryActionHref}
-                  className={`inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
+                  className={`btn-shine inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
                 >
                   {primaryActionLabel}
                 </Link>
@@ -678,7 +902,7 @@ export function NicheLandingPage() {
                 Não precisa de cartão de crédito.
               </p>
 
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl">
+              <div className="animate-rise mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl" style={{ animationDelay: "320ms" }}>
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
                   <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 1</p>
                   <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Plano por peso das matérias" : "Score claro de aderência"}</p>
@@ -694,11 +918,11 @@ export function NicheLandingPage() {
               </div>
 
               {/* Quick features */}
-              <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="animate-rise mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3" style={{ animationDelay: "400ms" }}>
                 {niche.quickFeatures.map((feature) => (
                   <div
                     key={feature}
-                    className={`rounded-xl px-3 py-2.5 text-[11px] font-medium leading-snug ${theme.chip}`}
+                    className={`rounded-xl px-3 py-2.5 text-[11px] font-medium leading-snug transition-transform hover:-translate-y-0.5 ${theme.chip}`}
                   >
                     {feature}
                   </div>
@@ -707,7 +931,11 @@ export function NicheLandingPage() {
             </div>
 
             {/* Hero visual */}
-            <div className="relative mx-auto w-full max-w-xs aspect-[4/5] mt-16 lg:mt-0 lg:-translate-y-6">
+            <div
+              ref={heroVisualRef}
+              className="hero-tilt animate-rise relative mx-auto w-full max-w-xs aspect-[4/5] mt-16 lg:mt-0 lg:-translate-y-6"
+              style={{ animationDelay: "300ms" }}
+            >
               <div className={`absolute inset-0 rounded-[2.5rem] bg-gradient-to-br ${theme.blob} opacity-90`} />
               <div className="absolute inset-0 rounded-[2.5rem] overflow-hidden">
                 <Image
@@ -718,16 +946,18 @@ export function NicheLandingPage() {
                   className="object-cover object-top"
                 />
               </div>
-              <div className="absolute -top-24 -right-4 max-w-[11rem] rounded-2xl bg-white/95 p-3 text-slate-900 shadow-xl backdrop-blur">
+              <div className="animate-float-soft absolute -top-24 -right-4 max-w-[11rem] rounded-2xl bg-white/95 p-3 text-slate-900 shadow-xl backdrop-blur">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">Leitura rápida</p>
-                <p className="mt-2 text-2xl font-extrabold leading-none">{niche.samplePreview.score}</p>
+                <p className="mt-2 text-2xl font-extrabold leading-none">
+                  <CountUp value={niche.samplePreview.score} />
+                </p>
                 <p className="mt-1 text-xs font-semibold leading-snug text-slate-700">{niche.samplePreview.scoreLabel}</p>
               </div>
-              <div className="absolute left-4 right-4 bottom-4 rounded-2xl bg-slate-950/78 p-3 text-white shadow-xl backdrop-blur-sm">
+              <div className="animate-float-soft-slow absolute left-4 right-4 bottom-4 rounded-2xl bg-slate-950/78 p-3 text-white shadow-xl backdrop-blur-sm">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/50">Pergunta que costuma aparecer</p>
                 <p className="mt-1 text-sm leading-snug">“{niche.samplePreview.sampleQuestion}”</p>
               </div>
-              <span className="absolute bottom-5 right-5 h-11 w-11 rounded-full bg-white/95 shadow-md flex items-center justify-center text-xl">
+              <span className="animate-float-soft absolute bottom-5 right-5 h-11 w-11 rounded-full bg-white/95 shadow-md flex items-center justify-center text-xl">
                 {niche.heroIcon}
               </span>
             </div>
@@ -737,12 +967,12 @@ export function NicheLandingPage() {
 
       <main className="max-w-6xl mx-auto px-4 md:px-8">
         {/* Attention strip */}
-        <section className="-mt-6 pb-4 md:pb-6 relative z-10">
+        <section className="reveal -mt-6 pb-4 md:pb-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {attentionCards.map((card) => (
               <div
                 key={card.label}
-                className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white/96 dark:bg-neutral-950/96 p-5 shadow-lg shadow-slate-900/5"
+                className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white/96 dark:bg-neutral-950/96 p-5 shadow-lg shadow-slate-900/5 transition-all hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-900/10"
               >
                 <p className={`text-[11px] font-semibold uppercase tracking-[0.24em] ${theme.accentText}`}>{card.label}</p>
                 <p className="mt-2 text-base font-bold tracking-tight text-neutral-900 dark:text-white">{card.title}</p>
@@ -753,7 +983,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* Human reassurance */}
-        <section className="pb-6 md:pb-8">
+        <section className="reveal pb-6 md:pb-8">
           <div className="rounded-[2rem] border border-neutral-200 dark:border-neutral-800 bg-slate-950 text-white p-6 md:p-8 shadow-2xl shadow-slate-950/20 overflow-hidden relative">
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(96,165,250,0.16),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,197,94,0.10),transparent_35%)]" />
             <div className="relative">
@@ -785,7 +1015,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* Pain points */}
-        <section className="py-10 md:py-14">
+        <section className="reveal py-10 md:py-14">
           <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 shadow-sm space-y-3 max-w-2xl mx-auto">
             <div className="flex items-start justify-between gap-4 pb-1">
               <div>
@@ -838,7 +1068,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* Sample preview */}
-        <section className="pb-12">
+        <section className="reveal pb-12">
           <div className="text-center max-w-2xl mx-auto">
             <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>Exemplo real</p>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">
@@ -851,8 +1081,11 @@ export function NicheLandingPage() {
 
           <div className="mt-8 max-w-2xl mx-auto rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 md:p-8 shadow-sm">
             <div className="flex items-center gap-5">
-              <div className={`h-16 w-16 md:h-20 md:w-20 shrink-0 rounded-full flex items-center justify-center text-lg md:text-xl font-extrabold ${theme.chip}`}>
-                {niche.samplePreview.score}
+              <div className={`relative h-16 w-16 md:h-20 md:w-20 shrink-0 ${theme.accentText}`}>
+                <ScoreRing value={niche.samplePreview.score} />
+                <div className="absolute inset-0 flex items-center justify-center text-lg md:text-xl font-extrabold text-neutral-900 dark:text-white">
+                  <CountUp value={niche.samplePreview.score} />
+                </div>
               </div>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
@@ -920,7 +1153,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* How it works */}
-        <section id="como-funciona" className="py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
+        <section id="como-funciona" className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-center">
             Como funciona
           </h2>
@@ -932,8 +1165,8 @@ export function NicheLandingPage() {
                 { title: "Receba seu plano de ação", description: "Veja o que fazer para aumentar suas chances nas próximas candidaturas." },
               ]
             ).map((step, i) => (
-              <div key={step.title} className="text-center">
-                <span className={`mx-auto h-10 w-10 rounded-xl text-white flex items-center justify-center font-bold shadow-md ${theme.numberBg}`}>
+              <div key={step.title} className="group text-center">
+                <span className={`mx-auto h-10 w-10 rounded-xl text-white flex items-center justify-center font-bold shadow-md transition-transform group-hover:scale-110 ${theme.numberBg}`}>
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <p className="font-semibold text-sm mt-3">{step.title}</p>
@@ -946,7 +1179,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* CTA banner */}
-        <section className="py-10 border-t border-neutral-100 dark:border-neutral-900 text-center">
+        <section className="reveal py-10 border-t border-neutral-100 dark:border-neutral-900 text-center">
           <h2 className={`text-xl md:text-2xl font-bold tracking-tight ${theme.accentText}`}>
             Comece de graça hoje mesmo
           </h2>
@@ -957,7 +1190,7 @@ export function NicheLandingPage() {
           </p>
           <Link
             href={primaryActionHref}
-            className={`mt-5 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
+            className={`btn-shine mt-5 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
           >
             {primaryActionLabel}
           </Link>
@@ -975,7 +1208,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* Pricing: grátis, pagamento único e assinatura mensal, valor específico do nicho */}
-        <section id="planos" className="py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
+        <section id="planos" className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
           <div className="text-center max-w-2xl mx-auto">
             <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>O que você ganha</p>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">
@@ -1027,7 +1260,7 @@ export function NicheLandingPage() {
             </div>
 
             {/* Tier 3: assinatura mensal, valor por nicho */}
-            <div className={`relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
+            <div className={`animate-soft-glow relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
               <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full text-white text-[10px] font-bold uppercase tracking-wide px-3 py-1 shadow-sm whitespace-nowrap ${theme.numberBg}`}>
                 Melhor custo-benefício
               </span>
@@ -1068,7 +1301,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* Learning resources */}
-        <section id="recursos" className="py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
+        <section id="recursos" className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
               <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>
@@ -1101,11 +1334,12 @@ export function NicheLandingPage() {
               })}
             </div>
           </div>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div key={activeResourceTab} className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-5">
             {resourceItems.map((item, index) => (
               <div
                 key={item}
-                className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
+                className="animate-rise rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
+                style={{ animationDelay: `${index * 80}ms` }}
               >
                 <p className={`text-[10px] font-semibold uppercase tracking-[0.24em] ${theme.accentText}`}>
                   {RESOURCE_TABS[index].label}
@@ -1117,7 +1351,7 @@ export function NicheLandingPage() {
         </section>
 
         {/* Benefits */}
-        <section className="py-12 border-t border-neutral-100 dark:border-neutral-900">
+        <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-center">
             {isStudyNiche ? "O que a sua preparação inclui" : "O que você recebe na análise"}
           </h2>
@@ -1136,7 +1370,7 @@ export function NicheLandingPage() {
 
         {/* First job tips teaser */}
         {isFirstJob && (
-          <section className="py-12 border-t border-neutral-100 dark:border-neutral-900">
+          <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-center">
               Dicas para {FIRST_JOB_PATH_OPTIONS.find((p) => p.key === firstJobPath)!.label.toLowerCase()}
             </h2>
@@ -1168,7 +1402,7 @@ export function NicheLandingPage() {
         )}
 
         {/* Final CTA */}
-        <section className="py-14 pb-24 sm:pb-14 border-t border-neutral-100 dark:border-neutral-900 text-center">
+        <section className="reveal py-14 pb-24 sm:pb-14 border-t border-neutral-100 dark:border-neutral-900 text-center">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
             {isStudyNiche ? "Pronto para começar a estudar certo?" : "Pronto para montar seu currículo?"}
           </h2>
@@ -1179,7 +1413,7 @@ export function NicheLandingPage() {
           </p>
           <Link
             href={primaryActionHref}
-            className={`mt-6 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
+            className={`btn-shine mt-6 inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all shadow-md hover:-translate-y-0.5 ${theme.btnPrimary}`}
           >
             {primaryActionLabel}
           </Link>
@@ -1190,7 +1424,7 @@ export function NicheLandingPage() {
       <div className="sm:hidden fixed bottom-0 inset-x-0 z-20 border-t border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur px-4 py-3">
         <Link
           href={primaryActionHref}
-          className={`flex items-center justify-center rounded-xl font-semibold px-6 py-3 text-sm transition-all shadow-md ${theme.btnPrimary}`}
+          className={`btn-shine flex items-center justify-center rounded-xl font-semibold px-6 py-3 text-sm transition-all shadow-md ${theme.btnPrimary}`}
         >
           {primaryActionLabel}
         </Link>

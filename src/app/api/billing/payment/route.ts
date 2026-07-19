@@ -12,6 +12,7 @@ import {
   sendSubscriptionConfirmationEmail,
   sendPaymentFailedEmail,
   sendOnce,
+  notifyAdminPurchase,
 } from "@/lib/resend";
 import {
   isPeriodPlanKind,
@@ -196,6 +197,7 @@ export async function POST(req: NextRequest) {
     } else {
       void sendPaymentConfirmationEmail(email, { kind, amountCents });
     }
+    void notifyAdminPurchase({ product: productName, amountCents, email });
   } else if (status === "cancelled") {
     // Cartão recusado no caminho síncrono: avisa o cliente com uma via alternativa.
     // sendOnce (chaveado pelo mpPaymentId) evita duplicar caso o webhook também dispare.
