@@ -9,7 +9,7 @@ Revise esta lista manualmente antes de cada deploy.
 
 | Variável | Uso | Observação |
 |---|---|---|
-| `DATABASE_URL` | Conexão Prisma/SQLite | `file:./dev.db` local, `file:/app/data/dev.db` no Docker (volume) |
+| `DATABASE_URL` | Conexão Prisma/PostgreSQL | URL `postgresql://...`; no Compose é montada com `POSTGRES_USER`, `POSTGRES_PASSWORD` e `POSTGRES_DB` |
 | `AUTH_SECRET` | Assinatura de JWT/sessão do NextAuth | gerar com `openssl rand -base64 32` |
 | `GROQ_API_KEY` ou `OPENAI_API_KEY` | Chamadas de análise de currículo/vaga | configure ao menos um provedor |
 | `GROQ_MODEL` | Modelo usado nas análises | default sugerido: `llama-3.3-70b-versatile` |
@@ -175,23 +175,22 @@ com a API OpenAI.
 
 ## Docker Compose
 
-### Backup diário do SQLite
+### Backup diário do PostgreSQL
 
-O serviço `sqlite-backup` cria uma cópia consistente com o comando `.backup` do
-SQLite assim que sobe e depois a cada 24 horas. Antes de publicar o arquivo, roda
-`PRAGMA integrity_check`. Por padrão os backups ficam em `./backups` no host e
+O serviço `postgres-backup` executa `scripts/backup-postgres.sh` e cria dumps
+periódicos do PostgreSQL. Por padrão, os backups ficam em `./backups` no host e
 são retidos por 14 dias.
 
 | Variável | Default | Uso |
 |---|---:|---|
-| `SQLITE_BACKUP_HOST_DIR` | `./backups` | Diretório no host; em produção prefira um disco/diretório fora da pasta da aplicação |
+| `SQLITE_BACKUP_HOST_DIR` | `./backups` | Nome legado usado pelo Compose para o diretório de backups PostgreSQL no host |
 | `BACKUP_INTERVAL_SECONDS` | `86400` | Intervalo entre backups |
 | `BACKUP_RETENTION_DAYS` | `14` | Retenção local |
 
-Teste de restauração recomendado: copie o backup para um arquivo temporário e
-execute `sqlite3 copia.db "PRAGMA integrity_check;"`. Um backup no mesmo servidor
-protege contra corrupção/erro operacional, mas não contra perda total da VPS;
-sincronize esse diretório com armazenamento externo.
+Teste a restauração em uma instância PostgreSQL isolada e confira migrations,
+contagens e consultas críticas. Um backup no mesmo servidor protege contra
+alguns erros operacionais, mas não contra perda total da VPS; sincronize o
+diretório com armazenamento externo.
 
 ### Resiliência da IA
 

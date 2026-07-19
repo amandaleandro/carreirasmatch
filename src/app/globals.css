@@ -99,6 +99,12 @@ select option {
   background-color: #ffffff;
 }
 
+/* O AdSense marca unidades sem inventário como "unfilled". Elas não devem
+   continuar reservando um grande bloco vazio entre o conteúdo e o rodapé. */
+.ad-slot:has(.adsbygoogle[data-ad-status="unfilled"]) {
+  display: none;
+}
+
 /* Custom subtle scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;

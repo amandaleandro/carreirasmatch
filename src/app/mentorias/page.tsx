@@ -2,37 +2,48 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { VideoCard } from "@/components/video-card";
+import { Pagination } from "@/components/Pagination";
+
+const VIDEOS_PER_PAGE = 12;
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Mentorias e vídeos de carreira gratuitos | CarreirasMatch",
-  description: "Assista a mentorias e cursos gratuitos de carreira, entrevista, currículo e concursos, selecionados do YouTube.",
+  title: "Vídeos educativos e mentorias gratuitos | CarreirasMatch",
+  description: "Assista a vídeos educativos, mentorias e cursos gratuitos sobre carreira, tecnologia, idiomas, finanças e desenvolvimento profissional.",
   alternates: { canonical: "/mentorias" },
 };
 
 export default async function MentoriasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ area?: string }>;
+  searchParams: Promise<{ area?: string; page?: string }>;
 }) {
-  const { area = "" } = await searchParams;
-  const videos = await prisma.careerVideo.findMany({
-    where: { active: true, ...(area ? { area } : {}) },
-    orderBy: [{ area: "asc" }, { publishedAt: "desc" }],
-    take: 120,
-  });
-  const areas = await prisma.careerVideo.findMany({
-    where: { active: true },
-    distinct: ["area"],
-    select: { area: true },
-    orderBy: { area: "asc" },
-  });
+  const { area = "", page: pageParam } = await searchParams;
+  const where = { active: true, ...(area ? { area } : {}) };
+  const parsedPage = Number.parseInt(pageParam ?? "1", 10);
+  const total = await prisma.careerVideo.count({ where });
+  const totalPages = Math.max(1, Math.ceil(total / VIDEOS_PER_PAGE));
+  const page = Math.min(Math.max(Number.isNaN(parsedPage) ? 1 : parsedPage, 1), totalPages);
+  const [videos, areas] = await Promise.all([
+    prisma.careerVideo.findMany({
+      where,
+      orderBy: [{ publishedAt: "desc" }, { title: "asc" }],
+      skip: (page - 1) * VIDEOS_PER_PAGE,
+      take: VIDEOS_PER_PAGE,
+    }),
+    prisma.careerVideo.findMany({
+      where: { active: true },
+      distinct: ["area"],
+      select: { area: true },
+      orderBy: { area: "asc" },
+    }),
+  ]);
 
   return (
     <ContentPage
       eyebrow="Mentorias"
-      title="Mentorias e vídeos de carreira"
-      description="Conteúdo gratuito selecionado do YouTube para você evoluir na carreira — mentoria, entrevista, currículo, concursos e mais."
+      title="Vídeos para aprender e evoluir"
+      description="Conteúdo educativo gratuito do YouTube sobre carreira, tecnologia, idiomas, finanças, comunicação, estudos e outras habilidades úteis."
       wide
     >
       {areas.length > 0 && (
@@ -61,7 +72,7 @@ export default async function MentoriasPage({
         </p>
       ) : (
         <>
-          <p className="mt-5 text-sm text-neutral-500">{videos.length} vídeo(s) encontrado(s).</p>
+          <p className="mt-5 text-sm text-neutral-500">{total} vídeo(s) encontrado(s).</p>
           <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {videos.map((video) => (
               <VideoCard
@@ -74,6 +85,14 @@ export default async function MentoriasPage({
                 durationSec={video.durationSec}
               />
             ))}
+          </div>
+          <div className="mt-8">
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              basePath="/mentorias"
+              searchParams={{ area }}
+            />
           </div>
         </>
       )}

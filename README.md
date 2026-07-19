@@ -5,7 +5,8 @@ entrevistas, montar plano de ação de carreira, acompanhar candidaturas e
 encontrar vagas - com um modelo de monetização via assinatura e pagamentos
 avulsos pelo Mercado Pago.
 
-> Documentação relacionada: [`docs/FEATURES.md`](docs/FEATURES.md) ·
+> Índice completo: [`docs/README.md`](docs/README.md). Documentação relacionada:
+> [`docs/FEATURES.md`](docs/FEATURES.md) ·
 > [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
 > [`docs/ENV.md`](docs/ENV.md) · [`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md)
 
@@ -14,7 +15,7 @@ avulsos pelo Mercado Pago.
 - **Next.js 16** (App Router) + **React 19**
 - **NextAuth v5** (beta) - login por credenciais (e-mail/senha com bcrypt);
   Google OAuth suportado mas desativado por padrão (sem client id/secret)
-- **Prisma 7** + **SQLite** (`dev.db`, via `better-sqlite3`) - ver
+- **Prisma 7** + **PostgreSQL 17** - ver
   [`prisma/schema.prisma`](prisma/schema.prisma)
 - **Groq SDK** - análises de currículo/vaga via LLM (`src/lib/groq.ts`)
 - **Mercado Pago** (`mercadopago` + `@mercadopago/sdk-react`) - pagamento
@@ -56,7 +57,7 @@ src/app/api/        Endpoints REST internos (auth, billing, analyze, feed…)
 src/app/tools/      Catálogo grande de ferramentas/guias gratuitos (SEO/lead gen)
 src/components/     Componentes de UI compartilhados
 src/lib/            Lógica de domínio (auth, billing, groq, entitlements, feed…)
-prisma/             Schema + migrations (SQLite)
+prisma/             Schema + migrations (PostgreSQL)
 scripts/            Scripts avulsos (ex.: grandfather-existing-analyses.sql)
 ```
 
@@ -66,11 +67,11 @@ currículo, pagamento, admin).
 
 ## Banco de dados
 
-O projeto usa **SQLite em arquivo** (`dev.db`) tanto em dev quanto no
-`docker-compose.yml` atual (persistido em volume). Isso é adequado para um
-lançamento inicial de baixo tráfego, mas **não escala para escrita
-concorrente** - ver a seção de riscos em
-[`docs/LAUNCH_CHECKLIST.md`](docs/LAUNCH_CHECKLIST.md).
+O projeto usa **PostgreSQL 17**. No Docker Compose, os dados são persistidos no
+volume `postgres-data` e o serviço `postgres-backup` cria backups periódicos.
+Scripts de SQLite preservados no repositório pertencem ao processo histórico de
+migração. Veja [`docs/DATABASE.md`](docs/DATABASE.md) e
+[`docs/OPERATIONS.md`](docs/OPERATIONS.md).
 
 ## Pagamentos (Mercado Pago)
 

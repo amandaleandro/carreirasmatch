@@ -58,7 +58,7 @@ export function AdSlot({
   if (!ADSENSE_CLIENT || !slot) return null;
 
   return (
-    <div className={className} aria-label="Publicidade">
+    <div className={`ad-slot ${className ?? ""}`} aria-label="Publicidade">
       {/* `key` força um <ins> novo a cada rota: o AdSense não repreenche um
           elemento já usado, e sem isso a navegação client-side deixaria o
           espaço do anúncio vazio. */}

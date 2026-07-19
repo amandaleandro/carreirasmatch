@@ -265,15 +265,13 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
 ## 5. Requisitos não funcionais e limitações conhecidas
 
 - **Idioma**: produto 100% em pt-BR, sem i18n.
-- **Persistência**: SQLite em arquivo - adequado para baixo tráfego
-  inicial, **não escala para escrita concorrente**; sem backup
-  automático hoje.
+- **Persistência**: PostgreSQL 17 via Prisma, com volume e backup periódico no
+  Docker Compose.
 - **Rate limiting**: em memória (não distribuído) - não sobrevive a
   múltiplas instâncias/reinícios; aplicado a análise anônima, login,
   cadastro e ações autenticadas.
-- **Confiabilidade da IA**: sem retry/backoff nem validação de schema
-  (zod) sobre a resposta da Groq - resposta truncada é só logada, não
-  reprocessada.
+- **Confiabilidade da IA**: timeout, retry/backoff, fallback multi-provedor e
+  validação Zod nas respostas estruturadas principais.
 - **Segurança de webhook**: validação HMAC falha fechado (rejeita se mal
   configurado), o que é seguro mas exige configuração correta antes de
   aceitar pagamentos reais.

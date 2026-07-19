@@ -72,8 +72,8 @@ const BASE_STEPS: Record<StepId, TourStep> = {
   },
   mentorias: {
     target: '[data-tour="nav-mentorias"]',
-    title: "Mentorias em vídeo",
-    body: "Mentorias e cursos gratuitos de carreira, entrevista e currículo, selecionados do YouTube. É de graça, aproveite.",
+    title: "Vídeos para aprender",
+    body: "Vídeos educativos, mentorias e cursos gratuitos sobre carreira, tecnologia, idiomas, finanças e outras habilidades úteis.",
     placement: "right",
   },
   concursos: {

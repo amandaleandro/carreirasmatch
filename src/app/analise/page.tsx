@@ -4,6 +4,14 @@ import { defaultTrackForSegment, tracksForSegment, CAREER_SEGMENT_LABELS, normal
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { AnalyzeVagaPage } from "@/components/analyze-vaga";
 import type { CareerTrack } from "@/components/analysis-display";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Compare seu currículo com uma vaga | CarreirasMatch",
+  description:
+    "Envie seu currículo e uma vaga real para descobrir aderência, lacunas, palavras-chave e os próximos ajustes antes de se candidatar.",
+  alternates: { canonical: "/analise" },
+};
 
 export default async function AnalisePage() {
   const session = await auth();

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { NICHE_QUERIES, mapSearchItem, parseIsoDuration } from "./youtube-sync";
+import { classifyVideoArea, NICHE_QUERIES, mapSearchItem, parseIsoDuration } from "./youtube-sync";
 
 describe("parseIsoDuration", () => {
   it("converte horas, minutos e segundos", () => {
@@ -14,6 +14,21 @@ describe("parseIsoDuration", () => {
   it("retorna 0 para valor inválido", () => {
     expect(parseIsoDuration("")).toBe(0);
     expect(parseIsoDuration("xyz")).toBe(0);
+  });
+});
+
+describe("classifyVideoArea", () => {
+  it("classifica pelo conteúdo, mesmo quando veio de outra busca", () => {
+    expect(classifyVideoArea("Carreira", "Curso de Excel para iniciantes", "Aprenda planilhas")).toBe(
+      "Excel e produtividade",
+    );
+    expect(classifyVideoArea("Carreira", "Como organizar seu dinheiro", "Educação financeira prática")).toBe(
+      "Educação financeira",
+    );
+  });
+
+  it("mantém o tema da busca quando não encontra sinal mais específico", () => {
+    expect(classifyVideoArea("Carreira", "Como crescer profissionalmente", "Dicas práticas")).toBe("Carreira");
   });
 });
 

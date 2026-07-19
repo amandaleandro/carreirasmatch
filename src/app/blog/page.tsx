@@ -6,7 +6,8 @@ import { FreeTierAd } from "@/components/free-tier-ad";
 import { Pagination } from "@/components/Pagination";
 import { prisma } from "@/lib/prisma";
 
-const POSTS_PER_PAGE = 10;
+// Mantém todas as linhas completas na grade de três colunas em telas grandes.
+const POSTS_PER_PAGE = 9;
 
 export const dynamic = "force-dynamic";
 

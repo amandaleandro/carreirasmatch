@@ -50,22 +50,55 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
   }
 
   return (
-    <main className="max-w-lg mx-auto px-4 py-12 w-full">
-      <header className="mb-8 text-center">
+    <main className="max-w-5xl mx-auto px-4 py-12 w-full">
+      <header className="mb-10 text-center max-w-2xl mx-auto">
         <p className="text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400">
-          Assinatura
+          Plano recomendado para o seu momento
         </p>
-        <h1 className="text-2xl font-bold tracking-tight mt-2">Assinar {offer.monthlyName}</h1>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight mt-2">
+          Continue evoluindo a cada nova oportunidade
+        </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2 text-sm">
-          Cartão recorrente, ou Pix/cartão sem renovação automática. Depois do pagamento, você cria sua conta para acessar tudo.
+          Escolha seu momento profissional para ver a oferta certa. Você pode assinar no
+          cartão ou comprar um período com Pix, sem renovação automática.
         </p>
       </header>
 
-      <section className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+      <div className="grid gap-6 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
+        <aside className="rounded-2xl border border-blue-100 bg-[linear-gradient(145deg,#eff6ff,#ffffff_58%,#fff7ed)] p-6 shadow-sm dark:border-blue-900/40 dark:bg-[linear-gradient(145deg,#0b1f3a,#0b1220_58%,#22170b)]">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600 dark:text-blue-300">
+            {offer.title}
+          </p>
+          <h2 className="mt-3 text-2xl font-bold">{offer.monthlyName}</h2>
+          <p className="mt-2 text-3xl font-extrabold text-blue-600 dark:text-blue-400">
+            {formatCentsToBRL(monthlyCents)}
+            <span className="text-sm font-medium text-neutral-500 dark:text-neutral-400">/mês</span>
+          </p>
+          <p className="mt-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+            Para quem quer melhorar várias candidaturas, acompanhar a evolução e chegar
+            mais preparado às próximas etapas.
+          </p>
+          <div className="mt-6 space-y-3">
+            {[...offer.monthlyFeatures, ...offer.retentionFeatures].map((feature) => (
+              <div key={feature} className="flex items-start gap-3 text-sm text-neutral-700 dark:text-neutral-200">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-bold text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300">
+                  ✓
+                </span>
+                {feature}
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 rounded-xl border border-white/80 bg-white/70 p-4 text-xs leading-relaxed text-neutral-500 dark:border-white/10 dark:bg-white/5 dark:text-neutral-400">
+            O CarreirasMatch ajuda você a se preparar e se apresentar melhor. Não
+            garante entrevista, contratação ou aprovação.
+          </div>
+        </aside>
+
+      <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5 md:p-6 bg-white dark:bg-neutral-950 shadow-sm">
         {!showBrick ? (
           <form onSubmit={handleStart} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium mb-1">Seu momento</label>
+              <label className="block text-sm font-semibold mb-1">1. Qual é o seu momento?</label>
               <select
                 value={segment}
                 onChange={(e) => setSegment(e.target.value as CareerSegment)}
@@ -80,7 +113,7 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
             </div>
 
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium mb-1">Como você quer pagar</legend>
+              <legend className="text-sm font-semibold mb-1">2. Como você prefere acessar?</legend>
               {plans.map((p) => (
                 <label
                   key={p.id}
@@ -110,7 +143,7 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
             </fieldset>
 
             <div>
-              <label className="block text-sm font-medium mb-1">E-mail para liberar seu acesso</label>
+              <label className="block text-sm font-semibold mb-1">3. E-mail para liberar o acesso</label>
               <input
                 type="email"
                 value={email}
@@ -124,10 +157,13 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
 
             <button
               type="submit"
-              className="w-full rounded-md bg-blue-600 text-white font-medium py-2.5 hover:bg-blue-700 transition-colors"
+              className="w-full rounded-xl bg-blue-600 text-white font-semibold py-3 hover:bg-blue-700 transition-colors"
             >
-              Ir para pagamento
+              Continuar para pagamento seguro
             </button>
+            <p className="text-center text-xs text-neutral-400">
+              Pagamento processado pelo Mercado Pago. Consulte cancelamento e renovação na opção escolhida.
+            </p>
           </form>
         ) : (
           <div className="space-y-4">
@@ -171,6 +207,7 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
           </div>
         )}
       </section>
+      </div>
     </main>
   );
 }

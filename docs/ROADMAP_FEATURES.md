@@ -25,7 +25,7 @@ ajuste manual.
 |---|---|---|---|
 | ✅ Teste real de pagamento ponta a ponta (validado em 16/07/2026) | Confirma Mercado Pago, webhook e liberacao de acesso | Pagamento aprovado ativa diagnostico/assinatura automaticamente | Concluido |
 | Confirmar `ADMIN_EMAILS` em producao | Garante suporte e concessao manual em caso de problema | Admin acessivel no ambiente real | P0 |
-| Plano simples de backup do SQLite | Evita perda total de dados no inicio | Backup diario do arquivo do banco | P0 |
+| ✅ PostgreSQL e backup periódico | Reduz risco de perda e suporta concorrência | Dumps automáticos; falta validar restauração periodicamente | Concluído |
 | Ativar Plausible e Sentry em producao | Permite medir funil e enxergar erros reais | Eventos e erros visiveis desde o dia 1 | P1 |
 | Revisao juridica de termos/privacidade | Reduz risco ao operar com dados, IA e pagamentos | Base legal mais segura para escala | P1 |
 
@@ -100,7 +100,7 @@ operacao menos fragil.
 
 | Iniciativa | Por que fazer | Momento recomendado |
 |---|---|---|
-| Migrar SQLite para Postgres | SQLite e bom no inicio, mas sofre com escrita concorrente | Quando houver uso diario consistente ou trafego pago |
+| ✅ PostgreSQL 17 | Migração concluída com volume e backup dedicado | Concluído; monitorar e testar restauração |
 | Rate limit distribuido | Limite em memoria nao funciona bem com multiplas instancias | Antes de escalar horizontalmente |
 | Fila para analises e scraping | Evita timeout e melhora experiencia em tarefas longas | Quando analises/feed ficarem lentos |
 | Cache de matching de vagas | Reduz chamadas de IA repetidas | Quando feed tiver volume maior |

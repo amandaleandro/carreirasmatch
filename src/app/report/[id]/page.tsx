@@ -10,7 +10,6 @@ import {
   CareerTrack,
 } from "@/components/analysis-display";
 import { canViewFullDiagnostic } from "@/lib/entitlements";
-import { toAnalysisTeaser } from "@/lib/analysis-teaser";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
@@ -125,10 +124,22 @@ export default async function ReportPage({
       ) : (
         <AnalysisTeaserView result={teaser}>
           <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
-            <h3 className="font-semibold">Quer o diagnóstico completo?</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Currículo otimizado, plano de estudo, perguntas de entrevista e mensagem pronta para o recrutador.
+            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
+              Próximo passo recomendado
             </p>
+            <h3 className="font-semibold text-lg">Veja exatamente o que ajustar antes de aplicar</h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+              Libere o diagnóstico desta vaga com palavras-chave, ajustes de currículo,
+              plano de evolução, perguntas de entrevista e mensagem para o recrutador.
+            </p>
+            <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
+              {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (
+                <li key={item} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                  {item}
+                </li>
+              ))}
+            </ul>
             <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
           </div>
         </AnalysisTeaserView>

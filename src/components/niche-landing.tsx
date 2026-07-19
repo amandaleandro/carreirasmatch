@@ -699,8 +699,9 @@ function ScoreRing({ value }: { value: number }) {
   );
 }
 
-export function NicheLandingPage() {
+export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug }) {
   const [activeSlug, setActiveSlug] = useState<NicheSlug>(() => {
+    if (initialNiche) return initialNiche;
     if (typeof window === "undefined") return "estagiarios";
     const fromUrl = new URLSearchParams(window.location.search).get("nicho");
     return isNicheSlug(fromUrl) ? fromUrl : "estagiarios";

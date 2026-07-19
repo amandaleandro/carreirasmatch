@@ -343,11 +343,11 @@ export default async function JobsTodayPage({
 
         <div className="rounded-lg bg-blue-600 p-5 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <p className="font-semibold">Quer saber quais dessas vagas combinam com voce?</p>
-            <p className="text-sm text-blue-100 mt-1">Crie uma conta e veja o feed ordenado por aderencia ao seu curriculo.</p>
+            <p className="font-semibold">Encontrou uma vaga interessante?</p>
+            <p className="text-sm text-blue-100 mt-1">Compare com seu curriculo antes de aplicar e veja os ajustes prioritarios.</p>
           </div>
-          <Link href="/register" className="rounded-lg bg-white text-blue-700 px-4 py-2 text-sm font-semibold text-center">
-            Ver meu feed personalizado
+          <Link href="/analise" className="rounded-lg bg-white text-blue-700 px-4 py-2 text-sm font-semibold text-center">
+            Analisar curriculo e vaga
           </Link>
         </div>
       </section>

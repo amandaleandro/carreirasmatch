@@ -4,7 +4,7 @@
 
 Next.js App Router monolítico: páginas server-rendered em `src/app/`,
 endpoints de API em `src/app/api/`, lógica de domínio em `src/lib/`,
-persistência em SQLite via Prisma.
+persistência em PostgreSQL via Prisma.
 
 ## Autenticação (`src/auth.ts`, `src/auth.config.ts`, `src/proxy.ts`)
 
@@ -88,8 +88,7 @@ configurada.
 ## Deploy (`Dockerfile`, `docker-compose.yml`, `docker-entrypoint.sh`)
 
 Build multi-stage → `prisma generate` + `next build`. No entrypoint,
-`npx prisma migrate deploy` roda antes de `npm start`. O SQLite é
-persistido em volume nomeado. **`docker-compose.yml` hoje não repassa as
-variáveis do Mercado Pago nem das fontes de vaga** - só variáveis
-`ABACATEPAY_*` obsoletas de uma integração de pagamento anterior - ver
-[`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md).
+`npx prisma migrate deploy` roda antes de `npm start`. O PostgreSQL 17 é
+persistido no volume `postgres-data`. O Compose repassa as configurações de
+pagamento, IA, fontes, e-mail, analytics e observabilidade. Caddy faz proxy/TLS
+e o serviço `postgres-backup` executa os backups periódicos.

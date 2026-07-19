@@ -213,7 +213,7 @@ export function FreeResumeBuilder() {
                 Faça a análise e veja score de aderência, palavras-chave faltantes e o que ajustar antes de aplicar.
               </p>
               <Link
-                href="/?track=internship"
+                href="/analise?track=internship"
                 className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-3 text-sm transition-colors"
               >
                 Fazer minha primeira análise

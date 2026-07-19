@@ -1,5 +1,7 @@
 import { getSetting, setSetting } from "@/lib/app-settings";
 import { syncAllExternalSources } from "@/lib/external-source-sync";
+import { prisma } from "@/lib/prisma";
+import { syncYoutubeCareerVideos } from "@/lib/youtube-sync";
 
 const RUNS_SETTING_KEY = "external-sources:runs";
 const TICK_INTERVAL_MS = 15 * 60 * 1000;
@@ -98,11 +100,23 @@ export async function runExternalSourceTick(): Promise<void> {
 
 let started = false;
 
+async function bootstrapYoutubeVideos(): Promise<void> {
+  try {
+    const activeVideos = await prisma.careerVideo.count({ where: { active: true } });
+    if (activeVideos === 0 && process.env.YOUTUBE_API_KEY) {
+      const videos = await syncYoutubeCareerVideos();
+      console.log(`external-source-scheduler: youtube bootstrap videos=${videos}`);
+    }
+  } catch (error) {
+    console.error("external-source-scheduler: youtube bootstrap failed", error);
+  }
+}
+
 export function startExternalSourceScheduler(): void {
   if (started) return;
   started = true;
   setTimeout(() => {
-    void runExternalSourceTick();
+    void bootstrapYoutubeVideos().finally(() => runExternalSourceTick());
     setInterval(() => void runExternalSourceTick(), TICK_INTERVAL_MS);
   }, INITIAL_DELAY_MS);
 }

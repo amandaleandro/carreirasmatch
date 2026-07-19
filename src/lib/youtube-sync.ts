@@ -13,8 +13,9 @@ const SEARCH_ENDPOINT = "https://www.googleapis.com/youtube/v3/search";
 const VIDEOS_ENDPOINT = "https://www.googleapis.com/youtube/v3/videos";
 const MAX_PER_NICHE = 8;
 
-// Nicho (rótulo exibido) -> termo de busca curado. Cada nicho = 1 busca (100 unidades
-// de cota/dia). Mantidos alinhados às ferramentas e nichos que a plataforma já cobre.
+// Tema (rótulo exibido) -> busca educativa. Cada tema consome uma busca da API.
+// Além de carreira, o catálogo cobre conhecimentos úteis para estudo, trabalho,
+// organização pessoal e desenvolvimento profissional.
 export const NICHE_QUERIES: { area: string; query: string }[] = [
   { area: "Carreira", query: "mentoria de carreira como crescer profissionalmente" },
   { area: "Primeiro emprego", query: "como conseguir o primeiro emprego sem experiência" },
@@ -28,6 +29,14 @@ export const NICHE_QUERIES: { area: string; query: string }[] = [
   { area: "Empreendedorismo", query: "empreendedorismo para iniciantes como começar um negócio" },
   { area: "Estágio e aprendiz", query: "como conseguir estágio e programa jovem aprendiz" },
   { area: "Produtividade e estudos", query: "como manter a disciplina e organizar a rotina de estudos" },
+  { area: "Tecnologia", query: "curso tecnologia para iniciantes aula completa português" },
+  { area: "Informática", query: "curso informática básica aula completa português" },
+  { area: "Inglês", query: "curso inglês para iniciantes aula completa português" },
+  { area: "Educação financeira", query: "educação financeira para iniciantes aula completa" },
+  { area: "Comunicação", query: "comunicação e oratória curso aula completa" },
+  { area: "Marketing", query: "marketing digital para iniciantes curso completo" },
+  { area: "Gestão e liderança", query: "gestão e liderança curso aula completa" },
+  { area: "Excel e produtividade", query: "curso excel para iniciantes aula completa" },
 ];
 
 type YoutubeSearchItem = {
@@ -60,6 +69,33 @@ export type CareerVideoRecord = {
   publishedAt: Date | null;
 };
 
+const CONTENT_AREAS: { area: string; terms: RegExp }[] = [
+  { area: "Excel e produtividade", terms: /\bexcel\b|planilha|powerpoint|word\b|office\b/i },
+  { area: "Tecnologia", terms: /programa[cç][aã]o|desenvolvimento|intelig[eê]ncia artificial|\bia\b|python|javascript|tecnologia/i },
+  { area: "Informática", terms: /inform[aá]tica|computador|windows|internet|digita[cç][aã]o/i },
+  { area: "Inglês", terms: /ingl[eê]s|english|vocabul[aá]rio|pron[uú]ncia/i },
+  { area: "Educação financeira", terms: /finan[cç]|dinheiro|investimento|or[cç]amento|d[ií]vida/i },
+  { area: "Comunicação", terms: /comunica[cç][aã]o|orat[oó]ria|falar em p[uú]blico|apresenta[cç][aã]o/i },
+  { area: "Marketing", terms: /marketing|tr[aá]fego pago|redes sociais|copywriting|vendas/i },
+  { area: "Gestão e liderança", terms: /gest[aã]o|lideran[cç]a|liderar|equipe|administra[cç][aã]o/i },
+  { area: "LinkedIn", terms: /linkedin/i },
+  { area: "Currículo", terms: /curr[ií]culo|\bcv\b/i },
+  { area: "Entrevista de emprego", terms: /entrevista|recrutador|processo seletivo/i },
+  { area: "Primeiro emprego", terms: /primeiro emprego|sem experi[eê]ncia/i },
+  { area: "Estágio e aprendiz", terms: /est[aá]gio|estagi[aá]rio|jovem aprendiz/i },
+  { area: "Transição de carreira", terms: /transi[cç][aã]o de carreira|mudar de (?:carreira|[aá]rea)|nova carreira/i },
+  { area: "Concursos", terms: /concurso p[uú]blico|concursado|banca examinadora/i },
+  { area: "OAB", terms: /\boab\b|exame da ordem/i },
+  { area: "Vestibular e ENEM", terms: /vestibular|\benem\b/i },
+  { area: "Empreendedorismo", terms: /empreendedor|neg[oó]cio pr[oó]prio|empresa/i },
+  { area: "Produtividade e estudos", terms: /produtividade|estudar|estudos|disciplina|organiza[cç][aã]o|rotina/i },
+];
+
+export function classifyVideoArea(fallbackArea: string, title: string, description: string): string {
+  const content = `${title} ${description}`;
+  return CONTENT_AREAS.find(({ terms }) => terms.test(content))?.area ?? fallbackArea;
+}
+
 /**
  * Converte um item de busca do YouTube (+ duração já resolvida) no registro que será
  * gravado. Retorna null quando o item deve ser descartado: sem videoId, ou vídeo muito
@@ -78,7 +114,7 @@ export function mapSearchItem(area: string, item: YoutubeSearchItem, durationSec
     channel: (snippet.channelTitle ?? "").slice(0, 120),
     description: (snippet.description ?? "").slice(0, 500),
     thumbnail,
-    area,
+    area: classifyVideoArea(area, snippet.title ?? "", snippet.description ?? ""),
     durationSec,
     publishedAt: snippet.publishedAt ? new Date(snippet.publishedAt) : null,
   };

@@ -1,19 +1,18 @@
 # Plano seguro de escala
 
-## PostgreSQL
+## PostgreSQL — concluído
 
-A troca de SQLite por PostgreSQL deve acontecer em uma janela planejada:
+O runtime atual já usa PostgreSQL 17: o provider do Prisma é `postgresql`, o
+Compose mantém o volume `postgres-data` e há backup periódico dedicado. Os
+scripts de SQLite permanecem apenas como histórico da migração.
 
-1. criar a instância PostgreSQL e restringir o acesso à rede da aplicação;
-2. gerar um backup íntegro do SQLite;
-3. suspender escritas durante a migração;
-4. migrar e conferir contagens de usuários, pagamentos, análises e candidaturas;
-5. alterar o provider do Prisma e `DATABASE_URL`;
-6. executar testes de pagamento, login, análise e alertas;
-7. manter o backup original para retorno.
+Próximos cuidados de escala:
 
-Não é seguro trocar o banco da VPS automaticamente enquanto usuários podem
-gravar dados.
+1. testar restauração regularmente;
+2. monitorar conexões, disco, locks e consultas lentas;
+3. revisar índices com dados representativos;
+4. adotar pool de conexões antes de multiplicar réplicas;
+5. planejar migrations destrutivas com compatibilidade entre versões.
 
 ## Fila de processamento
 

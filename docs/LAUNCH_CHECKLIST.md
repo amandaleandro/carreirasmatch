@@ -71,10 +71,10 @@ passando, build de produção completo).
 
 ## 🟡 Importante, mas não impede o lançamento de amanhã
 
-- [x] Backup automático do `dev.db`: serviço `sqlite-backup` cria cópia
-  consistente diariamente, valida integridade e retém 14 dias no diretório do
-  host configurado por `SQLITE_BACKUP_HOST_DIR`. Ainda é recomendado replicar
-  esse diretório para fora da VPS.
+- [x] PostgreSQL 17 e backup automático: serviço `postgres-backup` cria dumps
+  periódicos e retém 14 dias no diretório do host configurado por
+  `SQLITE_BACKUP_HOST_DIR` (nome legado). Ainda é recomendado replicar esse
+  diretório para fora da VPS e testar a restauração.
 - [ ] Revisar o texto dos Termos/Privacidade com um advogado antes de
   operar em maior escala - o conteúdo criado é uma base sólida e honesta,
   mas não substitui revisão jurídica formal.
@@ -85,8 +85,8 @@ passando, build de produção completo).
   falhar só no primeiro uso.
 - [ ] Testes de integração para o webhook de billing e o pipeline de
   análise Groq (hoje só as libs de suporte têm teste, não as rotas).
-- [ ] Plano de migração para Postgres quando o tráfego/concorrência de
-  escrita crescer além do que SQLite aguenta confortavelmente.
+- [x] Migração para PostgreSQL concluída; próximos passos são teste periódico
+  de restauração, monitoramento e pool de conexões antes da escala horizontal.
 - [x] Retry/backoff por provedor, timeout, fallback multi-provedor e validação
   Zod das respostas principais de análise, extração e sugestões.
 - [ ] Homologação da integração com Glassdoor (hoje incompleta/sem
