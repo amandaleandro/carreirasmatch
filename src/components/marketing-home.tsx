@@ -121,7 +121,7 @@ export function MarketingHome() {
 
         <header className="relative mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 md:px-8">
           <Link href="/" aria-label="CarreirasMatch">
-            <BrandLogo heightClassName="h-11" onDark />
+            <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
           <nav className="hidden items-center gap-6 text-sm font-medium text-white/70 md:flex">
             <a href="#como-funciona" className="hover:text-white">Como funciona</a>

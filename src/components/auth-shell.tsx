@@ -21,7 +21,7 @@ export function AuthShell({
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(96,165,250,0.18),transparent_45%),radial-gradient(circle_at_bottom_right,rgba(34,197,94,0.10),transparent_40%)]" />
 
         <Link href="/" className="relative">
-          <BrandLogo heightClassName="h-11" onDark />
+          <BrandLogo heightClassName="h-12 xl:h-14" onDark />
         </Link>
 
         <div className="relative">
@@ -55,7 +55,7 @@ export function AuthShell({
         <div className="w-full max-w-sm">
           <div className="lg:hidden mb-8 flex flex-col items-center text-center">
             <Link href="/">
-              <BrandLogo heightClassName="h-11" />
+              <BrandLogo heightClassName="h-12 sm:h-14" />
             </Link>
           </div>
           {children}

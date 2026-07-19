@@ -91,7 +91,7 @@ export function FreeResumeBuilder() {
     <div className="min-h-screen">
       <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex items-center justify-between">
         <Link href="/comece">
-          <BrandLogo />
+          <BrandLogo heightClassName="h-12 sm:h-14" />
         </Link>
         <Link
           href="/login"

@@ -121,7 +121,7 @@ export function Topbar({
           >
             <div className="space-y-6">
               <div className="flex items-center justify-between pb-4 border-b border-white/5">
-                <BrandLogo heightClassName="h-8" onDark />
+                <BrandLogo heightClassName="h-10" onDark />
                 <button type="button" className="text-slate-400" onClick={() => setMobileNavOpen(false)}>
                   <X className="h-5 w-5" strokeWidth={1.75} />
                 </button>
