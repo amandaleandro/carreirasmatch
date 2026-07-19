@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { locationSlug } from "@/lib/location-slug";
+import { FREE_TOOL_PATHS } from "@/lib/tools-catalog";
 
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
@@ -14,11 +15,15 @@ export const dynamic = "force-dynamic";
 // Ferramentas realmente públicas (as demais /tools/* exigem assinatura por
 // design, não entram no sitemap para não apontar a crawler para páginas que
 // redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts;
-// os guias abertos vêm da flag `free` do catálogo.
-const PUBLIC_TOOL_PATHS = [
-  "/tools/vocation-test",
-  "/tools/vocation-test/discover",
-];
+// os guias abertos vêm da flag `free` do catálogo (FREE_TOOL_PATHS) — antes
+// ficavam de fora do sitemap e o Google não os descobria.
+const PUBLIC_TOOL_PATHS = Array.from(
+  new Set([
+    "/tools/vocation-test",
+    "/tools/vocation-test/discover",
+    ...FREE_TOOL_PATHS,
+  ]),
+);
 
 /**
  * Sitemap para os crawlers. Cobre só as páginas públicas/indexáveis, landing,
@@ -40,6 +45,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/recolocacao`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/transicao`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/curriculo-gratis`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${BASE_URL}/como-fazer-curriculo`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE_URL}/curriculo-sem-experiencia`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${BASE_URL}/gratuito`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${BASE_URL}/vagas-de-hoje`, lastModified: now, changeFrequency: "daily", priority: 0.9 },
     { url: `${BASE_URL}/vagas-publicas`, lastModified: now, changeFrequency: "daily", priority: 0.8 },

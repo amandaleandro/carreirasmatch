@@ -1,5 +1,6 @@
 import type { NextAuthConfig } from "next-auth";
 import { NextResponse } from "next/server";
+import { isFreeTool } from "@/lib/tools-catalog";
 const PUBLIC_PATHS = [
   "/login",
   "/register",
@@ -16,6 +17,8 @@ const PUBLIC_PATHS = [
   "/recolocacao",
   "/transicao",
   "/curriculo-gratis",
+  "/como-fazer-curriculo",
+  "/curriculo-sem-experiencia",
   "/vagas-de-hoje",
   "/vagas-publicas",
   "/cursos-gratuitos",
@@ -57,7 +60,12 @@ export const authConfig: NextAuthConfig = {
       }
 
       const isPublic =
-        pathname === "/" || pathname === "/tools" || PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+        pathname === "/" ||
+        pathname === "/tools" ||
+        // Ferramentas marcadas como `free` no catálogo são conteúdo aberto (guias
+        // com anúncio, liberadas no robots) e devem ser acessíveis sem login.
+        isFreeTool(pathname) ||
+        PUBLIC_PATHS.some((p) => pathname.startsWith(p));
       if (isPublic) return true;
       return isLoggedIn;
     },
