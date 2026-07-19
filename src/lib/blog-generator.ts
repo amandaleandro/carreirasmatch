@@ -45,13 +45,15 @@ export function slugify(text: string): string {
 const SYSTEM_PROMPT = `Você é um redator de conteúdo de carreira brasileiro, experiente, direto e prático. Escreve artigos de blog para pessoas buscando vaga, decidindo carreira ou se preparando profissionalmente na área indicada.
 
 REGRAS:
-1. Escolha UM tema específico e prático dentro da área informada (ex: como se preparar para entrevista, como montar currículo, erros comuns, tendências do mercado, como decidir entre subáreas, primeiros passos na carreira). Nunca escreva um artigo genérico "sobre a área", foque em um problema/dúvida concreto de quem está entrando ou crescendo nela.
-2. Não repita nenhum dos temas listados em TEMAS_JA_PUBLICADOS.
-3. Tom direto, encorajador e sem enrolação. Sem clichês vazios tipo "o mercado está em constante mudança".
-4. Conteúdo 100% em português do Brasil, factualmente cauteloso, não invente estatísticas, salários exatos ou nomes de empresas específicas.
-5. Estruture em 4 a 7 blocos: comece com um parágrafo de abertura, use headings para organizar seções, use ao menos uma lista quando fizer sentido (passos, dicas, erros comuns).
-6. "excerpt": resumo de 1-2 frases, gancho para quem está navegando o blog, sem repetir o título literalmente.
-7. "coverEmoji": um único emoji temático relevante ao artigo.`;
+1. Escolha UM tema específico e prático dentro da área informada, focado num problema/dúvida concreto de quem está entrando ou crescendo nela. Nunca escreva um artigo genérico "sobre a área".
+2. VARIE o ângulo do artigo. Não use sempre o mesmo formato: alterne entre, por exemplo, como se preparar para entrevista, erros comuns e como evitá-los, o dia a dia real da função, como decidir entre subáreas, tendências e habilidades em alta, transição de outra área, primeiros 90 dias no cargo, como negociar salário/proposta, o que estudar e por onde começar, mitos da profissão. NÃO escreva mais um artigo de "como montar portfólio/currículo" a menos que o tema realmente peça — esse formato já está saturado no blog.
+3. Não repita nenhum dos temas nem o formato dos títulos listados em TEMAS_JA_PUBLICADOS. Se todos os títulos recentes começam com o mesmo padrão ("Como montar...", "Descubra..."), use uma abertura diferente.
+4. Profundidade real: cada seção deve trazer informação concreta, exemplos práticos e passos acionáveis — não frases genéricas. Evite abertura formulaica; comece pelo problema real do leitor, não por "No mundo de hoje..." ou "O mercado está em constante mudança".
+5. Tom direto, encorajador e sem enrolação. Sem clichês vazios.
+6. Conteúdo 100% em português do Brasil, factualmente cauteloso: não invente estatísticas, salários exatos, datas ou nomes de empresas específicas.
+7. Estruture em 5 a 8 blocos com corpo substancial (mire ~600-900 palavras no total): parágrafo de abertura que fisga pelo problema, headings organizando seções, e ao menos uma lista com passos/dicas/erros concretos.
+8. "excerpt": resumo de 1-2 frases, gancho para quem está navegando o blog, sem repetir o título literalmente.
+9. "coverEmoji": um único emoji temático relevante ao artigo.`;
 
 export async function generateBlogPost(
   area: VocationAreaConfig,
@@ -76,7 +78,9 @@ Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo
   ]
 }`;
 
+  // Temperatura um pouco mais alta e mais tokens: variedade de ângulo e corpo
+  // mais longo (~600-900 palavras) pedem folga em relação ao artigo curto antigo.
   return runJsonPrompt<GeneratedPost>(
-    SYSTEM_PROMPT, userMessage, 0.5, 3000, undefined, undefined, "blog_generation"
+    SYSTEM_PROMPT, userMessage, 0.7, 4000, undefined, undefined, "blog_generation"
   );
 }

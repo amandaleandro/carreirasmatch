@@ -43,10 +43,12 @@ export async function generateNextPost(): Promise<Post> {
   const cursor = await nextNicheCursor();
   const area = VOCATION_AREAS[cursor];
 
+  // Mais títulos recentes = melhor sinal de deduplicação para o gerador não
+  // repetir tema nem formato de título dentro da mesma área.
   const recent = await prisma.post.findMany({
     where: { areaSlug: area.slug },
     orderBy: { publishedAt: "desc" },
-    take: 5,
+    take: 15,
     select: { title: true },
   });
 
