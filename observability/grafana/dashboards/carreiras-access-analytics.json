@@ -42,7 +42,7 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "none", "decimals": 2 } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
-      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"page_views\",period=\"$period\"} / clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "páginas/sessão" }]
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"page_views\",period=\"$period\"} / ignoring(entity, metric) clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "páginas/sessão" }]
     },
     {
       "type": "stat", "title": "Novos usuários", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
@@ -56,14 +56,14 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.02 }, { "color": "green", "value": 0.05 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"$period\"} / clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "cadastro" }]
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"$period\"} / ignoring(entity, metric) clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "cadastro" }]
     },
     {
       "type": "stat", "title": "Conversão em análise", "description": "Novas análises divididas pelas sessões únicas.", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.02 }, { "color": "green", "value": 0.05 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
-      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"analyses\",period=\"$period\"} / clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "análise" }]
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"analyses\",period=\"$period\"} / ignoring(entity, metric) clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "análise" }]
     },
     { "type": "row", "title": "Conteúdo e origem — ranking de 30 dias", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 }, "collapsed": false, "panels": [] },
     {
