@@ -4,6 +4,7 @@ import { assertPublicHttpUrl } from "@/lib/url-safety";
 import { PDFParse } from "pdf-parse";
 import { assessOpportunityRisk } from "@/lib/opportunity-safety";
 import { syncYoutubeCareerVideos } from "@/lib/youtube-sync";
+import { syncRadars } from "@/lib/radar-sync";
 
 const USER_AGENT = "CarreirasMatch/1.0 (+https://carreirasmatch.com.br/contato)";
 const APRENDA_MAIS = "https://aprendamais.mec.gov.br/course/";
@@ -460,6 +461,7 @@ export async function syncAllExternalSources() {
     syncRegisteredOpportunitySources(),
     syncRegisteredCourseSources(),
     syncYoutubeCareerVideos(),
+    syncRadars(),
   ]);
   const errors = results.flatMap((result) =>
     result.status === "rejected"
@@ -480,6 +482,14 @@ export async function syncAllExternalSources() {
         ? results[2].value.opportunities
         : 0,
     videos: results[4].status === "fulfilled" ? results[4].value : 0,
+    concursos:
+      results[5].status === "fulfilled" && typeof results[5].value === "object"
+        ? results[5].value.concursos
+        : 0,
+    vestibulares:
+      results[5].status === "fulfilled" && typeof results[5].value === "object"
+        ? results[5].value.vestibulares
+        : 0,
     errors,
   };
 }

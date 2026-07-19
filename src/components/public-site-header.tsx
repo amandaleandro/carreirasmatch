@@ -25,6 +25,12 @@ export function PublicSiteHeader() {
           <Link href="/mentorias" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Mentorias
           </Link>
+          <Link href="/concursos" className="hidden lg:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Concursos
+          </Link>
+          <Link href="/vestibulares" className="hidden lg:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
+            Vestibulares
+          </Link>
           <Link href="/mercado-de-trabalho" className="hidden xl:inline hover:text-blue-600 dark:hover:text-blue-400 transition-colors whitespace-nowrap">
             Mercado
           </Link>

@@ -581,6 +581,23 @@ model CareerVideo {
   @@index([source, lastSeenAt])
 }
 
+model RadarItem {
+  id          String    @id @default(cuid())
+  kind        String
+  title       String
+  url         String    @unique
+  source      String
+  summary     String    @default("")
+  publishedAt DateTime?
+  active      Boolean   @default(true)
+  lastSeenAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([kind, active, publishedAt])
+  @@index([source, lastSeenAt])
+}
+
 model PublicJobBulletin {
   id          String   @id @default(cuid())
   title       String

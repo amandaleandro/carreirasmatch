@@ -20,6 +20,8 @@ import {
   HelpCircle,
   TrendingUp,
   GraduationCap,
+  Landmark,
+  ScrollText,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -43,6 +45,8 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/history", label: "Relatórios", icon: BarChart3 },
   { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
   { href: "/mentorias", label: "Mentorias", icon: GraduationCap },
+  { href: "/concursos", label: "Radar de concursos", icon: Landmark },
+  { href: "/vestibulares", label: "Radar de vestibulares", icon: ScrollText },
   { href: "/suporte", label: "Suporte", icon: LifeBuoy },
   { href: "/settings", label: "Perfil", icon: User },
 ];

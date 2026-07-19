@@ -24,6 +24,8 @@ type SyncResult = {
   bulletins?: number;
   opportunities?: number;
   videos?: number;
+  concursos?: number;
+  vestibulares?: number;
   errors?: string[];
   error?: string;
 };
@@ -90,7 +92,7 @@ export function AdminExternalSources() {
       const data = await readJson<SyncResult>(response);
       if (!response.ok && response.status !== 207) throw new Error(data.error ?? "Falha na coleta.");
 
-      const summary = `${data.courses ?? 0} cursos, ${data.bulletins ?? 0} boletins, ${data.opportunities ?? 0} oportunidades e ${data.videos ?? 0} vídeos atualizados.`;
+      const summary = `${data.courses ?? 0} cursos, ${data.bulletins ?? 0} boletins, ${data.opportunities ?? 0} oportunidades, ${data.videos ?? 0} vídeos, ${data.concursos ?? 0} concursos e ${data.vestibulares ?? 0} vestibulares atualizados.`;
       const errors = Array.isArray(data.errors) ? data.errors.filter(Boolean) : [];
       setMessage({
         text: errors.length ? `${summary} ${errors.length} fonte(s) falharam: ${errors.join(" | ")}` : summary,
