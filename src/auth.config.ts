@@ -11,6 +11,7 @@ const PUBLIC_PATHS = [
   "/vagas-de-hoje",
   "/vagas-publicas",
   "/cursos-gratuitos",
+  "/mentorias",
   "/mercado-de-trabalho",
   "/parceiros",
   "/vagas",
