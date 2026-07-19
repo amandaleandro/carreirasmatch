@@ -72,6 +72,7 @@ export function Topbar({
 
         <ThemeToggle className="hidden sm:inline-flex" />
 
+        <div className="flex items-center gap-2 md:gap-3">
         <div className="relative">
           <button
             type="button"
@@ -105,6 +106,9 @@ export function Topbar({
               </div>
             </div>
           )}
+        </div>
+
+        <LogoutButton className="hidden sm:flex items-center gap-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors" />
         </div>
       </header>
 
