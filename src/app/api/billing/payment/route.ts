@@ -30,7 +30,14 @@ const DEFAULT_ANON_SEGMENT = "career_pro";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const { kind, analysisId, formData, couponCode, segment: requestedSegment } = await req.json();
+  const { kind, analysisId, formData, couponCode, segment: requestedSegment, attribution } = await req.json();
+  const tracking = {
+    sessionId: typeof attribution?.sessionId === "string" ? attribution.sessionId.slice(0, 100) : "",
+    source: typeof attribution?.source === "string" ? attribution.source.slice(0, 120) : "",
+    medium: typeof attribution?.medium === "string" ? attribution.medium.slice(0, 120) : "",
+    campaign: typeof attribution?.campaign === "string" ? attribution.campaign.slice(0, 200) : "",
+    content: typeof attribution?.content === "string" ? attribution.content.slice(0, 200) : "",
+  };
 
   const isPeriodPlan = typeof kind === "string" && isPeriodPlanKind(kind);
   if (kind !== "first_analysis" && kind !== "diagnostic" && !isPeriodPlan) {
@@ -178,6 +185,7 @@ export async function POST(req: NextRequest) {
       analysisId: kind === "diagnostic" ? analysisId : null,
       couponId,
       paidAt: status === "paid" ? new Date() : null,
+      ...tracking,
     },
   });
 
@@ -198,6 +206,17 @@ export async function POST(req: NextRequest) {
       void sendPaymentConfirmationEmail(email, { kind, amountCents });
     }
     void notifyAdminPurchase({ product: productName, amountCents, email });
+    await prisma.funnelEvent.create({
+      data: {
+        name: isPeriodPlan ? "subscription_confirmed" : "payment_confirmed",
+        userId,
+        analysisId: kind === "diagnostic" ? analysisId : null,
+        paymentId: payment.id,
+        segment,
+        ...tracking,
+        properties: JSON.stringify({ kind, amountCents }),
+      },
+    });
   } else if (status === "cancelled") {
     // Cartão recusado no caminho síncrono: avisa o cliente com uma via alternativa.
     // sendOnce (chaveado pelo mpPaymentId) evita duplicar caso o webhook também dispare.

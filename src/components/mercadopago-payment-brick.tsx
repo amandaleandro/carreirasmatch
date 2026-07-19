@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
+import { ANALYTICS_EVENTS, getStoredAttribution, track } from "@/lib/analytics";
 
 let initialized = false;
 function ensureInitialized() {
@@ -80,16 +81,25 @@ export function MercadoPagoPaymentBrick({
         }}
         onSubmit={async (formData) => {
           setError(null);
+          track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind });
           try {
             const res = await fetch("/api/billing/payment", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ kind, analysisId, formData, couponCode, segment }),
+              body: JSON.stringify({
+                kind,
+                analysisId,
+                formData,
+                couponCode,
+                segment,
+                attribution: getStoredAttribution(),
+              }),
             });
             const data = await res.json();
             if (!res.ok) throw new Error(data.error ?? "Erro ao processar pagamento.");
 
             if (data.pix) {
+              track(ANALYTICS_EVENTS.PIX_GENERATED, { kind });
               setRegisterUrl(data.registerUrl ?? null);
               setPix(data.pix);
             } else if (data.status === "approved") {
@@ -105,6 +115,7 @@ export function MercadoPagoPaymentBrick({
               setError("Pagamento em análise. Você será avisado quando for confirmado.");
             }
           } catch (err) {
+            track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { kind });
             setError(err instanceof Error ? err.message : "Erro inesperado.");
             throw err;
           }

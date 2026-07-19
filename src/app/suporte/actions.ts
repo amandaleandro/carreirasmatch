@@ -8,8 +8,11 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import {
   MAX_SUPPORT_MESSAGE_LENGTH,
   MAX_SUPPORT_SUBJECT_LENGTH,
+  type SupportActionState,
   normalizeSupportCategory,
+  validateSupportAttachment,
 } from "@/lib/support";
+import { notifyAdminSupportTicket } from "@/lib/resend";
 
 // Suporte é aberto a qualquer pessoa logada, inclusive quem não assina - quem
 // tem problema de pagamento normalmente é exatamente quem ainda não conseguiu
@@ -23,56 +26,118 @@ async function requireUserId() {
   return session.user.id;
 }
 
-export async function createSupportTicket(formData: FormData) {
+export async function createSupportTicket(
+  _previousState: SupportActionState,
+  formData: FormData
+): Promise<SupportActionState> {
   const userId = await requireUserId();
 
   const subject = String(formData.get("subject") ?? "").trim().slice(0, MAX_SUPPORT_SUBJECT_LENGTH);
   const body = String(formData.get("body") ?? "").trim().slice(0, MAX_SUPPORT_MESSAGE_LENGTH);
   const category = normalizeSupportCategory(formData.get("category"));
 
-  if (!subject || !body) return;
+  if (!subject || !body) return { error: "Preencha o assunto e descreva o que aconteceu." };
+  const attachment = validateSupportAttachment(formData.get("attachment"));
+  if (attachment.error) return { error: attachment.error };
 
-  if (!checkRateLimit(`support-ticket:${userId}`, TICKET_LIMIT).allowed) return;
+  if (!checkRateLimit(`support-ticket:${userId}`, TICKET_LIMIT).allowed) {
+    return { error: "Muitos chamados em pouco tempo. Aguarde alguns minutos e tente novamente." };
+  }
 
-  const ticket = await prisma.supportTicket.create({
-    data: {
-      userId,
-      subject,
-      category,
-      status: "open",
-      messages: { create: { body, fromAdmin: false, readByUser: true } },
-    },
-  });
+  let ticket;
+  try {
+    ticket = await prisma.supportTicket.create({
+      data: {
+        userId,
+        subject,
+        category,
+        status: "open",
+        messages: {
+          create: {
+            body,
+            fromAdmin: false,
+            readByUser: true,
+            attachments: attachment.file ? {
+              create: {
+                fileName: attachment.file.name.slice(0, 180),
+                mimeType: attachment.file.type,
+                size: attachment.file.size,
+                data: Buffer.from(await attachment.file.arrayBuffer()),
+              },
+            } : undefined,
+          },
+        },
+      },
+      include: { user: { select: { email: true } } },
+    });
+  } catch (error) {
+    console.error("Falha ao criar chamado de suporte:", error);
+    return { error: "Não foi possível abrir o chamado agora. Tente novamente em instantes." };
+  }
 
+  if (ticket.user.email) {
+    void notifyAdminSupportTicket({ ticketId: ticket.id, subject: ticket.subject, email: ticket.user.email });
+  }
   revalidatePath("/suporte");
   redirect(`/suporte/${ticket.id}`);
 }
 
-export async function replySupportTicket(ticketId: string, formData: FormData) {
+export async function replySupportTicket(
+  ticketId: string,
+  _previousState: SupportActionState,
+  formData: FormData
+): Promise<SupportActionState> {
   const userId = await requireUserId();
   const body = String(formData.get("body") ?? "").trim().slice(0, MAX_SUPPORT_MESSAGE_LENGTH);
-  if (!body) return;
+  const attachment = validateSupportAttachment(formData.get("attachment"));
+  if (!body && !attachment.file) return { error: "Escreva uma mensagem ou adicione um anexo." };
+  if (attachment.error) return { error: attachment.error };
 
-  if (!checkRateLimit(`support-message:${userId}`, MESSAGE_LIMIT).allowed) return;
+  if (!checkRateLimit(`support-message:${userId}`, MESSAGE_LIMIT).allowed) {
+    return { error: "Muitas mensagens em pouco tempo. Aguarde alguns minutos." };
+  }
 
   const ticket = await prisma.supportTicket.findFirst({
     where: { id: ticketId, userId },
-    select: { id: true },
+    select: { id: true, status: true },
   });
-  if (!ticket) return;
+  if (!ticket) return { error: "Chamado não encontrado." };
 
-  await prisma.supportMessage.create({
-    data: { ticketId, body, fromAdmin: false, readByUser: true },
-  });
-
-  // Responder reabre a fila do admin, mesmo num ticket já resolvido.
-  await prisma.supportTicket.update({
-    where: { id: ticketId },
-    data: { status: "open" },
-  });
+  try {
+    await prisma.$transaction([
+      prisma.supportMessage.create({
+        data: {
+          ticketId,
+          body: body || "Anexo enviado",
+          fromAdmin: false,
+          readByUser: true,
+          attachments: attachment.file ? {
+            create: {
+              fileName: attachment.file.name.slice(0, 180),
+              mimeType: attachment.file.type,
+              size: attachment.file.size,
+              data: Buffer.from(await attachment.file.arrayBuffer()),
+            },
+          } : undefined,
+        },
+      }),
+      prisma.supportTicket.update({
+        where: { id: ticketId },
+        data: {
+          status: "open",
+          resolvedAt: null,
+          reopenCount: ticket.status === "resolved" ? { increment: 1 } : undefined,
+        },
+      }),
+    ]);
+  } catch (error) {
+    console.error("Falha ao responder chamado de suporte:", error);
+    return { error: "Não foi possível enviar a mensagem. Tente novamente." };
+  }
 
   revalidatePath("/suporte");
   revalidatePath(`/suporte/${ticketId}`);
+  return { success: "Mensagem enviada." };
 }
 
 export async function closeSupportTicket(ticketId: string) {
@@ -80,7 +145,7 @@ export async function closeSupportTicket(ticketId: string) {
 
   await prisma.supportTicket.updateMany({
     where: { id: ticketId, userId },
-    data: { status: "resolved" },
+    data: { status: "resolved", resolvedAt: new Date() },
   });
 
   revalidatePath("/suporte");

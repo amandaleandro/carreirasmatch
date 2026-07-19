@@ -9,10 +9,12 @@ import {
   TRACK_LABELS,
   CareerTrack,
 } from "@/components/analysis-display";
-import { canViewFullDiagnostic } from "@/lib/entitlements";
+import { canViewFullDiagnostic, hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
+import { FunnelImpression, TEASER_VIEWED_EVENT } from "@/components/funnel-impression";
+import { SubscriptionUpsell } from "@/components/subscription-upsell";
 
 export const dynamic = "force-dynamic";
 
@@ -35,7 +37,10 @@ export default async function ReportPage({
     notFound();
   }
 
-  const unlocked = await canViewFullDiagnostic(session.user.id, id);
+  const [unlocked, subscribed] = await Promise.all([
+    canViewFullDiagnostic(session.user.id, id),
+    hasActiveSubscriptionAccess(session.user.id),
+  ]);
   const segment = normalizeCareerSegment(user?.careerSegment);
   const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$14,90";
 
@@ -116,13 +121,21 @@ export default async function ReportPage({
       </header>
 
       {analysis ? (
-        <AnalysisResult
-          result={analysis}
-          careerTrack={record.careerTrack as CareerTrack}
-          jobTitle={record.jobTitle}
-        />
+        <div className="space-y-6">
+          <AnalysisResult
+            result={analysis}
+            careerTrack={record.careerTrack as CareerTrack}
+            jobTitle={record.jobTitle}
+          />
+          {!subscribed && <SubscriptionUpsell segment={segment ?? "career_pro"} />}
+        </div>
       ) : (
         <AnalysisTeaserView result={teaser}>
+          <FunnelImpression
+            event={TEASER_VIEWED_EVENT}
+            analysisId={id}
+            segment={segment ?? undefined}
+          />
           <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
             <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
               Próximo passo recomendado

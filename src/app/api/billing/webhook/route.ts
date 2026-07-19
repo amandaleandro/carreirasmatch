@@ -106,12 +106,41 @@ export async function POST(req: NextRequest) {
         );
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
         void notifyAdminPurchase({ product: periodPlanProductName(payment.kind), amountCents: payment.amount, email });
+        await prisma.funnelEvent.create({
+          data: {
+            name: "subscription_confirmed",
+            userId: payment.userId,
+            paymentId: payment.id,
+            segment: payment.segment,
+            sessionId: payment.sessionId,
+            source: payment.source,
+            medium: payment.medium,
+            campaign: payment.campaign,
+            content: payment.content,
+            properties: JSON.stringify({ kind: payment.kind, amountCents: payment.amount }),
+          },
+        });
       } else {
         if (email) void sendPaymentConfirmationEmail(email, { kind: payment.kind, amountCents: payment.amount });
         void notifyAdminPurchase({
           product: payment.kind === "diagnostic" ? "Diagnóstico completo" : "Primeira análise",
           amountCents: payment.amount,
           email,
+        });
+        await prisma.funnelEvent.create({
+          data: {
+            name: "payment_confirmed",
+            userId: payment.userId,
+            analysisId: payment.analysisId,
+            paymentId: payment.id,
+            segment: payment.segment,
+            sessionId: payment.sessionId,
+            source: payment.source,
+            medium: payment.medium,
+            campaign: payment.campaign,
+            content: payment.content,
+            properties: JSON.stringify({ kind: payment.kind, amountCents: payment.amount }),
+          },
         });
 
         // PIX/confirmação assíncrona de avulso anônimo: reivindica a análise sem
@@ -177,6 +206,20 @@ export async function POST(req: NextRequest) {
         const email = await userEmail(payment.userId);
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
         void notifyAdminPurchase({ product: "Assinatura mensal", amountCents: payment.amount, email });
+        await prisma.funnelEvent.create({
+          data: {
+            name: "subscription_confirmed",
+            userId: payment.userId,
+            paymentId: payment.id,
+            segment: payment.segment,
+            sessionId: payment.sessionId,
+            source: payment.source,
+            medium: payment.medium,
+            campaign: payment.campaign,
+            content: payment.content,
+            properties: JSON.stringify({ kind: "subscription", amountCents: payment.amount }),
+          },
+        });
       }
     } else if (status === "cancelled" && payment.status !== "cancelled") {
       // Assinatura cancelada no Mercado Pago: reflete no nosso registro e avisa

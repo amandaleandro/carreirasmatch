@@ -15,7 +15,14 @@ function getAppUrl(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const { token, couponCode, payerEmail, segment: requestedSegment } = await req.json();
+  const { token, couponCode, payerEmail, segment: requestedSegment, attribution } = await req.json();
+  const tracking = {
+    sessionId: typeof attribution?.sessionId === "string" ? attribution.sessionId.slice(0, 100) : "",
+    source: typeof attribution?.source === "string" ? attribution.source.slice(0, 120) : "",
+    medium: typeof attribution?.medium === "string" ? attribution.medium.slice(0, 120) : "",
+    campaign: typeof attribution?.campaign === "string" ? attribution.campaign.slice(0, 200) : "",
+    content: typeof attribution?.content === "string" ? attribution.content.slice(0, 200) : "",
+  };
 
   if (typeof token !== "string" || !token) {
     return NextResponse.json({ error: "Dados de cartão ausentes." }, { status: 400 });
@@ -98,6 +105,7 @@ export async function POST(req: NextRequest) {
       mpPaymentId: result.id,
       couponId,
       paidAt: status === "paid" ? new Date() : null,
+      ...tracking,
     },
   });
 
@@ -113,6 +121,16 @@ export async function POST(req: NextRequest) {
     // assíncrono o e-mail sai no webhook, com guard para não duplicar.
     void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
     void notifyAdminPurchase({ product: offer.monthlyName, amountCents, email });
+    await prisma.funnelEvent.create({
+      data: {
+        name: "subscription_confirmed",
+        userId,
+        paymentId: payment.id,
+        segment,
+        ...tracking,
+        properties: JSON.stringify({ kind: "subscription", amountCents }),
+      },
+    });
   }
 
   return NextResponse.json({

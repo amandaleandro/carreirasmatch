@@ -1,26 +1,27 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ArrowRight, CircleHelp, MessageCircle, Plus } from "lucide-react";
 import { auth } from "@/auth";
+import { NewSupportTicketForm } from "@/components/support-forms";
 import { prisma } from "@/lib/prisma";
 import {
-  SUPPORT_CATEGORIES,
-  SUPPORT_CATEGORY_DESCRIPTIONS,
   SUPPORT_CATEGORY_LABELS,
   SUPPORT_STATUS_LABELS,
   normalizeSupportCategory,
   normalizeSupportStatus,
   supportStatusBadgeClass,
 } from "@/lib/support";
-import { createSupportTicket } from "./actions";
 
 export const dynamic = "force-dynamic";
 
-const INPUT_CLASS =
-  "w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors";
-
-export default async function SupportPage() {
+export default async function SupportPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; subject?: string }>;
+}) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
+  const defaults = await searchParams;
 
   const tickets = await prisma.supportTicket.findMany({
     where: { userId: session.user.id },
@@ -33,123 +34,73 @@ export default async function SupportPage() {
       _count: { select: { messages: { where: { fromAdmin: true, readByUser: false } } } },
     },
   });
+  const unreadTotal = tickets.reduce((total, ticket) => total + ticket._count.messages, 0);
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 w-full">
-      <header className="mb-10">
+    <main className="mx-auto w-full max-w-6xl px-4 py-8 md:py-12">
+      <header className="mb-8">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
           Suporte
         </span>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Fale com a gente</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Abra um chamado e converse direto com nosso time aqui dentro do
-          sistema. Você recebe a resposta nesta mesma página.
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Como podemos ajudar?</h1>
+        <p className="mt-2 max-w-2xl text-neutral-600 dark:text-neutral-400">
+          Envie sua dúvida e acompanhe a resposta por aqui. Antes de abrir um chamado,
+          você também pode consultar as respostas mais comuns.
         </p>
+        <Link href="/ajuda" className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+          <CircleHelp className="h-4 w-4" /> Consultar a Central de Ajuda
+        </Link>
       </header>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-        <h2 className="font-semibold mb-4">Abrir um chamado</h2>
-        <form action={createSupportTicket} className="space-y-4">
+      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(320px,.85fr)]">
+      <section className="order-2 lg:order-1">
+        <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <label htmlFor="category" className="block text-sm font-medium mb-1">
-              Área
-            </label>
-            <select id="category" name="category" defaultValue="other" className={INPUT_CLASS}>
-              {SUPPORT_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {SUPPORT_CATEGORY_LABELS[category]} - {SUPPORT_CATEGORY_DESCRIPTIONS[category]}
-                </option>
-              ))}
-            </select>
+            <h2 className="text-lg font-bold">Seus chamados</h2>
+            <p className="mt-1 text-sm text-neutral-500">Acompanhe conversas abertas e anteriores.</p>
           </div>
-
-          <div>
-            <label htmlFor="subject" className="block text-sm font-medium mb-1">
-              Assunto
-            </label>
-            <input
-              id="subject"
-              name="subject"
-              type="text"
-              required
-              maxLength={120}
-              placeholder="Ex: Paguei no Pix e a assinatura não liberou"
-              className={INPUT_CLASS}
-            />
-          </div>
-
-          <div>
-            <label htmlFor="body" className="block text-sm font-medium mb-1">
-              O que aconteceu?
-            </label>
-            <textarea
-              id="body"
-              name="body"
-              required
-              rows={5}
-              maxLength={4000}
-              placeholder="Conte com detalhes. Se for sobre pagamento, o horário e o valor ajudam a achar a transação."
-              className={INPUT_CLASS}
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
-          >
-            Enviar chamado
-          </button>
-        </form>
-      </section>
-
-      <section className="mt-10">
-        <h2 className="font-semibold mb-4">Seus chamados</h2>
-
+          {unreadTotal > 0 && <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-bold text-blue-700 dark:bg-blue-950 dark:text-blue-300">{unreadTotal} nova{unreadTotal > 1 ? "s" : ""}</span>}
+        </div>
         {tickets.length === 0 ? (
-          <p className="text-sm text-neutral-500">
-            Você ainda não abriu nenhum chamado.
-          </p>
+          <div className="rounded-2xl border border-dashed border-neutral-300 bg-white/60 px-6 py-12 text-center dark:border-neutral-700 dark:bg-neutral-950/60">
+            <MessageCircle className="mx-auto h-9 w-9 text-neutral-400" />
+            <h3 className="mt-3 font-semibold">Nenhum chamado por aqui</h3>
+            <p className="mx-auto mt-1 max-w-sm text-sm text-neutral-500">Quando você enviar uma dúvida, a conversa e as respostas aparecerão nesta área.</p>
+          </div>
         ) : (
           <div className="space-y-3">
             {tickets.map((ticket) => {
               const status = normalizeSupportStatus(ticket.status);
               const unread = ticket._count.messages;
               return (
-                <Link
-                  key={ticket.id}
-                  href={`/suporte/${ticket.id}`}
-                  className="block rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 hover:shadow-md transition-shadow"
-                >
+                <Link key={ticket.id} href={`/suporte/${ticket.id}`} className={`group block rounded-2xl border bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:bg-neutral-950 ${unread ? "border-blue-300 ring-2 ring-blue-500/10 dark:border-blue-800" : "border-neutral-200/80 dark:border-neutral-800"}`}>
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-sm font-semibold leading-snug">{ticket.subject}</h3>
-                    <span
-                      className={`shrink-0 text-[11px] font-semibold rounded-full px-2 py-0.5 ${supportStatusBadgeClass(status)}`}
-                    >
-                      {SUPPORT_STATUS_LABELS[status]}
-                    </span>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {unread > 0 && <span className="h-2 w-2 shrink-0 rounded-full bg-blue-500" aria-label="Nova resposta" />}
+                        <h3 className="truncate text-sm font-semibold">{ticket.subject}</h3>
+                      </div>
+                      <p className="mt-1 text-xs text-neutral-500">{SUPPORT_CATEGORY_LABELS[normalizeSupportCategory(ticket.category)]} · Atualizado em {ticket.updatedAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</p>
+                    </div>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${supportStatusBadgeClass(status)}`}>{SUPPORT_STATUS_LABELS[status]}</span>
                   </div>
-                  <p className="text-xs text-neutral-500 mt-1">
-                    {SUPPORT_CATEGORY_LABELS[normalizeSupportCategory(ticket.category)]}
-                    {" · "}
-                    {ticket.updatedAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}
-                    {unread > 0 && (
-                      <span className="ml-2 font-semibold text-blue-600 dark:text-blue-400">
-                        {unread} nova{unread > 1 ? "s" : ""} resposta{unread > 1 ? "s" : ""}
-                      </span>
-                    )}
-                  </p>
-                  {ticket.messages[0] && (
-                    <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-2 line-clamp-2">
-                      {ticket.messages[0].fromAdmin ? "Suporte: " : "Você: "}
-                      {ticket.messages[0].body}
-                    </p>
-                  )}
+                  {ticket.messages[0] && <p className="mt-3 line-clamp-2 text-sm text-neutral-600 dark:text-neutral-400">{ticket.messages[0].fromAdmin ? "Suporte: " : "Você: "}{ticket.messages[0].body}</p>}
+                  <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 dark:text-blue-400">Abrir conversa <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" /></span>
                 </Link>
               );
             })}
           </div>
         )}
       </section>
+
+      <section className="order-1 rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-950 lg:order-2 lg:sticky lg:top-24 md:p-6">
+        <div className="mb-5 flex items-start gap-3">
+          <span className="rounded-xl bg-blue-50 p-2.5 text-blue-600 dark:bg-blue-950/40 dark:text-blue-300"><Plus className="h-5 w-5" /></span>
+          <div><h2 className="font-bold">Abrir novo chamado</h2><p className="mt-0.5 text-sm text-neutral-500">Respondemos por aqui e por e-mail, normalmente em até 1 dia útil.</p></div>
+        </div>
+        <NewSupportTicketForm defaultCategory={defaults.category} defaultSubject={defaults.subject?.slice(0, 120)} />
+      </section>
+      </div>
     </main>
   );
 }

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { auth } from "@/auth";
+import { ConfirmResolveButton, SupportReplyForm } from "@/components/support-forms";
 import { prisma } from "@/lib/prisma";
 import {
   SUPPORT_CATEGORY_LABELS,
@@ -9,7 +11,7 @@ import {
   normalizeSupportStatus,
   supportStatusBadgeClass,
 } from "@/lib/support";
-import { closeSupportTicket, replySupportTicket } from "../actions";
+import { closeSupportTicket } from "../actions";
 
 export const dynamic = "force-dynamic";
 
@@ -24,7 +26,7 @@ export default async function SupportTicketPage({
 
   const ticket = await prisma.supportTicket.findFirst({
     where: { id, userId: session.user.id },
-    include: { messages: { orderBy: { createdAt: "asc" } } },
+    include: { messages: { orderBy: { createdAt: "asc" }, include: { attachments: true } } },
   });
 
   if (!ticket) notFound();
@@ -38,9 +40,9 @@ export default async function SupportTicketPage({
   const status = normalizeSupportStatus(ticket.status);
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 w-full">
-      <Link href="/suporte" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-        ← Voltar para o suporte
+    <main className="mx-auto w-full max-w-3xl px-4 py-8 md:py-12">
+      <Link href="/suporte" className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">
+        <ArrowLeft className="h-4 w-4" /> Todos os chamados
       </Link>
 
       <header className="mt-4 mb-8">
@@ -59,14 +61,15 @@ export default async function SupportTicketPage({
         </p>
       </header>
 
+      <div className="rounded-2xl border border-neutral-200/80 bg-white/50 p-3 dark:border-neutral-800 dark:bg-neutral-950/40 sm:p-5">
       <div className="space-y-4">
         {ticket.messages.map((message) => (
           <article
             key={message.id}
-            className={`rounded-2xl border p-4 shadow-sm shadow-slate-900/5 ${
+            className={`max-w-[92%] rounded-2xl border p-4 shadow-sm shadow-slate-900/5 ${
               message.fromAdmin
-                ? "border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/20"
-                : "border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950"
+                ? "mr-auto border-blue-200 bg-blue-50/70 dark:border-blue-900 dark:bg-blue-950/30"
+                : "ml-auto border-neutral-200/80 bg-white dark:border-neutral-800 dark:bg-neutral-900"
             }`}
           >
             <div className="flex items-center justify-between gap-2 mb-2">
@@ -86,42 +89,28 @@ export default async function SupportTicketPage({
             <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-wrap">
               {message.body}
             </p>
+            {message.attachments.map((attachment) => (
+              <a key={attachment.id} href={`/api/support/attachments/${attachment.id}`} className="mt-3 inline-flex items-center rounded-lg border border-current/15 px-3 py-2 text-xs font-semibold text-blue-700 hover:underline dark:text-blue-300">
+                Anexo: {attachment.fileName} ({Math.ceil(attachment.size / 1024)} KB)
+              </a>
+            ))}
           </article>
         ))}
       </div>
 
-      <form action={replySupportTicket.bind(null, ticket.id)} className="mt-6 space-y-3">
-        <label htmlFor="body" className="block text-sm font-medium">
-          Responder
-        </label>
-        <textarea
-          id="body"
-          name="body"
-          required
-          rows={4}
-          maxLength={4000}
-          placeholder="Escreva sua resposta..."
-          className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-        />
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            type="submit"
-            className="flex-1 rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
-          >
-            Enviar resposta
-          </button>
-          {status !== "resolved" && (
-            <button
-              type="submit"
-              formAction={closeSupportTicket.bind(null, ticket.id)}
-              formNoValidate
-              className="rounded-xl border border-neutral-200 dark:border-neutral-800 px-5 py-2.5 text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
-            >
-              Marcar como resolvido
-            </button>
-          )}
-        </div>
-      </form>
+      <SupportReplyForm ticketId={ticket.id} />
+      {status !== "resolved" && (
+        <form className="mt-3 flex justify-end">
+          <ConfirmResolveButton formAction={closeSupportTicket.bind(null, ticket.id)} />
+        </form>
+      )}
+      </div>
+
+      {status === "resolved" && (
+        <p className="mt-4 flex items-center justify-center gap-2 text-sm text-neutral-500">
+          <CheckCircle2 className="h-4 w-4 text-emerald-500" /> Chamado resolvido. Ao responder, ele será reaberto.
+        </p>
+      )}
     </main>
   );
 }

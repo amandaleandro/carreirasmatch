@@ -7,6 +7,7 @@ import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick"
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { parseBRLToCents, formatCentsToBRL } from "@/lib/pricing";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 type PlanId = "card_recurring" | "monthly_oneoff" | "annual";
 
@@ -46,6 +47,7 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
 
   function handleStart(e: FormEvent) {
     e.preventDefault();
+    track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind: plan, segment });
     setShowBrick(true);
   }
 

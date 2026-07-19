@@ -23,6 +23,10 @@ function referrerHost(value: string) {
 }
 
 export async function POST(request: Request) {
+  const userAgent = request.headers.get("user-agent") ?? "";
+  if (/bot|crawler|spider|slurp|headless/i.test(userAgent)) {
+    return new NextResponse(null, { status: 204 });
+  }
   let payload: unknown;
   try {
     payload = await request.json();

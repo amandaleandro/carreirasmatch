@@ -190,6 +190,30 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
   );
 }
 
+export async function sendSupportReplyEmail(to: string, opts: { ticketId: string; subject: string }) {
+  await send(
+    to,
+    `Nova resposta no suporte: ${opts.subject}`,
+    `
+      <h2 style="font-size: 20px;">Você recebeu uma resposta</h2>
+      <p>Nossa equipe respondeu ao chamado <strong>${opts.subject}</strong>.</p>
+      ${button(`${APP_URL}/suporte/${opts.ticketId}`, "Ver resposta")}
+    `
+  );
+}
+
+export async function notifyAdminSupportTicket(opts: {
+  ticketId: string;
+  subject: string;
+  email: string;
+}) {
+  await sendAdmin("Novo chamado de suporte", [
+    ["Assunto", opts.subject],
+    ["Usuário", opts.email],
+    ["Atendimento", `${APP_URL}/admin/suporte/${opts.ticketId}`],
+  ]);
+}
+
 export async function sendPaymentConfirmationEmail(
   to: string,
   opts: { kind: string; amountCents: number }
@@ -316,6 +340,41 @@ export async function sendLeadFollowUpEmail(
       <p>Leva menos de 2 minutos para desbloquear:</p>
       ${button(`${APP_URL}${checkoutUrl}`, "Ver minha análise completa")}
       <p>Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
+    `
+  );
+}
+
+export async function sendDiagnosticUpgradeEmail(
+  to: string,
+  opts: { segment: string; analysisId?: string | null }
+) {
+  const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
+  await send(
+    to,
+    "Leve seu diagnóstico para as próximas vagas",
+    `
+      <h2 style="font-size: 20px;">Um diagnóstico é o começo</h2>
+      <p>Agora que você já viu o que ajustar nesta oportunidade, o próximo passo é repetir o processo nas próximas vagas e acompanhar sua evolução.</p>
+      <p>Com o plano mensal, você reúne novas análises, currículo otimizado, preparação de entrevista, plano de ação e acompanhamento das candidaturas.</p>
+      ${button(href, "Conhecer o plano mensal")}
+      <p>Você pode cancelar quando quiser.</p>
+    `
+  );
+}
+
+export async function sendCheckoutRecoveryEmail(
+  to: string,
+  opts: { segment: string }
+) {
+  const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
+  await send(
+    to,
+    "Quer continuar sua assinatura?",
+    `
+      <h2 style="font-size: 20px;">Seu plano ainda não foi ativado</h2>
+      <p>Você começou o pagamento, mas a assinatura ainda não foi confirmada. Se o Pix expirou ou o cartão não foi aprovado, pode retomar com outra forma de pagamento.</p>
+      ${button(href, "Retomar assinatura")}
+      <p>Se já pagou por Pix, aguarde alguns instantes: a confirmação é automática.</p>
     `
   );
 }

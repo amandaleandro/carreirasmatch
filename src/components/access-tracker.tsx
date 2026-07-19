@@ -42,6 +42,23 @@ export function AccessTracker() {
       term: searchParams.get("utm_term") ?? "",
     });
 
+    const parsed = JSON.parse(body) as {
+      sessionId: string; source: string; medium: string; campaign: string; content: string;
+    };
+    let previous: Record<string, string> = {};
+    try {
+      previous = JSON.parse(localStorage.getItem("cm_attribution") ?? "{}") as Record<string, string>;
+    } catch {
+      previous = {};
+    }
+    localStorage.setItem("cm_attribution", JSON.stringify({
+      sessionId: parsed.sessionId,
+      source: parsed.source || previous.source || "",
+      medium: parsed.medium || previous.medium || "",
+      campaign: parsed.campaign || previous.campaign || "",
+      content: parsed.content || previous.content || "",
+    }));
+
     if (navigator.sendBeacon) {
       navigator.sendBeacon("/api/analytics/page-view", new Blob([body], { type: "application/json" }));
     } else {

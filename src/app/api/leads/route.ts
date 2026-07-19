@@ -23,6 +23,14 @@ export async function POST(req: NextRequest) {
   const analysisId = typeof body?.analysisId === "string" ? body.analysisId : null;
   const vocationTestResultId =
     typeof body?.vocationTestResultId === "string" ? body.vocationTestResultId : null;
+  const attribution = body?.attribution;
+  const tracking = {
+    sessionId: typeof attribution?.sessionId === "string" ? attribution.sessionId.slice(0, 100) : "",
+    attributionSource: typeof attribution?.source === "string" ? attribution.source.slice(0, 120) : "",
+    medium: typeof attribution?.medium === "string" ? attribution.medium.slice(0, 120) : "",
+    campaign: typeof attribution?.campaign === "string" ? attribution.campaign.slice(0, 200) : "",
+    content: typeof attribution?.content === "string" ? attribution.content.slice(0, 200) : "",
+  };
 
   if (!source || !VALID_SOURCES.includes(source)) {
     return NextResponse.json(
@@ -36,7 +44,7 @@ export async function POST(req: NextRequest) {
   }
 
   const lead = await prisma.lead.create({
-    data: { name, email, phone, source },
+    data: { name, email, phone, source, ...tracking },
   });
 
   if (analysisId) {

@@ -110,6 +110,60 @@ limpos.
 Uma taxa baixa deve ser diagnosticada por segmento, device, canal e erro antes
 de redesenhar o funil inteiro.
 
+## Meta mínima diária de crescimento
+
+Para os primeiros 30 dias de aquisição ativa, a meta operacional é:
+
+| Métrica | Mínimo diário | Meta semanal | Meta em 30 dias |
+| --- | ---: | ---: | ---: |
+| Novas assinaturas confirmadas | 5 | 35 | 150 |
+| Visitas qualificadas | 1.000 | 7.000 | 30.000 |
+| Conversão visita → assinatura | 0,5% | 0,5% | 0,5% |
+
+**Visita qualificada** é uma sessão válida em uma landing, vaga ou ferramenta,
+excluindo bots, tráfego interno e sessões sem engajamento. Visualizações de
+vídeo e impressões de anúncio devem ser acompanhadas separadamente e não contam
+como visita qualificada.
+
+A meta diária serve como ritmo, mas a decisão deve considerar a média móvel de
+sete dias. Um dia abaixo da meta não exige mudança imediata; sete dias abaixo de
+35 assinaturas ou 7.000 visitas exigem diagnóstico do canal e do funil.
+
+### Cálculo da meta
+
+```text
+assinaturas necessárias por dia =
+meta de novas assinaturas no período / número de dias
+
+visitas qualificadas necessárias por dia =
+assinaturas necessárias por dia / conversão visita → assinatura
+```
+
+Com a meta inicial:
+
+```text
+5 assinaturas / 0,005 = 1.000 visitas qualificadas por dia
+```
+
+Recalcular após quatro semanas com a conversão real, sem reduzir a meta de
+assinaturas apenas porque o funil converteu abaixo do esperado. Exemplo: se a
+conversão real for 0,3%, serão necessárias aproximadamente 1.667 visitas
+qualificadas por dia para manter cinco assinaturas; se for 1%, serão necessárias
+500.
+
+### Semáforo diário com leitura semanal
+
+| Situação | Assinaturas/dia | Visitas qualificadas/dia | Ação |
+| --- | ---: | ---: | --- |
+| Vermelho | 0–2 | abaixo de 600 | Corrigir aquisição, mensagem ou falhas do funil |
+| Amarelo | 3–4 | 600–999 | Manter testes e atacar a etapa de maior perda |
+| Verde | 5–7 | 1.000–1.499 | Manter execução e validar CAC, margem e retenção |
+| Supermeta | 8+ | 1.500+ | Considerar escala gradual se a economia estiver saudável |
+
+O resultado comercial prevalece sobre o volume: atingir visitas sem assinatura
+não caracteriza meta batida. Da mesma forma, assinatura com CAC acima do limite
+ou pagamento não conciliado não deve justificar escala.
+
 ## Economia unitária
 
 ```text

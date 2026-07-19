@@ -8,7 +8,7 @@ import {
   createCardToken,
   initMercadoPago,
 } from "@mercadopago/sdk-react";
-import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { track, ANALYTICS_EVENTS, getStoredAttribution } from "@/lib/analytics";
 
 let initialized = false;
 function ensureInitialized() {
@@ -82,6 +82,7 @@ export function MercadoPagoSubscriptionBrick({
     e.preventDefault();
     setError(null);
     setLoading(true);
+    track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind: "subscription", segment: segment ?? "unknown" });
 
     try {
       if (!cardholderName.trim()) {
@@ -111,6 +112,7 @@ export function MercadoPagoSubscriptionBrick({
           payerEmail,
           segment,
           couponCode,
+          attribution: getStoredAttribution(),
         }),
       });
       const data = await res.json();
@@ -123,6 +125,7 @@ export function MercadoPagoSubscriptionBrick({
         setError("Assinatura pendente de confirmação. Você será avisado quando for ativada.");
       }
     } catch (err) {
+      track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { kind: "subscription" });
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
       setLoading(false);

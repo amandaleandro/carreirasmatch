@@ -6,6 +6,8 @@ import {
   sendOnboardingNudgeEmail,
   sendLeadFollowUpEmail,
   sendJobAlertEmail,
+  sendDiagnosticUpgradeEmail,
+  sendCheckoutRecoveryEmail,
 } from "@/lib/resend";
 
 // O scheduler roda algumas vezes ao dia; a idempotência (sendOnce + EmailLog)
@@ -171,6 +173,52 @@ async function sendJobAlerts(now: Date): Promise<void> {
   }
 }
 
+async function sendDiagnosticUpgradeEmails(now: Date): Promise<void> {
+  const from = new Date(now.getTime() - 4 * DAY_MS);
+  const to = new Date(now.getTime() - 1 * DAY_MS);
+  const payments = await prisma.payment.findMany({
+    where: { kind: "diagnostic", status: "paid", paidAt: { gte: from, lte: to } },
+    select: {
+      id: true,
+      analysisId: true,
+      segment: true,
+      user: { select: { email: true, subscription: { select: { status: true } } } },
+    },
+  });
+  for (const payment of payments) {
+    if (!payment.user.email || payment.user.subscription?.status === "active") continue;
+    await sendOnce("diagnostic_upgrade", payment.id, payment.user.email, () =>
+      sendDiagnosticUpgradeEmail(payment.user.email!, {
+        segment: payment.segment,
+        analysisId: payment.analysisId,
+      })
+    );
+  }
+}
+
+async function sendCheckoutRecoveryEmails(now: Date): Promise<void> {
+  const from = new Date(now.getTime() - 3 * DAY_MS);
+  const to = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+  const attempts = await prisma.payment.findMany({
+    where: {
+      kind: { in: ["subscription", "subscription_monthly", "subscription_annual"] },
+      status: { in: ["pending", "cancelled"] },
+      createdAt: { gte: from, lte: to },
+    },
+    select: {
+      id: true,
+      segment: true,
+      user: { select: { email: true, subscription: { select: { status: true } } } },
+    },
+  });
+  for (const attempt of attempts) {
+    if (!attempt.user.email || attempt.user.subscription?.status === "active") continue;
+    await sendOnce("checkout_recovery", attempt.id, attempt.user.email, () =>
+      sendCheckoutRecoveryEmail(attempt.user.email!, { segment: attempt.segment })
+    );
+  }
+}
+
 export async function runLifecycleEmailTick(): Promise<void> {
   const now = new Date();
   const steps: Array<[string, () => Promise<void>]> = [
@@ -178,6 +226,8 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["expire_subscriptions", () => expireLapsedSubscriptions(now)],
     ["onboarding_nudges", () => sendOnboardingNudges(now)],
     ["lead_followups", () => sendLeadFollowUps(now)],
+    ["diagnostic_upgrades", () => sendDiagnosticUpgradeEmails(now)],
+    ["checkout_recovery", () => sendCheckoutRecoveryEmails(now)],
     ["job_alerts", () => sendJobAlerts(now)],
   ];
   for (const [name, step] of steps) {

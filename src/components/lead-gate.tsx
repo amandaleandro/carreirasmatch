@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { track, ANALYTICS_EVENTS, getStoredAttribution } from "@/lib/analytics";
 import { formatBrazilPhone, validateContact } from "@/lib/contact-validation";
 
 const LEAD_STORAGE_KEY = "carreiramatch:lead-contact";
@@ -63,6 +63,7 @@ export function LeadGate({
           source,
           analysisId,
           vocationTestResultId,
+          attribution: getStoredAttribution(),
         }),
       });
       const data = await res.json();

@@ -9,6 +9,7 @@ import {
   SUPPORT_STATUS_LABELS,
   normalizeSupportCategory,
   normalizeSupportStatus,
+  validateSupportAttachment,
 } from "@/lib/support";
 
 describe("normalizeSupportCategory", () => {
@@ -53,5 +54,17 @@ describe("labels", () => {
       expect(SUPPORT_STATUS_LABELS[status]).toBeTruthy();
       expect(SUPPORT_STATUS_ADMIN_LABELS[status]).toBeTruthy();
     }
+  });
+});
+
+describe("validateSupportAttachment", () => {
+  it("accepts supported files up to 2 MB", () => {
+    const file = new File(["conteúdo"], "comprovante.pdf", { type: "application/pdf" });
+    expect(validateSupportAttachment(file)).toEqual({ file });
+  });
+
+  it("rejects unsupported or oversized files", () => {
+    expect(validateSupportAttachment(new File(["x"], "arquivo.exe", { type: "application/octet-stream" })).error).toMatch(/PDF/);
+    expect(validateSupportAttachment(new File([new Uint8Array(2 * 1024 * 1024 + 1)], "grande.png", { type: "image/png" })).error).toMatch(/2 MB/);
   });
 });

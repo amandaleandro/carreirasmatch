@@ -255,6 +255,41 @@ export default async function AdminPage() {
   const jobCoverage = pct(activeJobs, totalJobs);
   const paidCount = paidPayments._count;
   const paid24hCount = payments24h._count;
+  const [subscriptions24h, subscriptions7d, qualifiedSessions24h, funnel24h, channelSubscriptions30d] =
+    await Promise.all([
+      prisma.funnelEvent.count({
+        where: { name: "subscription_confirmed", createdAt: { gte: since24h } },
+      }),
+      prisma.funnelEvent.count({
+        where: {
+          name: "subscription_confirmed",
+          createdAt: { gte: new Date(now.getTime() - 7 * 86400000) },
+        },
+      }),
+      prisma.pageView.groupBy({
+        by: ["sessionId"],
+        where: { createdAt: { gte: since24h }, path: { not: "/admin" } },
+      }),
+      prisma.funnelEvent.groupBy({
+        by: ["name"],
+        where: { createdAt: { gte: since24h } },
+        _count: { _all: true },
+      }),
+      prisma.funnelEvent.groupBy({
+        by: ["source", "medium", "campaign"],
+        where: {
+          name: "subscription_confirmed",
+          createdAt: { gte: new Date(now.getTime() - 30 * 86400000) },
+        },
+        _count: { _all: true },
+        orderBy: { _count: { source: "desc" } },
+        take: 8,
+      }),
+    ]);
+  const visits24h = qualifiedSessions24h.length;
+  const visitToSubscription = visits24h
+    ? ((subscriptions24h / visits24h) * 100).toFixed(2)
+    : "0,00";
 
   return (
     <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
@@ -272,6 +307,55 @@ export default async function AdminPage() {
           Atualizado em tempo real a cada carregamento da página.
         </div>
       </header>
+
+      <section className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 dark:border-blue-900 dark:bg-blue-950/20">
+        <div>
+          <h2 className="font-semibold">Meta diária de crescimento</h2>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">
+            Ritmo das últimas 24 horas e média móvel de sete dias.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <StatCard label="Assinaturas" value={`${subscriptions24h} / 5`} helper="Confirmações oficiais" />
+          <StatCard label="Visitas qualificadas" value={`${visits24h} / 1.000`} helper="Sessões válidas registradas" />
+          <StatCard label="Conversão" value={`${visitToSubscription}%`} helper="Visita → assinatura" />
+          <StatCard
+            label="Média de 7 dias"
+            value={(subscriptions7d / 7).toFixed(1)}
+            helper={`${subscriptions7d} assinaturas no período`}
+          />
+        </div>
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <div>
+            <h3 className="text-sm font-semibold">Funil nas últimas 24h</h3>
+            <div className="mt-3 space-y-2 text-sm">
+              {funnel24h.map((item) => (
+                <div key={item.name} className="flex justify-between gap-3">
+                  <span>{item.name}</span>
+                  <strong>{item._count._all}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold">Assinaturas por origem · 30 dias</h3>
+            <div className="mt-3 space-y-2 text-sm">
+              {channelSubscriptions30d.length === 0 && (
+                <p className="text-neutral-500">Nenhuma assinatura atribuída ainda.</p>
+              )}
+              {channelSubscriptions30d.map((item) => (
+                <div key={`${item.source}:${item.medium}:${item.campaign}`} className="flex justify-between gap-3">
+                  <span className="truncate">
+                    {item.source || "direto"} / {item.medium || "-"}
+                    {item.campaign ? ` · ${item.campaign}` : ""}
+                  </span>
+                  <strong>{item._count._all}</strong>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-lg border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
         <div>

@@ -54,6 +54,24 @@ export const SUPPORT_STATUS_ADMIN_LABELS: Record<SupportStatus, string> = {
 
 export const MAX_SUPPORT_SUBJECT_LENGTH = 120;
 export const MAX_SUPPORT_MESSAGE_LENGTH = 4000;
+export const MAX_SUPPORT_ATTACHMENT_SIZE = 2 * 1024 * 1024;
+export const SUPPORT_ATTACHMENT_TYPES = ["application/pdf", "image/png", "image/jpeg"] as const;
+
+export type SupportActionState = {
+  error?: string;
+  success?: string;
+};
+
+export function validateSupportAttachment(value: FormDataEntryValue | null) {
+  if (!(value instanceof File) || value.size === 0) return { file: null };
+  if (!(SUPPORT_ATTACHMENT_TYPES as readonly string[]).includes(value.type)) {
+    return { file: null, error: "Envie um arquivo PDF, PNG ou JPEG." };
+  }
+  if (value.size > MAX_SUPPORT_ATTACHMENT_SIZE) {
+    return { file: null, error: "O anexo deve ter no máximo 2 MB." };
+  }
+  return { file: value };
+}
 
 export function normalizeSupportCategory(value: unknown): SupportCategory {
   const raw = String(value ?? "").trim();

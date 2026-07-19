@@ -278,11 +278,17 @@ model Payment {
   paidAt           DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  sessionId        String    @default("")
+  source           String    @default("")
+  medium           String    @default("")
+  campaign         String    @default("")
+  content          String    @default("")
 
   @@index([userId])
   @@index([status])
   @@index([analysisId])
   @@index([couponId])
+  @@index([campaign, createdAt])
 }
 
 /// Cupons de desconto de influenciadores. Um código por influenciador para rastrear origem das vendas.
@@ -378,11 +384,40 @@ model Lead {
   email               String
   phone               String
   source              String // "vocation_test" | "resume_analysis" | "registration"
+  sessionId           String               @default("")
+  attributionSource   String               @default("")
+  medium              String               @default("")
+  campaign            String               @default("")
+  content             String               @default("")
   createdAt           DateTime             @default(now())
   vocationTestResults VocationTestResult[]
   analyses            Analysis[]
 
   @@index([email])
+}
+
+/// Eventos internos do funil. Não armazena currículo, vaga, e-mail, telefone ou IP.
+model FunnelEvent {
+  id         String   @id @default(cuid())
+  name       String
+  sessionId  String   @default("")
+  userId     String?
+  analysisId String?
+  paymentId  String?
+  segment    String   @default("")
+  source     String   @default("")
+  medium     String   @default("")
+  campaign   String   @default("")
+  content    String   @default("")
+  path       String   @default("")
+  properties String   @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([name, createdAt])
+  @@index([sessionId, createdAt])
+  @@index([userId, createdAt])
+  @@index([campaign, createdAt])
+  @@index([paymentId])
 }
 
 model WeeklyGoal {
@@ -487,6 +522,9 @@ model SupportTicket {
   subject   String
   category  String   @default("other")
   status    String   @default("open")
+  firstResponseAt DateTime?
+  resolvedAt       DateTime?
+  reopenCount      Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   messages  SupportMessage[]
@@ -505,8 +543,24 @@ model SupportMessage {
   readByUser  Boolean       @default(false)
   readByAdmin Boolean       @default(false)
   createdAt   DateTime      @default(now())
+  attachments SupportAttachment[]
 
   @@index([ticketId, createdAt])
+}
+
+/// Arquivo pequeno enviado em uma conversa de suporte. Os bytes ficam no banco
+/// e só são entregues por uma rota autenticada, nunca por uma pasta pública.
+model SupportAttachment {
+  id        String         @id @default(cuid())
+  messageId String
+  message   SupportMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileName  String
+  mimeType  String
+  size      Int
+  data      Bytes
+  createdAt DateTime       @default(now())
+
+  @@index([messageId])
 }
 
 /// Page views anonimos para medir aquisicao e campanhas sem armazenar IP ou dados pessoais.
