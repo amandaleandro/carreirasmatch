@@ -1,0 +1,115 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Pagamentos & Receita",
+  "uid": "carreiras-payments-revenue",
+  "tags": ["carreiras-match", "negócio", "pagamentos"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-30d", "to": "now" },
+  "refresh": "1m",
+  "templating": {
+    "list": [{
+      "name": "period", "label": "Janela", "type": "custom", "query": "24h,7d,30d",
+      "current": { "text": "30d", "value": "30d" },
+      "options": [
+        { "text": "24h", "value": "24h", "selected": false },
+        { "text": "7d", "value": "7d", "selected": false },
+        { "text": "30d", "value": "30d", "selected": true }
+      ]
+    }]
+  },
+  "panels": [
+    { "type": "row", "title": "Resultado financeiro — $period", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Receita total", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(carreiras_business_revenue_cents{period=\"$period\"}) / 100", "legendFormat": "receita" }]
+    },
+    {
+      "type": "stat", "title": "Receita candidatos", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_revenue_cents{channel=\"candidate\",period=\"$period\"} / 100", "legendFormat": "candidatos" }]
+    },
+    {
+      "type": "stat", "title": "Receita empresas", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_revenue_cents{channel=\"company\",period=\"$period\"} / 100", "legendFormat": "empresas" }]
+    },
+    {
+      "type": "stat", "title": "Tentativas", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(carreiras_business_flow{metric=\"payment_attempts\",period=\"$period\"})", "legendFormat": "tentativas" }]
+    },
+    {
+      "type": "stat", "title": "Aprovados", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(carreiras_business_flow{metric=\"payments_paid\",period=\"$period\"})", "legendFormat": "aprovados" }]
+    },
+    {
+      "type": "stat", "title": "Taxa de aprovação", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "green", "value": 0.75 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(carreiras_business_flow{metric=\"payments_paid\",period=\"$period\"}) / clamp_min(sum(carreiras_business_flow{metric=\"payment_attempts\",period=\"$period\"}), 1)", "legendFormat": "aprovação" }]
+    },
+    { "type": "row", "title": "Conversão por canal", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 }, "collapsed": false, "panels": [] },
+    {
+      "type": "bargauge", "title": "Tentativas e aprovações", "gridPos": { "h": 9, "w": 12, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "min": 0 } },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_flow{metric=\"payment_attempts\",period=\"$period\"}", "legendFormat": "{{channel}} / tentativas" },
+        { "refId": "B", "expr": "carreiras_business_flow{metric=\"payments_paid\",period=\"$period\"}", "legendFormat": "{{channel}} / aprovados" }
+      ]
+    },
+    {
+      "type": "bargauge", "title": "Taxa de aprovação por canal", "gridPos": { "h": 9, "w": 12, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 1 } },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_flow{metric=\"payments_paid\",period=\"$period\"} / ignoring(metric) clamp_min(carreiras_business_flow{metric=\"payment_attempts\",period=\"$period\"}, 1)", "legendFormat": "{{channel}}" }]
+    },
+    { "type": "row", "title": "Receita e carteira", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 16 }, "collapsed": false, "panels": [] },
+    {
+      "type": "timeseries", "title": "Receita móvel por canal", "gridPos": { "h": 9, "w": 12, "x": 0, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2, "custom": { "fillOpacity": 20 } } },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_revenue_cents{period=\"$period\"} / 100", "legendFormat": "{{channel}}" }]
+    },
+    {
+      "type": "barchart", "title": "Status dos pagamentos", "gridPos": { "h": 9, "w": 12, "x": 12, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=~\"payment_status|company_payment_status\"}", "legendFormat": "{{metric}} / {{value}}", "instant": true }]
+    },
+    {
+      "type": "barchart", "title": "Status das assinaturas", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"subscription_status\"}", "legendFormat": "{{value}}", "instant": true }]
+    },
+    {
+      "type": "stat", "title": "Receita média por pagamento", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 26 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "(sum(carreiras_business_revenue_cents{period=\"$period\"}) / 100) / clamp_min(sum(carreiras_business_flow{metric=\"payments_paid\",period=\"$period\"}), 1)", "legendFormat": "ticket médio" }]
+    }
+  ]
+}

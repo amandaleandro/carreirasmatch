@@ -74,6 +74,12 @@ principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
 - O dashboard **"Carreiras Match - Operação & SLO"** reúne disponibilidade,
   latência HTTP, erros, runtime Node, PostgreSQL, saturação da VPS, containers e
   logs críticos.
+- O dashboard **"Carreiras Match - Crescimento & Funil"** separa aquisição,
+  ativação, conversões e engajamento, com filtro de 24h, 7d ou 30d.
+- O dashboard **"Carreiras Match - Pagamentos & Receita"** acompanha tentativas,
+  aprovações, conversão, ticket médio, receita por canal e status financeiros.
+- O dashboard **"Carreiras Match - IA Confiabilidade & Roteamento"** mostra
+  sucesso, falhas, fallback, latência p95, cache, provedores e modelos usados.
 
 As métricas agregadas de negócio são atualizadas no máximo uma vez por minuto
 durante o scrape de `/api/metrics`. Elas expõem apenas contagens e valores

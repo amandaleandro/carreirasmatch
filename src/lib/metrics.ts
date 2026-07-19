@@ -172,6 +172,17 @@ export const businessRevenueCents = getOrCreate(
     })
 );
 
+export const businessFlow = getOrCreate(
+  "carreiras_business_flow",
+  () =>
+    new Gauge({
+      name: "carreiras_business_flow",
+      help: "Volumes agregados dos fluxos de negócio por canal e período",
+      labelNames: ["metric", "channel", "period"] as const,
+      registers: [registry],
+    })
+);
+
 export const postgresStats = getOrCreate(
   "carreiras_postgres_stat",
   () =>
@@ -281,6 +292,18 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
           where: { status: "paid", paidAt: { gte: start } },
           _sum: { amount: true },
         }),
+        candidatePaymentAttempts: await prisma.payment.count({
+          where: { createdAt: { gte: start } },
+        }),
+        candidatePaymentsPaid: await prisma.payment.count({
+          where: { status: "paid", paidAt: { gte: start } },
+        }),
+        companyPaymentAttempts: await prisma.companyPayment.count({
+          where: { createdAt: { gte: start } },
+        }),
+        companyPaymentsPaid: await prisma.companyPayment.count({
+          where: { status: "paid", paidAt: { gte: start } },
+        }),
       }))
     ),
   ]);
@@ -301,6 +324,7 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
 
   businessCreated.reset();
   businessRevenueCents.reset();
+  businessFlow.reset();
   for (const snapshot of periodSnapshots) {
     for (const [entity, value] of Object.entries({
       users: snapshot.users,
@@ -320,6 +344,22 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     businessRevenueCents.set(
       { channel: "company", period: snapshot.label },
       snapshot.companyRevenue._sum.amount ?? 0
+    );
+    businessFlow.set(
+      { metric: "payment_attempts", channel: "candidate", period: snapshot.label },
+      snapshot.candidatePaymentAttempts
+    );
+    businessFlow.set(
+      { metric: "payments_paid", channel: "candidate", period: snapshot.label },
+      snapshot.candidatePaymentsPaid
+    );
+    businessFlow.set(
+      { metric: "payment_attempts", channel: "company", period: snapshot.label },
+      snapshot.companyPaymentAttempts
+    );
+    businessFlow.set(
+      { metric: "payments_paid", channel: "company", period: snapshot.label },
+      snapshot.companyPaymentsPaid
     );
   }
 
