@@ -26,6 +26,9 @@ type StepId =
   | "applications"
   | "resume"
   | "tools"
+  | "mentorias"
+  | "concursos"
+  | "vestibulares"
   | "search"
   | "overview"
   | "closing";
@@ -67,6 +70,24 @@ const BASE_STEPS: Record<StepId, TourStep> = {
     body: "Carta de apresentação, simulador de entrevista, teste vocacional e muito mais - tudo pronto para acelerar sua busca.",
     placement: "right",
   },
+  mentorias: {
+    target: '[data-tour="nav-mentorias"]',
+    title: "Mentorias em vídeo",
+    body: "Mentorias e cursos gratuitos de carreira, entrevista e currículo, selecionados do YouTube. É de graça, aproveite.",
+    placement: "right",
+  },
+  concursos: {
+    target: '[data-tour="nav-concursos"]',
+    title: "Radar de concursos",
+    body: "Novos editais, inscrições e provas de concursos públicos, reunidos e atualizados ao longo do dia.",
+    placement: "right",
+  },
+  vestibulares: {
+    target: '[data-tour="nav-vestibulares"]',
+    title: "Radar de vestibulares",
+    body: "Vestibulares, ENEM, Sisu, ProUni e bolsas mais recentes, tudo num lugar só.",
+    placement: "right",
+  },
   search: {
     target: '[data-tour="topbar-search"]',
     title: "Busca rápida",
@@ -93,6 +114,7 @@ const DEFAULT_ORDER: StepId[] = [
   "applications",
   "resume",
   "tools",
+  "mentorias",
   "search",
   "overview",
   "closing",
@@ -151,8 +173,8 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
     },
   },
   student: {
-    // Estudante escolhendo faculdade/técnico: foco em ferramentas, não em caça a vagas.
-    order: ["welcome", "tools", "analise", "resume", "overview", "closing"],
+    // Estudante escolhendo faculdade/técnico: foco em ferramentas e radar de vestibulares.
+    order: ["welcome", "tools", "vestibulares", "mentorias", "analise", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como escolher sua faculdade ou curso técnico com segurança. Pode usar a tela normalmente.",
@@ -165,7 +187,45 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
         body: "Já pensa em estágio ou primeiro emprego? Cole uma vaga + currículo e veja sua aderência quando quiser.",
       },
       closing: {
-        body: "Comece pelo teste vocacional e explore os guias. Para rever este passo a passo, use o botão de ajuda no canto.",
+        body: "Comece pelo teste vocacional, fique de olho no radar de vestibulares e explore os guias. Para rever, use o botão de ajuda no canto.",
+      },
+    },
+  },
+  concurseiro: {
+    // Concurseiro: radar de concursos e ferramentas de preparação no centro; vagas são plano B.
+    order: ["welcome", "concursos", "tools", "mentorias", "analise", "resume", "overview", "closing"],
+    overrides: {
+      welcome: {
+        body: "Em 1 minuto eu te mostro como a plataforma turbina a sua preparação para concursos. Pode usar a tela normalmente.",
+      },
+      tools: {
+        title: "Ferramentas para concurseiros",
+        body: "Plano de estudo, simulado e nota de corte por banca - tudo para organizar sua preparação.",
+      },
+      analise: {
+        body: "Também analisa vagas: se quiser um plano B no mercado, cole uma vaga + currículo e veja sua aderência.",
+      },
+      closing: {
+        body: "Fique de olho no radar de concursos e monte seu plano de estudo. Para rever este guia, use o botão de ajuda no canto.",
+      },
+    },
+  },
+  oab: {
+    // Estudante de OAB: ferramentas do exame e conteúdo de estudo no centro.
+    order: ["welcome", "tools", "mentorias", "analise", "resume", "overview", "closing"],
+    overrides: {
+      welcome: {
+        body: "Em 1 minuto eu te mostro como a plataforma apoia a sua preparação para o Exame da OAB. Pode usar a tela normalmente.",
+      },
+      tools: {
+        title: "Ferramentas para a OAB",
+        body: "Preparação de 1ª e 2ª fase, prática de peças e revisão por disciplina jurídica. Comece por aqui.",
+      },
+      analise: {
+        body: "Também analisa vagas: se quiser avaliar oportunidades no mercado jurídico, cole uma vaga + currículo.",
+      },
+      closing: {
+        body: "Aprofunde na preparação de 1ª e 2ª fase e explore as mentorias. Para rever este guia, use o botão de ajuda no canto.",
       },
     },
   },

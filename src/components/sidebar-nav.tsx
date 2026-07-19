@@ -44,9 +44,9 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
   { href: "/history", label: "Relatórios", icon: BarChart3 },
   { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
-  { href: "/mentorias", label: "Mentorias", icon: GraduationCap },
-  { href: "/concursos", label: "Radar de concursos", icon: Landmark },
-  { href: "/vestibulares", label: "Radar de vestibulares", icon: ScrollText },
+  { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+  { href: "/concursos", label: "Radar de concursos", icon: Landmark, tour: "nav-concursos" },
+  { href: "/vestibulares", label: "Radar de vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
   { href: "/suporte", label: "Suporte", icon: LifeBuoy },
   { href: "/settings", label: "Perfil", icon: User },
 ];
