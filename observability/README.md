@@ -16,7 +16,10 @@ Tudo roda num `docker-compose.observability.yml` separado, na mesma rede Docker 
 - `GET /api/metrics` (route handler Next, runtime Node) expõe:
   - métricas de processo Node (heap, event loop lag, GC, CPU) via `prom-client`;
   - métricas de negócio: `carreiras_analysis_total`, `carreiras_analysis_duration_seconds`,
-    `carreiras_ai_provider_calls_total`, `carreiras_payment_events_total` (ver `src/lib/metrics.ts`).
+    `carreiras_ai_provider_calls_total`, `carreiras_ai_tokens_total`,
+    `carreiras_ai_estimated_cost_usd_total`, `carreiras_ai_cache_events_total`,
+    `carreiras_ai_provider_duration_seconds` e `carreiras_payment_events_total`
+    (ver `src/lib/metrics.ts`).
 - O Caddy expõe `/metrics` no endpoint admin (porta 2019), com taxa de requests,
   status e latência na borda.
 
@@ -58,6 +61,18 @@ principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
 - Grafana: `https://carreirasmatch.com.br/grafana` (login com as credenciais acima).
 - O dashboard **"Carreiras Match - Visão Geral"** já vem provisionado, junto com os
   datasources Prometheus e Loki.
+- O dashboard **"Carreiras Match - Custos de IA"** mostra custo estimado em
+  USD/BRL, projeção mensal, tokens, cache, participação das cotas gratuitas,
+  falhas e latência. Ajuste a variável `Cotação USD/BRL` no topo quando necessário.
+- O dashboard **"Carreiras Match - Capacidade diária da IA"** contabiliza
+  tarefas concluídas por provedor e por operação, média de tokens por tarefa,
+  ritmo diário projetado e quantas tarefas o saldo informado suporta com base
+  no custo médio realmente observado. O filtro `Operação` ajuda a localizar
+  quais recursos merecem otimização primeiro.
+
+O custo financeiro é calculado apenas para modelos presentes na tabela de preços
+em `src/lib/ai-providers.ts`; modelos sem preço conhecido continuam aparecendo em
+tokens e chamadas, sem inventar um valor monetário.
 
 ## Reiniciar só a observabilidade
 

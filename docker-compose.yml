@@ -36,6 +36,9 @@ services:
     restart: unless-stopped
     environment:
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-4.1-nano}
+      - AI_ROUTING_MODE=${AI_ROUTING_MODE:-free_first}
       - DATABASE_URL=postgresql://${POSTGRES_USER:-carreiras}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-carreiras_match}
       - AUTH_SECRET=${AUTH_SECRET}
       - AUTH_TRUST_HOST=true

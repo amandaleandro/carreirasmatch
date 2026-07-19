@@ -11,7 +11,7 @@ Revise esta lista manualmente antes de cada deploy.
 |---|---|---|
 | `DATABASE_URL` | Conexão Prisma/SQLite | `file:./dev.db` local, `file:/app/data/dev.db` no Docker (volume) |
 | `AUTH_SECRET` | Assinatura de JWT/sessão do NextAuth | gerar com `openssl rand -base64 32` |
-| `GROQ_API_KEY` | Chamadas de análise de currículo/vaga | free tier tem limite diário de tokens |
+| `GROQ_API_KEY` ou `OPENAI_API_KEY` | Chamadas de análise de currículo/vaga | configure ao menos um provedor |
 | `GROQ_MODEL` | Modelo usado nas análises | default sugerido: `llama-3.3-70b-versatile` |
 | `APP_URL` | Monta `back_url` do Mercado Pago (Preapproval) | precisa ser a URL pública real em produção |
 | `MERCADOPAGO_ACCESS_TOKEN` | Backend: cria pagamentos/assinaturas | `APP_USR-...` = **produção real**, `TEST-...` = sandbox |
@@ -113,15 +113,18 @@ São dois grupos:
 
 ## Opcionais (provedores de IA extras - multi-provedor com fallback)
 
-O sistema usa **Groq** por padrão (`GROQ_API_KEY` / `GROQ_MODEL`), mas a camada de
-IA (`src/lib/ai-providers.ts`) é multi-provedor: qualquer provedor abaixo com
-chave setada entra numa **rotação com fallback automático** - se um bater no
-limite ou falhar, a chamada tenta o próximo. Cada requisição loga
+O sistema usa **rotação free-first**: cada nova chamada alterna primeiro entre
+Groq, Cerebras e Gemini. Se as cotas gratuitas falharem ou acabarem, tenta os
+provedores secundários e deixa a OpenAI paga como última reserva. Isso distribui
+as cotas gratuitas sem consumir o saldo pago enquanto elas estiverem disponíveis.
+A camada de IA (`src/lib/ai-providers.ts`) inclui qualquer provedor abaixo que
+tenha uma chave válida. Cada requisição loga
 `provider=… model=… ms=…` para comparar qual é o melhor. Todos são compatíveis
 com a API OpenAI.
 
 | Variável | Provedor | Onde pegar a chave |
 |---|---|---|
+| `OPENAI_API_KEY` / `OPENAI_MODEL` | OpenAI (`gpt-4.1-nano` por padrão) | platform.openai.com/api-keys |
 | `CEREBRAS_API_KEY` / `CEREBRAS_MODEL` | Cerebras (rápido, tipo Groq) | cloud.cerebras.ai |
 | `GEMINI_API_KEY` / `GEMINI_MODEL` | Google Gemini (free tier generoso) | aistudio.google.com/apikey |
 | `TOGETHER_API_KEY` / `TOGETHER_MODEL` | Together AI | api.together.xyz |
@@ -200,8 +203,18 @@ ou fora do schema é tratada como falha e aciona retry/backoff e depois fallback
 |---|---:|---|
 | `AI_MAX_RETRIES` | `2` | Repetições por provedor (máximo aceito: 3) |
 | `AI_REQUEST_TIMEOUT_MS` | `45000` | Timeout de cada tentativa (mínimo: 5s) |
+| `AI_MAX_INPUT_CHARS` | `50000` | Proteção global contra entradas gigantes; preserva o começo e as instruções finais |
+| `AI_RESULT_CACHE_TTL_MS` | `300000` | Reutiliza por 5 minutos respostas idênticas de baixa temperatura; `0` desliga |
+| `AI_RESULT_CACHE_MAX_ENTRIES` | `100` | Máximo de resultados mantidos apenas na memória do processo |
+| `AI_ROUTING_MODE` | `free_first` | `free_first` preserva OpenAI como reserva; `round_robin` alterna todos; `priority` usa ordem fixa |
 
-`docker-compose.yml` hoje repassa: `GROQ_API_KEY`, `DATABASE_URL`,
+Chamadas idênticas simultâneas compartilham a mesma requisição para evitar
+cobrança duplicada por duplo clique. O cache não persiste currículos em disco e
+é perdido ao reiniciar o processo. Os logs de sucesso incluem
+`input_tokens`, `output_tokens` e `total_tokens` para acompanhar o consumo real.
+
+`docker-compose.yml` hoje repassa: `OPENAI_API_KEY`, `OPENAI_MODEL`,
+`GROQ_API_KEY`, `DATABASE_URL`,
 `AUTH_SECRET`, `AUTH_TRUST_HOST`, `AUTH_URL`, `GOOGLE_CLIENT_ID/SECRET`,
 `ADZUNA_APP_ID/KEY`, `JOOBLE_API_KEY`, `GUPY_COMPANIES`,
 `SOLIDES_COMPANIES`, `GLASSDOOR_PARTNER_ID/KEY`, `GREENHOUSE_BOARDS`,

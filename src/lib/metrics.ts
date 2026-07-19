@@ -63,7 +63,52 @@ export const aiProviderCalls = getOrCreate(
     new Counter({
       name: "carreiras_ai_provider_calls_total",
       help: "Chamadas a provedores de IA por resultado",
-      labelNames: ["provider", "outcome"] as const,
+      labelNames: ["provider", "model", "operation", "outcome"] as const,
+      registers: [registry],
+    })
+);
+
+export const aiTokensTotal = getOrCreate(
+  "carreiras_ai_tokens_total",
+  () =>
+    new Counter({
+      name: "carreiras_ai_tokens_total",
+      help: "Tokens consumidos por provedor, modelo e direção",
+      labelNames: ["provider", "model", "operation", "direction"] as const,
+      registers: [registry],
+    })
+);
+
+export const aiEstimatedCostUsd = getOrCreate(
+  "carreiras_ai_estimated_cost_usd_total",
+  () =>
+    new Counter({
+      name: "carreiras_ai_estimated_cost_usd_total",
+      help: "Custo estimado em USD para modelos com preço conhecido",
+      labelNames: ["provider", "model", "operation"] as const,
+      registers: [registry],
+    })
+);
+
+export const aiCacheEvents = getOrCreate(
+  "carreiras_ai_cache_events_total",
+  () =>
+    new Counter({
+      name: "carreiras_ai_cache_events_total",
+      help: "Eventos do cache de IA",
+      labelNames: ["operation", "result"] as const,
+      registers: [registry],
+    })
+);
+
+export const aiProviderDuration = getOrCreate(
+  "carreiras_ai_provider_duration_seconds",
+  () =>
+    new Histogram({
+      name: "carreiras_ai_provider_duration_seconds",
+      help: "Latência das tentativas por provedor, modelo e resultado",
+      labelNames: ["provider", "model", "operation", "outcome"] as const,
+      buckets: [0.25, 0.5, 1, 2, 5, 10, 20, 40, 60],
       registers: [registry],
     })
 );

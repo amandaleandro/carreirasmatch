@@ -10,6 +10,24 @@ import {
 
 const BASE_RULES = `Responda SEMPRE em português do Brasil. Seja específico e baseie-se apenas em fatos fornecidos pelo usuário, nunca invente experiência, ferramentas ou resultados que não foram mencionados. Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois.`;
 
+function runToolJsonPrompt<T>(
+  operation: string,
+  systemPrompt: string,
+  userMessage: string,
+  temperature = 0.2,
+  maxCompletionTokens = 3500
+): Promise<T> {
+  return runJsonPrompt<T>(
+    systemPrompt,
+    userMessage,
+    temperature,
+    maxCompletionTokens,
+    undefined,
+    undefined,
+    operation
+  );
+}
+
 // --- Transformar projeto em experiência ---
 
 export type ProjectToExperienceResult = {
@@ -34,7 +52,7 @@ Formato de resposta:
 DESCRIÇÃO DO PROJETO (como a pessoa mesma descreveu, de forma informal):
 ${projectDescription}`;
 
-  return runJsonPrompt<ProjectToExperienceResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<ProjectToExperienceResult>("project_to_experience", systemPrompt, userMessage);
 }
 
 // --- Vocação de carreira ---
@@ -87,7 +105,7 @@ Formato de resposta:
 CURRÍCULO (pode estar vazio se a pessoa não enviou):
 ${resumeText || "(não informado)"}`;
 
-  return runJsonPrompt<VocationResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<VocationResult>("vocation_test", systemPrompt, userMessage);
 }
 
 // --- Descoberta de área ampla (Etapa 1) ---
@@ -144,7 +162,7 @@ Formato de resposta:
 CURRÍCULO (pode estar vazio se a pessoa não enviou):
 ${resumeText || "(não informado)"}`;
 
-  return runJsonPrompt<DiscoveryResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<DiscoveryResult>("career_discovery", systemPrompt, userMessage);
 }
 
 // --- Área do dia ---
@@ -174,7 +192,7 @@ Formato de resposta:
   const userMessage = `ÁREA: ${area.label}
 Subáreas possíveis: ${area.subareas.join(", ")}`;
 
-  return runJsonPrompt<AreaOfTheDayResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<AreaOfTheDayResult>("area_of_day", systemPrompt, userMessage);
 }
 
 // --- Mapa de estudos para ENEM/vestibular ---
@@ -244,7 +262,7 @@ HORAS DE ESTUDO POR SEMANA: ${answers.weeklyStudyHours}
 MATÉRIAS QUE MAIS DOMINA: ${answers.subjectStrengths.join(", ") || "não informado"}
 MATÉRIAS COM MAIS DIFICULDADE: ${answers.subjectWeaknesses.join(", ") || "não informado"}`;
 
-  return runJsonPrompt<ExamMapResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<ExamMapResult>("exam_map", systemPrompt, userMessage);
 }
 
 // --- Corretor de redação (ENEM) ---
@@ -290,7 +308,7 @@ Formato de resposta:
 TEXTO DA REDAÇÃO:
 ${essayText}`;
 
-  return runJsonPrompt<EssayGradeResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<EssayGradeResult>("essay_grading", systemPrompt, userMessage);
 }
 
 // --- Calculadora de chance no SISU / nota de corte ---
@@ -323,7 +341,7 @@ Formato de resposta:
 NOTA DO CANDIDATO (média ponderada estimada): ${userScore}
 TIPO DE INSTITUIÇÃO-ALVO: ${targetInstitutionType}`;
 
-  return runJsonPrompt<CutoffEstimateResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<CutoffEstimateResult>("sisu_cutoff", systemPrompt, userMessage);
 }
 
 // --- Currículo do zero ---
@@ -388,7 +406,7 @@ ${input.projects}
 HABILIDADES/TECNOLOGIAS:
 ${input.skills}`;
 
-  return runJsonPrompt<ResumeFromScratchResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<ResumeFromScratchResult>("resume_from_scratch", systemPrompt, userMessage);
 }
 
 // --- Análise de LinkedIn ---
@@ -419,7 +437,7 @@ Formato de resposta:
 CONTEÚDO ATUAL DO PERFIL DO LINKEDIN (headline, sobre, experiências, colado pelo usuário):
 ${linkedInText}`;
 
-  const result = await runJsonPrompt<LinkedInReviewResult>(systemPrompt, userMessage);
+  const result = await runToolJsonPrompt<LinkedInReviewResult>("linkedin_review", systemPrompt, userMessage);
 
   return {
     overallImpression: asText(result?.overallImpression),
@@ -476,7 +494,8 @@ Formato de resposta:
   "question": string (a pergunta, em uma ou duas frases, como o entrevistador falaria em voz alta)
 }`;
 
-  const result = await runJsonPrompt<InterviewQuestionResult>(
+  const result = await runToolJsonPrompt<InterviewQuestionResult>(
+    "interview_question",
     systemPrompt,
     interviewContext(input),
     0.7
@@ -518,7 +537,9 @@ Formato de resposta:
 TRANSCRIÇÃO DA ENTREVISTA ATÉ AQUI (avalie apenas a RESPOSTA ${answered}):
 ${transcript}`;
 
-  const result = await runJsonPrompt<InterviewAnswerResult>(systemPrompt, userMessage, 0.6);
+  const result = await runToolJsonPrompt<InterviewAnswerResult>(
+    "interview_answer", systemPrompt, userMessage, 0.6
+  );
 
   const nextQuestion = asOptionalText(result?.nextQuestion);
   if (!isLast && !nextQuestion) {
@@ -560,7 +581,7 @@ Formato de resposta:
 CONTEÚDO DO GITHUB (lista de repositórios, descrições, READMEs, colado pelo usuário):
 ${githubText}`;
 
-  const result = await runJsonPrompt<GithubReviewResult>(systemPrompt, userMessage);
+  const result = await runToolJsonPrompt<GithubReviewResult>("github_review", systemPrompt, userMessage);
 
   return {
     overallImpression: asText(result?.overallImpression),
@@ -611,7 +632,7 @@ ${input.projects}
 HABILIDADES/TECNOLOGIAS:
 ${input.skills}`;
 
-  return runJsonPrompt<ProfileFromScratchResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<ProfileFromScratchResult>("profile_from_scratch", systemPrompt, userMessage);
 }
 
 // --- Comparador de vagas ---
@@ -680,7 +701,7 @@ Formato de resposta:
 
   const userMessage = `CURRÍCULO DO CANDIDATO:\n${truncate(resumeText, MAX_RESUME_CHARS)}\n\n${jobsBlock}`;
 
-  return runJsonPrompt<JobComparisonResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<JobComparisonResult>("job_comparison", systemPrompt, userMessage);
 }
 
 // --- Triagem de candidatos (uma vaga × muitos currículos) ---
@@ -727,7 +748,7 @@ Formato de resposta:
 
   const userMessage = `VAGA: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${truncate(jobText, MAX_JOB_TEXT_CHARS)}\n\nCANDIDATOS:\n\n${candidatesBlock}`;
 
-  return runJsonPrompt<CandidateRankingResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<CandidateRankingResult>("candidate_ranking", systemPrompt, userMessage);
 }
 
 // --- Palavras-chave de busca de vaga (a partir do currículo) ---
@@ -750,7 +771,7 @@ Formato de resposta:
 
   const userMessage = `CURRÍCULO:\n${truncate(resumeText, MAX_RESUME_CHARS)}`;
 
-  return runJsonPrompt<JobSearchKeywords>(systemPrompt, userMessage);
+  return runToolJsonPrompt<JobSearchKeywords>("job_search_keywords", systemPrompt, userMessage);
 }
 
 // --- Simulado de entrevista (feedback por resposta) ---
@@ -805,7 +826,8 @@ RESPOSTA DO CANDIDATO: ${qa.answer || "(não respondida)"}`
   )
   .join("\n\n")}`;
 
-  const { results } = await runJsonPrompt<{ results: InterviewFeedbackResult[] }>(
+  const { results } = await runToolJsonPrompt<{ results: InterviewFeedbackResult[] }>(
+    "interview_feedback",
     systemPrompt,
     userMessage
   );
@@ -852,7 +874,8 @@ Formato de resposta:
 
   const userMessage = `CARGO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText || "não informada"}`;
 
-  const { questions } = await runJsonPrompt<{ questions: string[] }>(
+  const { questions } = await runToolJsonPrompt<{ questions: string[] }>(
+    "interview_questions",
     systemPrompt,
     userMessage,
     0.9
@@ -898,7 +921,7 @@ ${jobText || "não informada"}
 CURRÍCULO DO CANDIDATO:
 ${truncate(resumeText, MAX_RESUME_CHARS)}`;
 
-  return runJsonPrompt<CoverLetterResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<CoverLetterResult>("cover_letter", systemPrompt, userMessage);
 }
 
 // --- Teste comportamental (soft skills + personalidade) ---
@@ -943,7 +966,7 @@ ${skillLines}
 PONTUAÇÕES DE PERSONALIDADE (0-100):
 ${traitLines}`;
 
-  return runJsonPrompt<BehavioralSummaryResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<BehavioralSummaryResult>("behavioral_summary", systemPrompt, userMessage);
 }
 
 // --- Simulado a partir de provas anteriores ---
@@ -981,7 +1004,7 @@ Formato de resposta:
   const userMessage = `TEXTO EXTRAÍDO DA PROVA (${sourceLabel}):
 ${examText}`;
 
-  return runJsonPrompt<MockExamResult>(systemPrompt, userMessage, 0.7);
+  return runToolJsonPrompt<MockExamResult>("mock_exam", systemPrompt, userMessage, 0.7);
 }
 
 // --- Concurso público / OAB: plano de estudo por edital ---
@@ -1037,7 +1060,7 @@ ${input.disciplinas || "não informado"}
 TEMPO ATÉ A PROVA: ${input.timeUntilExam || "não informado"}
 HORAS DE ESTUDO POR SEMANA: ${input.weeklyStudyHours || "não informado"}`;
 
-  return runJsonPrompt<ConcursoStudyPlanResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<ConcursoStudyPlanResult>("concurso_study_plan", systemPrompt, userMessage);
 }
 
 // --- Concurso público / OAB 1ª fase: simulado por banca e disciplina ---
@@ -1074,7 +1097,7 @@ Formato de resposta:
 BANCA: ${input.banca || "não informada"}
 DISCIPLINA: ${input.disciplina || "não informada"}`;
 
-  return runJsonPrompt<MockExamResult>(systemPrompt, userMessage, 0.7);
+  return runToolJsonPrompt<MockExamResult>("concurso_mock_exam", systemPrompt, userMessage, 0.7);
 }
 
 // --- Concurso público: estimativa de nota de corte ---
@@ -1105,7 +1128,7 @@ BANCA: ${input.banca || "não informada"}
 REGIÃO/ESTADO: ${input.regiao || "não informado"}
 PONTUAÇÃO ESTIMADA DO CANDIDATO (percentual de acerto ou nota): ${input.userScore}`;
 
-  return runJsonPrompt<CutoffEstimateResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<CutoffEstimateResult>("concurso_cutoff", systemPrompt, userMessage);
 }
 
 // --- OAB 2ª fase: corretor de peça prático-profissional e discursivas ---
@@ -1157,5 +1180,5 @@ Formato de resposta:
 TEXTO DA PEÇA / RESPOSTA DISCURSIVA DO CANDIDATO:
 ${pecaText}`;
 
-  return runJsonPrompt<OabSecondPhaseResult>(systemPrompt, userMessage);
+  return runToolJsonPrompt<OabSecondPhaseResult>("oab_second_phase", systemPrompt, userMessage);
 }

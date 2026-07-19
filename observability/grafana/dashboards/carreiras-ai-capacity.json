@@ -1,0 +1,228 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Capacidade diária da IA",
+  "uid": "carreiras-ai-capacity",
+  "tags": ["carreiras-match", "ia", "capacidade"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "usd_brl",
+        "label": "Cotação USD/BRL",
+        "type": "constant",
+        "query": "5.60",
+        "current": { "text": "5.60", "value": "5.60" },
+        "hide": 0
+      },
+      {
+        "name": "budget_brl",
+        "label": "Saldo da IA em R$",
+        "type": "constant",
+        "query": "40",
+        "current": { "text": "40", "value": "40" },
+        "hide": 0
+      },
+      {
+        "name": "operation",
+        "label": "Operação",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "prometheus" },
+        "query": { "query": "label_values(carreiras_ai_provider_calls_total, operation)", "refId": "operation-var" },
+        "includeAll": true,
+        "allValue": ".*",
+        "multi": true,
+        "refresh": 1,
+        "current": { "text": "All", "value": ["$__all"] }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Produção diária",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Tarefas concluídas (24h)",
+      "description": "Cada sucesso é uma operação de IA concluída. Uma análise de currículo completa pode incluir análise + extração.",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[24h]))", "legendFormat": "tarefas" }]
+    },
+    {
+      "type": "stat",
+      "title": "Média de tokens por tarefa (24h)",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum(increase(carreiras_ai_tokens_total{direction=~\"input|output\",operation=~\"$operation\"}[24h])) / clamp_min(sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[24h])), 1)",
+        "legendFormat": "tokens/tarefa"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Ritmo projetado por dia",
+      "description": "Ritmo das últimas 6 horas projetado para 24 horas; não representa limite contratual.",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[6h])) * 4",
+        "legendFormat": "tarefas/dia"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Tarefas estimadas com o saldo",
+      "description": "Usa o saldo em R$, cotação e custo médio real observado da OpenAI no período. Só aparece após haver uso pago.",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{
+        "refId": "A",
+        "expr": "($budget_brl / $usd_brl) / clamp_min(sum(increase(carreiras_ai_estimated_cost_usd_total{provider=\"openai\",operation=~\"$operation\"}[$__range])) / clamp_min(sum(increase(carreiras_ai_provider_calls_total{provider=\"openai\",outcome=\"success\",operation=~\"$operation\"}[$__range])), 1), 0.000000001)",
+        "legendFormat": "tarefas"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "Onde as tarefas estão sendo processadas",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "barchart",
+      "title": "Tarefas concluídas por provedor (24h)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always", "stacking": "none", "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (provider) (increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[24h]))",
+        "legendFormat": "{{provider}}",
+        "instant": true
+      }]
+    },
+    {
+      "type": "barchart",
+      "title": "Tarefas concluídas por operação (24h)",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always", "stacking": "none", "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (operation) (increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[24h]))",
+        "legendFormat": "{{operation}}",
+        "instant": true
+      }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tarefas concluídas por hora",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (provider) (increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[1h]))",
+        "legendFormat": "{{provider}}"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "Eficiência por tipo de tarefa",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "barchart",
+      "title": "Média de tokens por operação",
+      "description": "Operações no topo são as melhores candidatas para encurtar prompts ou respostas.",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always", "stacking": "none" },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (operation) (increase(carreiras_ai_tokens_total{direction=~\"input|output\",operation=~\"$operation\"}[$__range])) / clamp_min(sum by (operation) (increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[$__range])), 1)",
+        "legendFormat": "{{operation}}",
+        "instant": true
+      }]
+    },
+    {
+      "type": "barchart",
+      "title": "Custo médio por operação (USD)",
+      "description": "Aparece apenas para modelos com preço cadastrado.",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyUSD", "decimals": 6 } },
+      "options": { "orientation": "horizontal", "showValue": "always", "stacking": "none" },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (operation) (increase(carreiras_ai_estimated_cost_usd_total{operation=~\"$operation\"}[$__range])) / clamp_min(sum by (operation) (increase(carreiras_ai_provider_calls_total{provider=\"openai\",outcome=\"success\",operation=~\"$operation\"}[$__range])), 1)",
+        "legendFormat": "{{operation}}",
+        "instant": true
+      }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Erros por provedor e operação",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (provider, operation) (increase(carreiras_ai_provider_calls_total{outcome=\"error\",operation=~\"$operation\"}[1h]))",
+        "legendFormat": "{{provider}} / {{operation}}"
+      }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Chamadas evitadas pelo cache por operação",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 33 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (operation) (increase(carreiras_ai_cache_events_total{result=~\"hit|in_flight\",operation=~\"$operation\"}[1h]))",
+        "legendFormat": "{{operation}}"
+      }]
+    },
+    {
+      "type": "table",
+      "title": "Detalhamento por provedor, modelo e operação",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 41 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (provider, model, operation) (increase(carreiras_ai_provider_calls_total{outcome=\"success\",operation=~\"$operation\"}[$__range]))",
+        "legendFormat": "{{provider}} / {{model}} / {{operation}}",
+        "format": "table",
+        "instant": true
+      }]
+    }
+  ]
+}

@@ -1,0 +1,189 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Custos de IA",
+  "uid": "carreiras-ai-costs",
+  "tags": ["carreiras-match", "ia", "custos"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      {
+        "name": "usd_brl",
+        "label": "Cotação USD/BRL",
+        "type": "constant",
+        "query": "5.60",
+        "current": { "text": "5.60", "value": "5.60" },
+        "hide": 0
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Resumo financeiro",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Custo estimado (24h)",
+      "description": "Somente modelos com preço conhecido. O valor considera tokens de entrada em cache.",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyUSD", "decimals": 4, "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "red", "value": 1 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_estimated_cost_usd_total[24h]))", "legendFormat": "USD" }]
+    },
+    {
+      "type": "stat",
+      "title": "Custo estimado em reais (24h)",
+      "description": "Conversão pela variável Cotação USD/BRL no topo do dashboard.",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_estimated_cost_usd_total[24h])) * $usd_brl", "legendFormat": "BRL" }]
+    },
+    {
+      "type": "stat",
+      "title": "Projeção mensal",
+      "description": "Projeção simples: consumo das últimas 24h multiplicado por 30.",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_estimated_cost_usd_total[24h])) * $usd_brl * 30", "legendFormat": "BRL/mês" }]
+    },
+    {
+      "type": "stat",
+      "title": "Chamadas evitadas pelo cache (24h)",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_cache_events_total{result=~\"hit|in_flight\"}[24h]))", "legendFormat": "evitadas" }]
+    },
+    {
+      "type": "row",
+      "title": "Consumo e custo",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Custo estimado por hora (USD)",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyUSD", "decimals": 5, "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
+      "targets": [{ "refId": "A", "expr": "sum by (provider, model) (increase(carreiras_ai_estimated_cost_usd_total[1h]))", "legendFormat": "{{provider}} / {{model}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tokens por minuto",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 15 } } },
+      "targets": [{
+        "refId": "A",
+        "expr": "sum by (provider, direction) (rate(carreiras_ai_tokens_total[5m])) * 60",
+        "legendFormat": "{{provider}} / {{direction}}"
+      }]
+    },
+    {
+      "type": "table",
+      "title": "Consumo no período por provedor e modelo",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 15 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "showHeader": true, "cellHeight": "sm" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (provider, model, direction) (increase(carreiras_ai_tokens_total[$__range]))",
+          "legendFormat": "{{provider}} / {{model}} / {{direction}}",
+          "format": "table",
+          "instant": true
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "title": "Eficiência e disponibilidade",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Chamadas por provedor e resultado",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
+      "targets": [{ "refId": "A", "expr": "sum by (provider, outcome) (rate(carreiras_ai_provider_calls_total[5m]))", "legendFormat": "{{provider}} / {{outcome}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Eventos de cache por minuto",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20 } } },
+      "targets": [{ "refId": "A", "expr": "sum by (result) (rate(carreiras_ai_cache_events_total[5m])) * 60", "legendFormat": "{{result}}" }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latência p95 por provedor",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s" } },
+      "targets": [{
+        "refId": "A",
+        "expr": "histogram_quantile(0.95, sum by (provider, le) (rate(carreiras_ai_provider_duration_seconds_bucket{outcome=\"success\"}[5m])))",
+        "legendFormat": "{{provider}}"
+      }]
+    },
+    {
+      "type": "stat",
+      "title": "Taxa de sucesso (24h)",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.9 }, { "color": "green", "value": 0.98 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\"}[24h])) / clamp_min(sum(increase(carreiras_ai_provider_calls_total[24h])), 1)", "legendFormat": "sucesso" }]
+    },
+    {
+      "type": "stat",
+      "title": "Uso atendido por gratuitas (24h)",
+      "description": "Percentual de sucessos atendidos por Groq, Cerebras ou Gemini.",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 1 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\",provider=~\"groq|cerebras|gemini\"}[24h])) / clamp_min(sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\"}[24h])), 1)", "legendFormat": "gratuitas" }]
+    },
+    {
+      "type": "stat",
+      "title": "Erros de provedor (24h)",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"error\"}[24h]))", "legendFormat": "erros" }]
+    },
+    {
+      "type": "stat",
+      "title": "Tokens totais (24h)",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_tokens_total{direction=~\"input|output\"}[24h]))", "legendFormat": "tokens" }]
+    }
+  ]
+}

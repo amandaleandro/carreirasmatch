@@ -76,5 +76,7 @@ Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo
   ]
 }`;
 
-  return runJsonPrompt<GeneratedPost>(SYSTEM_PROMPT, userMessage, 0.5, 3000);
+  return runJsonPrompt<GeneratedPost>(
+    SYSTEM_PROMPT, userMessage, 0.5, 3000, undefined, undefined, "blog_generation"
+  );
 }

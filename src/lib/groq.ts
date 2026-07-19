@@ -46,7 +46,8 @@ export async function runJsonPrompt<T>(
   temperature = 0.2,
   maxCompletionTokens = 3500,
   model?: string,
-  schema?: ZodType<T>
+  schema?: ZodType<T>,
+  operation = "other"
 ): Promise<T> {
   // `model` (quando passado, ex.: extração) define o modelo do endpoint Groq;
   // os demais provedores usam seus próprios modelos. A camada multi-provedor
@@ -58,7 +59,8 @@ export async function runJsonPrompt<T>(
     temperature,
     maxCompletionTokens,
     groqModel,
-    schema ? (value) => { schema.parse(value); } : undefined
+    schema ? (value) => { schema.parse(value); } : undefined,
+    operation
   );
   // A resposta em JSON-mode é fechada em JSON sintaticamente válido mesmo quando
   // cortada por max_tokens, então um corte é logado na camada de provedores.
@@ -451,7 +453,9 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
 
   const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
-  return runJsonPrompt<ResumeAnalysis>(systemPrompt, userMessage, 0.15, 6000, undefined, resumeAnalysisSchema);
+  return runJsonPrompt<ResumeAnalysis>(
+    systemPrompt, userMessage, 0.15, 6000, undefined, resumeAnalysisSchema, "resume_analysis"
+  );
 }
 
 const STRUCTURED_RESUME_JSON_TEMPLATE = `{
@@ -474,7 +478,8 @@ export async function extractStructuredResume(resumeText: string): Promise<Struc
     0.1,
     6000,
     EXTRACTION_MODEL,
-    structuredResumeSchema
+    structuredResumeSchema,
+    "resume_extraction"
   );
 }
 
@@ -599,6 +604,7 @@ export async function generateProfileSuggestions(input: {
     0.3,
     undefined,
     undefined,
-    profileSuggestionsSchema
+    profileSuggestionsSchema,
+    "profile_suggestions"
   );
 }
