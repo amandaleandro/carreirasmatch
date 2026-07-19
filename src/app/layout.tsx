@@ -37,6 +37,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
+  // Verificação de propriedade do Google Search Console. O valor vem do env
+  // (runtime, não precisa rebuild): pegar o "content" da meta tag que o Search
+  // Console gera e definir GOOGLE_SITE_VERIFICATION no .env da VPS. Sem a var,
+  // nenhuma meta tag é renderizada.
+  verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
 };
 
 export default function RootLayout({
