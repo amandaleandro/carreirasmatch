@@ -5,6 +5,12 @@ import { locationSlug } from "@/lib/location-slug";
 
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
+// Gerado a cada requisição: no build do Docker o banco não está acessível, então
+// se o sitemap fosse estático os posts e as páginas de localização (ambos vindos
+// do banco) sairiam vazios e o Google nunca os descobriria. force-dynamic garante
+// que a query rode em runtime, com o banco no ar.
+export const dynamic = "force-dynamic";
+
 // Ferramentas realmente públicas (as demais /tools/* exigem assinatura por
 // design, não entram no sitemap para não apontar a crawler para páginas que
 // redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts;
