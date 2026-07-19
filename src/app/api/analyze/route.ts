@@ -8,6 +8,11 @@ import { normalizeCareerSegment, tracksForSegment } from "@/lib/career-segments"
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { analysisTotal, analysisDuration } from "@/lib/metrics";
+import {
+  FREE_ANALYSIS_DAILY_LIMIT,
+  FREE_ANALYSIS_MONTHLY_LIMIT,
+  getFreeAnalysisAllowance,
+} from "@/lib/free-analysis-limit";
 
 import { PDFParse } from "pdf-parse";
 
@@ -28,6 +33,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     const userId = session?.user?.id ?? null;
+    const hasPaidAccess = userId ? await hasActiveSubscriptionAccess(userId) : false;
 
     if (!userId) {
       const rateLimit = checkRateLimit(`anon-analyze:${getClientIp(req)}`, ANONYMOUS_ANALYSIS_LIMIT);
@@ -35,6 +41,39 @@ export async function POST(req: NextRequest) {
         return NextResponse.json(
           { error: "Muitas análises por aqui. Crie uma conta gratuita para continuar analisando." },
           { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+        );
+      }
+    } else if (!hasPaidAccess) {
+      const ipLimit = checkRateLimit(
+        `free-user-analyze:${getClientIp(req)}`,
+        ANONYMOUS_ANALYSIS_LIMIT
+      );
+      if (!ipLimit.allowed) {
+        return NextResponse.json(
+          { error: "Muitas análises por este acesso. Aguarde um pouco e tente novamente." },
+          { status: 429, headers: { "Retry-After": String(ipLimit.retryAfterSeconds) } }
+        );
+      }
+
+      const allowance = await getFreeAnalysisAllowance(userId);
+      if (!allowance.allowed) {
+        const error =
+          allowance.reason === "monthly"
+            ? `Você já usou as ${FREE_ANALYSIS_MONTHLY_LIMIT} análises gratuitas deste mês. Assine para continuar analisando sem esse limite.`
+            : `Você já usou as ${FREE_ANALYSIS_DAILY_LIMIT} análises gratuitas de hoje. Tente novamente amanhã ou assine para continuar.`;
+        return NextResponse.json(
+          {
+            error,
+            code: allowance.reason === "monthly"
+              ? "FREE_MONTHLY_ANALYSIS_LIMIT"
+              : "FREE_DAILY_ANALYSIS_LIMIT",
+            dailyUsed: allowance.dailyUsed,
+            monthlyUsed: allowance.monthlyUsed,
+          },
+          {
+            status: 429,
+            headers: { "Retry-After": String(allowance.retryAfterSeconds) },
+          }
         );
       }
     }
@@ -140,7 +179,7 @@ export async function POST(req: NextRequest) {
     // regardless of what the client submitted (the form UI already enforces this, but a
     // tampered/stale request should not be able to bypass it).
     let effectiveCareerTrack: CareerTrack = careerTrack;
-    if (userId && candidate && (await hasActiveSubscriptionAccess(userId))) {
+    if (userId && candidate && hasPaidAccess) {
       const allowedTracks = tracksForSegment(candidate.careerSegment) as CareerTrack[] | null;
       if (allowedTracks && allowedTracks.length > 0 && !allowedTracks.includes(careerTrack)) {
         effectiveCareerTrack = allowedTracks[0];
