@@ -141,39 +141,39 @@ export function MarketingHome() {
 
         <div className="relative mx-auto grid max-w-6xl gap-12 px-4 pb-20 pt-12 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:pb-28 lg:pt-20">
           <div>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/90">
+            <span className="animate-rise inline-block text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/90">
               Candidaturas mais estratégicas
             </span>
-            <h1 className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight md:text-6xl">
+            <h1 className="animate-rise mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight md:text-6xl" style={{ animationDelay: "80ms" }}>
               Pare de se candidatar no escuro.
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-xl">
+            <p className="animate-rise mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-xl" style={{ animationDelay: "160ms" }}>
               Compare seu currículo com uma vaga real, descubra o que está ajudando ou
               atrapalhando e receba um plano claro antes de aplicar.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "240ms" }}>
               <Link
                 href="/analise"
-                className="btn-shine inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold shadow-lg shadow-blue-950/30 transition hover:-translate-y-0.5 hover:bg-blue-500"
+                className="btn-shine group inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold shadow-lg shadow-blue-950/30 transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-xl hover:shadow-blue-900/40"
               >
                 Analisar currículo e vaga
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Link>
               <Link
                 href="/vagas-de-hoje"
-                className="inline-flex items-center justify-center rounded-xl border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-xl border border-white/25 px-6 py-3.5 text-sm font-bold text-white transition-colors duration-200 hover:border-white/40 hover:bg-white/10"
               >
                 Ver vagas de hoje
               </Link>
             </div>
-            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55">
+            <div className="animate-rise mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55" style={{ animationDelay: "320ms" }}>
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Resultado inicial gratuito</span>
               <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Sem promessa de contratação</span>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="rounded-3xl border border-white/15 bg-white/[0.08] p-4 shadow-2xl backdrop-blur-md md:p-6">
+          <div className="animate-rise relative" style={{ animationDelay: "300ms" }}>
+            <div className="rounded-3xl border border-white/15 bg-white/[0.08] p-4 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:-translate-y-1 md:p-6">
               <div className="rounded-2xl bg-white p-5 text-slate-950 shadow-xl md:p-6">
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -206,14 +206,14 @@ export function MarketingHome() {
 
       <main>
         <section id="como-funciona" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 md:px-8">
-          <div className="max-w-2xl">
+          <div className="reveal-up max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Da vaga ao próximo passo</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Clareza em três etapas.</h2>
             <p className="mt-4 text-neutral-600 dark:text-neutral-400">Você não precisa mudar toda a sua história. Precisa mostrar as evidências mais relevantes para a oportunidade certa.</p>
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {steps.map((step) => (
-              <div key={step.number} className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+              <div key={step.number} className="reveal-up rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-blue-900">
                 <span className="text-sm font-extrabold text-blue-600">{step.number}</span>
                 <h3 className="mt-5 text-lg font-bold">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">{step.description}</p>
@@ -224,7 +224,7 @@ export function MarketingHome() {
 
         <section className="border-y border-neutral-200 bg-white/70 dark:border-neutral-800 dark:bg-neutral-950/50">
           <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 md:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
-            <div>
+            <div className="reveal-up">
               <span className="inline-flex rounded-xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-950/30 dark:text-blue-300">
                 <Target className="h-6 w-6" />
               </span>
@@ -236,7 +236,7 @@ export function MarketingHome() {
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {deliverables.map((item) => (
-                <div key={item} className="flex items-start gap-3 rounded-xl border border-neutral-200 bg-white p-4 text-sm font-semibold dark:border-neutral-800 dark:bg-neutral-950">
+                <div key={item} className="reveal-up flex items-start gap-3 rounded-xl border border-neutral-200 bg-white p-4 text-sm font-semibold transition-colors duration-200 hover:border-blue-200 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-blue-900">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                   {item}
                 </div>
@@ -246,13 +246,13 @@ export function MarketingHome() {
         </section>
 
         <section id="para-voce" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 md:px-8">
-          <div className="text-center">
+          <div className="reveal-up text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Orientação para o seu momento</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Qual desafio você está tentando resolver?</h2>
           </div>
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {journeys.map(({ href, label, title, description, icon: Icon, accent }) => (
-              <Link key={href} href={href} className="group rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-950">
+              <Link key={href} href={href} className="reveal-up group rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-950">
                 <span className={`inline-flex rounded-xl p-3 ${accent}`}><Icon className="h-5 w-5" /></span>
                 <p className="mt-5 text-xs font-bold uppercase tracking-wide text-neutral-400">{label}</p>
                 <h3 className="mt-2 text-xl font-bold">{title}</h3>
@@ -266,14 +266,14 @@ export function MarketingHome() {
         </section>
 
         <section className="mx-auto max-w-6xl px-4 pb-20 md:px-8">
-          <div className="grid gap-8 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white md:px-10 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="reveal-up grid gap-8 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white md:px-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="flex items-center gap-2 text-blue-300"><FileSearch className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Sua próxima candidatura</span></div>
               <h2 className="mt-4 text-3xl font-bold tracking-tight">Encontrou uma vaga? Não envie o mesmo currículo ainda.</h2>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">Faça a comparação, identifique os requisitos centrais e ajuste apenas o que for verdadeiro e relevante.</p>
             </div>
-            <Link href="/analise" className="btn-shine inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold hover:bg-blue-500">
-              Analisar antes de aplicar <ArrowRight className="h-4 w-4" />
+            <Link href="/analise" className="btn-shine group inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-xl hover:shadow-blue-900/40">
+              Analisar antes de aplicar <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
           </div>
         </section>
