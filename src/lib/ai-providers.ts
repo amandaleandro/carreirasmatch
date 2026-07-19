@@ -44,14 +44,14 @@ function buildRegistry(groqModel: string): AiEndpoint[] {
       label: "Cerebras",
       baseURL: "https://api.cerebras.ai/v1",
       apiKey: process.env.CEREBRAS_API_KEY,
-      model: process.env.CEREBRAS_MODEL || "llama-3.3-70b",
+      model: process.env.CEREBRAS_MODEL || "gpt-oss-120b",
     },
     {
       id: "gemini",
       label: "Gemini",
       baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
       apiKey: process.env.GEMINI_API_KEY,
-      model: process.env.GEMINI_MODEL || "gemini-2.0-flash",
+      model: process.env.GEMINI_MODEL || "gemini-3.1-flash-lite",
     },
     {
       id: "openai",
