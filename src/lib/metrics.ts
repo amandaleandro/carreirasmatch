@@ -183,6 +183,28 @@ export const businessFlow = getOrCreate(
     })
 );
 
+export const accessSummary = getOrCreate(
+  "carreiras_access_summary",
+  () =>
+    new Gauge({
+      name: "carreiras_access_summary",
+      help: "Indicadores agregados de acesso por período",
+      labelNames: ["metric", "period"] as const,
+      registers: [registry],
+    })
+);
+
+export const accessBreakdown = getOrCreate(
+  "carreiras_access_breakdown",
+  () =>
+    new Gauge({
+      name: "carreiras_access_breakdown",
+      help: "Principais dimensões agregadas de tráfego nos últimos 30 dias",
+      labelNames: ["dimension", "value"] as const,
+      registers: [registry],
+    })
+);
+
 export const postgresStats = getOrCreate(
   "carreiras_postgres_stat",
   () =>
@@ -244,6 +266,10 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     companyPaymentGroups,
     databaseRows,
     periodSnapshots,
+    topPaths,
+    topSources,
+    topMediums,
+    topReferrers,
   ] = await Promise.all([
     prisma.user.count(),
     prisma.lead.count(),
@@ -284,6 +310,12 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
         applications: await prisma.application.count({ where: { createdAt: { gte: start } } }),
         companies: await prisma.company.count({ where: { createdAt: { gte: start } } }),
         pageViews: await prisma.pageView.count({ where: { createdAt: { gte: start } } }),
+        uniqueSessions: (
+          await prisma.pageView.groupBy({
+            by: ["sessionId"],
+            where: { createdAt: { gte: start } },
+          })
+        ).length,
         paidRevenue: await prisma.payment.aggregate({
           where: { status: "paid", paidAt: { gte: start } },
           _sum: { amount: true },
@@ -306,6 +338,34 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
         }),
       }))
     ),
+    prisma.pageView.groupBy({
+      by: ["path"],
+      where: { createdAt: { gte: periods[2].start } },
+      _count: { _all: true },
+      orderBy: { _count: { path: "desc" } },
+      take: 10,
+    }),
+    prisma.pageView.groupBy({
+      by: ["source"],
+      where: { createdAt: { gte: periods[2].start } },
+      _count: { _all: true },
+      orderBy: { _count: { source: "desc" } },
+      take: 10,
+    }),
+    prisma.pageView.groupBy({
+      by: ["medium"],
+      where: { createdAt: { gte: periods[2].start } },
+      _count: { _all: true },
+      orderBy: { _count: { medium: "desc" } },
+      take: 10,
+    }),
+    prisma.pageView.groupBy({
+      by: ["referrerHost"],
+      where: { createdAt: { gte: periods[2].start } },
+      _count: { _all: true },
+      orderBy: { _count: { referrerHost: "desc" } },
+      take: 10,
+    }),
   ]);
 
   businessTotals.reset();
@@ -325,6 +385,7 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
   businessCreated.reset();
   businessRevenueCents.reset();
   businessFlow.reset();
+  accessSummary.reset();
   for (const snapshot of periodSnapshots) {
     for (const [entity, value] of Object.entries({
       users: snapshot.users,
@@ -360,6 +421,36 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     businessFlow.set(
       { metric: "payments_paid", channel: "company", period: snapshot.label },
       snapshot.companyPaymentsPaid
+    );
+    accessSummary.set(
+      { metric: "unique_sessions", period: snapshot.label },
+      snapshot.uniqueSessions
+    );
+  }
+
+  accessBreakdown.reset();
+  for (const item of topPaths) {
+    accessBreakdown.set(
+      { dimension: "path", value: item.path },
+      item._count._all
+    );
+  }
+  for (const item of topSources) {
+    accessBreakdown.set(
+      { dimension: "source", value: item.source || "(direto)" },
+      item._count._all
+    );
+  }
+  for (const item of topMediums) {
+    accessBreakdown.set(
+      { dimension: "medium", value: item.medium || "(não informado)" },
+      item._count._all
+    );
+  }
+  for (const item of topReferrers) {
+    accessBreakdown.set(
+      { dimension: "referrer", value: item.referrerHost || "(direto)" },
+      item._count._all
     );
   }
 

@@ -1,0 +1,133 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Acessos & Aquisição",
+  "uid": "carreiras-access-analytics",
+  "tags": ["carreiras-match", "acessos", "aquisição", "produto"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-30d", "to": "now" },
+  "refresh": "1m",
+  "templating": {
+    "list": [{
+      "name": "period", "label": "Janela", "type": "custom", "query": "24h,7d,30d",
+      "current": { "text": "30d", "value": "30d" },
+      "options": [
+        { "text": "24h", "value": "24h", "selected": false },
+        { "text": "7d", "value": "7d", "selected": false },
+        { "text": "30d", "value": "30d", "selected": true }
+      ]
+    }]
+  },
+  "panels": [
+    { "type": "row", "title": "Visão geral dos acessos — $period", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Visualizações", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"page_views\",period=\"$period\"}", "legendFormat": "views" }]
+    },
+    {
+      "type": "stat", "title": "Sessões únicas", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}", "legendFormat": "sessões" }]
+    },
+    {
+      "type": "stat", "title": "Páginas por sessão", "description": "Visualizações divididas pelas sessões únicas.", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"page_views\",period=\"$period\"} / clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "páginas/sessão" }]
+    },
+    {
+      "type": "stat", "title": "Novos usuários", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"$period\"}", "legendFormat": "usuários" }]
+    },
+    {
+      "type": "stat", "title": "Conversão em cadastro", "description": "Novos usuários divididos pelas sessões únicas.", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.02 }, { "color": "green", "value": 0.05 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"$period\"} / clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "cadastro" }]
+    },
+    {
+      "type": "stat", "title": "Conversão em análise", "description": "Novas análises divididas pelas sessões únicas.", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.02 }, { "color": "green", "value": 0.05 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"analyses\",period=\"$period\"} / clamp_min(carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}, 1)", "legendFormat": "análise" }]
+    },
+    { "type": "row", "title": "Conteúdo e origem — ranking de 30 dias", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 }, "collapsed": false, "panels": [] },
+    {
+      "type": "barchart", "title": "Páginas mais acessadas", "gridPos": { "h": 10, "w": 12, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "topk(10, carreiras_access_breakdown{dimension=\"path\"})", "legendFormat": "{{value}}", "instant": true }]
+    },
+    {
+      "type": "barchart", "title": "Fontes de tráfego", "gridPos": { "h": 10, "w": 12, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "topk(10, carreiras_access_breakdown{dimension=\"source\"})", "legendFormat": "{{value}}", "instant": true }]
+    },
+    {
+      "type": "barchart", "title": "Mídias / canais", "gridPos": { "h": 9, "w": 12, "x": 0, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "topk(10, carreiras_access_breakdown{dimension=\"medium\"})", "legendFormat": "{{value}}", "instant": true }]
+    },
+    {
+      "type": "barchart", "title": "Domínios de referência", "gridPos": { "h": 9, "w": 12, "x": 12, "y": 17 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "topk(10, carreiras_access_breakdown{dimension=\"referrer\"})", "legendFormat": "{{value}}", "instant": true }]
+    },
+    { "type": "row", "title": "Tendência e qualidade técnica", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 26 }, "collapsed": false, "panels": [] },
+    {
+      "type": "timeseries", "title": "Visualizações e sessões (janela móvel)", "gridPos": { "h": 9, "w": 12, "x": 0, "y": 27 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "custom": { "fillOpacity": 15 } } },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_created{entity=\"page_views\",period=\"$period\"}", "legendFormat": "visualizações" },
+        { "refId": "B", "expr": "carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}", "legendFormat": "sessões" }
+      ]
+    },
+    {
+      "type": "timeseries", "title": "Requests por status HTTP", "gridPos": { "h": 9, "w": 12, "x": 12, "y": 27 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal", "group": "A" } } } },
+      "targets": [{ "refId": "A", "expr": "sum by (code) (rate(caddy_http_request_duration_seconds_count{server=\"srv0\"}[5m]))", "legendFormat": "HTTP {{code}}" }]
+    },
+    {
+      "type": "timeseries", "title": "Latência percebida na borda", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 3 } },
+      "targets": [
+        { "refId": "A", "expr": "histogram_quantile(0.50, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{server=\"srv0\"}[5m])))", "legendFormat": "p50" },
+        { "refId": "B", "expr": "histogram_quantile(0.95, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{server=\"srv0\"}[5m])))", "legendFormat": "p95" },
+        { "refId": "C", "expr": "histogram_quantile(0.99, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{server=\"srv0\"}[5m])))", "legendFormat": "p99" }
+      ]
+    },
+    {
+      "type": "timeseries", "title": "Erros HTTP por segundo", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } } },
+      "targets": [
+        { "refId": "A", "expr": "sum(rate(caddy_http_request_duration_seconds_count{code=~\"4..\"}[5m]))", "legendFormat": "4xx" },
+        { "refId": "B", "expr": "sum(rate(caddy_http_request_duration_seconds_count{code=~\"5..\"}[5m]))", "legendFormat": "5xx" }
+      ]
+    }
+  ]
+}

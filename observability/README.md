@@ -80,6 +80,9 @@ principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
   aprovações, conversão, ticket médio, receita por canal e status financeiros.
 - O dashboard **"Carreiras Match - IA Confiabilidade & Roteamento"** mostra
   sucesso, falhas, fallback, latência p95, cache, provedores e modelos usados.
+- O dashboard **"Carreiras Match - Acessos & Aquisição"** mostra visualizações,
+  sessões únicas, páginas por sessão, conversões, páginas mais visitadas, fontes,
+  mídias, referências, status HTTP e latência percebida.
 
 As métricas agregadas de negócio são atualizadas no máximo uma vez por minuto
 durante o scrape de `/api/metrics`. Elas expõem apenas contagens e valores
