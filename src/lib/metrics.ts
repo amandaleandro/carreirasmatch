@@ -2,8 +2,10 @@ import {
   Registry,
   collectDefaultMetrics,
   Counter,
+  Gauge,
   Histogram,
 } from "prom-client";
+import { prisma } from "@/lib/prisma";
 
 // Registry único e compartilhado. Guardado no globalThis para sobreviver ao
 // hot-reload do dev e a múltiplas importações do módulo (evita erro de métrica
@@ -123,3 +125,256 @@ export const paymentEvents = getOrCreate(
       registers: [registry],
     })
 );
+
+// --- Snapshots agregados de negócio e PostgreSQL ---
+
+export const businessTotals = getOrCreate(
+  "carreiras_business_total",
+  () =>
+    new Gauge({
+      name: "carreiras_business_total",
+      help: "Totais atuais agregados por entidade de negócio",
+      labelNames: ["entity"] as const,
+      registers: [registry],
+    })
+);
+
+export const businessCreated = getOrCreate(
+  "carreiras_business_created",
+  () =>
+    new Gauge({
+      name: "carreiras_business_created",
+      help: "Registros criados em uma janela móvel por entidade",
+      labelNames: ["entity", "period"] as const,
+      registers: [registry],
+    })
+);
+
+export const businessBreakdown = getOrCreate(
+  "carreiras_business_breakdown",
+  () =>
+    new Gauge({
+      name: "carreiras_business_breakdown",
+      help: "Distribuições atuais de métricas de negócio por categoria",
+      labelNames: ["metric", "value"] as const,
+      registers: [registry],
+    })
+);
+
+export const businessRevenueCents = getOrCreate(
+  "carreiras_business_revenue_cents",
+  () =>
+    new Gauge({
+      name: "carreiras_business_revenue_cents",
+      help: "Receita confirmada em centavos por canal e período",
+      labelNames: ["channel", "period"] as const,
+      registers: [registry],
+    })
+);
+
+export const postgresStats = getOrCreate(
+  "carreiras_postgres_stat",
+  () =>
+    new Gauge({
+      name: "carreiras_postgres_stat",
+      help: "Estatísticas operacionais agregadas do PostgreSQL",
+      labelNames: ["metric"] as const,
+      registers: [registry],
+    })
+);
+
+export const businessSnapshotSuccess = getOrCreate(
+  "carreiras_business_snapshot_success",
+  () =>
+    new Gauge({
+      name: "carreiras_business_snapshot_success",
+      help: "1 se a última coleta agregada de negócio funcionou, 0 se falhou",
+      registers: [registry],
+    })
+);
+
+export const businessSnapshotDuration = getOrCreate(
+  "carreiras_business_snapshot_duration_seconds",
+  () =>
+    new Histogram({
+      name: "carreiras_business_snapshot_duration_seconds",
+      help: "Duração da coleta agregada de métricas de negócio",
+      buckets: [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2, 5],
+      registers: [registry],
+    })
+);
+
+let businessSnapshotExpiresAt = 0;
+let businessSnapshotInFlight: Promise<void> | null = null;
+const BUSINESS_SNAPSHOT_TTL_MS = 60_000;
+
+type GroupCount = { status: string; _count: { _all: number } };
+type DatabaseStatsRow = { database_bytes: bigint; connections: bigint };
+
+async function collectBusinessSnapshot(now: Date): Promise<void> {
+  const periods = [
+    { label: "24h", start: new Date(now.getTime() - 24 * 60 * 60 * 1000) },
+    { label: "7d", start: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) },
+    { label: "30d", start: new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000) },
+  ] as const;
+
+  const [
+    users,
+    leads,
+    resumes,
+    analyses,
+    applications,
+    companies,
+    companyScreenings,
+    talentContacts,
+    subscriptionGroups,
+    applicationGroups,
+    paymentGroups,
+    companyPaymentGroups,
+    databaseRows,
+    periodSnapshots,
+  ] = await Promise.all([
+    prisma.user.count(),
+    prisma.lead.count(),
+    prisma.resume.count(),
+    prisma.analysis.count(),
+    prisma.application.count(),
+    prisma.company.count(),
+    prisma.companyJob.count(),
+    prisma.talentContactRequest.count(),
+    prisma.subscription.groupBy({ by: ["status"], _count: { _all: true } }),
+    prisma.application.groupBy({ by: ["status"], _count: { _all: true } }),
+    prisma.payment.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+      _sum: { amount: true },
+    }),
+    prisma.companyPayment.groupBy({
+      by: ["status"],
+      _count: { _all: true },
+      _sum: { amount: true },
+    }),
+    prisma.$queryRaw<DatabaseStatsRow[]>`
+      SELECT
+        pg_database_size(current_database())::bigint AS database_bytes,
+        (
+          SELECT COUNT(*)::bigint
+          FROM pg_stat_activity
+          WHERE datname = current_database()
+        ) AS connections
+    `,
+    Promise.all(
+      periods.map(async ({ label, start }) => ({
+        label,
+        users: await prisma.user.count({ where: { createdAt: { gte: start } } }),
+        leads: await prisma.lead.count({ where: { createdAt: { gte: start } } }),
+        resumes: await prisma.resume.count({ where: { createdAt: { gte: start } } }),
+        analyses: await prisma.analysis.count({ where: { createdAt: { gte: start } } }),
+        applications: await prisma.application.count({ where: { createdAt: { gte: start } } }),
+        companies: await prisma.company.count({ where: { createdAt: { gte: start } } }),
+        pageViews: await prisma.pageView.count({ where: { createdAt: { gte: start } } }),
+        paidRevenue: await prisma.payment.aggregate({
+          where: { status: "paid", paidAt: { gte: start } },
+          _sum: { amount: true },
+        }),
+        companyRevenue: await prisma.companyPayment.aggregate({
+          where: { status: "paid", paidAt: { gte: start } },
+          _sum: { amount: true },
+        }),
+      }))
+    ),
+  ]);
+
+  businessTotals.reset();
+  for (const [entity, value] of Object.entries({
+    users,
+    leads,
+    resumes,
+    analyses,
+    applications,
+    companies,
+    company_screenings: companyScreenings,
+    talent_contacts: talentContacts,
+  })) {
+    businessTotals.set({ entity }, value);
+  }
+
+  businessCreated.reset();
+  businessRevenueCents.reset();
+  for (const snapshot of periodSnapshots) {
+    for (const [entity, value] of Object.entries({
+      users: snapshot.users,
+      leads: snapshot.leads,
+      resumes: snapshot.resumes,
+      analyses: snapshot.analyses,
+      applications: snapshot.applications,
+      companies: snapshot.companies,
+      page_views: snapshot.pageViews,
+    })) {
+      businessCreated.set({ entity, period: snapshot.label }, value);
+    }
+    businessRevenueCents.set(
+      { channel: "candidate", period: snapshot.label },
+      snapshot.paidRevenue._sum.amount ?? 0
+    );
+    businessRevenueCents.set(
+      { channel: "company", period: snapshot.label },
+      snapshot.companyRevenue._sum.amount ?? 0
+    );
+  }
+
+  businessBreakdown.reset();
+  for (const group of subscriptionGroups as GroupCount[]) {
+    businessBreakdown.set(
+      { metric: "subscription_status", value: group.status },
+      group._count._all
+    );
+  }
+  for (const group of applicationGroups as GroupCount[]) {
+    businessBreakdown.set(
+      { metric: "application_status", value: group.status },
+      group._count._all
+    );
+  }
+  for (const group of paymentGroups) {
+    businessBreakdown.set(
+      { metric: "payment_status", value: group.status },
+      group._count._all
+    );
+  }
+  for (const group of companyPaymentGroups) {
+    businessBreakdown.set(
+      { metric: "company_payment_status", value: group.status },
+      group._count._all
+    );
+  }
+
+  const database = databaseRows[0];
+  if (database) {
+    postgresStats.set({ metric: "database_bytes" }, Number(database.database_bytes));
+    postgresStats.set({ metric: "connections" }, Number(database.connections));
+  }
+}
+
+export async function refreshBusinessMetrics(): Promise<void> {
+  const now = Date.now();
+  if (businessSnapshotExpiresAt > now) return;
+  if (businessSnapshotInFlight) return businessSnapshotInFlight;
+
+  businessSnapshotInFlight = (async () => {
+    const stopTimer = businessSnapshotDuration.startTimer();
+    try {
+      await collectBusinessSnapshot(new Date());
+      businessSnapshotSuccess.set(1);
+      businessSnapshotExpiresAt = Date.now() + BUSINESS_SNAPSHOT_TTL_MS;
+    } catch (error) {
+      businessSnapshotSuccess.set(0);
+      console.error("[metrics] falha ao coletar snapshot de negócio:", error);
+    } finally {
+      stopTimer();
+      businessSnapshotInFlight = null;
+    }
+  })();
+
+  return businessSnapshotInFlight;
+}

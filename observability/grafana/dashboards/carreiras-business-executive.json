@@ -1,0 +1,163 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Negócio Executivo",
+  "uid": "carreiras-business-executive",
+  "tags": ["carreiras-match", "negócio", "executivo"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-30d", "to": "now" },
+  "refresh": "1m",
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "type": "row", "title": "Visão executiva", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "stat", "title": "Usuários cadastrados", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"users\"}", "legendFormat": "usuários" }]
+    },
+    {
+      "type": "stat", "title": "Novos usuários (30d)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"30d\"}", "legendFormat": "novos" }]
+    },
+    {
+      "type": "stat", "title": "Assinaturas ativas", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"}", "legendFormat": "ativas" }]
+    },
+    {
+      "type": "stat", "title": "Conversão para assinatura", "description": "Assinaturas ativas / usuários cadastrados.", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"} / clamp_min(carreiras_business_total{entity=\"users\"}, 1)", "legendFormat": "conversão" }]
+    },
+    {
+      "type": "stat", "title": "Receita confirmada (30d)", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "sum(carreiras_business_revenue_cents{period=\"30d\"}) / 100", "legendFormat": "receita" }]
+    },
+    {
+      "type": "stat", "title": "Empresas cadastradas", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"companies\"}", "legendFormat": "empresas" }]
+    },
+    {
+      "type": "row", "title": "Aquisição e ativação", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "bargauge", "title": "Funil acumulado", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "min": 0 } },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_total{entity=\"leads\"}", "legendFormat": "1. Leads" },
+        { "refId": "B", "expr": "carreiras_business_total{entity=\"users\"}", "legendFormat": "2. Usuários" },
+        { "refId": "C", "expr": "carreiras_business_total{entity=\"resumes\"}", "legendFormat": "3. Currículos" },
+        { "refId": "D", "expr": "carreiras_business_total{entity=\"analyses\"}", "legendFormat": "4. Análises" },
+        { "refId": "E", "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"}", "legendFormat": "5. Assinantes ativos" }
+      ]
+    },
+    {
+      "type": "barchart", "title": "Novos registros por período", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 7 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always", "stacking": "none" },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_created{entity=~\"users|leads|resumes|analyses\",period=\"24h\"}", "legendFormat": "{{entity}} / 24h", "instant": true },
+        { "refId": "B", "expr": "carreiras_business_created{entity=~\"users|leads|resumes|analyses\",period=\"7d\"}", "legendFormat": "{{entity}} / 7d", "instant": true },
+        { "refId": "C", "expr": "carreiras_business_created{entity=~\"users|leads|resumes|analyses\",period=\"30d\"}", "legendFormat": "{{entity}} / 30d", "instant": true }
+      ]
+    },
+    {
+      "type": "row", "title": "Uso do produto", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "stat", "title": "Visualizações (24h)", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"page_views\",period=\"24h\"}", "legendFormat": "views" }]
+    },
+    {
+      "type": "stat", "title": "Análises (24h)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"analyses\",period=\"24h\"}", "legendFormat": "análises" }]
+    },
+    {
+      "type": "stat", "title": "Candidaturas (30d)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"applications\",period=\"30d\"}", "legendFormat": "candidaturas" }]
+    },
+    {
+      "type": "stat", "title": "Triagens de empresas", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"company_screenings\"}", "legendFormat": "triagens" }]
+    },
+    {
+      "type": "stat", "title": "Pedidos de contato", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"talent_contacts\"}", "legendFormat": "contatos" }]
+    },
+    {
+      "type": "stat", "title": "Análises por usuário", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "none", "decimals": 2 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"analyses\"} / clamp_min(carreiras_business_total{entity=\"users\"}, 1)", "legendFormat": "média" }]
+    },
+    {
+      "type": "barchart", "title": "Status das candidaturas", "gridPos": { "h": 8, "w": 8, "x": 0, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"application_status\"}", "legendFormat": "{{value}}", "instant": true }]
+    },
+    {
+      "type": "barchart", "title": "Status das assinaturas", "gridPos": { "h": 8, "w": 8, "x": 8, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"subscription_status\"}", "legendFormat": "{{value}}", "instant": true }]
+    },
+    {
+      "type": "barchart", "title": "Status dos pagamentos", "gridPos": { "h": 8, "w": 8, "x": 16, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "orientation": "horizontal", "showValue": "always" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=~\"payment_status|company_payment_status\"}", "legendFormat": "{{metric}} / {{value}}", "instant": true }]
+    },
+    {
+      "type": "timeseries", "title": "Receita móvel por canal", "gridPos": { "h": 8, "w": 24, "x": 0, "y": 29 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2, "custom": { "fillOpacity": 20 } } },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_revenue_cents{period=\"24h\"} / 100", "legendFormat": "{{channel}} / 24h" },
+        { "refId": "B", "expr": "carreiras_business_revenue_cents{period=\"30d\"} / 100", "legendFormat": "{{channel}} / 30d" }
+      ]
+    }
+  ]
+}

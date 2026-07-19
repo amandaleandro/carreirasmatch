@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { registry } from "@/lib/metrics";
+import { refreshBusinessMetrics, registry } from "@/lib/metrics";
 
 // Sempre em tempo de request e no runtime Node (prom-client depende de APIs do
 // Node como process/perf_hooks; não roda em edge).
@@ -19,6 +19,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  await refreshBusinessMetrics();
   const body = await registry.metrics();
   return new NextResponse(body, {
     status: 200,

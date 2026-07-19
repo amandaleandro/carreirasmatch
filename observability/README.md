@@ -69,6 +69,15 @@ principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
   ritmo diário projetado e quantas tarefas o saldo informado suporta com base
   no custo médio realmente observado. O filtro `Operação` ajuda a localizar
   quais recursos merecem otimização primeiro.
+- O dashboard **"Carreiras Match - Negócio Executivo"** acompanha aquisição,
+  ativação, assinaturas, receita, uso do produto, empresas, triagens e funil.
+- O dashboard **"Carreiras Match - Operação & SLO"** reúne disponibilidade,
+  latência HTTP, erros, runtime Node, PostgreSQL, saturação da VPS, containers e
+  logs críticos.
+
+As métricas agregadas de negócio são atualizadas no máximo uma vez por minuto
+durante o scrape de `/api/metrics`. Elas expõem apenas contagens e valores
+financeiros agregados, nunca nomes, e-mails, currículos ou outros dados pessoais.
 
 O custo financeiro é calculado apenas para modelos presentes na tabela de preços
 em `src/lib/ai-providers.ts`; modelos sem preço conhecido continuam aparecendo em
