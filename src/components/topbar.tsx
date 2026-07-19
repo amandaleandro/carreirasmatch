@@ -139,6 +139,9 @@ export function Topbar({
                 <Link href="/vestibulares" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de vestibulares</Link>
                 <Link href="/suporte" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Suporte</Link>
                 <Link href="/settings" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Perfil</Link>
+                <div className="mt-2 pt-2 border-t border-white/5">
+                  <LogoutButton className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-300 hover:bg-white/5 rounded-lg" />
+                </div>
               </div>
             </div>
 
