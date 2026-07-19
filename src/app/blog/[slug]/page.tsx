@@ -6,6 +6,8 @@ import { BlogPostCard } from "@/components/blog-post-card";
 import { FreeTierAd } from "@/components/free-tier-ad";
 import { COVER_GRADIENTS, type ContentBlock } from "@/lib/blog-generator";
 import { prisma } from "@/lib/prisma";
+import { JsonLd } from "@/components/json-ld";
+import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -20,11 +22,20 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
-  if (!post) return { title: "Post não encontrado | CarreirasMatch" };
+  if (!post) return { title: "Post não encontrado" };
 
+  const path = `/blog/${post.slug}`;
   return {
-    title: `${post.title} | CarreirasMatch`,
+    title: post.title,
     description: post.excerpt,
+    alternates: { canonical: path },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.excerpt,
+      url: path,
+      publishedTime: post.publishedAt.toISOString(),
+    },
   };
 }
 
@@ -50,6 +61,8 @@ export default async function BlogPostPage({
     take: 3,
   });
 
+  const path = `/blog/${post.slug}`;
+
   return (
     <ContentPage
       eyebrow="Blog"
@@ -58,6 +71,21 @@ export default async function BlogPostPage({
       backHref="/blog"
       backLabel="← Blog"
     >
+      <JsonLd
+        data={articleJsonLd({
+          title: post.title,
+          description: post.excerpt,
+          path,
+          publishedAt: post.publishedAt,
+        })}
+      />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Início", path: "/" },
+          { name: "Blog", path: "/blog" },
+          { name: post.title, path },
+        ])}
+      />
       <div className={`bg-gradient-to-br ${gradient} rounded-2xl h-32 flex items-center justify-center text-6xl mb-6`}>
         {post.coverEmoji}
       </div>

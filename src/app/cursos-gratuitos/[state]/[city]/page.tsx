@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
   const { state, city } = await params;
   const name = cityName(city);
   return {
-    title: `Cursos gratuitos em ${name}, ${state.toUpperCase()} | CarreirasMatch`,
+    title: `Cursos gratuitos em ${name}, ${state.toUpperCase()}`,
     description: `Cursos gratuitos online e locais disponíveis para moradores de ${name}.`,
     alternates: { canonical: `/cursos-gratuitos/${state}/${city}` },
   };

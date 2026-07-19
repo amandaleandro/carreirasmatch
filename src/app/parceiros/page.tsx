@@ -3,7 +3,7 @@ import { ContentPage } from "@/components/content-page";
 import { PartnerSubmissionForm } from "@/components/partner-submission-form";
 
 export const metadata: Metadata = {
-  title: "Publique vagas, cursos e parcerias | CarreirasMatch",
+  title: "Publique vagas, cursos e parcerias",
   description: "Empresas, prefeituras e instituições podem enviar oportunidades para revisão gratuita.",
   alternates: { canonical: "/parceiros" },
 };

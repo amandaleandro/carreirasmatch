@@ -4,7 +4,7 @@ import { ContentPage } from "@/components/content-page";
 import { auth } from "@/auth";
 
 export const metadata: Metadata = {
-  title: "Central de Ajuda | CarreirasMatch",
+  title: "Central de Ajuda",
   description: "Perguntas frequentes sobre análise de currículo, assinatura e pagamento no CarreirasMatch.",
 };
 

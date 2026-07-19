@@ -7,6 +7,8 @@ import { findPublicJobCategory, PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-c
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { cleanJobSnippet } from "@/lib/job-snippet";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -64,6 +66,7 @@ export async function generateMetadata({
   return {
     title: category.title,
     description: category.description,
+    alternates: { canonical: `/vagas/${category.slug}` },
   };
 }
 
@@ -118,6 +121,13 @@ export default async function PublicJobCategoryPage({
 
   return (
     <main className="min-h-screen bg-neutral-50 dark:bg-[#070b12] text-neutral-950 dark:text-neutral-50">
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: "Início", path: "/" },
+          { name: "Vagas de hoje", path: "/vagas-de-hoje" },
+          { name: category.h1, path: `/vagas/${category.slug}` },
+        ])}
+      />
       <PublicSiteHeader />
 
       <section className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-6">

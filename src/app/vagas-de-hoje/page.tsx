@@ -9,7 +9,7 @@ import { cleanJobSnippet } from "@/lib/job-snippet";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Vagas de hoje | CarreirasMatch",
+  title: "Vagas de hoje",
   description: "Veja vagas novas e recentes coletadas pelo CarreirasMatch, sem precisar criar conta.",
 };
 

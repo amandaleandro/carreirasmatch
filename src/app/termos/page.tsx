@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ContentPage, ContentSection } from "@/components/content-page";
 
 export const metadata: Metadata = {
-  title: "Termos de Uso | CarreirasMatch",
+  title: "Termos de Uso",
   description: "Termos de uso da plataforma CarreirasMatch.",
 };
 

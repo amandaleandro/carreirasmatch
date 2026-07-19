@@ -9,7 +9,7 @@ import { locationSlug } from "@/lib/location-slug";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Vagas de SINE e prefeituras | CarreirasMatch",
+  title: "Vagas de SINE e prefeituras",
   description: "Pesquise vagas oficiais por cargo, cidade e estado e crie alertas gratuitos.",
   alternates: { canonical: "/vagas-publicas" },
 };

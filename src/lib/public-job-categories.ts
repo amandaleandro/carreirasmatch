@@ -32,7 +32,7 @@ export type PublicJobCategory = {
 export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   {
     slug: "sem-experiencia",
-    title: "Vagas sem experiência | CarreirasMatch",
+    title: "Vagas sem experiência",
     h1: "Vagas sem experiência",
     description: "Vagas de entrada, primeiro emprego, jovem aprendiz e oportunidades que não exigem experiência.",
     where: { entryLevel: true },
@@ -49,7 +49,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "primeiro-emprego",
-    title: "Vagas de primeiro emprego | CarreirasMatch",
+    title: "Vagas de primeiro emprego",
     h1: "Vagas para primeiro emprego",
     description: "Oportunidades para quem está começando a carreira.",
     where: {
@@ -69,7 +69,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "estagio",
-    title: "Vagas de estágio | CarreirasMatch",
+    title: "Vagas de estágio",
     h1: "Vagas de estágio",
     description: "Vagas de estágio e trainee coletadas automaticamente.",
     where: { seniority: "Estagio" },
@@ -86,7 +86,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "jovem-aprendiz",
-    title: "Vagas de jovem aprendiz | CarreirasMatch",
+    title: "Vagas de jovem aprendiz",
     h1: "Vagas de jovem aprendiz",
     description: "Vagas de jovem aprendiz e aprendizagem para entrada no mercado.",
     where: { q: ["jovem aprendiz", "menor aprendiz", "aprendiz"] },
@@ -103,7 +103,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "home-office",
-    title: "Vagas home office | CarreirasMatch",
+    title: "Vagas home office",
     h1: "Vagas home office",
     description: "Vagas remotas e oportunidades de trabalho de casa.",
     where: { workModel: "Remoto" },
@@ -120,7 +120,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "administrativo",
-    title: "Vagas administrativas | CarreirasMatch",
+    title: "Vagas administrativas",
     h1: "Vagas administrativas",
     description: "Vagas administrativas, auxiliares e assistentes.",
     where: { area: "Administrativo" },
@@ -137,7 +137,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "atendimento",
-    title: "Vagas de atendimento ao cliente | CarreirasMatch",
+    title: "Vagas de atendimento ao cliente",
     h1: "Vagas de atendimento ao cliente",
     description: "Vagas de atendimento, suporte ao cliente, recepção e relacionamento.",
     where: {
@@ -156,7 +156,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "comercial",
-    title: "Vagas comerciais e de vendas | CarreirasMatch",
+    title: "Vagas comerciais e de vendas",
     h1: "Vagas comerciais e de vendas",
     description: "Vagas comerciais, vendas internas, consultoria comercial e SDR.",
     where: { area: "Vendas" },
@@ -173,7 +173,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "marketing",
-    title: "Vagas de marketing | CarreirasMatch",
+    title: "Vagas de marketing",
     h1: "Vagas de marketing",
     description: "Vagas de marketing digital, social media, conteúdo e campanhas.",
     where: { area: "Marketing" },
@@ -190,7 +190,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "financeiro",
-    title: "Vagas na área financeira | CarreirasMatch",
+    title: "Vagas na área financeira",
     h1: "Vagas na área financeira",
     description: "Vagas financeiras, contas a pagar, análise financeira e administrativo financeiro.",
     where: { area: "Financeiro" },
@@ -207,7 +207,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "logistica",
-    title: "Vagas de logística | CarreirasMatch",
+    title: "Vagas de logística",
     h1: "Vagas de logística",
     description: "Vagas de logística, estoque, expedição e operações.",
     where: { area: "Logistica" },
@@ -224,7 +224,7 @@ export const PUBLIC_JOB_CATEGORIES: PublicJobCategory[] = [
   },
   {
     slug: "tecnologia",
-    title: "Vagas de tecnologia | CarreirasMatch",
+    title: "Vagas de tecnologia",
     h1: "Vagas de tecnologia",
     description: "Vagas de tecnologia, desenvolvimento, dados e suporte técnico.",
     where: { area: "Tecnologia" },

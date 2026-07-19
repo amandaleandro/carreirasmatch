@@ -5,7 +5,7 @@ import { RadarList } from "@/components/radar-list";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Radar de concursos: novos editais e concursos públicos | CarreirasMatch",
+  title: "Radar de concursos: novos editais e concursos públicos",
   description:
     "Acompanhe os concursos públicos mais recentes: novos editais, inscrições abertas, provas e convocações, reunidos em um só lugar.",
   alternates: { canonical: "/concursos" },

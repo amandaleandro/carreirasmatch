@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
 
 export const metadata: Metadata = {
-  title: "Planeje sua transição de carreira | CarreirasMatch",
+  title: "Planeje sua transição de carreira",
   description:
     "Encontre habilidades transferíveis, cargos-ponte e uma narrativa clara para conectar sua experiência à nova carreira.",
   alternates: { canonical: "/transicao" },

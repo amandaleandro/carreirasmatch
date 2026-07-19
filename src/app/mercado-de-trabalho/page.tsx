@@ -6,7 +6,7 @@ import { locationSlug } from "@/lib/location-slug";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Mercado de trabalho por cidade | CarreirasMatch",
+  title: "Mercado de trabalho por cidade",
   description: "Veja cidades, cargos e faixas salariais que aparecem nas oportunidades públicas.",
   alternates: { canonical: "/mercado-de-trabalho" },
 };

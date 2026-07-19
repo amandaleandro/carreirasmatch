@@ -5,7 +5,7 @@ import { RadarList } from "@/components/radar-list";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Radar de vestibulares: novos vestibulares, ENEM e Sisu | CarreirasMatch",
+  title: "Radar de vestibulares: novos vestibulares, ENEM e Sisu",
   description:
     "Acompanhe os vestibulares mais recentes: novos editais, inscrições, ENEM, Sisu, ProUni e bolsas, reunidos em um só lugar.",
   alternates: { canonical: "/vestibulares" },

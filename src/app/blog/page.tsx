@@ -12,7 +12,7 @@ const POSTS_PER_PAGE = 9;
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Blog | CarreirasMatch",
+  title: "Blog",
   description: "Conteúdo sobre currículo, entrevistas e carreira para cada momento profissional.",
 };
 

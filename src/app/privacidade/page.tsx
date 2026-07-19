@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ContentPage, ContentSection } from "@/components/content-page";
 
 export const metadata: Metadata = {
-  title: "Política de Privacidade | CarreirasMatch",
+  title: "Política de Privacidade",
   description: "Como o CarreirasMatch coleta, usa e protege seus dados pessoais.",
 };
 

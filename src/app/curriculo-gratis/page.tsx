@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { FreeResumeBuilder } from "@/components/free-resume-builder";
 
 export const metadata: Metadata = {
-  title: "Currículo grátis com IA | CarreirasMatch",
+  title: "Currículo grátis com IA",
   description:
     "Monte um currículo inicial grátis e depois descubra se ele está pronto para uma vaga real.",
 };

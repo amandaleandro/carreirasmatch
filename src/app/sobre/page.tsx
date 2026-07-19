@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ContentPage } from "@/components/content-page";
 
 export const metadata: Metadata = {
-  title: "Sobre nós | CarreirasMatch",
+  title: "Sobre nós",
   description: "Conheça a missão do CarreirasMatch: ajudar você a se posicionar com confiança em cada etapa da carreira.",
 };
 

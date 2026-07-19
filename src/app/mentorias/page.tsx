@@ -8,7 +8,7 @@ const VIDEOS_PER_PAGE = 12;
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Vídeos educativos e mentorias gratuitos | CarreirasMatch",
+  title: "Vídeos educativos e mentorias gratuitos",
   description: "Assista a vídeos educativos, mentorias e cursos gratuitos sobre carreira, tecnologia, idiomas, finanças e desenvolvimento profissional.",
   alternates: { canonical: "/mentorias" },
 };

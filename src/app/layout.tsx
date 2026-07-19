@@ -5,6 +5,8 @@ import { Analytics } from "@/components/analytics";
 import { AdsenseScript } from "@/components/adsense-script";
 import { AccessTracker } from "@/components/access-tracker";
 import { DashSanitizer } from "@/components/dash-sanitizer";
+import { JsonLd } from "@/components/json-ld";
+import { BASE_URL, SITE_NAME, organizationJsonLd, webSiteJsonLd } from "@/lib/seo";
 import { Suspense } from "react";
 import "./globals.css";
 
@@ -19,8 +21,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CarreirasMatch",
+  metadataBase: new URL(BASE_URL),
+  title: {
+    default: "CarreirasMatch — compare seu currículo com a vaga",
+    template: `%s | ${SITE_NAME}`,
+  },
   description: "Descubra sua aderência real a uma vaga e como se preparar para a entrevista.",
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "pt_BR",
+    url: BASE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+  },
 };
 
 export default function RootLayout({
@@ -41,6 +57,8 @@ export default function RootLayout({
           }}
         />
         <AdsenseScript />
+        <JsonLd data={organizationJsonLd()} />
+        <JsonLd data={webSiteJsonLd()} />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppShell>{children}</AppShell>

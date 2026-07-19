@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ state: st
   const location = await resolveLocation(value.state, value.city);
   if (!location) return {};
   return {
-    title: `Vagas em ${location.city}, ${location.state} | CarreirasMatch`,
+    title: `Vagas em ${location.city}, ${location.state}`,
     description: `Vagas oficiais de SINE e prefeitura em ${location.city}. Consulte oportunidades e crie alertas gratuitos.`,
     alternates: { canonical: `/vagas-publicas/${value.state}/${value.city}` },
   };

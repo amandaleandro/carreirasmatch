@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
 
 export const metadata: Metadata = {
-  title: "Currículo para o primeiro emprego | CarreirasMatch",
+  title: "Currículo para o primeiro emprego",
   description:
     "Descubra como apresentar cursos, projetos e atividades para conquistar a primeira oportunidade profissional.",
   alternates: { canonical: "/primeiro-emprego" },

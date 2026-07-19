@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ContentPage } from "@/components/content-page";
 
 export const metadata: Metadata = {
-  title: "Contato | CarreirasMatch",
+  title: "Contato",
   description: "Fale com o time do CarreirasMatch.",
 };
 

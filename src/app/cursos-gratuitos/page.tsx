@@ -7,7 +7,7 @@ const COURSES_PER_PAGE = 12;
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Cursos gratuitos com certificado | CarreirasMatch",
+  title: "Cursos gratuitos com certificado",
   description: "Encontre cursos gratuitos verificados para melhorar seu currículo e aumentar suas chances.",
   alternates: { canonical: "/cursos-gratuitos" },
 };

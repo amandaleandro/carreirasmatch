@@ -4,7 +4,7 @@ import { ContentPage } from "@/components/content-page";
 import { TOOLS_CATALOG } from "@/lib/tools-catalog";
 
 export const metadata: Metadata = {
-  title: "Ferramentas gratuitas para emprego | CarreirasMatch",
+  title: "Ferramentas gratuitas para emprego",
   description: "Currículo, entrevista, salário, estágio e carreira: ferramentas gratuitas para avançar na busca por emprego.",
   alternates: { canonical: "/gratuito" },
 };
