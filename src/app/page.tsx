@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Compare seu currículo com a vaga",
+  // A home é o mesmo segmento do layout raiz, então o title.template não a
+  // alcança; usamos absolute para manter a marca no título.
+  title: { absolute: "Compare seu currículo com a vaga | CarreirasMatch" },
   description:
     "Entenda sua aderência a uma vaga real, veja o que ajustar no currículo e prepare seus próximos passos antes de se candidatar.",
   alternates: { canonical: "/" },
