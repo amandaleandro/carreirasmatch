@@ -58,7 +58,13 @@ export function AdSlot({
   if (!ADSENSE_CLIENT || !slot) return null;
 
   return (
-    <div className={`ad-slot ${className ?? ""}`} aria-label="Publicidade">
+    <div className={`ad-slot ${className ?? ""}`}>
+      {/* Rótulo visível: o AdSense só permite "Anúncios"/"Publicidade" como
+          rótulo, e deixá-lo à mostra separa o anúncio do conteúdo (evita que
+          pareça parte da página) e ajuda na análise de aprovação. */}
+      <span className="block text-[11px] uppercase tracking-wide text-neutral-400 dark:text-neutral-500 mb-1">
+        Publicidade
+      </span>
       {/* `key` força um <ins> novo a cada rota: o AdSense não repreenche um
           elemento já usado, e sem isso a navegação client-side deixaria o
           espaço do anúncio vazio. */}
