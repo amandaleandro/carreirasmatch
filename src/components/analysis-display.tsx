@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChecklistCard } from "@/components/checklist-card";
 import { InterviewSimulator } from "@/components/interview-simulator";
+import { CircularScore } from "@/components/circular-score";
 
 export type ApplicationStatus = "apply_now" | "adjust_first" | "deprioritize";
 
@@ -116,6 +117,79 @@ export function StatusBanner({
   );
 }
 
+/** Superfície de card premium compartilhada por todo o diagnóstico: profundidade
+ *  suave e borda discreta, alinhada à identidade das ferramentas (globals.css). */
+const CARD =
+  "rounded-2xl border border-neutral-200/70 dark:border-neutral-800/80 bg-white dark:bg-neutral-950 p-6 shadow-[0_12px_36px_-16px_rgba(7,24,39,0.28)]";
+
+type BadgeTone = "primary" | "success" | "danger" | "warning" | "neutral";
+
+const BADGE_TONES: Record<BadgeTone, string> = {
+  primary:
+    "bg-blue-50 text-blue-600 ring-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:ring-blue-900/50",
+  success:
+    "bg-emerald-50 text-emerald-600 ring-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 dark:ring-emerald-900/50",
+  danger:
+    "bg-red-50 text-red-600 ring-red-100 dark:bg-red-950/50 dark:text-red-300 dark:ring-red-900/50",
+  warning:
+    "bg-amber-50 text-amber-600 ring-amber-100 dark:bg-amber-950/50 dark:text-amber-300 dark:ring-amber-900/50",
+  neutral:
+    "bg-neutral-100 text-neutral-600 ring-neutral-200 dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-800",
+};
+
+function CardHeader({
+  icon,
+  tone = "primary",
+  title,
+  aside,
+}: {
+  icon?: string;
+  tone?: BadgeTone;
+  title: string;
+  aside?: React.ReactNode;
+}) {
+  return (
+    <div className="mb-4 flex items-center gap-3">
+      {icon && (
+        <span
+          aria-hidden
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm ring-1 ${BADGE_TONES[tone]}`}
+        >
+          {icon}
+        </span>
+      )}
+      <h3 className="font-semibold tracking-tight">{title}</h3>
+      {aside && <span className="ml-auto text-xs text-neutral-500">{aside}</span>}
+    </div>
+  );
+}
+
+type ListMarker = "dot" | "check" | "alert" | "number";
+
+function Marker({ marker, index }: { marker: ListMarker; index: number }) {
+  const base =
+    "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold";
+  if (marker === "check")
+    return (
+      <span className={`${base} bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300`}>
+        ✓
+      </span>
+    );
+  if (marker === "alert")
+    return (
+      <span className={`${base} bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300`}>
+        !
+      </span>
+    );
+  if (marker === "number")
+    return (
+      <span className={`${base} bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300`}>
+        {index + 1}
+      </span>
+    );
+  return <span className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500/70" />;
+}
+
 export function KeywordCard({
   title,
   items,
@@ -127,17 +201,27 @@ export function KeywordCard({
 }) {
   const chipClass =
     variant === "found"
-      ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300"
-      : "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300";
+      ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300"
+      : "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300";
+  const dotClass = variant === "found" ? "bg-emerald-500" : "bg-red-500";
   return (
-    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-      <h3 className="font-semibold mb-3">{title}</h3>
+    <div className={CARD}>
+      <CardHeader
+        icon={variant === "found" ? "✓" : "○"}
+        tone={variant === "found" ? "success" : "danger"}
+        title={title}
+        aside={items.length > 0 ? String(items.length) : undefined}
+      />
       {items.length === 0 ? (
         <p className="text-sm text-neutral-500">Nenhum item identificado.</p>
       ) : (
         <div className="flex flex-wrap gap-2">
           {items.map((item, i) => (
-            <span key={i} className={`text-xs rounded-full px-3 py-1 ${chipClass}`}>
+            <span
+              key={i}
+              className={`inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-3 py-1 ${chipClass}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${dotClass}`} />
               {item}
             </span>
           ))}
@@ -166,16 +250,31 @@ export function ScoreBar({ label, value }: { label: string; value: number }) {
   );
 }
 
-export function ListCard({ title, items }: { title: string; items: string[] }) {
+export function ListCard({
+  title,
+  items,
+  icon,
+  tone = "primary",
+  marker = "dot",
+}: {
+  title: string;
+  items: string[];
+  icon?: string;
+  tone?: BadgeTone;
+  marker?: ListMarker;
+}) {
   return (
-    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-      <h3 className="font-semibold mb-3">{title}</h3>
+    <div className={CARD}>
+      <CardHeader icon={icon} tone={tone} title={title} />
       {items.length === 0 ? (
         <p className="text-sm text-neutral-500">Nenhum item identificado nesta análise.</p>
       ) : (
-        <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
+        <ul className="space-y-2.5 text-sm text-neutral-700 dark:text-neutral-300">
           {items.map((item, i) => (
-            <li key={i}>{item}</li>
+            <li key={i} className="flex items-start gap-2.5">
+              <Marker marker={marker} index={i} />
+              <span className="leading-relaxed">{item}</span>
+            </li>
           ))}
         </ul>
       )}
@@ -186,16 +285,22 @@ export function ListCard({ title, items }: { title: string; items: string[] }) {
 export function SummaryCard({
   title,
   summary,
+  icon = "📝",
+  tone = "primary",
 }: {
   title: string;
   summary: string;
+  icon?: string;
+  tone?: BadgeTone;
 }) {
   return (
-    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-      <h3 className="font-semibold mb-3">{title}</h3>
-      <p className="text-sm text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
-        {summary}
-      </p>
+    <div className={CARD}>
+      <CardHeader icon={icon} tone={tone} title={title} />
+      <div className="rounded-xl border border-neutral-200/70 bg-neutral-50 p-4 dark:border-neutral-800/70 dark:bg-neutral-900/50">
+        <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
+          {summary}
+        </p>
+      </div>
     </div>
   );
 }
@@ -203,16 +308,23 @@ export function SummaryCard({
 export function OrderedListCard({
   title,
   items,
+  icon,
+  tone = "primary",
 }: {
   title: string;
   items: string[];
+  icon?: string;
+  tone?: BadgeTone;
 }) {
   return (
-    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-      <h3 className="font-semibold mb-3">{title}</h3>
-      <ol className="space-y-2 list-decimal list-inside text-sm text-neutral-700 dark:text-neutral-300">
+    <div className={CARD}>
+      <CardHeader icon={icon} tone={tone} title={title} />
+      <ol className="space-y-2.5 text-sm text-neutral-700 dark:text-neutral-300">
         {items.map((item, i) => (
-          <li key={i}>{item}</li>
+          <li key={i} className="flex items-start gap-2.5">
+            <Marker marker="number" index={i} />
+            <span className="leading-relaxed">{item}</span>
+          </li>
         ))}
       </ol>
     </div>
@@ -220,25 +332,42 @@ export function OrderedListCard({
 }
 
 export function StudyPlanCard({ plan }: { plan: StudyPlanPhased }) {
-  const groups: { label: string; items: string[] }[] = [
-    { label: "Essencial", items: plan.essential },
-    { label: "Bom ter", items: plan.niceToHave },
-    { label: "Pode ficar para depois", items: plan.later },
+  const groups: { label: string; items: string[]; pill: string }[] = [
+    {
+      label: "Essencial",
+      items: plan.essential,
+      pill: "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+    },
+    {
+      label: "Bom ter",
+      items: plan.niceToHave,
+      pill: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+    },
+    {
+      label: "Pode ficar para depois",
+      items: plan.later,
+      pill: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300",
+    },
   ];
   return (
-    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-      <h3 className="font-semibold mb-3">Plano de estudo</h3>
+    <div className={CARD}>
+      <CardHeader icon="📚" tone="primary" title="Plano de estudo" />
       <div className="space-y-4">
         {groups.map(
           (group) =>
             group.items.length > 0 && (
               <div key={group.label}>
-                <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500 mb-1.5">
+                <span
+                  className={`mb-2 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${group.pill}`}
+                >
                   {group.label}
-                </p>
-                <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
+                </span>
+                <ul className="space-y-1.5 text-sm text-neutral-700 dark:text-neutral-300">
                   {group.items.map((item, i) => (
-                    <li key={i}>{item}</li>
+                    <li key={i} className="flex items-start gap-2.5">
+                      <span className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500/70" />
+                      <span className="leading-relaxed">{item}</span>
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -290,8 +419,20 @@ export function AnalysisTeaserView({
         variant="missing"
       />
 
-      <ListCard title="Pontos fortes" items={result.strengths} />
-      <ListCard title="Pontos fracos" items={result.weaknesses} />
+      <ListCard
+        icon="💪"
+        tone="success"
+        marker="check"
+        title="Pontos fortes"
+        items={result.strengths}
+      />
+      <ListCard
+        icon="⚠️"
+        tone="warning"
+        marker="alert"
+        title="Pontos fracos"
+        items={result.weaknesses}
+      />
 
       {children}
     </section>
@@ -423,6 +564,87 @@ export function SimpleFitTeaser({
   );
 }
 
+export function ScoreHero({
+  status,
+  reason,
+  overall,
+  technical,
+  experience,
+  seniority,
+  ats,
+}: {
+  status: ApplicationStatus;
+  reason: string;
+  overall: number;
+  technical: number;
+  experience: number;
+  seniority: number;
+  ats: number;
+}) {
+  const config = STATUS_CONFIG[status];
+  const subScores = [
+    { label: "Técnica", value: technical },
+    { label: "Experiência", value: experience },
+    { label: "Senioridade", value: seniority },
+    { label: "Currículo / ATS", value: ats },
+  ];
+  return (
+    <div
+      className={`relative overflow-hidden rounded-3xl border p-6 md:p-8 shadow-[0_28px_70px_-32px_rgba(7,24,39,0.5)] ${config.className}`}
+    >
+      {/* Barra de acento da marca (azul → âmbar), como nas ferramentas. */}
+      <span
+        aria-hidden
+        className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-blue-500 via-blue-400 to-amber-400"
+      />
+      <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-7 sm:text-left">
+        <div className="shrink-0">
+          <CircularScore value={overall} size={124} strokeWidth={11} />
+        </div>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+            Aderência com esta vaga
+          </p>
+          <p className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
+            {config.emoji} {config.label}
+          </p>
+          <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+            {reason}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {subScores.map((s) => (
+          <div
+            key={s.label}
+            className="flex flex-col items-center gap-2 rounded-2xl border border-white/70 bg-white/70 py-4 backdrop-blur-sm dark:border-neutral-800/60 dark:bg-neutral-950/50"
+          >
+            <CircularScore value={s.value} size={46} strokeWidth={5} />
+            <span className="px-1 text-center text-[11px] font-medium leading-tight text-neutral-600 dark:text-neutral-300">
+              {s.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SectionHeading({ icon, title }: { icon: string; title: string }) {
+  return (
+    <div className="flex items-center gap-2.5 pt-3">
+      <span aria-hidden className="text-lg">
+        {icon}
+      </span>
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+        {title}
+      </h2>
+      <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+    </div>
+  );
+}
+
 export function AnalysisResult({
   result,
   careerTrack,
@@ -432,133 +654,186 @@ export function AnalysisResult({
   careerTrack: CareerTrack;
   jobTitle?: string;
 }) {
+  const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   return (
     <section className="space-y-6">
-      <StatusBanner
+      <ScoreHero
         status={result.applicationStatus}
         reason={result.applicationStatusReason}
+        overall={result.overallScore}
+        technical={result.technicalScore}
+        experience={result.experienceScore}
+        seniority={result.seniorityScore}
+        ats={result.atsScore}
       />
 
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 space-y-4">
-        <h2 className="font-semibold text-lg">Diagnóstico para esta vaga</h2>
-        <ScoreBar label="Aderência geral" value={result.overallScore} />
-        <ScoreBar label="Técnica" value={result.technicalScore} />
-        <ScoreBar label="Experiência" value={result.experienceScore} />
-        <ScoreBar label="Senioridade" value={result.seniorityScore} />
-        <ScoreBar label="Currículo / ATS" value={result.atsScore} />
+      {/* DIAGNÓSTICO — o que a vaga pede e o que já bate */}
+      <SectionHeading icon="🎯" title="Diagnóstico" />
+      <div className="grid gap-6 md:grid-cols-2">
+        <KeywordCard
+          title="Palavras-chave encontradas"
+          items={result.keywordsFound}
+          variant="found"
+        />
+        <KeywordCard
+          title="Palavras-chave ausentes"
+          items={result.keywordsMissing}
+          variant="missing"
+        />
       </div>
+      {careerTrack === "reemployment" &&
+        result.recruiterObjections &&
+        result.recruiterObjections.length > 0 && (
+          <ListCard
+            icon="🧐"
+            tone="warning"
+            marker="alert"
+            title="Objeções prováveis do recrutador"
+            items={result.recruiterObjections}
+          />
+        )}
+      {result.alternativeRoles && result.alternativeRoles.length > 0 && (
+        <ListCard
+          icon="🎯"
+          tone="neutral"
+          title="Vagas mais adequadas para o seu momento agora"
+          items={result.alternativeRoles}
+        />
+      )}
 
-      <KeywordCard
-        title="Palavras-chave encontradas"
-        items={result.keywordsFound}
-        variant="found"
+      {/* SEU CURRÍCULO — leitura do que você tem hoje e o que ajustar */}
+      <SectionHeading icon="📄" title="Seu currículo" />
+      <div className="grid gap-6 md:grid-cols-2">
+        <ListCard
+          icon="💪"
+          tone="success"
+          marker="check"
+          title="Pontos fortes"
+          items={result.strengths}
+        />
+        <ListCard
+          icon="⚠️"
+          tone="warning"
+          marker="alert"
+          title="Pontos fracos"
+          items={result.weaknesses}
+        />
+      </div>
+      <ListCard
+        icon="🔧"
+        tone="primary"
+        marker="number"
+        title="Antes de aplicar, corrija isso"
+        items={result.fixes}
       />
-      <KeywordCard
-        title="Palavras-chave ausentes"
-        items={result.keywordsMissing}
-        variant="missing"
+      {isEntryLevel && <ChecklistCard items={result.fixes} />}
+      {careerTrack === "career_change" &&
+        result.transferableSkills &&
+        result.transferableSkills.length > 0 && (
+          <ListCard
+            icon="🔁"
+            tone="success"
+            marker="check"
+            title="Habilidades transferíveis da sua experiência anterior"
+            items={result.transferableSkills}
+          />
+        )}
+      <SummaryCard
+        icon="📝"
+        title="Resumo profissional sugerido"
+        summary={result.suggestedSummary}
       />
 
-      <SummaryCard title="Resumo profissional sugerido" summary={result.suggestedSummary} />
-
-      {(careerTrack === "internship" || careerTrack === "apprentice") &&
-        result.talkAboutYourselfAnswer && (
+      {/* PREPARAÇÃO — entrevista e estudo */}
+      <SectionHeading icon="🎓" title="Preparação" />
+      {isEntryLevel && result.talkAboutYourselfAnswer && (
         <SummaryCard
+          icon="🗣️"
           title='Resposta pronta: "Fale sobre você"'
           summary={result.talkAboutYourselfAnswer}
         />
       )}
-
       {careerTrack === "career_change" && (
         <>
-          {result.transferableSkills && result.transferableSkills.length > 0 && (
-            <ListCard
-              title="Habilidades transferíveis da sua experiência anterior"
-              items={result.transferableSkills}
-            />
-          )}
           {result.transitionNarrative && (
             <SummaryCard
+              icon="🌉"
               title="Narrativa de transição (LinkedIn/entrevista)"
               summary={result.transitionNarrative}
             />
           )}
           {result.whyCareerChangeAnswer && (
             <SummaryCard
+              icon="💬"
               title='Resposta pronta: "Por que você quer mudar de área?"'
               summary={result.whyCareerChangeAnswer}
             />
           )}
           {result.bridgeRoles && result.bridgeRoles.length > 0 && (
             <OrderedListCard
+              icon="🪜"
               title="Cargos-ponte até seu objetivo"
               items={result.bridgeRoles}
             />
           )}
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            <Link href="/tools/career-change-guide" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-              Ver guia completo de transição de carreira →
-            </Link>
-          </p>
         </>
       )}
-
       {careerTrack === "reemployment" && (
         <>
-          {result.recruiterObjections && result.recruiterObjections.length > 0 && (
-            <ListCard
-              title="Objeções prováveis do recrutador"
-              items={result.recruiterObjections}
-            />
-          )}
           {result.applicationStrategy && (
             <SummaryCard
+              icon="♟️"
               title="Estratégia de candidatura"
               summary={result.applicationStrategy}
             />
           )}
           {result.weeklyApplicationPlan && result.weeklyApplicationPlan.length > 0 && (
             <OrderedListCard
+              icon="🗓️"
               title="Plano semanal de candidaturas"
               items={result.weeklyApplicationPlan}
             />
           )}
           {result.feedbackAnalysis && (
             <SummaryCard
+              icon="📊"
               title="Análise dos feedbacks recebidos"
               summary={result.feedbackAnalysis}
             />
           )}
-          <p className="text-sm text-neutral-600 dark:text-neutral-400">
-            <Link href="/tools/reemployment-guide" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-              Ver guia completo de recolocação →
-            </Link>
-          </p>
         </>
       )}
-
-      {result.alternativeRoles && result.alternativeRoles.length > 0 && (
-        <ListCard
-          title="Vagas mais adequadas para o seu momento agora"
-          items={result.alternativeRoles}
-        />
-      )}
-
-      <ListCard title="Pontos fortes" items={result.strengths} />
-      <ListCard title="Pontos fracos" items={result.weaknesses} />
-      <ListCard title="Antes de aplicar, corrija isso" items={result.fixes} />
-
-      {(careerTrack === "internship" || careerTrack === "apprentice") && (
-        <ChecklistCard items={result.fixes} />
-      )}
-
       <ListCard
+        icon="🎤"
+        tone="primary"
         title="Perguntas prováveis da entrevista"
         items={result.interviewQuestions}
       />
       <InterviewSimulator questions={result.interviewQuestions} jobTitle={jobTitle} />
       <StudyPlanCard plan={result.studyPlan} />
-      <SummaryCard title="Mensagem pronta para o recrutador" summary={result.recruiterMessage} />
+
+      {/* AÇÃO — o próximo passo concreto */}
+      <SectionHeading icon="✉️" title="Próxima ação" />
+      <SummaryCard
+        icon="✉️"
+        tone="primary"
+        title="Mensagem pronta para o recrutador"
+        summary={result.recruiterMessage}
+      />
+      {careerTrack === "career_change" && (
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          <Link href="/tools/career-change-guide" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+            Ver guia completo de transição de carreira →
+          </Link>
+        </p>
+      )}
+      {careerTrack === "reemployment" && (
+        <p className="text-sm text-neutral-600 dark:text-neutral-400">
+          <Link href="/tools/reemployment-guide" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
+            Ver guia completo de recolocação →
+          </Link>
+        </p>
+      )}
     </section>
   );
 }
