@@ -307,6 +307,10 @@ export async function POST(req: NextRequest) {
         {
           error:
             "No momento a análise por IA está com muita demanda. Aguarde alguns instantes e tente novamente.",
+          // Sinaliza ao cliente que esta falha é transitória (todos os provedores
+          // no limite naquele instante) e pode ser repetida automaticamente, ao
+          // contrário dos 429 de cota gratuita / rate limit por acesso.
+          retryable: true,
         },
         { status: 429 }
       );

@@ -20,6 +20,12 @@ import {
  * Para ligar um provedor, basta definir a chave (e, opcional, o modelo) no .env:
  *   OPENAI_API_KEY, GROQ_API_KEY, CEREBRAS_API_KEY, GEMINI_API_KEY, TOGETHER_API_KEY,
  *   DEEPINFRA_API_KEY, OPENROUTER_API_KEY
+ *
+ * Controle proativo de cota (opcional): antes de chamar, provedores que já
+ * estouraram o orçamento diário de tokens (AI_DAILY_TOKEN_BUDGET ou
+ * AI_DAILY_TOKEN_BUDGET_<ID>, 0 = ilimitado) ou que estão em cooldown por um
+ * 429 recente são removidos da fila. Se todos ficarem indisponíveis, a lista
+ * original é usada mesmo assim (melhor tentar e receber 429 do que não tentar).
  */
 
 export type AiEndpoint = {
@@ -126,7 +132,80 @@ export function orderEndpointsForRouting(
 function endpointsForRequest(endpoints: AiEndpoint[]): AiEndpoint[] {
   const ordered = orderEndpointsForRouting(endpoints, process.env.AI_ROUTING_MODE, rotationCursor);
   rotationCursor = (rotationCursor + 1) % endpoints.length;
-  return ordered;
+  return filterAvailableEndpoints(ordered);
+}
+
+// ---- Disponibilidade por provedor: cota diária de tokens + cooldown em 429 ----
+
+type ProviderState = {
+  /** Dia UTC (AAAA-MM-DD) a que os tokens acumulados pertencem. */
+  day: string;
+  /** Tokens (entrada + saída) já gastos no dia. */
+  tokensUsed: number;
+  /** Epoch ms; provedor pausado até aqui (definido por um 429). */
+  cooldownUntil: number;
+};
+
+const providerState = new Map<string, ProviderState>();
+
+/** Chave de dia UTC usada para zerar o consumo a cada 24h. */
+export function utcDayKey(now = Date.now()): string {
+  return new Date(now).toISOString().slice(0, 10);
+}
+
+function stateFor(id: string, now: number): ProviderState {
+  const day = utcDayKey(now);
+  let state = providerState.get(id);
+  if (!state || state.day !== day) {
+    state = { day, tokensUsed: 0, cooldownUntil: 0 };
+    providerState.set(id, state);
+  }
+  return state;
+}
+
+/** Orçamento diário de tokens do provedor (0 = ilimitado). */
+export function dailyTokenBudget(id: string): number {
+  const specific = Number(process.env[`AI_DAILY_TOKEN_BUDGET_${id.toUpperCase()}`]);
+  if (Number.isFinite(specific) && specific > 0) return Math.floor(specific);
+  const global = Number(process.env.AI_DAILY_TOKEN_BUDGET);
+  if (Number.isFinite(global) && global > 0) return Math.floor(global);
+  return 0;
+}
+
+/** Registra tokens gastos numa chamada bem-sucedida do provedor. */
+export function recordProviderUsage(id: string, tokens: number, now = Date.now()): void {
+  if (tokens <= 0) return;
+  stateFor(id, now).tokensUsed += tokens;
+}
+
+/** Pausa o provedor por `ms` (ex.: após um 429), sem encurtar um cooldown maior já ativo. */
+export function markProviderCooldown(id: string, ms: number, now = Date.now()): void {
+  if (ms <= 0) return;
+  const state = stateFor(id, now);
+  state.cooldownUntil = Math.max(state.cooldownUntil, now + ms);
+}
+
+/** true se o provedor não está em cooldown nem estourou o orçamento diário. */
+export function isProviderAvailable(id: string, now = Date.now()): boolean {
+  // A reserva paga (OpenAI) é a rede de segurança: nunca é removida da fila por
+  // cota ou cooldown, para que sempre haja um provedor capaz de salvar a chamada
+  // e o cliente não receba erro quando as gratuitas estiverem esgotadas.
+  if (PAID_RESERVE_PROVIDER_IDS.has(id)) return true;
+  const state = stateFor(id, now);
+  if (state.cooldownUntil > now) return false;
+  const budget = dailyTokenBudget(id);
+  if (budget > 0 && state.tokensUsed >= budget) return false;
+  return true;
+}
+
+/**
+ * Remove da fila, preservando a ordem, os provedores em cooldown ou que já
+ * estouraram a cota diária. Se todos estiverem indisponíveis, devolve a lista
+ * original (melhor tentar e receber 429 do que falhar sem tentar nada).
+ */
+export function filterAvailableEndpoints(endpoints: AiEndpoint[], now = Date.now()): AiEndpoint[] {
+  const available = endpoints.filter((endpoint) => isProviderAvailable(endpoint.id, now));
+  return available.length > 0 ? available : endpoints;
 }
 
 const clients = new Map<string, OpenAI>();
@@ -153,6 +232,26 @@ function numericStatus(err: unknown): number | null {
 function isRetryable(err: unknown): boolean {
   const status = numericStatus(err);
   return status === null || status === 408 || status === 409 || status === 429 || status >= 500;
+}
+
+/** Lê o header retry-after (segundos) ou retry-after-ms de um erro do SDK, em ms. */
+export function retryAfterMs(err: unknown): number | null {
+  if (!err || typeof err !== "object" || !("headers" in err)) return null;
+  const raw = (err as { headers?: unknown }).headers;
+  const read = (name: string): string | null => {
+    if (!raw) return null;
+    if (raw instanceof Headers) return raw.get(name);
+    if (typeof raw === "object") {
+      const value = (raw as Record<string, unknown>)[name];
+      return typeof value === "string" ? value : null;
+    }
+    return null;
+  };
+  const ms = Number(read("retry-after-ms"));
+  if (Number.isFinite(ms) && ms > 0) return ms;
+  const seconds = Number(read("retry-after"));
+  if (Number.isFinite(seconds) && seconds > 0) return seconds * 1000;
+  return null;
 }
 
 function sleep(ms: number): Promise<void> {
@@ -368,6 +467,7 @@ export async function runJsonAcrossProviders(
           const inputTokens = usage?.prompt_tokens ?? 0;
           const outputTokens = usage?.completion_tokens ?? 0;
           const cachedInputTokens = usage?.prompt_tokens_details?.cached_tokens ?? 0;
+          recordProviderUsage(e.id, usage?.total_tokens ?? inputTokens + outputTokens);
           aiProviderCalls.inc({ provider: e.id, model: e.model, operation, outcome: "success" });
           aiProviderDuration.observe(
             { provider: e.id, model: e.model, operation, outcome: "success" },
@@ -409,6 +509,10 @@ export async function runJsonAcrossProviders(
           return json;
         } catch (err) {
           lastErr = err;
+          if (numericStatus(err) === 429) {
+            const cooldown = boundedEnvNumber("AI_RATE_LIMIT_COOLDOWN_MS", 60_000, 1_000, 24 * 60 * 60_000);
+            markProviderCooldown(e.id, retryAfterMs(err) ?? cooldown);
+          }
           aiProviderCalls.inc({ provider: e.id, model: e.model, operation, outcome: "error" });
           aiProviderDuration.observe(
             { provider: e.id, model: e.model, operation, outcome: "error" },

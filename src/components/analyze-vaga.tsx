@@ -319,8 +319,17 @@ export function AnalyzeVagaPage({
         formData.append("pastFeedback", pastFeedback);
       }
 
-      const res = await fetch("/api/analyze", { method: "POST", body: formData });
-      const data = await res.json();
+      // Uma única repetição automática quando a IA está momentaneamente
+      // sobrecarregada (todos os provedores no limite): o usuário não precisa
+      // clicar de novo. Só repete quando a API marca a falha como retryable,
+      // nunca em 429 de cota gratuita ou rate limit por acesso.
+      let res = await fetch("/api/analyze", { method: "POST", body: formData });
+      let data = await res.json();
+      if (!res.ok && res.status === 429 && data?.retryable) {
+        await new Promise((resolve) => setTimeout(resolve, 4000));
+        res = await fetch("/api/analyze", { method: "POST", body: formData });
+        data = await res.json();
+      }
 
       if (!res.ok) {
         throw new Error(data.error ?? "Erro ao processar a análise.");
@@ -330,7 +339,11 @@ export function AnalyzeVagaPage({
       setResult(data as AnalysisWithId);
       setResultTrack(careerTrack);
       setResultJobTitle(jobTitle);
-      track(ANALYTICS_EVENTS.ANALYSIS_COMPLETED, { careerTrack });
+      track(ANALYTICS_EVENTS.ANALYSIS_COMPLETED, { careerTrack, analysisId: data.id });
+      track(ANALYTICS_EVENTS.DIAGNOSTIC_TEASER_VIEWED, {
+        careerTrack,
+        analysisId: data.id,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
