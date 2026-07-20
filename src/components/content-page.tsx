@@ -86,7 +86,7 @@ export function ContentPage({
         </div>
       </main>
 
-      <SiteFooter />
+      <SiteFooter maxWidth={maxWidthClassName} />
     </div>
   );
 }

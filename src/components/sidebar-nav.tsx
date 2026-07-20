@@ -92,7 +92,7 @@ export function SidebarNav({
                   : "text-slate-300 hover:bg-white/[0.06] hover:text-white hover:translate-x-0.5"
               }`}
             >
-              <Icon strokeWidth={1.75} className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-white" : "text-slate-400 group-hover:text-amber-400"}`} />
+              <Icon strokeWidth={1.75} className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-white" : "text-slate-400 group-hover:text-blue-400"}`} />
               {item.label}
             </Link>
           );
@@ -138,7 +138,7 @@ export function SidebarNav({
         </div>
 
         <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 p-4 shadow-lg shadow-blue-950/40">
-          <div className="absolute -right-4 -top-6 h-20 w-20 rounded-full bg-amber-400/20 blur-xl" />
+          <div className="absolute -right-4 -top-6 h-20 w-20 rounded-full bg-blue-400/20 blur-xl" />
           <p className="text-sm font-semibold flex items-center gap-1.5 relative">
             🏆 Plano Profissional
           </p>
@@ -147,7 +147,7 @@ export function SidebarNav({
           </p>
           <Link
             href="/tools"
-            className="mt-3 block text-center text-sm font-semibold bg-white text-blue-700 rounded-md py-2 hover:bg-amber-400 hover:text-blue-950 transition-colors relative"
+            className="mt-3 block text-center text-sm font-semibold bg-white text-blue-700 rounded-md py-2 hover:bg-blue-50 transition-colors relative"
           >
             Ver meu plano
           </Link>

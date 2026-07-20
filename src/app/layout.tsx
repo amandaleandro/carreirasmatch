@@ -56,16 +56,18 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <AdsenseScript />
+        <JsonLd id="jsonld-org" data={organizationJsonLd()} />
+        <JsonLd id="jsonld-website" data={webSiteJsonLd()} />
+      </head>
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <script
+          id="theme-initializer"
+          suppressHydrationWarning
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();`,
           }}
         />
-        <AdsenseScript />
-        <JsonLd data={organizationJsonLd()} />
-        <JsonLd data={webSiteJsonLd()} />
-      </head>
-      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <AppShell>{children}</AppShell>
         <Analytics />
         <Suspense fallback={null}>

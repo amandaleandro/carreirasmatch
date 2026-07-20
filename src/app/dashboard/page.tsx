@@ -129,7 +129,7 @@ export default async function DashboardPage() {
   ).length;
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8">
+    <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
       <div data-tour="dash-overview">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
           Visão geral
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
+        <div className="lg:col-span-2 card-premium p-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
           <div>
             <p className="text-sm text-neutral-500">Aderência média às vagas</p>
             <p className="text-5xl font-bold text-blue-600 mt-2">
@@ -163,7 +163,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <div className="card-premium p-6">
           <p className="text-sm font-semibold mb-4">Semáforo de prioridade</p>
           <div className="space-y-3">
             {(Object.keys(STATUS_CONFIG) as (keyof typeof STATUS_CONFIG)[]).map(
@@ -185,7 +185,7 @@ export default async function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <div className="lg:col-span-1 card-premium p-6">
           <div className="flex items-center justify-between mb-4">
             <p className="font-semibold">Melhores vagas para você agora</p>
             <Link href="/history" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
@@ -211,7 +211,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 flex flex-col">
+        <div className="card-premium p-6 flex flex-col">
           <p className="font-semibold mb-4">Próximo passo recomendado</p>
           <p className="text-sm font-medium">
             Ajuste seu currículo para vagas de{" "}
@@ -236,7 +236,7 @@ export default async function DashboardPage() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 flex flex-col">
+        <div className="card-premium p-6 flex flex-col">
           <p className="font-semibold mb-4">Resumo do currículo</p>
           <p className="text-sm font-medium">
             {latest.atsScore >= 75
@@ -257,7 +257,7 @@ export default async function DashboardPage() {
       </div>
 
       {upcomingDeadlines.length > 0 && (
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <div className="card-premium p-6">
           <p className="font-semibold mb-4">Prazos próximos</p>
           <div className="space-y-2">
             {upcomingDeadlines.map((item) => {
@@ -296,7 +296,7 @@ export default async function DashboardPage() {
       )}
 
       {upcomingInterviews.length > 0 && (
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <div className="card-premium p-6">
           <p className="font-semibold mb-4">Próximas entrevistas</p>
           <div className="space-y-2">
             {upcomingInterviews.map((item) => (
@@ -318,7 +318,7 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <div className="card-premium p-6">
         <p className="font-semibold mb-4">Sua jornada de busca</p>
         <div className="grid grid-cols-3 gap-4">
           <div>
@@ -342,7 +342,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <div className="card-premium p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
           <div>
             <p className="font-semibold">Pipeline de candidaturas</p>
@@ -384,7 +384,7 @@ export default async function DashboardPage() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <div className="card-premium p-6">
         <p className="font-semibold mb-6">Plano de evolução</p>
         <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
           {[

@@ -130,7 +130,7 @@ export default async function PublicJobCategoryPage({
       />
       <PublicSiteHeader />
 
-      <section className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-6">
+      <section className="max-w-7xl mx-auto px-4 md:px-8 py-8 space-y-6">
         <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
           <div className="max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300 px-3 py-1 text-xs font-semibold">

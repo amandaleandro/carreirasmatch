@@ -817,7 +817,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             className={`animate-aurora-delayed absolute -bottom-40 right-[-6rem] h-[30rem] w-[30rem] rounded-full bg-gradient-to-br ${theme.blob} opacity-20 blur-3xl`}
           />
         </div>
-        <header className="public-header relative max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
+        <header className="public-header relative max-w-7xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
@@ -837,7 +837,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           </div>
         </header>
 
-        <div className="relative max-w-6xl mx-auto px-4 md:px-8">
+        <div className="relative max-w-7xl mx-auto px-4 md:px-8">
           {/* Niche selector */}
           <section className="pt-2 md:pt-4">
             <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-3">
@@ -958,7 +958,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 md:px-8">
+      <main className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Attention strip */}
         <section className="reveal -mt-6 pb-4 md:pb-6 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

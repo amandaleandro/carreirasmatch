@@ -89,6 +89,22 @@ body {
   color: transparent;
 }
 
+/* Premium clean SaaS Card style (similar to Linear or Vercel) */
+.card-premium {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: 0 1px 2px 0 rgba(7, 24, 39, 0.03), 0 4px 12px -2px rgba(7, 24, 39, 0.05);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-premium:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 1px 2px 0 rgba(7, 24, 39, 0.03), 0 12px 24px -4px rgba(7, 24, 39, 0.08);
+  border-color: color-mix(in srgb, var(--border-color) 70%, var(--accent) 30%);
+}
+
+
 /* Native <option> popups render with a white background on Windows
    regardless of page theme, so force readable dark text there always. */
 select {
@@ -197,6 +213,7 @@ select option {
    dentro do AppShell (que já traz Topbar + Sidebar), então escondemos o header
    público para não duplicar a navegação. Deslogado, aparece normalmente. */
 [data-authenticated] .public-header,
+[data-authenticated] .public-footer,
 [data-authenticated] .public-mobile-cta {
   display: none;
 }

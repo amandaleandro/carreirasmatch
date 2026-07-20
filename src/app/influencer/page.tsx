@@ -84,7 +84,7 @@ export default async function InfluencerPage() {
   const paidCount = revenue._count._all;
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8">
+    <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <Link href="/dashboard" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">

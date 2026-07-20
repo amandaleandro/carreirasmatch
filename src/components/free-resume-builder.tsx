@@ -89,7 +89,7 @@ export function FreeResumeBuilder() {
 
   return (
     <div className="min-h-screen">
-      <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex items-center justify-between">
+      <header className="max-w-7xl mx-auto px-4 md:px-8 py-6 flex items-center justify-between">
         <Link href="/comece">
           <BrandLogo heightClassName="h-12 sm:h-14" />
         </Link>
@@ -101,7 +101,7 @@ export function FreeResumeBuilder() {
         </Link>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 md:px-8 pb-14">
+      <main className="max-w-7xl mx-auto px-4 md:px-8 pb-14">
         <Link href="/gratuito" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
           ← Voltar para recursos gratuitos
         </Link>

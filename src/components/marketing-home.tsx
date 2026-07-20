@@ -119,7 +119,7 @@ export function MarketingHome() {
           <div className="absolute -bottom-40 right-[-8rem] h-[30rem] w-[30rem] rounded-full bg-amber-400/10 blur-3xl" />
         </div>
 
-        <header className="relative mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 md:px-8">
+        <header className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-6 md:px-8">
           <Link href="/" aria-label="CarreirasMatch">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
@@ -139,7 +139,7 @@ export function MarketingHome() {
           </div>
         </header>
 
-        <div className="relative mx-auto grid max-w-6xl gap-12 px-4 pb-20 pt-12 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:pb-28 lg:pt-20">
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-12 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:pb-28 lg:pt-20">
           <div>
             <span className="animate-rise inline-block text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/90">
               Candidaturas mais estratégicas
@@ -205,7 +205,7 @@ export function MarketingHome() {
       </section>
 
       <main>
-        <section id="como-funciona" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 md:px-8">
+        <section id="como-funciona" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 md:px-8">
           <div className="reveal-up max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Da vaga ao próximo passo</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Clareza em três etapas.</h2>
@@ -223,7 +223,7 @@ export function MarketingHome() {
         </section>
 
         <section className="border-y border-neutral-200 bg-white/70 dark:border-neutral-800 dark:bg-neutral-950/50">
-          <div className="mx-auto grid max-w-6xl gap-10 px-4 py-20 md:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
+          <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 md:px-8 lg:grid-cols-[.9fr_1.1fr] lg:items-center">
             <div className="reveal-up">
               <span className="inline-flex rounded-xl bg-blue-50 p-3 text-blue-600 dark:bg-blue-950/30 dark:text-blue-300">
                 <Target className="h-6 w-6" />
@@ -245,7 +245,7 @@ export function MarketingHome() {
           </div>
         </section>
 
-        <section id="para-voce" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-20 md:px-8">
+        <section id="para-voce" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-20 md:px-8">
           <div className="reveal-up text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Orientação para o seu momento</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Qual desafio você está tentando resolver?</h2>
@@ -265,7 +265,7 @@ export function MarketingHome() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-4 pb-20 md:px-8">
+        <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
           <div className="reveal-up grid gap-8 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white md:px-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="flex items-center gap-2 text-blue-300"><FileSearch className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Sua próxima candidatura</span></div>

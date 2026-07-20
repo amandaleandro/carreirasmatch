@@ -93,7 +93,7 @@ export default async function HistoryPage({
   const totalPages = Math.max(1, Math.ceil(total / HISTORY_PAGE_SIZE));
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8">
+    <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Histórico de diagnósticos</h1>

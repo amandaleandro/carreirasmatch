@@ -37,7 +37,7 @@ export default async function SupportPage({
   const unreadTotal = tickets.reduce((total, ticket) => total + ticket._count.messages, 0);
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 md:py-12">
+    <main className="mx-auto w-full max-w-7xl px-4 py-8 md:py-12">
       <header className="mb-8">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
           Suporte

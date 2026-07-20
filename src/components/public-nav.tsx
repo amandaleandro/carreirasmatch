@@ -11,15 +11,9 @@ import Link from "next/link";
  */
 const NAV_LINKS: { href: string; label: string; show: string }[] = [
   { href: "/vagas-de-hoje", label: "Vagas de hoje", show: "" },
-  { href: "/vagas-publicas", label: "SINE e prefeituras", show: "hidden lg:inline" },
-  { href: "/cursos-gratuitos", label: "Cursos gratuitos", show: "hidden xl:inline" },
-  { href: "/mentorias", label: "Mentorias", show: "hidden xl:inline" },
-  { href: "/concursos", label: "Concursos", show: "hidden lg:inline" },
-  { href: "/vestibulares", label: "Vestibulares", show: "hidden lg:inline" },
-  { href: "/mercado-de-trabalho", label: "Mercado", show: "hidden xl:inline" },
   { href: "/blog", label: "Blog", show: "" },
-  { href: "/gratuito", label: "Ferramentas grátis", show: "hidden md:inline" },
-  { href: "/comece", label: "Como funciona", show: "hidden sm:inline" },
+  { href: "/gratuito", label: "Ferramentas grátis", show: "hidden sm:inline" },
+  { href: "/comece", label: "Como funciona", show: "hidden md:inline" },
 ];
 
 export function PublicNav({ onDark = false }: { onDark?: boolean }) {

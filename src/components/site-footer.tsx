@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 
-export function SiteFooter() {
+export function SiteFooter({ maxWidth = "max-w-7xl" }: { maxWidth?: string }) {
   return (
-    <footer className="border-t border-neutral-100 dark:border-neutral-900">
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-12 grid grid-cols-2 sm:grid-cols-4 gap-8">
-        <div className="col-span-2 sm:col-span-1">
+    <footer className="public-footer border-t border-neutral-100 dark:border-neutral-900">
+      <div className={`${maxWidth} mx-auto px-4 md:px-8 py-12 grid grid-cols-2 md:grid-cols-5 gap-8`}>
+        <div className="col-span-2 md:col-span-1">
           <Link href="/">
             <BrandLogo heightClassName="h-11 sm:h-12" />
           </Link>
@@ -20,6 +20,17 @@ export function SiteFooter() {
             <li><Link href="/#recursos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Recursos</Link></li>
             <li><Link href="/#planos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Planos</Link></li>
             <li><Link href="/empresa/cadastro" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Para empresas</Link></li>
+          </ul>
+        </div>
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-wide text-neutral-500 mb-3">Radar e Recursos</p>
+          <ul className="space-y-2 text-xs text-neutral-500 dark:text-neutral-400">
+            <li><Link href="/vagas-publicas" className="hover:text-neutral-800 dark:hover:text-white transition-colors">SINE e prefeituras</Link></li>
+            <li><Link href="/cursos-gratuitos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Cursos gratuitos</Link></li>
+            <li><Link href="/concursos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Concursos</Link></li>
+            <li><Link href="/vestibulares" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Vestibulares</Link></li>
+            <li><Link href="/mercado-de-trabalho" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Mercado</Link></li>
+            <li><Link href="/mentorias" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Mentorias</Link></li>
           </ul>
         </div>
         <div>
