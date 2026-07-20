@@ -33,6 +33,7 @@ export type MatchableCourse = {
   free?: boolean;
   certificate?: boolean;
   modality?: string;
+  featured?: boolean;
 };
 
 /**
@@ -60,9 +61,14 @@ export function scoreCourse(
     if (gapTokens.some((token) => haystack.has(token))) score += 3;
   }
 
-  if (score === 0) return 0;
+  if (score === 0) {
+    // Se o curso for destacado (patrocinado), ele pontua mesmo sem matching explícito de texto
+    if (course.featured) return 10;
+    return 0;
+  }
   if (course.free) score += 0.5;
   if (course.certificate) score += 0.5;
+  if (course.featured) score += 10;
   return score;
 }
 

@@ -84,6 +84,38 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         };
       },
     }),
+    Credentials({
+      id: "partner-credentials",
+      name: "Parceiro",
+      credentials: {
+        email: { label: "E-mail", type: "email" },
+        password: { label: "Senha", type: "password" },
+      },
+      async authorize(credentials, request) {
+        const email = normalizeEmail(credentials?.email);
+        const password = credentials?.password as string | undefined;
+
+        if (!email || !password) return null;
+
+        const ip = getClientIp(request);
+        const rateLimit = checkRateLimit(`partner-login:${ip}:${email}`, LOGIN_LIMIT);
+        if (!rateLimit.allowed) return null;
+
+        const partner = await prisma.partner.findUnique({ where: { email } });
+        if (!partner?.passwordHash) return null;
+
+        const valid = await bcrypt.compare(password, partner.passwordHash);
+        if (!valid) return null;
+
+        return {
+          id: partner.id,
+          name: partner.name,
+          email: partner.email,
+          accountType: "partner" as const,
+          partnerId: partner.id,
+        };
+      },
+    }),
   ],
   callbacks: {
     ...authConfig.callbacks,

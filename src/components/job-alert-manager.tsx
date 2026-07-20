@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { JobAlertForm } from "@/components/job-alert-form";
+import { PushOptIn } from "@/components/push-opt-in";
 
 type Alert = {
   id: string;
@@ -24,6 +25,7 @@ export function JobAlertManager({ initialAlerts }: { initialAlerts: Alert[] }) {
       <h2 className="text-lg font-semibold">Alertas de vagas</h2>
       <p className="mt-1 text-sm text-neutral-500">Receba oportunidades novas de acordo com seus interesses.</p>
       <div className="mt-4"><JobAlertForm /></div>
+      <PushOptIn />
       <div className="mt-4 space-y-2">
         {alerts.map((alert) => (
           <div key={alert.id} className="flex items-center justify-between rounded-xl border border-neutral-200 p-3 text-sm dark:border-neutral-800">

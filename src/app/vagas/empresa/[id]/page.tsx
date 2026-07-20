@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MapPin } from "lucide-react";
+import { MapPin, Sparkles } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ApplyVaga } from "@/components/apply-vaga";
 import { vagaAttributeChips } from "@/lib/vaga-fields";
+import { PartnerCourseActions } from "@/components/partner-course-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +46,28 @@ export default async function CompanyVagaPublicPage({ params }: { params: Promis
       });
       applyState = existing ? "applied" : "candidate";
     }
+  }
+
+  // Busca cursos patrocinados recomendados para a área dessa vaga
+  let recommendedCourses = await prisma.externalCourse.findMany({
+    where: {
+      active: true,
+      featured: true,
+      area: { contains: vaga.area },
+    },
+    take: 3,
+  });
+
+  if (recommendedCourses.length < 3) {
+    const extra = await prisma.externalCourse.findMany({
+      where: {
+        active: true,
+        featured: true,
+        id: { notIn: recommendedCourses.map((c) => c.id) },
+      },
+      take: 3 - recommendedCourses.length,
+    });
+    recommendedCourses = [...recommendedCourses, ...extra];
   }
 
   const location = [vaga.area, vaga.state].filter(Boolean).join(" · ");
@@ -86,6 +109,48 @@ export default async function CompanyVagaPublicPage({ params }: { params: Promis
             <h2 className="font-semibold mb-3">Candidatar-se</h2>
             <ApplyVaga vagaId={vaga.id} state={applyState} />
           </div>
+
+          {/* Seção de recomendações de cursos do parceiro */}
+          {recommendedCourses.length > 0 && (
+            <div className="rounded-2xl border border-amber-200 dark:border-amber-950/40 bg-amber-50/10 dark:bg-amber-950/5 p-6 space-y-4 shadow-sm">
+              <div>
+                <h3 className="text-sm font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                  <Sparkles className="h-4 w-4 fill-amber-500 text-amber-500" />
+                  Quer aumentar suas chances?
+                </h3>
+                <p className="text-xs text-neutral-500 mt-1">
+                  Se qualifique nas competências exigidas para essa vaga com cursos recomendados dos nossos parceiros:
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                {recommendedCourses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm text-left flex flex-col justify-between"
+                  >
+                    <div>
+                      <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/40 px-1.5 py-0.5 rounded">
+                        {course.area}
+                      </span>
+                      <h4 className="mt-2 font-bold text-sm text-neutral-900 dark:text-white line-clamp-2 leading-tight">
+                        {course.title}
+                      </h4>
+                      <p className="mt-1 text-xs text-neutral-500">{course.provider}</p>
+                    </div>
+
+                    <PartnerCourseActions
+                      courseId={course.id}
+                      courseUrl={course.url}
+                      couponCode={course.couponCode || undefined}
+                      couponDiscount={course.couponDiscount || undefined}
+                      featured={true}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </main>
       <SiteFooter />

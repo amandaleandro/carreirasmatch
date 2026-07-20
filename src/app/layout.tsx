@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { Analytics } from "@/components/analytics";
@@ -37,11 +37,21 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
   },
+  // PWA: nome/estilo quando instalado na tela inicial do iOS.
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: "default",
+  },
   // Verificação de propriedade do Google Search Console. O valor vem do env
   // (runtime, não precisa rebuild): pegar o "content" da meta tag que o Search
   // Console gera e definir GOOGLE_SITE_VERIFICATION no .env da VPS. Sem a var,
   // nenhuma meta tag é renderizada.
   verification: { google: process.env.GOOGLE_SITE_VERIFICATION },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#2563eb",
 };
 
 export default function RootLayout({

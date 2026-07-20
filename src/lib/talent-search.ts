@@ -16,6 +16,7 @@ export type TalentMatch = {
   contactStatus: "none" | "pending" | "accepted" | "declined";
   /** Só preenchido quando contactStatus === "accepted". */
   contact: { name: string; email: string; phone: string } | null;
+  isTopPlayer?: boolean;
 };
 
 function firstNameOf(name: string | null): string {
@@ -36,30 +37,41 @@ export async function searchTalent(
   jobText: string,
   filters: { area?: string; state?: string } = {}
 ): Promise<TalentMatch[]> {
-  const pool = await prisma.user.findMany({
-    where: {
-      discoverable: true,
-      resumes: { some: {} },
-      ...(filters.area ? { professionalArea: { contains: filters.area, mode: "insensitive" } } : {}),
-      ...(filters.state ? { state: filters.state.toUpperCase() } : {}),
-    },
-    orderBy: { createdAt: "desc" },
-    take: TALENT_SEARCH_POOL_LIMIT,
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      phone: true,
-      professionalArea: true,
-      city: true,
-      state: true,
-      resumes: {
-        orderBy: { createdAt: "desc" },
-        take: 1,
-        select: { rawText: true },
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const [pool, topMonthlyScores] = await Promise.all([
+    prisma.user.findMany({
+      where: {
+        discoverable: true,
+        resumes: { some: {} },
+        ...(filters.area ? { professionalArea: { contains: filters.area, mode: "insensitive" } } : {}),
+        ...(filters.state ? { state: filters.state.toUpperCase() } : {}),
       },
-    },
-  });
+      orderBy: { createdAt: "desc" },
+      take: TALENT_SEARCH_POOL_LIMIT,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        phone: true,
+        professionalArea: true,
+        city: true,
+        state: true,
+        resumes: {
+          orderBy: { createdAt: "desc" },
+          take: 1,
+          select: { rawText: true },
+        },
+      },
+    }),
+    prisma.gameScore.findMany({
+      where: { createdAt: { gte: startOfMonth } },
+      orderBy: { score: "desc" },
+      take: 10,
+      select: { userId: true },
+    }),
+  ]);
+
+  const top10UserIds = new Set(topMonthlyScores.map((s) => s.userId));
 
   const withResume = pool.filter((u) => u.resumes[0]?.rawText?.trim());
   if (withResume.length === 0) return [];
@@ -98,6 +110,7 @@ export async function searchTalent(
         contactStatus === "accepted"
           ? { name: u.name ?? "", email: u.email ?? "", phone: u.phone ?? "" }
           : null,
+      isTopPlayer: top10UserIds.has(u.id),
     };
   });
 

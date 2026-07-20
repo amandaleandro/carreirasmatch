@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarDays, ExternalLink, MapPin, Search } from "lucide-react";
+import { CalendarDays, ExternalLink, MapPin, Search, Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { findPublicJobCategory, PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { PublicSiteHeader } from "@/components/public-site-header";
@@ -10,6 +10,7 @@ import { cleanJobSnippet } from "@/lib/job-snippet";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbJsonLd } from "@/lib/seo";
 import type { Prisma } from "@/generated/prisma/client";
+import { PartnerCourseActions } from "@/components/partner-course-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -111,6 +112,31 @@ export default async function PublicJobCategoryPage({
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
+  // Busca cursos patrocinados para os candidatos que visualizam esta categoria de vagas
+  let recommendedCourses: any[] = [];
+  if (page === 1) {
+    recommendedCourses = await prisma.externalCourse.findMany({
+      where: {
+        active: true,
+        featured: true,
+        ...(category.where.area ? { area: { contains: category.where.area } } : {}),
+      },
+      take: 3,
+    });
+
+    if (recommendedCourses.length < 3) {
+      const extra = await prisma.externalCourse.findMany({
+        where: {
+          active: true,
+          featured: true,
+          id: { notIn: recommendedCourses.map((c) => c.id) },
+        },
+        take: 3 - recommendedCourses.length,
+      });
+      recommendedCourses = [...recommendedCourses, ...extra];
+    }
+  }
+
   function pageHref(nextPage: number): string {
     const next = new URLSearchParams();
     if (nextPage > 1) next.set("page", String(nextPage));
@@ -198,6 +224,41 @@ export default async function PublicJobCategoryPage({
             </Link>
           ))}
         </div>
+
+        {page === 1 && recommendedCourses.length > 0 && (
+          <div className="rounded-lg border border-amber-200 dark:border-amber-950/40 bg-amber-50/10 dark:bg-amber-950/5 p-5 space-y-4 shadow-sm">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+              <Sparkles className="h-4 w-4 fill-amber-500 text-amber-500" />
+              Quer se preparar para estas oportunidades?
+            </h3>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {recommendedCourses.map((course) => (
+                <div
+                  key={course.id}
+                  className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm text-left flex flex-col justify-between"
+                >
+                  <div>
+                    <span className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-950/40 px-1.5 py-0.5 rounded">
+                      {course.area}
+                    </span>
+                    <h4 className="mt-2 font-bold text-sm text-neutral-900 dark:text-white line-clamp-2 leading-tight">
+                      {course.title}
+                    </h4>
+                    <p className="mt-1 text-xs text-neutral-500">{course.provider}</p>
+                  </div>
+
+                  <PartnerCourseActions
+                    courseId={course.id}
+                    courseUrl={course.url}
+                    couponCode={course.couponCode || undefined}
+                    couponDiscount={course.couponDiscount || undefined}
+                    featured={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {jobs.length === 0 && (
           <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-8 text-center">

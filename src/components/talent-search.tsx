@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Trophy } from "lucide-react";
 
 type ContactStatus = "none" | "pending" | "accepted" | "declined";
 
@@ -15,6 +16,7 @@ type TalentMatch = {
   reason: string;
   contactStatus: ContactStatus;
   contact: { name: string; email: string; phone: string } | null;
+  isTopPlayer?: boolean;
 };
 
 function scoreColor(score: number): string {
@@ -165,6 +167,11 @@ export function TalentSearch() {
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-bold text-neutral-400">#{index + 1}</span>
                       <h3 className="font-semibold truncate">{m.firstName}</h3>
+                      {m.isTopPlayer && (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-950/40 dark:text-amber-400 px-2 py-0.5 rounded border border-amber-200/50 dark:border-amber-500/20">
+                          <Trophy className="h-3 w-3 fill-amber-500 text-amber-500" /> Top Match Gamificado
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-neutral-500 mt-0.5">
                       {[m.professionalArea, [m.city, m.state].filter(Boolean).join("/")].filter(Boolean).join(" · ")}

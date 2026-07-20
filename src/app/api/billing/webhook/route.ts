@@ -14,6 +14,7 @@ import {
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod, periodPlanProductName } from "@/lib/billing-plans";
 import { grantScreeningCredits } from "@/lib/company-billing";
+import { grantPartnerCredits } from "@/lib/partner-billing";
 
 async function userEmail(userId: string): Promise<string | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
@@ -62,6 +63,29 @@ export async function POST(req: NextRequest) {
         ) {
           await prisma.companyPayment.update({
             where: { id: companyPayment.id },
+            data: { status: "cancelled" },
+          });
+        }
+      }
+      // Pode ser um pagamento de parceiro (compra de créditos de anúncio).
+      const partnerPayment = await prisma.partnerPayment.findUnique({ where: { mpPaymentId: dataId } });
+      if (partnerPayment) {
+        const mpPayment = await getPayment(dataId);
+        if (mpPayment.status === "approved") {
+          const balance = await grantPartnerCredits(partnerPayment.id);
+          if (balance !== null) {
+            void notifyAdminPurchase({
+              product: `${partnerPayment.credits} destaques de curso (parceiro)`,
+              amountCents: partnerPayment.amount,
+              email: null,
+            });
+          }
+        } else if (
+          (mpPayment.status === "rejected" || mpPayment.status === "cancelled") &&
+          partnerPayment.status === "pending"
+        ) {
+          await prisma.partnerPayment.update({
+            where: { id: partnerPayment.id },
             data: { status: "cancelled" },
           });
         }

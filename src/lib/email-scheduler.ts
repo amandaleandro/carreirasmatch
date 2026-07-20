@@ -10,6 +10,7 @@ import {
   sendCheckoutRecoveryEmail,
   sendConvertToSubscriptionEmail,
 } from "@/lib/resend";
+import { sendPushToUser } from "@/lib/push";
 
 // O scheduler roda algumas vezes ao dia; a idempotência (sendOnce + EmailLog)
 // garante que cada e-mail de ciclo de vida saia uma única vez por evento.
@@ -218,13 +219,22 @@ async function sendJobAlerts(now: Date): Promise<void> {
     const period = alert.frequency === "weekly"
       ? `${now.getUTCFullYear()}-W${Math.ceil(now.getUTCDate() / 7)}-${now.getUTCMonth()}`
       : now.toISOString().slice(0, 10);
-    await sendOnce("job_alert", `${alert.id}:${period}`, alert.user.email, () =>
-      sendJobAlertEmail(alert.user.email!, {
+    const location = [alert.city, alert.state].filter(Boolean).join(", ");
+    // Push e e-mail compartilham o mesmo sendOnce: a reserva no EmailLog garante
+    // que ambos saiam no máximo uma vez por alerta por período.
+    await sendOnce("job_alert", `${alert.id}:${period}`, alert.user.email, async () => {
+      await sendJobAlertEmail(alert.user.email!, {
         query: alert.query,
-        location: [alert.city, alert.state].filter(Boolean).join(", "),
+        location,
         jobs: jobs.map((job) => ({ title: job.title, url: job.url, source: job.source.name })),
-      }),
-    );
+      });
+      await sendPushToUser(alert.userId, {
+        title: jobs.length === 1 ? "1 vaga nova para você" : `${jobs.length} vagas novas para você`,
+        body: [alert.query || "Vagas", location].filter(Boolean).join(" • ") + `: ${jobs[0].title}`,
+        url: "/vagas-publicas",
+        tag: `job_alert_${alert.id}`,
+      });
+    });
   }
 }
 

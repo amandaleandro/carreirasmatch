@@ -16,6 +16,8 @@ services:
       retries: 12
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
     networks:
       - default
 

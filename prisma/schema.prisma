@@ -48,9 +48,11 @@ model User {
   supportTickets     SupportTicket[]
   freeToolUsages     FreeToolUsage[]
   jobAlerts          JobAlert[]
+  pushSubscriptions  PushSubscription[]
   opportunityReports OpportunityReport[]
   contactRequests    TalentContactRequest[]
   companyJobApplications CompanyJobApplication[]
+  gameScores             GameScore[]
 
   // Marketplace freelancer. Um mesmo User pode ser freelancer (freelancerProfile,
   // propostas) e/ou contratante (projetos que publicou).
@@ -623,10 +625,17 @@ model ExternalCourse {
   lastSeenAt  DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  partnerId   String?
+  partner     Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+  featured    Boolean  @default(false)
+  couponCode  String   @default("")
+  couponDiscount String @default("")
 
   @@index([active, area])
   @@index([state, city])
   @@index([source, lastSeenAt])
+  @@index([partnerId])
 }
 
 model CareerVideo {
@@ -766,6 +775,22 @@ model JobAlert {
   updatedAt DateTime @updatedAt
 
   @@index([userId, active])
+}
+
+/// Inscrição de Web Push (PushSubscription do browser). Um usuário pode ter
+/// várias (um por dispositivo/navegador). `endpoint` é único e identifica a
+/// inscrição; quando o push retorna 404/410 a inscrição está morta e é removida.
+model PushSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }
 
 model OpportunityClick {
@@ -1154,4 +1179,77 @@ model FreelanceMessage {
   createdAt    DateTime @default(now())
 
   @@index([threadId, createdAt])
+}
+
+model Partner {
+  id           String            @id @default(cuid())
+  name         String
+  cnpj         String            @default("")
+  email        String            @unique
+  passwordHash String
+  logoUrl      String            @default("")
+  website      String            @default("")
+  description  String            @default("")
+  status       String            @default("active") // pending | active | suspended
+  credits      Int               @default(0) // créditos para destacar cursos
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  courses      ExternalCourse[]
+  payments     PartnerPayment[]
+
+  @@index([email])
+}
+
+model PartnerPayment {
+  id          String    @id @default(cuid())
+  partnerId   String
+  partner     Partner   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  kind        String    // "ad_pack"
+  credits     Int       // créditos concedidos ao confirmar o pagamento
+  amount      Int       // valor em centavos
+  status      String    @default("pending") // pending | paid | cancelled | refunded
+  mpPaymentId String    @unique
+  paidAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([partnerId])
+  @@index([status])
+}
+
+model PartnerCourseClick {
+  id        String   @id @default(cuid())
+  courseId  String
+  partnerId String
+  createdAt DateTime @default(now())
+
+  @@index([partnerId, createdAt])
+  @@index([courseId])
+}
+
+model PartnerLead {
+  id        String   @id @default(cuid())
+  partnerId String
+  courseId  String
+  name      String
+  email     String
+  phone     String
+  status    String   @default("new") // new | contacted
+  createdAt DateTime @default(now())
+
+  @@index([partnerId, status])
+  @@index([courseId])
+}
+
+model GameScore {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game      String   // typer | quiz | memory
+  area      String
+  score     Int
+  createdAt DateTime @default(now())
+
+  @@index([game, createdAt, score])
+  @@index([userId])
 }

@@ -60,9 +60,10 @@ export const authConfig: NextAuthConfig = {
       if (user) {
         token.id = user.id;
         const u = user as {
-          accountType?: "company";
+          accountType?: "company" | "partner";
           companyId?: string;
           companyRole?: "owner" | "member";
+          partnerId?: string;
         };
         if (u.accountType === "company") {
           token.accountType = "company";
@@ -70,11 +71,15 @@ export const authConfig: NextAuthConfig = {
           token.companyId = u.companyId ?? user.id;
           token.companyRole = u.companyRole ?? "member";
           token.memberId = user.id;
+        } else if (u.accountType === "partner") {
+          token.accountType = "partner";
+          token.partnerId = u.partnerId ?? user.id;
         } else {
           token.accountType = "candidate";
           token.companyId = undefined;
           token.companyRole = undefined;
           token.memberId = undefined;
+          token.partnerId = undefined;
         }
       }
       return token;
@@ -82,16 +87,18 @@ export const authConfig: NextAuthConfig = {
     async session({ session, token }) {
       if (session.user && token.id) {
         session.user.id = token.id as string;
-        session.user.accountType = (token.accountType as "candidate" | "company") ?? "candidate";
+        session.user.accountType = (token.accountType as "candidate" | "company" | "partner") ?? "candidate";
         session.user.companyId = token.companyId as string | undefined;
         session.user.companyRole = token.companyRole as "owner" | "member" | undefined;
         session.user.memberId = token.memberId as string | undefined;
+        session.user.partnerId = token.partnerId as string | undefined;
       }
       return session;
     },
     authorized({ auth, request }) {
       const isLoggedIn = Boolean(auth?.user);
       const isCompany = auth?.user?.accountType === "company";
+      const isPartner = auth?.user?.accountType === "partner";
       const pathname = request.nextUrl.pathname;
 
       // Área de empresa: login/cadastro são públicos; o resto exige sessão de empresa.
@@ -105,9 +112,18 @@ export const authConfig: NextAuthConfig = {
         return NextResponse.redirect(new URL("/empresa/login", request.nextUrl));
       }
 
-      // Candidato já logado não precisa ver login/cadastro de candidato. (Empresa
-      // fica de fora: /login é o caminho pra trocar de conta pro lado candidato.)
-      if ((pathname === "/login" || pathname === "/register") && isLoggedIn && !isCompany) {
+      // Área de parceiro: login/cadastro são públicos; o resto exige sessão de parceiro.
+      if (pathname.startsWith("/parceiro")) {
+        if (pathname === "/parceiro/login" || pathname === "/parceiro/cadastro") {
+          if (isPartner) return NextResponse.redirect(new URL("/parceiro/dashboard", request.nextUrl));
+          return true;
+        }
+        if (isPartner) return true;
+        return NextResponse.redirect(new URL("/parceiro/login", request.nextUrl));
+      }
+
+      // Candidato já logado não precisa ver login/cadastro de candidato.
+      if ((pathname === "/login" || pathname === "/register") && isLoggedIn && !isCompany && !isPartner) {
         return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
       }
 
@@ -120,6 +136,7 @@ export const authConfig: NextAuthConfig = {
         PUBLIC_PATHS.some((p) => pathname.startsWith(p));
       if (isPublic) return true;
       if (isCompany) return NextResponse.redirect(new URL("/empresa", request.nextUrl));
+      if (isPartner) return NextResponse.redirect(new URL("/parceiro/dashboard", request.nextUrl));
       return isLoggedIn;
     },
   },

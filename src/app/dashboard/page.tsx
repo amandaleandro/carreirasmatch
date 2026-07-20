@@ -8,6 +8,7 @@ import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segm
 import { toolsForSegment } from "@/lib/tools-catalog";
 import { computeJourneyMetrics } from "@/lib/applications";
 import { formatBrazilDate, formatBrazilDateTime } from "@/lib/brazil";
+import { Trophy } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +22,10 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [analyses, user, behavioralResult] = await Promise.all([
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [analyses, user, behavioralResult, topMonthlyScores] = await Promise.all([
     prisma.analysis.findMany({
       where: { resume: { userId: session.user.id } },
       orderBy: { createdAt: "desc" },
@@ -32,7 +36,25 @@ export default async function DashboardPage() {
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     }),
+    prisma.gameScore.findMany({
+      where: { createdAt: { gte: startOfMonth } },
+      orderBy: { score: "desc" },
+      take: 10,
+      select: { userId: true },
+    }),
   ]);
+
+  const isTopPlayer = topMonthlyScores.some((s) => s.userId === session.user.id);
+
+  let topVagas: any[] = [];
+  if (isTopPlayer) {
+    topVagas = await prisma.companyVaga.findMany({
+      where: { status: "open", publishedToFeed: true },
+      take: 3,
+      include: { company: { select: { name: true } } },
+    });
+  }
+
   const applications = await prisma.application.findMany({
     where: { userId: session.user.id },
     orderBy: { updatedAt: "desc" },
@@ -146,6 +168,45 @@ export default async function DashboardPage() {
           na sua carreira.
         </p>
       </div>
+
+      {isTopPlayer && (
+        <div className="rounded-3xl border border-amber-300 dark:border-amber-500/20 bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent p-6 space-y-4 shadow-sm relative overflow-hidden animate-in fade-in duration-250">
+          <div className="flex items-center gap-3">
+            <Trophy className="h-8 w-8 text-amber-500 fill-amber-500 shrink-0" />
+            <div>
+              <h2 className="text-lg font-bold text-neutral-900 dark:text-white">
+                Você é um dos 10 melhores jogadores do mês! 🏆
+              </h2>
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                Como recompensa por sua dedicação, aqui estão vagas exclusivas recomendadas com prioridade para você:
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-3 mt-2">
+            {topVagas.map((vaga) => (
+              <Link
+                key={vaga.id}
+                href={`/vagas/empresa/${vaga.id}`}
+                className="rounded-2xl border border-amber-200 dark:border-amber-800 bg-white dark:bg-neutral-900 p-4 shadow-sm hover:border-amber-400 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <span className="text-[10px] font-bold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40 px-2 py-0.5 rounded">
+                    {vaga.area}
+                  </span>
+                  <h3 className="mt-2 font-bold text-sm text-neutral-900 dark:text-white line-clamp-2 leading-tight">
+                    {vaga.title}
+                  </h3>
+                  <p className="text-xs text-neutral-500 mt-1">{vaga.company.name}</p>
+                </div>
+                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-3 inline-block">
+                  Ver Vaga Exclusiva →
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 card-premium p-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
