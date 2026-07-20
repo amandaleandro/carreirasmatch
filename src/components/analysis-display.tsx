@@ -650,14 +650,14 @@ export function ScoreHero({
 
 function SectionHeading({ icon, title }: { icon: string; title: string }) {
   return (
-    <div className="flex items-center gap-2.5 pt-3">
-      <span aria-hidden className="text-lg">
+    <div className="flex items-center gap-3 pt-6 pb-2">
+      <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm text-sm">
         {icon}
-      </span>
-      <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+      </div>
+      <h2 className="text-xs font-extrabold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
         {title}
       </h2>
-      <div className="h-px flex-1 bg-neutral-200 dark:bg-neutral-800" />
+      <div className="h-[2px] flex-1 bg-gradient-to-r from-neutral-200 to-transparent dark:from-neutral-800" />
     </div>
   );
 }
