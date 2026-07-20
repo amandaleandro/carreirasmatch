@@ -54,6 +54,15 @@ export function ScreeningResults({
   const [candidates, setCandidates] = useState<ScreeningCandidate[]>(initial);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | "favorite" | "approved" | "rejected">("all");
+
+  const counts = {
+    all: candidates.length,
+    favorite: candidates.filter((c) => c.status === "favorite").length,
+    approved: candidates.filter((c) => c.status === "approved").length,
+    rejected: candidates.filter((c) => c.status === "rejected").length,
+  };
+  const visible = filter === "all" ? candidates : candidates.filter((c) => c.status === filter);
 
   async function setStatus(id: string, next: CandidateStatus) {
     const current = candidates.find((c) => c.id === id)?.status ?? "none";
@@ -109,10 +118,28 @@ export function ScreeningResults({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-neutral-500">
-          {candidates.length} {candidates.length === 1 ? "candidato" : "candidatos"}
-        </p>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {([
+            ["all", "Todos"],
+            ["favorite", "★ Favoritos"],
+            ["approved", "Aprovados"],
+            ["rejected", "Reprovados"],
+          ] as const).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setFilter(key)}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                filter === key
+                  ? "bg-blue-600 text-white"
+                  : "border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              }`}
+            >
+              {label} ({counts[key]})
+            </button>
+          ))}
+        </div>
         <button
           type="button"
           onClick={exportCsv}
@@ -122,13 +149,18 @@ export function ScreeningResults({
         </button>
       </div>
 
+      {visible.length === 0 ? (
+        <p className="text-sm text-neutral-500 py-6 text-center">Nenhum candidato nesse filtro.</p>
+      ) : (
       <ol className="space-y-3">
-        {candidates.map((c, index) => (
+        {visible.map((c) => {
+          const rank = candidates.findIndex((x) => x.id === c.id) + 1;
+          return (
           <li key={c.id} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-bold text-neutral-400">#{index + 1}</span>
+                  <span className="text-sm font-bold text-neutral-400">#{rank}</span>
                   <h3 className="font-semibold truncate">{c.candidateName || c.fileName}</h3>
                   {c.status !== "none" && (
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_META[c.status].badge}`}>
@@ -167,8 +199,10 @@ export function ScreeningResults({
               </div>
             )}
           </li>
-        ))}
+          );
+        })}
       </ol>
+      )}
     </div>
   );
 }

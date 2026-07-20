@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { parseStoredMatches, hydrateMatches } from "@/lib/company-vaga";
 import { VagaMatches } from "@/components/vaga-matches";
+import { VagaActions } from "@/components/vaga-actions";
 
 export const dynamic = "force-dynamic";
 
@@ -26,12 +27,28 @@ export default async function VagaDetailPage({ params }: { params: Promise<{ id:
           ← Voltar para vagas
         </Link>
 
-        <header>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{vaga.title}</h1>
-          {[vaga.area, vaga.state].filter(Boolean).length > 0 && (
-            <p className="text-sm text-neutral-500 mt-1">{[vaga.area, vaga.state].filter(Boolean).join(" / ")}</p>
-          )}
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-3 whitespace-pre-line leading-relaxed">
+        <header className="space-y-3">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{vaga.title}</h1>
+                <span
+                  className={`shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                    vaga.status === "closed"
+                      ? "bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300"
+                      : "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300"
+                  }`}
+                >
+                  {vaga.status === "closed" ? "Fechada" : "Aberta"}
+                </span>
+              </div>
+              {[vaga.area, vaga.state].filter(Boolean).length > 0 && (
+                <p className="text-sm text-neutral-500 mt-1">{[vaga.area, vaga.state].filter(Boolean).join(" / ")}</p>
+              )}
+            </div>
+            <VagaActions vagaId={vaga.id} status={vaga.status} />
+          </div>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-line leading-relaxed">
             {vaga.description}
           </p>
         </header>

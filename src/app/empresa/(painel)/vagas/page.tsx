@@ -50,7 +50,14 @@ export default async function CompanyVagasPage() {
                     className="flex items-center justify-between gap-4 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 hover:border-blue-400 dark:hover:border-blue-700 transition-colors"
                   >
                     <div className="min-w-0">
-                      <h2 className="font-semibold truncate">{vaga.title}</h2>
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-semibold truncate">{vaga.title}</h2>
+                        {vaga.status === "closed" && (
+                          <span className="shrink-0 rounded-full bg-neutral-200 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
+                            Fechada
+                          </span>
+                        )}
+                      </div>
                       <p className="text-sm text-neutral-500 mt-0.5">
                         {count} {count === 1 ? "candidato" : "candidatos"}
                         {[vaga.area, vaga.state].filter(Boolean).length > 0

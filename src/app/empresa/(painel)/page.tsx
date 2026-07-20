@@ -7,14 +7,24 @@ export const dynamic = "force-dynamic";
 export default async function CompanyDashboardPage() {
   const { company } = await requireCompanyPage();
 
-  const jobs = await prisma.companyJob.findMany({
-    where: { companyId: company.id },
-    orderBy: { createdAt: "desc" },
-    include: { _count: { select: { candidates: true } } },
-  });
+  const [jobs, openVagas, acceptedContacts] = await Promise.all([
+    prisma.companyJob.findMany({
+      where: { companyId: company.id },
+      orderBy: { createdAt: "desc" },
+      include: { _count: { select: { candidates: true } } },
+    }),
+    prisma.companyVaga.count({ where: { companyId: company.id, status: "open" } }),
+    prisma.talentContactRequest.count({ where: { companyId: company.id, status: "accepted" } }),
+  ]);
 
   const freeRemaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount);
   const remaining = freeRemaining + company.screeningCredits;
+
+  const stats: { label: string; value: number; href: string }[] = [
+    { label: "Triagens", value: jobs.length, href: "/empresa" },
+    { label: "Vagas abertas", value: openVagas, href: "/empresa/vagas" },
+    { label: "Contatos liberados", value: acceptedContacts, href: "/empresa/contatos" },
+  ];
 
   return (
     <div>
@@ -32,6 +42,19 @@ export default async function CompanyDashboardPage() {
           >
             + Nova triagem
           </Link>
+        </div>
+
+        <div className="grid grid-cols-3 gap-3">
+          {stats.map((s) => (
+            <Link
+              key={s.label}
+              href={s.href}
+              className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 hover:border-blue-400 dark:hover:border-blue-700 transition-colors"
+            >
+              <p className="text-2xl font-bold">{s.value}</p>
+              <p className="text-xs text-neutral-500 mt-0.5">{s.label}</p>
+            </Link>
+          ))}
         </div>
 
         <div className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">

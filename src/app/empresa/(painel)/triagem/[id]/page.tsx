@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { ScreeningResults, type ScreeningCandidate } from "@/components/screening-results";
+import { DeleteScreeningButton } from "@/components/delete-screening-button";
 
 export const dynamic = "force-dynamic";
 
@@ -42,12 +43,15 @@ export default async function ScreeningResultPage({
           ← Voltar para triagens
         </Link>
 
-        <header>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{job.title}</h1>
-          <p className="text-sm text-neutral-500 mt-1">
-            {job.candidates.length} {job.candidates.length === 1 ? "candidato" : "candidatos"} ·{" "}
-            {job.createdAt.toLocaleDateString("pt-BR")}
-          </p>
+        <header className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{job.title}</h1>
+            <p className="text-sm text-neutral-500 mt-1">
+              {job.candidates.length} {job.candidates.length === 1 ? "candidato" : "candidatos"} ·{" "}
+              {job.createdAt.toLocaleDateString("pt-BR")}
+            </p>
+          </div>
+          <DeleteScreeningButton jobId={job.id} />
         </header>
 
         {job.recommendation && (
