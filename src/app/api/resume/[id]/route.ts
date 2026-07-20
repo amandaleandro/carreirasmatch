@@ -21,9 +21,15 @@ export async function PATCH(
     return NextResponse.json({ error: "Análise não encontrada." }, { status: 404 });
   }
 
+  const currentProgress: string[] = JSON.parse(analysis.actionPlanProgress || "[]");
+  const newProgress = Array.from(new Set([...currentProgress, "today-0", "today-1"]));
+
   const updated = await prisma.analysis.update({
     where: { id },
-    data: { resumeOverride: JSON.stringify(body) },
+    data: { 
+      resumeOverride: JSON.stringify(body),
+      actionPlanProgress: JSON.stringify(newProgress),
+    },
   });
 
   return NextResponse.json({ resumeOverride: updated.resumeOverride });
