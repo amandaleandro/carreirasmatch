@@ -21,13 +21,17 @@ export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const [analyses, user] = await Promise.all([
+  const [analyses, user, behavioralResult] = await Promise.all([
     prisma.analysis.findMany({
       where: { resume: { userId: session.user.id } },
       orderBy: { createdAt: "desc" },
       include: { resume: true },
     }),
     prisma.user.findUnique({ where: { id: session.user.id }, select: { careerSegment: true } }),
+    prisma.softSkillTestResult.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
   const applications = await prisma.application.findMany({
     where: { userId: session.user.id },
@@ -255,6 +259,71 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {behavioralResult && (
+        <div className="card-premium p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 pb-4">
+            <div className="flex items-center gap-3">
+              <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 text-lg">
+                🧠
+              </span>
+              <div>
+                <h3 className="font-semibold text-lg">Seu perfil comportamental</h3>
+                <p className="text-xs text-neutral-500">Última avaliação de soft skills realizada</p>
+              </div>
+            </div>
+            <Link
+              href="/tools/behavioral-test"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold cursor-pointer"
+            >
+              Refazer teste comportamental →
+            </Link>
+          </div>
+          <div className="grid gap-6 md:grid-cols-12">
+            <div className="md:col-span-5 space-y-2">
+              <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider font-medium">Perfil Dominante</p>
+              <p className="font-bold text-base text-blue-600 dark:text-blue-400">{behavioralResult.personalityLabel}</p>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+                {behavioralResult.summary}
+              </p>
+            </div>
+            <div className="md:col-span-7">
+              <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider font-medium mb-3">Mapeamento de Soft Skills</p>
+              {(() => {
+                let skills: Record<string, number> = {};
+                try {
+                  skills = JSON.parse(behavioralResult.skillScores);
+                } catch(e){}
+                const labels: Record<string, string> = {
+                  comunicacao: "Comunicação",
+                  trabalho_em_equipe: "Trabalho em equipe",
+                  proatividade: "Proatividade",
+                  adaptabilidade: "Adaptabilidade",
+                  resolucao_problemas: "Resolução de problemas",
+                };
+                return (
+                  <div className="grid gap-3.5 sm:grid-cols-2">
+                    {Object.entries(skills).map(([dim, score]) => (
+                      <div key={dim} className="space-y-1">
+                        <div className="flex justify-between text-xs font-medium">
+                          <span className="text-neutral-600 dark:text-neutral-300">{labels[dim] || dim}</span>
+                          <span className="font-semibold">{score}/100</span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-blue-600"
+                            style={{ width: `${score}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {upcomingDeadlines.length > 0 && (
         <div className="card-premium p-6">
