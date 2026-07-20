@@ -11,6 +11,7 @@ import { AddJobForm } from "./AddJobForm";
 import { FetchJobsButton } from "./FetchJobsButton";
 import { Pagination } from "./Pagination";
 import { FeedFilters } from "./FeedFilters";
+import { ShareJobCard } from "./ShareJobCard";
 
 export const dynamic = "force-dynamic";
 
@@ -132,6 +133,7 @@ export default async function FeedPage({
         <p className="text-sm text-neutral-500">{totalJobs} vaga(s) disponível(is).</p>
         <AllJobsList jobs={jobs} />
         <Pagination page={page} totalPages={totalPages} searchParams={params} />
+        <ShareJobCard />
       </div>
     );
   }
@@ -301,6 +303,8 @@ export default async function FeedPage({
       />
 
       <Pagination page={page} totalPages={totalPages} searchParams={params} />
+
+      <ShareJobCard />
     </div>
   );
 }
