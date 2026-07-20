@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import {
   LayoutDashboard,
   Briefcase,
+  Handshake,
   Users,
   CreditCard,
   LogOut,
@@ -17,14 +18,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-type NavItem = { href: string; label: string; icon: LucideIcon };
+type NavItem = { href: string; label: string; icon: LucideIcon; badge?: number };
 
-const NAV_ITEMS: NavItem[] = [
-  { href: "/empresa", label: "Triagens", icon: LayoutDashboard },
-  { href: "/empresa/vagas", label: "Vagas", icon: Briefcase },
-  { href: "/empresa/talentos", label: "Banco de talentos", icon: Users },
-  { href: "/empresa/billing", label: "Créditos", icon: CreditCard },
-];
+function buildNavItems(contactsBadge: number): NavItem[] {
+  return [
+    { href: "/empresa", label: "Triagens", icon: LayoutDashboard },
+    { href: "/empresa/vagas", label: "Vagas", icon: Briefcase },
+    { href: "/empresa/talentos", label: "Banco de talentos", icon: Users },
+    { href: "/empresa/contatos", label: "Contatos", icon: Handshake, badge: contactsBadge },
+    { href: "/empresa/billing", label: "Créditos", icon: CreditCard },
+  ];
+}
 
 // /empresa é prefixo de tudo, então o ativo do "Triagens" precisa ser explícito:
 // dashboard e a página de resultado de uma triagem (/empresa/triagem/*).
@@ -37,18 +41,23 @@ function itemActive(pathname: string, href: string): boolean {
 
 export function CompanyShell({
   companyName,
+  logoUrl,
   remaining,
+  contactsBadge = 0,
   children,
 }: {
   companyName: string;
+  logoUrl?: string | null;
   remaining: number;
+  contactsBadge?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const navItems = buildNavItems(contactsBadge);
 
   const navLinks = (onNavigate?: () => void) =>
-    NAV_ITEMS.map((item) => {
+    navItems.map((item) => {
       const active = itemActive(pathname, item.href);
       const Icon = item.icon;
       return (
@@ -66,7 +75,12 @@ export function CompanyShell({
             strokeWidth={1.75}
             className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-white" : "text-slate-400 group-hover:text-amber-400"}`}
           />
-          {item.label}
+          <span className="flex-1">{item.label}</span>
+          {item.badge ? (
+            <span className="shrink-0 rounded-full bg-amber-400 text-blue-950 text-[10px] font-bold px-1.5 py-0.5 min-w-[1.25rem] text-center">
+              {item.badge}
+            </span>
+          ) : null}
         </Link>
       );
     });
@@ -125,9 +139,23 @@ export function CompanyShell({
 
           <ThemeToggle className="hidden sm:inline-flex" />
 
-          <span className="hidden sm:block text-sm font-medium text-neutral-700 dark:text-neutral-200 truncate max-w-[12rem]">
-            {companyName}
-          </span>
+          <Link
+            href="/empresa/perfil"
+            className="hidden sm:flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors"
+            title="Perfil da empresa"
+          >
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt={companyName} className="h-7 w-7 rounded-full object-cover" />
+            ) : (
+              <span className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-xs font-semibold">
+                {companyName.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <span className="text-sm font-medium text-neutral-700 dark:text-neutral-200 truncate max-w-[10rem]">
+              {companyName}
+            </span>
+          </Link>
 
           <button
             type="button"

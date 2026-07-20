@@ -2,14 +2,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
+import { ScreeningResults, type ScreeningCandidate } from "@/components/screening-results";
 
 export const dynamic = "force-dynamic";
 
-function scoreColor(score: number): string {
-  if (score >= 70) return "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900";
-  if (score >= 40) return "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900";
-  return "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-900";
-}
+type CandidateStatus = ScreeningCandidate["status"];
 
 export default async function ScreeningResultPage({
   params,
@@ -27,6 +24,16 @@ export default async function ScreeningResultPage({
   });
 
   if (!job) notFound();
+
+  const candidates: ScreeningCandidate[] = job.candidates.map((c) => ({
+    id: c.id,
+    candidateName: c.candidateName,
+    fileName: c.fileName,
+    fitScore: c.fitScore,
+    reason: c.reason,
+    status: (c.status as CandidateStatus) ?? "none",
+    rawText: c.rawText,
+  }));
 
   return (
     <div>
@@ -50,33 +57,7 @@ export default async function ScreeningResultPage({
           </div>
         )}
 
-        <ol className="space-y-3">
-          {job.candidates.map((candidate, index) => (
-            <li
-              key={candidate.id}
-              className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-neutral-400">#{index + 1}</span>
-                    <h3 className="font-semibold truncate">{candidate.candidateName || candidate.fileName}</h3>
-                  </div>
-                  {candidate.reason && (
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 leading-relaxed">
-                      {candidate.reason}
-                    </p>
-                  )}
-                </div>
-                <span
-                  className={`shrink-0 rounded-full border px-3 py-1 text-sm font-bold ${scoreColor(candidate.fitScore)}`}
-                >
-                  {candidate.fitScore}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ol>
+        <ScreeningResults jobTitle={job.title} candidates={candidates} />
       </div>
     </div>
   );

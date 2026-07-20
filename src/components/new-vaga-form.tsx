@@ -11,6 +11,30 @@ export function NewVagaForm() {
   const [state, setState] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
+  async function generateDescription() {
+    if (!title.trim()) {
+      setError("Informe o cargo da vaga primeiro.");
+      return;
+    }
+    setGenerating(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/empresa/vagas/descricao", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, notes: description }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Não foi possível gerar agora.");
+      setDescription(data.description as string);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
+      setGenerating(false);
+    }
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -55,11 +79,21 @@ export function NewVagaForm() {
         />
       </div>
       <div>
-        <label className={labelClass}>Descrição da vaga</label>
+        <div className="flex items-center justify-between mb-1.5">
+          <label className="block text-sm font-medium">Descrição da vaga</label>
+          <button
+            type="button"
+            onClick={generateDescription}
+            disabled={generating}
+            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline disabled:opacity-50"
+          >
+            {generating ? "Gerando..." : "✨ Gerar com IA"}
+          </button>
+        </div>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Requisitos, responsabilidades e o perfil desejado."
+          placeholder="Requisitos, responsabilidades e o perfil desejado. Ou clique em Gerar com IA."
           rows={6}
           className={inputClass}
           maxLength={5000}

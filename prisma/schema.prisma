@@ -895,6 +895,8 @@ model CompanyCandidate {
   rawText       String
   fitScore      Int        @default(0)
   reason        String     @default("")
+  /// Ação da empresa sobre o candidato: none | favorite | approved | rejected.
+  status        String     @default("none")
   createdAt     DateTime   @default(now())
 
   @@index([jobId, fitScore])
@@ -912,6 +914,8 @@ model TalentContactRequest {
   jobTitle  String   @default("")
   message   String   @default("")
   status    String   @default("pending") // pending | accepted | declined
+  /// A empresa já viu que este pedido foi aceito? Zera o aviso in-app.
+  viewedByCompany Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

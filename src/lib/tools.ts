@@ -55,6 +55,36 @@ ${projectDescription}`;
   return runToolJsonPrompt<ProjectToExperienceResult>("project_to_experience", systemPrompt, userMessage);
 }
 
+// --- Gerar descrição de vaga (para empresas) ---
+
+export type JobDescriptionResult = { description: string };
+
+export async function generateJobDescription(
+  title: string,
+  notes: string
+): Promise<JobDescriptionResult> {
+  const systemPrompt = `Você é um especialista em recrutamento que escreve descrições de vaga claras e objetivas para empresas brasileiras.
+${BASE_RULES}
+A descrição deve ser pronta para publicar, em texto corrido com seções curtas (Responsabilidades, Requisitos, Diferenciais), sem markdown pesado, tom profissional e acolhedor. Não invente benefícios, salário ou nome de empresa que não foram informados.
+Formato de resposta:
+{
+  "description": string (a descrição completa da vaga, entre 600 e 1500 caracteres)
+}`;
+
+  const userMessage = `CARGO DA VAGA: ${title}
+
+OBSERVAÇÕES DA EMPRESA (opcional, use se houver): ${notes || "nenhuma"}`;
+
+  const result = await runToolJsonPrompt<JobDescriptionResult>(
+    "job_description",
+    systemPrompt,
+    userMessage,
+    0.4,
+    1200
+  );
+  return { description: asText(result?.description) };
+}
+
 // --- Vocação de carreira ---
 
 export type VocationAnswers = {
