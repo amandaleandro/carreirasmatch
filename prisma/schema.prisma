@@ -918,6 +918,10 @@ model TalentContactRequest {
   status    String   @default("pending") // pending | accepted | declined
   /// A empresa já viu que este pedido foi aceito? Zera o aviso in-app.
   viewedByCompany Boolean @default(false)
+  /// Anotação interna da empresa sobre este contato.
+  note      String   @default("")
+  /// Entrevista agendada pela empresa (quando o contato foi liberado).
+  interviewAt DateTime?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

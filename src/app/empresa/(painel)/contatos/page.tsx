@@ -1,6 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { ExportContactsButton } from "@/components/export-contacts-button";
+import { ContactManage } from "@/components/contact-manage";
+
+function formatInterview(date: Date): string {
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "long",
+    timeStyle: "short",
+    timeZone: "America/Sao_Paulo",
+  }).format(date);
+}
 
 export const dynamic = "force-dynamic";
 
@@ -89,10 +98,20 @@ export default async function CompanyContactsPage() {
                             {r.user.phone && <p>{r.user.phone}</p>}
                           </div>
                         </div>
-                        <span className="shrink-0 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                          Liberado ✓
-                        </span>
+                        <div className="shrink-0 text-right">
+                          <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">Liberado ✓</span>
+                          {r.interviewAt && (
+                            <p className="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                              📅 {formatInterview(r.interviewAt)}
+                            </p>
+                          )}
+                        </div>
                       </div>
+                      <ContactManage
+                        contactId={r.id}
+                        initialNote={r.note}
+                        initialInterviewAt={r.interviewAt ? r.interviewAt.toISOString() : null}
+                      />
                     </li>
                   ))}
                 </ul>

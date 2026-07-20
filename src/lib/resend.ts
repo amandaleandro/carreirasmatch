@@ -249,6 +249,26 @@ export async function sendCompanyContactAcceptedEmail(
   );
 }
 
+/** Avisa o candidato que a empresa agendou uma entrevista. */
+export async function sendInterviewScheduledEmail(
+  to: string,
+  opts: { companyName: string; whenText: string; note?: string }
+) {
+  const noteHtml = opts.note?.trim()
+    ? `<p style="background:#f1f5f9;border-radius:10px;padding:12px;">${opts.note.trim()}</p>`
+    : "";
+  await send(
+    to,
+    `${opts.companyName} agendou uma entrevista com você`,
+    `
+      <h2 style="font-size: 20px;">Entrevista agendada 📅</h2>
+      <p><strong>${opts.companyName}</strong> agendou uma entrevista com você para <strong>${opts.whenText}</strong>.</p>
+      ${noteHtml}
+      <p>Fique atento(a) ao seu e-mail e telefone: a empresa pode entrar em contato com mais detalhes.</p>
+    `
+  );
+}
+
 export async function sendPaymentConfirmationEmail(
   to: string,
   opts: { kind: string; amountCents: number }
