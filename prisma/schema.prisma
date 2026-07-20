@@ -52,6 +52,19 @@ model User {
   contactRequests    TalentContactRequest[]
   companyJobApplications CompanyJobApplication[]
 
+  // Marketplace freelancer. Um mesmo User pode ser freelancer (freelancerProfile,
+  // propostas) e/ou contratante (projetos que publicou).
+  freelancerProfile      FreelancerProfile?
+  freelanceProjects      FreelanceProject[]  @relation("ClientProjects")
+  freelanceProposals     FreelanceProposal[] @relation("FreelancerProposals")
+  freelanceClientContracts     FreelanceContract[] @relation("ClientContracts")
+  freelanceFreelancerContracts FreelanceContract[] @relation("FreelancerContracts")
+  freelanceReviewsWritten  FreelanceReview[]  @relation("ReviewAuthor")
+  freelanceReviewsReceived FreelanceReview[]  @relation("ReviewTarget")
+  freelanceClientThreads       FreelanceThread[] @relation("ClientThreads")
+  freelanceFreelancerThreads   FreelanceThread[] @relation("FreelancerThreads")
+  freelanceMessagesSent    FreelanceMessage[] @relation("FreelanceMessageSender")
+
   /// Cupom usado no cadastro (link de indicação ou campo manual). Serve para o
   /// influenciador dono do cupom rastrear quem se cadastrou por indicação dele.
   signupCouponId     String?
@@ -978,4 +991,167 @@ model TalentContactRequest {
   @@unique([companyId, userId])
   @@index([userId, status])
   @@index([companyId, status])
+}
+
+// ---------------------------------------------------------------------------
+// Marketplace freelancer. Paralelo ao fluxo de emprego (Company/CompanyVaga),
+// mas 100% entre usuários comuns: qualquer User pode virar freelancer e/ou
+// contratar. Grátis por enquanto — o contrato registra o acordo para habilitar
+// entrega e avaliações, sem movimentar dinheiro (escrow fica para depois).
+// ---------------------------------------------------------------------------
+
+/// Perfil de freelancer de um usuário (opt-in). Um por User. Guarda a vitrine
+/// (skills, portfólio, valor) e as métricas de reputação, atualizadas quando
+/// uma avaliação é criada.
+model FreelancerProfile {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline      String   @default("")
+  bio           String   @default("")
+  category      String   @default("")
+  /// JSON string[] de habilidades.
+  skills        String   @default("[]")
+  /// Valor/hora em centavos. null = "a combinar".
+  hourlyRateCents Int?
+  /// JSON de { title, url, imageUrl, description }[].
+  portfolio     String   @default("[]")
+  /// Aceitando novos projetos? Controla visibilidade na vitrine.
+  available     Boolean  @default(true)
+  published     Boolean  @default(false)
+  /// Reputação desnormalizada a partir de FreelanceReview (direção → freelancer).
+  ratingSum     Int      @default(0)
+  ratingCount   Int      @default(0)
+  completedCount Int     @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([published, available, category])
+}
+
+/// Projeto publicado por um contratante (User). O ciclo é
+/// open → (proposta aceita) in_progress → completed | cancelled.
+model FreelanceProject {
+  id            String   @id @default(cuid())
+  clientUserId  String
+  client        User     @relation("ClientProjects", fields: [clientUserId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  category      String   @default("")
+  /// JSON string[] de habilidades desejadas.
+  skills        String   @default("[]")
+  /// "fixed" | "hourly".
+  budgetType    String   @default("fixed")
+  budgetMinCents Int?
+  budgetMaxCents Int?
+  workModel     String   @default("remoto") // remoto | presencial | hibrido
+  deadline      DateTime?
+  status        String   @default("open") // open | in_progress | completed | cancelled
+  proposalCount Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  proposals     FreelanceProposal[]
+  contract      FreelanceContract?
+  threads       FreelanceThread[]
+
+  @@index([status, createdAt])
+  @@index([status, category, createdAt])
+  @@index([clientUserId, createdAt])
+}
+
+/// Proposta de um freelancer a um projeto. Um freelancer só propõe uma vez por
+/// projeto.
+model FreelanceProposal {
+  id              String   @id @default(cuid())
+  projectId       String
+  project         FreelanceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  freelancerUserId String
+  freelancer      User     @relation("FreelancerProposals", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  coverLetter     String
+  bidCents        Int
+  estimatedDays   Int?
+  status          String   @default("pending") // pending | accepted | rejected | withdrawn
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  contract        FreelanceContract?
+
+  @@unique([projectId, freelancerUserId])
+  @@index([freelancerUserId, status])
+  @@index([projectId, createdAt])
+}
+
+/// Acordo criado quando uma proposta é aceita. Um por projeto. Habilita a
+/// entrega e as avaliações mútuas. Sem pagamento real por enquanto.
+model FreelanceContract {
+  id               String   @id @default(cuid())
+  projectId        String   @unique
+  project          FreelanceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  proposalId       String   @unique
+  proposal         FreelanceProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  clientUserId     String
+  client           User     @relation("ClientContracts", fields: [clientUserId], references: [id], onDelete: Cascade)
+  freelancerUserId String
+  freelancer       User     @relation("FreelancerContracts", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  agreedCents      Int
+  status           String   @default("active") // active | delivered | completed | cancelled
+  deliveredAt      DateTime?
+  completedAt      DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  reviews          FreelanceReview[]
+
+  @@index([clientUserId, status])
+  @@index([freelancerUserId, status])
+}
+
+/// Avaliação mútua após a conclusão de um contrato. Cada parte avalia a outra
+/// uma vez. `direction` diz de que lado veio.
+model FreelanceReview {
+  id           String   @id @default(cuid())
+  contractId   String
+  contract     FreelanceContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  authorUserId String
+  author       User     @relation("ReviewAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  targetUserId String
+  target       User     @relation("ReviewTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  direction    String   // client_to_freelancer | freelancer_to_client
+  rating       Int      // 1-5
+  comment      String   @default("")
+  createdAt    DateTime @default(now())
+
+  @@unique([contractId, authorUserId])
+  @@index([targetUserId, createdAt])
+}
+
+/// Conversa entre o contratante e um freelancer no contexto de um projeto.
+model FreelanceThread {
+  id               String   @id @default(cuid())
+  projectId        String
+  project          FreelanceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientUserId     String
+  client           User     @relation("ClientThreads", fields: [clientUserId], references: [id], onDelete: Cascade)
+  freelancerUserId String
+  freelancer       User     @relation("FreelancerThreads", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  lastMessageAt    DateTime @default(now())
+  createdAt        DateTime @default(now())
+  messages         FreelanceMessage[]
+
+  @@unique([projectId, freelancerUserId])
+  @@index([clientUserId, lastMessageAt])
+  @@index([freelancerUserId, lastMessageAt])
+}
+
+/// Mensagem dentro de uma FreelanceThread.
+model FreelanceMessage {
+  id           String   @id @default(cuid())
+  threadId     String
+  thread       FreelanceThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderUserId String
+  sender       User     @relation("FreelanceMessageSender", fields: [senderUserId], references: [id], onDelete: Cascade)
+  body         String
+  readByClient Boolean  @default(false)
+  readByFreelancer Boolean @default(false)
+  createdAt    DateTime @default(now())
+
+  @@index([threadId, createdAt])
 }

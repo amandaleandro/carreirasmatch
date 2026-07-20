@@ -11,7 +11,8 @@ import Link from "next/link";
  */
 const NAV_LINKS: { href: string; label: string; show: string }[] = [
   { href: "/vagas-de-hoje", label: "Vagas de hoje", show: "" },
-  { href: "/blog", label: "Blog", show: "" },
+  { href: "/freelancers", label: "Freelancers", show: "" },
+  { href: "/blog", label: "Blog", show: "hidden sm:inline" },
   { href: "/gratuito", label: "Ferramentas grátis", show: "hidden sm:inline" },
   { href: "/comece", label: "Como funciona", show: "hidden md:inline" },
 ];

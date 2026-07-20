@@ -20,6 +20,8 @@ const PUBLIC_PATHS = [
   "/como-fazer-curriculo",
   "/curriculo-sem-experiencia",
   "/vagas-de-hoje",
+  "/freelancers",
+  "/projetos",
   "/todas-as-vagas",
   "/vagas-publicas",
   "/cursos-gratuitos",
