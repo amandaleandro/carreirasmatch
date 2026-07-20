@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
+import { sendCompanyNewApplicationEmail } from "@/lib/resend";
 
 // Candidato se candidata a uma vaga de empresa publicada no feed.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -15,7 +16,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const vaga = await prisma.companyVaga.findFirst({
     where: { id, publishedToFeed: true, status: "open" },
-    select: { id: true },
+    select: { id: true, title: true, companyId: true },
   });
   if (!vaga) {
     return NextResponse.json({ error: "Vaga indisponível." }, { status: 404 });
@@ -29,11 +30,27 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     // corpo opcional
   }
 
+  // Só avisa a empresa se for uma candidatura nova (não em reenvios/edições).
+  const already = await prisma.companyJobApplication.findUnique({
+    where: { vagaId_userId: { vagaId: vaga.id, userId: session.user.id } },
+    select: { id: true },
+  });
+
   await prisma.companyJobApplication.upsert({
     where: { vagaId_userId: { vagaId: vaga.id, userId: session.user.id } },
     create: { vagaId: vaga.id, userId: session.user.id, message },
     update: message ? { message } : {},
   });
+
+  if (!already) {
+    const owners = await prisma.companyMember.findMany({
+      where: { companyId: vaga.companyId, role: "owner" },
+      select: { email: true },
+    });
+    const emails = owners.map((o) => o.email).filter(Boolean);
+    const candidateName = session.user.name?.trim() || "Um candidato";
+    void sendCompanyNewApplicationEmail(emails, { candidateName, vagaTitle: vaga.title, vagaId: vaga.id });
+  }
 
   return NextResponse.json({ ok: true });
 }

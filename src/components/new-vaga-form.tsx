@@ -9,6 +9,7 @@ export function NewVagaForm() {
   const [description, setDescription] = useState("");
   const [area, setArea] = useState("");
   const [state, setState] = useState("");
+  const [publishToFeed, setPublishToFeed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -48,7 +49,7 @@ export function NewVagaForm() {
       const res = await fetch("/api/empresa/vagas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, area, state }),
+        body: JSON.stringify({ title, description, area, state, publishedToFeed: publishToFeed }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao cadastrar a vaga.");
@@ -109,6 +110,22 @@ export function NewVagaForm() {
           <input type="text" value={state} onChange={(e) => setState(e.target.value.toUpperCase())} maxLength={2} className={inputClass} />
         </div>
       </div>
+
+      <label className="flex items-start gap-3 rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={publishToFeed}
+          onChange={(e) => setPublishToFeed(e.target.checked)}
+          className="mt-0.5 accent-blue-600"
+        />
+        <span>
+          <span className="text-sm font-medium">Publicar no feed de vagas</span>
+          <span className="block text-xs text-neutral-500">
+            A vaga aparece para os candidatos no feed público e eles podem se candidatar. Você pode
+            mudar isso depois.
+          </span>
+        </span>
+      </label>
 
       {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
 

@@ -249,6 +249,26 @@ export async function sendCompanyContactAcceptedEmail(
   );
 }
 
+/** Avisa a empresa que um candidato se candidatou a uma vaga publicada no feed. */
+export async function sendCompanyNewApplicationEmail(
+  to: string[],
+  opts: { candidateName: string; vagaTitle: string; vagaId: string }
+) {
+  if (to.length === 0) return;
+  for (const recipient of to) {
+    await send(
+      recipient,
+      `Nova candidatura: ${opts.vagaTitle}`,
+      `
+        <h2 style="font-size: 20px;">Nova candidatura 🎯</h2>
+        <p><strong>${opts.candidateName}</strong> se candidatou à sua vaga <strong>${opts.vagaTitle}</strong>.</p>
+        <p>Veja os dados de contato do candidato na sua vaga:</p>
+        ${button(`${APP_URL}/empresa/vagas/${opts.vagaId}`, "Ver candidatura")}
+      `
+    );
+  }
+}
+
 /** Convida um novo membro da equipe da empresa, com a senha temporária. */
 export async function sendCompanyMemberInviteEmail(
   to: string,
