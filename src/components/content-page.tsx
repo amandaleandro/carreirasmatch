@@ -11,6 +11,7 @@ export function ContentPage({
   wide = false,
   backHref,
   backLabel,
+  hideNav = false,
   children,
 }: {
   eyebrow: string;
@@ -21,6 +22,8 @@ export function ContentPage({
   /** Optional secondary link (e.g. "← Voltar") shown next to the logo instead of "Entrar". */
   backHref?: string;
   backLabel?: string;
+  /** Hides the full public navigation, leaving only the logo and the back/entrar link. */
+  hideNav?: boolean;
   children: ReactNode;
 }) {
   const maxWidthClassName = wide ? "max-w-4xl" : "max-w-3xl";
@@ -32,7 +35,7 @@ export function ContentPage({
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
-          <PublicNav onDark />
+          {!hideNav && <PublicNav onDark />}
           <div className="flex items-center gap-2">
             <Link
               href={backHref ?? "/login"}

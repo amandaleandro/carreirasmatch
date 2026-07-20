@@ -102,6 +102,9 @@ export function FreeResumeBuilder() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-8 pb-14">
+        <Link href="/gratuito" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+          ← Voltar para recursos gratuitos
+        </Link>
         <section className="py-8 md:py-12 grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 items-start">
           <div className="space-y-6">
             <div>

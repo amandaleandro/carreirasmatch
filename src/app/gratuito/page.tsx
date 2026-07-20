@@ -25,6 +25,9 @@ export default function FreeResourcesPage() {
       title="Recursos práticos para conseguir emprego."
       description="Currículo, análise de vaga e teste vocacional básico abrem sem cadastro. As outras ferramentas pedem apenas uma conta gratuita, sem cartão."
       wide
+      hideNav
+      backHref="/"
+      backLabel="← Voltar"
     >
       <ResourceSection title="Sem cadastro" subtitle="Abra e use agora.">
         {EXTRAS.map((item) => <ResourceCard key={item.href} {...item} label="Sem cadastro" />)}

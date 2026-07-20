@@ -422,6 +422,9 @@ export function AnalyzeVagaPage({
 
   return (
     <div className="px-4 md:px-8 py-7 max-w-[1240px] mx-auto w-full space-y-6">
+      <a href="/gratuito" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+        ← Voltar para recursos gratuitos
+      </a>
       {/* Top Banner and Header */}
       <div className="relative overflow-hidden rounded-3xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eef5ff_48%,#fff7ed_100%)] px-5 py-6 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#081225_0%,#0f1f3f_52%,#1b1730_100%)] md:px-7 md:py-7">
         <div className="absolute inset-y-0 right-0 hidden w-2/5 bg-[radial-gradient(circle_at_70%_35%,rgba(37,99,235,0.18),transparent_34%),radial-gradient(circle_at_50%_82%,rgba(245,158,11,0.16),transparent_32%)] lg:block" />
