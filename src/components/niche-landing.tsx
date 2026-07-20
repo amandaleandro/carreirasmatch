@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
-import { PublicNav } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 import type { CareerTrack } from "@/components/analysis-display";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
@@ -822,7 +821,6 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
-          <PublicNav onDark />
           <div className="flex items-center gap-2">
             <Link
               href="/login"
