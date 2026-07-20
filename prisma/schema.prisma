@@ -50,6 +50,7 @@ model User {
   jobAlerts          JobAlert[]
   opportunityReports OpportunityReport[]
   contactRequests    TalentContactRequest[]
+  companyJobApplications CompanyJobApplication[]
 
   /// Cupom usado no cadastro (link de indicação ou campo manual). Serve para o
   /// influenciador dono do cupom rastrear quem se cadastrou por indicação dele.
@@ -863,10 +864,30 @@ model CompanyVaga {
   /// O status do contato e o contato em si são resolvidos ao vivo na leitura.
   matchesJson   String    @default("")
   lastMatchedAt DateTime?
+  /// Publicada no feed público de vagas? Quando true, existe um Job espelho.
+  publishedToFeed Boolean @default(false)
+  /// Id do Job (feed) espelho desta vaga, quando publicada.
+  feedJobId     String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  applications  CompanyJobApplication[]
 
   @@index([companyId, createdAt])
+}
+
+/// Candidatura de um candidato a uma vaga de empresa publicada no feed.
+model CompanyJobApplication {
+  id        String      @id @default(cuid())
+  vagaId    String
+  vaga      CompanyVaga @relation(fields: [vagaId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String      @default("")
+  status    String      @default("new") // new | reviewed
+  createdAt DateTime    @default(now())
+
+  @@unique([vagaId, userId])
+  @@index([vagaId, createdAt])
 }
 
 /// Pagamento de empresa (compra de pacote de créditos de triagem). Espelha o

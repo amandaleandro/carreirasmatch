@@ -4,24 +4,40 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export function VagaActions({ vagaId, status }: { vagaId: string; status: string }) {
+export function VagaActions({
+  vagaId,
+  status,
+  publishedToFeed,
+}: {
+  vagaId: string;
+  status: string;
+  publishedToFeed: boolean;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const isOpen = status !== "closed";
 
-  async function toggleStatus() {
+  async function patch(payload: Record<string, unknown>) {
     setBusy(true);
     try {
       const res = await fetch(`/api/empresa/vagas/${vagaId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: isOpen ? "closed" : "open" }),
+        body: JSON.stringify(payload),
       });
       if (!res.ok) throw new Error();
       router.refresh();
     } catch {
       setBusy(false);
     }
+  }
+
+  async function toggleStatus() {
+    await patch({ status: isOpen ? "closed" : "open" });
+  }
+
+  async function toggleFeed() {
+    await patch({ publishedToFeed: !publishedToFeed });
   }
 
   async function duplicate() {
@@ -58,6 +74,19 @@ export function VagaActions({ vagaId, status }: { vagaId: string; status: string
       >
         Editar
       </Link>
+      <button
+        type="button"
+        onClick={toggleFeed}
+        disabled={busy || (!publishedToFeed && !isOpen)}
+        title={!publishedToFeed && !isOpen ? "Reabra a vaga para publicar" : undefined}
+        className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50 ${
+          publishedToFeed
+            ? "border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+        }`}
+      >
+        {publishedToFeed ? "Tirar do feed" : "Publicar no feed"}
+      </button>
       <button
         type="button"
         onClick={toggleStatus}
