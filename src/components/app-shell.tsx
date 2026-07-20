@@ -18,9 +18,11 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
 
   // Sessão de empresa não usa o shell de candidato (sidebar/topbar): as páginas
   // de /empresa carregam o próprio header, e o resto do app redireciona empresa
-  // para /empresa no middleware.
+  // para /empresa no middleware. data-authenticated ainda precisa ir junto, senão
+  // o header público de "Entrar / Criar conta" aparece nas páginas de conteúdo
+  // público (blog, vagas públicas) mesmo com a empresa logada.
   if (session.user.accountType === "company") {
-    return <>{children}</>;
+    return <div data-authenticated>{children}</div>;
   }
 
   const dbUser = session.user.id
