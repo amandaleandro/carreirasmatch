@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
-import { BrandLogo } from "@/components/brand-logo";
-import { CompanyLogoutButton } from "@/components/company-logout-button";
 
 export const dynamic = "force-dynamic";
 
@@ -19,19 +17,7 @@ export default async function CompanyDashboardPage() {
   const remaining = freeRemaining + company.screeningCredits;
 
   return (
-    <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
-      <header className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
-        <div className="max-w-4xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between">
-          <Link href="/empresa">
-            <BrandLogo heightClassName="h-11 sm:h-12" />
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-neutral-600 dark:text-neutral-400 hidden sm:inline">{company.name}</span>
-            <CompanyLogoutButton />
-          </div>
-        </div>
-      </header>
-
+    <main>
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-10 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>

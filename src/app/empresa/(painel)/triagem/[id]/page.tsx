@@ -29,7 +29,7 @@ export default async function ScreeningResultPage({
   if (!job) notFound();
 
   return (
-    <main className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
+    <main>
       <div className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
         <Link href="/empresa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
           ← Voltar

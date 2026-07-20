@@ -16,6 +16,13 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  // Sessão de empresa não usa o shell de candidato (sidebar/topbar): as páginas
+  // de /empresa carregam o próprio header, e o resto do app redireciona empresa
+  // para /empresa no middleware.
+  if (session.user.accountType === "company") {
+    return <>{children}</>;
+  }
+
   const dbUser = session.user.id
     ? await prisma.user.findUnique({
         where: { id: session.user.id },

@@ -85,6 +85,10 @@ export const authConfig: NextAuthConfig = {
         return NextResponse.redirect(new URL("/empresa/login", request.nextUrl));
       }
 
+      // Sessão de empresa não navega na área de candidato: qualquer rota
+      // protegida fora de /empresa volta para o painel da empresa.
+      const isCompany = auth?.user?.accountType === "company";
+
       const isPublic =
         pathname === "/" ||
         pathname === "/tools" ||
@@ -93,6 +97,7 @@ export const authConfig: NextAuthConfig = {
         isFreeTool(pathname) ||
         PUBLIC_PATHS.some((p) => pathname.startsWith(p));
       if (isPublic) return true;
+      if (isCompany) return NextResponse.redirect(new URL("/empresa", request.nextUrl));
       return isLoggedIn;
     },
   },
