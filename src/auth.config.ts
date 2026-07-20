@@ -29,6 +29,7 @@ const PUBLIC_PATHS = [
   "/mercado-de-trabalho",
   "/parceiros",
   "/vagas",
+  "/empresas",
   "/analise",
   "/tools/vocation-test",
   "/tools/concurso",

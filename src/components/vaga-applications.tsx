@@ -47,6 +47,7 @@ function toCsv(apps: VagaApplication[]): string {
 
 export function VagaApplications({ applications: initial }: { applications: VagaApplication[] }) {
   const [apps, setApps] = useState<VagaApplication[]>(initial);
+  const [view, setView] = useState<"list" | "board">("list");
 
   async function patch(id: string, payload: { status?: string; note?: string }) {
     try {
@@ -81,10 +82,23 @@ export function VagaApplications({ applications: initial }: { applications: Vaga
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-sm text-neutral-500">
-          {apps.length} {apps.length === 1 ? "candidatura" : "candidaturas"}
-        </p>
+      <div className="flex items-center justify-between gap-4 flex-wrap">
+        <div className="inline-flex rounded-lg border border-neutral-200 dark:border-neutral-800 p-0.5">
+          <button
+            type="button"
+            onClick={() => setView("list")}
+            className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${view === "list" ? "bg-blue-600 text-white" : "text-neutral-600 dark:text-neutral-300"}`}
+          >
+            Lista
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("board")}
+            className={`rounded-md px-3 py-1 text-sm font-medium transition-colors ${view === "board" ? "bg-blue-600 text-white" : "text-neutral-600 dark:text-neutral-300"}`}
+          >
+            Quadro
+          </button>
+        </div>
         <button
           type="button"
           onClick={exportCsv}
@@ -94,6 +108,39 @@ export function VagaApplications({ applications: initial }: { applications: Vaga
         </button>
       </div>
 
+      {view === "board" ? (
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          {APPLICATION_STATUSES.map((col) => {
+            const colApps = apps.filter((a) => a.status === col.value);
+            return (
+              <div key={col.value} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/40 p-3 min-w-0">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">{col.label}</span>
+                  <span className="text-xs text-neutral-400">{colApps.length}</span>
+                </div>
+                <div className="space-y-2">
+                  {colApps.map((a) => (
+                    <div key={a.id} className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3">
+                      <p className="font-semibold text-sm truncate">{a.name || "Candidato"}</p>
+                      {a.area && <p className="text-xs text-neutral-500 truncate">{a.area}</p>}
+                      {a.email && <p className="text-xs text-neutral-500 truncate">{a.email}</p>}
+                      <select
+                        value={a.status}
+                        onChange={(e) => setStatus(a.id, e.target.value)}
+                        className="mt-2 w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-2 py-1 text-xs outline-none focus:border-blue-500"
+                      >
+                        {APPLICATION_STATUSES.map((s) => (
+                          <option key={s.value} value={s.value}>Mover para: {s.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
       <ul className="space-y-3">
         {apps.map((a) => (
           <li key={a.id} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5">
@@ -138,6 +185,7 @@ export function VagaApplications({ applications: initial }: { applications: Vaga
           </li>
         ))}
       </ul>
+      )}
     </div>
   );
 }

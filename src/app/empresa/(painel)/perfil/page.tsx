@@ -1,5 +1,6 @@
 import { requireCompanyPage } from "@/lib/company-auth";
 import { CompanyProfileForm } from "@/components/company-profile-form";
+import { CompanyPublicProfileForm } from "@/components/company-public-profile-form";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +29,12 @@ export default async function CompanyProfilePage() {
             name: session.user.name ?? "",
             email: session.user.email ?? "",
           }}
+        />
+
+        <CompanyPublicProfileForm
+          publicProfile={company.publicProfile}
+          description={company.description}
+          slug={company.slug}
         />
       </div>
     </div>

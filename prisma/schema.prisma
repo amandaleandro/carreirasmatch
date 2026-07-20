@@ -819,6 +819,10 @@ model Company {
   screeningCount Int          @default(0)
   /// Créditos de triagem comprados; consumidos quando o teto gratuito acaba.
   screeningCredits Int        @default(0)
+  /// Página pública da empresa (marca empregadora). slug único quando ativa.
+  slug           String?      @unique
+  publicProfile  Boolean      @default(false)
+  description    String       @default("")
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   jobs           CompanyJob[]
