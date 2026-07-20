@@ -38,6 +38,7 @@ export default async function AnalisePage() {
       lockedTrack={lockedTrack}
       allowedTracks={allowedTracks}
       careerSegmentLabel={careerSegmentLabel}
+      isAuthenticated={Boolean(userId)}
     />
   );
 }
