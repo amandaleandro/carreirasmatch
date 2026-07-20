@@ -8,6 +8,7 @@ import {
   sendJobAlertEmail,
   sendDiagnosticUpgradeEmail,
   sendCheckoutRecoveryEmail,
+  sendConvertToSubscriptionEmail,
 } from "@/lib/resend";
 
 // O scheduler roda algumas vezes ao dia; a idempotência (sendOnce + EmailLog)
@@ -137,6 +138,60 @@ async function sendLeadFollowUps(now: Date): Promise<void> {
   }
 }
 
+/**
+ * Empurrão de conversão para o lead mais quente: fez o cadastro, já rodou ao
+ * menos uma análise (provou o produto) entre 4 e 7 dias atrás, mas não comprou
+ * nada nem tem assinatura ativa. É o estado que nenhum outro e-mail cobre — o
+ * onboarding_nudge só fala com quem NÃO analisou. Uma vez por usuário.
+ *
+ * Piso de data: só consideramos análises a partir de CONVERT_EMAIL_START para
+ * não disparar de uma vez para toda a base acumulada na primeira execução em
+ * produção. O funil pega os que entrarem no estado a partir daqui.
+ */
+const CONVERT_EMAIL_START = new Date("2026-07-20T00:00:00Z");
+
+async function sendConvertToSubscriptionEmails(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 7 * DAY_MS);
+  const from = windowStart > CONVERT_EMAIL_START ? windowStart : CONVERT_EMAIL_START;
+  const to = new Date(now.getTime() - 4 * DAY_MS);
+  if (from > to) return;
+
+  // Usuários com análise na janela. `distinct` evita repetir quem analisou várias
+  // vezes; o sendOnce (keyed por userId) é a trava final de "uma vez por pessoa".
+  const analyses = await prisma.analysis.findMany({
+    where: {
+      createdAt: { gte: from, lte: to },
+      resume: { user: { email: { not: null } } },
+    },
+    select: { resume: { select: { userId: true } } },
+    distinct: ["resumeId"],
+  });
+
+  const seen = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || seen.has(userId)) continue;
+    seen.add(userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        name: true,
+        careerSegment: true,
+        subscription: { select: { status: true } },
+        _count: { select: { payments: { where: { status: "paid" } } } },
+      },
+    });
+    // Já converteu (assinou ou pagou qualquer coisa): sai do funil.
+    if (!user?.email || user.subscription?.status === "active" || user._count.payments > 0) continue;
+
+    await sendOnce("convert_to_subscription", userId, user.email, () =>
+      sendConvertToSubscriptionEmail(user.email!, { name: user.name, segment: user.careerSegment })
+    );
+  }
+}
+
 async function sendJobAlerts(now: Date): Promise<void> {
   const alerts = await prisma.jobAlert.findMany({
     where: { active: true, user: { email: { not: null } } },
@@ -227,6 +282,7 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["onboarding_nudges", () => sendOnboardingNudges(now)],
     ["lead_followups", () => sendLeadFollowUps(now)],
     ["diagnostic_upgrades", () => sendDiagnosticUpgradeEmails(now)],
+    ["convert_to_subscription", () => sendConvertToSubscriptionEmails(now)],
     ["checkout_recovery", () => sendCheckoutRecoveryEmails(now)],
     ["job_alerts", () => sendJobAlerts(now)],
   ];

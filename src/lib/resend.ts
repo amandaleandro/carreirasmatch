@@ -492,6 +492,27 @@ export async function sendOnboardingNudgeEmail(
   );
 }
 
+export async function sendConvertToSubscriptionEmail(
+  to: string,
+  opts: { name?: string | null; segment?: string | null }
+) {
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  const href = opts.segment?.trim()
+    ? `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment.trim())}`
+    : `${APP_URL}/assinar`;
+  await send(
+    to,
+    "Você já sabe seu score. Falta o plano de ação.",
+    `
+      <h2 style="font-size: 20px;">${greeting}</h2>
+      <p>Você analisou seu currículo no ${BRAND} e viu onde está sua aderência. Esse é o diagnóstico, a parte que dói. A parte que resolve é o que vem depois.</p>
+      <p>Com o plano você transforma aquele score em ação: currículo reescrito ponto a ponto, simulação de entrevista para aquela vaga, e uma nova análise a cada oportunidade que aparecer, porque cada vaga pede um ajuste diferente.</p>
+      ${button(href, "Ver o que muda com o plano")}
+      <p>Sem fidelidade, cancela quando quiser. E se faltou algo para você decidir, é só responder este e-mail.</p>
+    `
+  );
+}
+
 export async function sendJobAlertEmail(
   to: string,
   opts: { query: string; location: string; jobs: Array<{ title: string; url: string; source: string }> }
