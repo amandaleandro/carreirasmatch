@@ -77,27 +77,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = user.id;
-        const accountType = (user as { accountType?: "company" }).accountType;
-        if (accountType === "company") {
-          token.accountType = "company";
-          token.companyId = user.id;
-        } else {
-          token.accountType = "candidate";
-          token.companyId = undefined;
-        }
-      }
-      return token;
-    },
-    async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
-        session.user.accountType = (token.accountType as "candidate" | "company") ?? "candidate";
-        session.user.companyId = token.companyId as string | undefined;
-      }
-      return session;
-    },
   },
 });

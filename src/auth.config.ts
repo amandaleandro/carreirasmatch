@@ -48,6 +48,32 @@ export const authConfig: NextAuthConfig = {
   },
   providers: [],
   callbacks: {
+    // jwt/session precisam viver aqui (e não só em auth.ts): o proxy.ts cria
+    // uma instância separada do NextAuth só com este config, e sem eles o
+    // middleware não enxerga o accountType — toda sessão de empresa era
+    // devolvida para /empresa/login.
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        const accountType = (user as { accountType?: "company" }).accountType;
+        if (accountType === "company") {
+          token.accountType = "company";
+          token.companyId = user.id;
+        } else {
+          token.accountType = "candidate";
+          token.companyId = undefined;
+        }
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token.id) {
+        session.user.id = token.id as string;
+        session.user.accountType = (token.accountType as "candidate" | "company") ?? "candidate";
+        session.user.companyId = token.companyId as string | undefined;
+      }
+      return session;
+    },
     authorized({ auth, request }) {
       const isLoggedIn = Boolean(auth?.user);
       const pathname = request.nextUrl.pathname;
