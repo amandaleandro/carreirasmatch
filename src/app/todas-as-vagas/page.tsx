@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { AllJobsList } from "@/app/feed/AllJobsList";
+import { Pagination } from "@/components/Pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -14,23 +14,26 @@ export const metadata: Metadata = {
     "Explore todas as vagas coletadas pelo CarreirasMatch. Crie sua conta grátis para ver a lista completa e receber as vagas que combinam com você.",
 };
 
-/** Quantas vagas o visitante deslogado consegue "espiar" antes do bloqueio. */
 const PREVIEW_VISIBLE = 6;
-/** Cards borrados atrás do overlay, só para dar a sensação de que há mais. */
 const PREVIEW_TEASER = 3;
+const PAGE_SIZE = 20;
 
-export default async function AllJobsPage() {
+export default async function AllJobsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
   const session = await auth();
-
-  // Quem já tem conta vai direto para o feed real (personalizado quando há currículo).
-  if (session?.user?.id) redirect("/feed");
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
 
   const [totalJobs, jobs] = await Promise.all([
     prisma.job.count({ where: { active: true } }),
     prisma.job.findMany({
       where: { active: true },
       orderBy: { createdAt: "desc" },
-      take: PREVIEW_VISIBLE + PREVIEW_TEASER,
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
       select: {
         id: true,
         jobTitle: true,
@@ -42,8 +45,30 @@ export default async function AllJobsPage() {
     }),
   ]);
 
+  const totalPages = Math.ceil(totalJobs / PAGE_SIZE);
+
+  if (session?.user?.id) {
+    // Logado: exibe a interface interna completa sem filtros/desfoques
+    return (
+      <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Todas as vagas</h1>
+          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
+            Lista completa de todas as vagas ativas no banco de dados, sem filtros de perfil.
+          </p>
+        </div>
+        <p className="text-sm text-neutral-500">{totalJobs} vaga(s) disponível(is).</p>
+        <AllJobsList jobs={jobs} />
+        <div className="mt-6">
+          <Pagination page={page} totalPages={totalPages} basePath="/todas-as-vagas" />
+        </div>
+      </div>
+    );
+  }
+
+  // Visitante deslogado: mostra preview e convite para criar conta
   const visible = jobs.slice(0, PREVIEW_VISIBLE);
-  const teaser = jobs.slice(PREVIEW_VISIBLE);
+  const teaser = jobs.slice(PREVIEW_VISIBLE, PREVIEW_VISIBLE + PREVIEW_TEASER);
   const remaining = Math.max(0, totalJobs - visible.length);
 
   return (

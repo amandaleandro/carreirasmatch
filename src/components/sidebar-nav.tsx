@@ -22,6 +22,7 @@ import {
   GraduationCap,
   Landmark,
   ScrollText,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -37,6 +38,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
   { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
+  { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
   { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
   { href: "/profile", label: "Sugestões de Melhoria", icon: Sparkles },
