@@ -22,6 +22,7 @@ const PUBLIC_PATHS = [
   "/vagas-de-hoje",
   "/freelancers",
   "/projetos",
+  "/jogos",
   "/todas-as-vagas",
   "/vagas-publicas",
   "/cursos-gratuitos",
