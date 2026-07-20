@@ -127,7 +127,7 @@ export function StatusBanner({
 /** Superfície de card premium compartilhada por todo o diagnóstico: profundidade
  *  suave e borda discreta, alinhada à identidade das ferramentas (globals.css). */
 const CARD =
-  "rounded-2xl border border-neutral-200/70 dark:border-neutral-800/80 bg-white dark:bg-neutral-950 p-6 shadow-[0_12px_36px_-16px_rgba(7,24,39,0.28)]";
+  "rounded-3xl border border-neutral-200/70 dark:border-neutral-850 bg-white dark:bg-neutral-950 p-6 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300";
 
 type BadgeTone = "primary" | "success" | "danger" | "warning" | "neutral";
 
@@ -597,38 +597,48 @@ export function ScoreHero({
   ];
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border p-6 md:p-8 shadow-[0_28px_70px_-32px_rgba(7,24,39,0.5)] ${config.className}`}
+      className={`relative overflow-hidden rounded-3xl border p-6 md:p-8 shadow-xl transition-all duration-300 hover:shadow-2xl ${config.className}`}
     >
-      {/* Barra de acento da marca (azul → âmbar), como nas ferramentas. */}
+      {/* Background decorations */}
+      <div className="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
+      <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
+
+      {/* vertical gradient bar */}
       <span
         aria-hidden
-        className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-blue-500 via-blue-400 to-amber-400"
+        className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-blue-600 via-blue-400 to-emerald-400"
       />
-      <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-7 sm:text-left">
-        <div className="shrink-0">
-          <CircularScore value={overall} size={124} strokeWidth={11} />
+
+      <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left relative z-10">
+        <div className="shrink-0 relative">
+          <div className="absolute inset-0 rounded-full bg-blue-500/10 animate-ping opacity-75" />
+          <div className="relative bg-white dark:bg-neutral-900 p-2 rounded-full shadow-inner">
+            <CircularScore value={overall} size={124} strokeWidth={11} />
+          </div>
         </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
-            Aderência com esta vaga
-          </p>
-          <p className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
+        <div className="space-y-1.5 min-w-0">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/80 dark:bg-black/20 shadow-sm border border-neutral-100 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400">
+            Diagnóstico de Aderência
+          </span>
+          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">
             {config.emoji} {config.label}
-          </p>
-          <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
+          </h2>
+          <p className="max-w-prose text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 font-medium">
             {reason}
           </p>
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 relative z-10">
         {subScores.map((s) => (
           <div
             key={s.label}
-            className="flex flex-col items-center gap-2 rounded-2xl border border-white/70 bg-white/70 py-4 backdrop-blur-sm dark:border-neutral-800/60 dark:bg-neutral-950/50"
+            className="flex flex-col items-center gap-3 rounded-2xl border border-white/60 bg-white/40 dark:border-neutral-800/50 dark:bg-neutral-900/30 p-4 shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-md"
           >
-            <CircularScore value={s.value} size={46} strokeWidth={5} />
-            <span className="px-1 text-center text-[11px] font-medium leading-tight text-neutral-600 dark:text-neutral-300">
+            <div className="bg-white dark:bg-neutral-950 p-1.5 rounded-full shadow-inner">
+              <CircularScore value={s.value} size={48} strokeWidth={5} />
+            </div>
+            <span className="px-1 text-center text-xs font-semibold text-neutral-600 dark:text-neutral-300">
               {s.label}
             </span>
           </div>
