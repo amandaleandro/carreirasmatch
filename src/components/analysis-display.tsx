@@ -2,6 +2,13 @@ import Link from "next/link";
 import { ChecklistCard } from "@/components/checklist-card";
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
+import {
+  SOFT_SKILL_LABELS,
+  PERSONALITY_TRAIT_LABELS,
+  PERSONALITY_TRAIT_DESCRIPTIONS,
+  type SoftSkillDimension,
+  type PersonalityTrait,
+} from "@/lib/behavioral-test";
 
 export type ApplicationStatus = "apply_now" | "adjust_first" | "deprioritize";
 
@@ -649,10 +656,12 @@ export function AnalysisResult({
   result,
   careerTrack,
   jobTitle = "",
+  behavioralResult,
 }: {
   result: Analysis;
   careerTrack: CareerTrack;
   jobTitle?: string;
+  behavioralResult?: { skills: string; traits: string } | null;
 }) {
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   return (
@@ -812,6 +821,10 @@ export function AnalysisResult({
       <InterviewSimulator questions={result.interviewQuestions} jobTitle={jobTitle} />
       <StudyPlanCard plan={result.studyPlan} />
 
+      {/* COMPORTAMENTAL & SOFT SKILLS */}
+      <SectionHeading icon="🧠" title="Mapeamento comportamental" />
+      <BehavioralFitCard jobTitle={jobTitle} behavioralResult={behavioralResult} />
+
       {/* AÇÃO — o próximo passo concreto */}
       <SectionHeading icon="✉️" title="Próxima ação" />
       <SummaryCard
@@ -835,5 +848,95 @@ export function AnalysisResult({
         </p>
       )}
     </section>
+  );
+}
+
+export function BehavioralFitCard({
+  jobTitle,
+  behavioralResult,
+}: {
+  jobTitle: string;
+  behavioralResult?: { skills: string; traits: string } | null;
+}) {
+  if (!behavioralResult) {
+    return (
+      <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="space-y-2">
+          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-850">
+            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span>Novo Recurso Premium</span>
+          </div>
+          <h3 className="font-bold text-lg leading-tight">Mapeamento Comportamental & Soft Skills</h3>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-xl">
+            Descubra como seu perfil comportamental e suas habilidades interpessoais se alinham a esta vaga de <strong>{jobTitle}</strong>. Responda o quiz rápido de 5 minutos para liberar esta análise!
+          </p>
+        </div>
+        <Link
+          href="/tools/behavioral-test"
+          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-3 shadow-sm shadow-blue-600/25 transition-all shrink-0 cursor-pointer w-full md:w-auto justify-center"
+        >
+          <span>Fazer Teste Comportamental</span>
+          <span>→</span>
+        </Link>
+      </div>
+    );
+  }
+
+  let skills: Record<SoftSkillDimension, number> = {} as any;
+  let traits: Record<PersonalityTrait, number> = {} as any;
+  try {
+    skills = JSON.parse(behavioralResult.skills);
+    traits = JSON.parse(behavioralResult.traits);
+  } catch (e) {
+    return null;
+  }
+
+  const sortedTraits = Object.entries(traits).sort((a, b) => b[1] - a[1]);
+  const primaryTrait = sortedTraits[0]?.[0] as PersonalityTrait;
+  const primaryTraitLabel = PERSONALITY_TRAIT_LABELS[primaryTrait];
+  const primaryTraitDesc = PERSONALITY_TRAIT_DESCRIPTIONS[primaryTrait];
+
+  return (
+    <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 pb-4">
+        <div>
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
+            Aderência Comportamental
+          </span>
+          <h3 className="font-bold text-lg mt-2">Mapeamento Comportamental & Soft Skills</h3>
+        </div>
+        <Link
+          href="/tools/behavioral-test"
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold shrink-0 cursor-pointer"
+        >
+          Refazer teste comportamental →
+        </Link>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-12">
+        <div className="md:col-span-5 space-y-3 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-200/50 dark:border-neutral-800/50">
+          <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider font-medium">Seu Perfil Dominante</p>
+          <p className="font-bold text-base text-blue-600 dark:text-blue-400">{primaryTraitLabel}</p>
+          <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+            {primaryTraitDesc}
+          </p>
+          <div className="pt-2">
+            <p className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 font-medium">Dica para a Vaga de {jobTitle}:</p>
+            <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mt-1">
+              Destaque na entrevista como sua personalidade de {primaryTraitLabel.toLowerCase()} o ajudará a gerar valor imediato como <strong>{jobTitle}</strong>.
+            </p>
+          </div>
+        </div>
+
+        <div className="md:col-span-7 space-y-4">
+          <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider font-medium">Pontuação de Soft Skills</p>
+          <div className="grid gap-3">
+            {Object.entries(skills).map(([dim, score]) => (
+              <ScoreBar key={dim} label={SOFT_SKILL_LABELS[dim as SoftSkillDimension]} value={score} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -28,9 +28,13 @@ export default async function ReportPage({
 
   const { id } = await params;
 
-  const [record, user] = await Promise.all([
+  const [record, user, behavioralResult] = await Promise.all([
     prisma.analysis.findUnique({ where: { id }, include: { resume: true } }),
     prisma.user.findUnique({ where: { id: session.user.id }, select: { careerSegment: true } }),
+    prisma.softSkillTestResult.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+    }),
   ]);
 
   if (!record || record.resume.userId !== session.user.id) {
@@ -126,6 +130,7 @@ export default async function ReportPage({
             result={analysis}
             careerTrack={record.careerTrack as CareerTrack}
             jobTitle={record.jobTitle}
+            behavioralResult={behavioralResult}
           />
           {!subscribed && <SubscriptionUpsell segment={segment ?? "career_pro"} />}
         </div>

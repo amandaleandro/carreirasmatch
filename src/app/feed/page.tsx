@@ -138,12 +138,16 @@ export default async function FeedPage({
     );
   }
 
-  const [allMatches, latestAnalysis] = await Promise.all([
+  const [allMatches, latestAnalysis, behavioralResult] = await Promise.all([
     getOrCreateFeedMatches(session.user.id, resume.id, resume.rawText),
     prisma.analysis.findFirst({
       where: { resumeId: resume.id },
       orderBy: { createdAt: "desc" },
       select: { careerTrack: true },
+    }),
+    prisma.softSkillTestResult.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
     }),
   ]);
 
@@ -216,6 +220,27 @@ export default async function FeedPage({
           Atualizado agora
         </span>
       </div>
+
+      {!behavioralResult && (
+        <div className="rounded-3xl border border-blue-200 dark:border-blue-900 bg-gradient-to-r from-blue-50/60 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/10 p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300 border border-blue-200/50 dark:border-blue-900/50">
+              ⚡ Teste Comportamental Requerido
+            </span>
+            <h3 className="font-bold text-lg leading-tight">Complete seu diagnóstico de Soft Skills</h3>
+            <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-2xl leading-relaxed">
+              Realize o teste comportamental de 5 minutos para mapear seus traços de liderança, comunicação e estilo de trabalho. Seu resultado será cruzado com cada uma das vagas do seu feed e adicionado ao diagnóstico de currículo.
+            </p>
+          </div>
+          <Link
+            href="/tools/behavioral-test"
+            className="inline-flex items-center gap-2 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-6 py-3 shadow-md shadow-blue-600/25 transition-all shrink-0 cursor-pointer w-full md:w-auto justify-center"
+          >
+            <span>Iniciar Teste Comportamental</span>
+            <span>→</span>
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
