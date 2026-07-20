@@ -661,7 +661,12 @@ export function AnalysisResult({
   result: Analysis;
   careerTrack: CareerTrack;
   jobTitle?: string;
-  behavioralResult?: { skills: string; traits: string } | null;
+  behavioralResult?: {
+    skillScores: string;
+    personalityType: string;
+    personalityLabel: string;
+    summary: string;
+  } | null;
 }) {
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   return (
