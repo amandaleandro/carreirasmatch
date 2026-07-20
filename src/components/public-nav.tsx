@@ -20,7 +20,6 @@ const NAV_LINKS: { href: string; label: string; show: string }[] = [
   { href: "/blog", label: "Blog", show: "" },
   { href: "/gratuito", label: "Ferramentas grátis", show: "hidden md:inline" },
   { href: "/comece", label: "Como funciona", show: "hidden sm:inline" },
-  { href: "/empresa/cadastro", label: "Para empresas", show: "" },
 ];
 
 export function PublicNav({ onDark = false }: { onDark?: boolean }) {

@@ -130,8 +130,9 @@ export default async function JobsTodayPage({
   const optionWhere = { active: true, createdAt: { gte: effectiveStart } };
   const where = { ...optionWhere, ...baseFilters };
 
-  const [total, rawJobs, sources, areas, seniorities, workModels] = await Promise.all([
+  const [total, allActiveCount, rawJobs, sources, areas, seniorities, workModels] = await Promise.all([
     prisma.job.count({ where }),
+    prisma.job.count({ where: { active: true } }),
     prisma.job.findMany({
       where,
       orderBy: { createdAt: "desc" },
@@ -218,6 +219,21 @@ export default async function JobsTodayPage({
         </div>
       </div>
 
+      <div className="mt-6 rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <p className="font-semibold">Estas são só as vagas de hoje.</p>
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+            Temos <strong>{allActiveCount.toLocaleString("pt-BR")} vagas</strong> no total. Crie sua conta grátis para ver todas e receber as que combinam com você.
+          </p>
+        </div>
+        <Link
+          href="/todas-as-vagas"
+          className="shrink-0 rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 hover:bg-blue-700 transition-colors text-center whitespace-nowrap"
+        >
+          Ver todas as vagas
+        </Link>
+      </div>
+
       <div className="mt-6 flex flex-wrap gap-2 text-sm">
         {PUBLIC_JOB_CATEGORIES.slice(0, 8).map((category) => (
           <Link
@@ -230,8 +246,8 @@ export default async function JobsTodayPage({
         ))}
       </div>
 
-      <form className="mt-6 grid gap-3 md:grid-cols-[1fr_180px_180px_180px_180px_auto] rounded-2xl border border-neutral-200 dark:border-neutral-800 p-4">
-        <label className="relative">
+      <form className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-4">
+        <label className="relative min-w-0 sm:col-span-2 lg:col-span-3">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <input
             name="q"
@@ -240,27 +256,27 @@ export default async function JobsTodayPage({
             className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-500"
           />
         </label>
-        <select name="area" defaultValue={area} className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
+        <select name="area" defaultValue={area} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
           <option value="">Todas as áreas</option>
           {areaOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
-        <select name="seniority" defaultValue={seniority} className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
+        <select name="seniority" defaultValue={seniority} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
           <option value="">Todos os níveis</option>
           {seniorityOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
-        <select name="workModel" defaultValue={workModel} className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
+        <select name="workModel" defaultValue={workModel} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
           <option value="">Todos os modelos</option>
           {workModelOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
-        <label className="relative">
+        <label className="relative min-w-0">
           <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-          <select name="source" defaultValue={source} className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-500">
+          <select name="source" defaultValue={source} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-500">
             <option value="">Todas as fontes</option>
             {sourceOptions.map((option) => (
               <option key={option} value={option}>{option}</option>
@@ -270,7 +286,7 @@ export default async function JobsTodayPage({
         <button className="rounded-xl bg-blue-600 text-white px-5 py-2.5 text-sm font-semibold hover:bg-blue-700 transition-colors">
           Filtrar
         </button>
-        <label className="md:col-span-6 inline-flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
+        <label className="sm:col-span-2 lg:col-span-3 inline-flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
           <input type="checkbox" name="entryLevel" value="yes" defaultChecked={entryLevel} className="h-4 w-4 rounded border-neutral-300" />
           Mostrar somente vagas sem experiência, estágio, jovem aprendiz ou primeiro emprego
         </label>
