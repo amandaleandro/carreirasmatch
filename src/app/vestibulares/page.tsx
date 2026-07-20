@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { RadarList } from "@/components/radar-list";
+import { Pagination } from "@/components/Pagination";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -11,12 +12,29 @@ export const metadata: Metadata = {
   alternates: { canonical: "/vestibulares" },
 };
 
-export default async function VestibularesRadarPage() {
-  const items = await prisma.radarItem.findMany({
-    where: { kind: "vestibular", active: true },
-    orderBy: [{ publishedAt: "desc" }, { lastSeenAt: "desc" }],
-    take: 60,
-  });
+const PAGE_SIZE = 20;
+
+export default async function VestibularesRadarPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string }>;
+}) {
+  const params = await searchParams;
+  const page = Math.max(1, Number(params.page) || 1);
+
+  const [items, totalItems] = await Promise.all([
+    prisma.radarItem.findMany({
+      where: { kind: "vestibular", active: true },
+      orderBy: [{ publishedAt: "desc" }, { lastSeenAt: "desc" }],
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+    }),
+    prisma.radarItem.count({
+      where: { kind: "vestibular", active: true },
+    }),
+  ]);
+
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE);
 
   return (
     <ContentPage
@@ -29,6 +47,9 @@ export default async function VestibularesRadarPage() {
         items={items}
         emptyLabel="Ainda não há vestibulares no radar. O conteúdo é atualizado automaticamente ao longo do dia."
       />
+      <div className="mt-8">
+        <Pagination page={page} totalPages={totalPages} basePath="/vestibulares" />
+      </div>
     </ContentPage>
   );
 }
