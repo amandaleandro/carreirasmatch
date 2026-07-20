@@ -76,18 +76,25 @@ export const authConfig: NextAuthConfig = {
     },
     authorized({ auth, request }) {
       const isLoggedIn = Boolean(auth?.user);
+      const isCompany = auth?.user?.accountType === "company";
       const pathname = request.nextUrl.pathname;
 
       // Área de empresa: login/cadastro são públicos; o resto exige sessão de empresa.
       if (pathname.startsWith("/empresa")) {
-        if (pathname === "/empresa/login" || pathname === "/empresa/cadastro") return true;
-        if (auth?.user?.accountType === "company") return true;
+        if (pathname === "/empresa/login" || pathname === "/empresa/cadastro") {
+          // Empresa já logada não precisa reautenticar; vai direto pro painel.
+          if (isCompany) return NextResponse.redirect(new URL("/empresa", request.nextUrl));
+          return true;
+        }
+        if (isCompany) return true;
         return NextResponse.redirect(new URL("/empresa/login", request.nextUrl));
       }
 
-      // Sessão de empresa não navega na área de candidato: qualquer rota
-      // protegida fora de /empresa volta para o painel da empresa.
-      const isCompany = auth?.user?.accountType === "company";
+      // Candidato já logado não precisa ver login/cadastro de candidato. (Empresa
+      // fica de fora: /login é o caminho pra trocar de conta pro lado candidato.)
+      if ((pathname === "/login" || pathname === "/register") && isLoggedIn && !isCompany) {
+        return NextResponse.redirect(new URL("/dashboard", request.nextUrl));
+      }
 
       const isPublic =
         pathname === "/" ||
