@@ -28,7 +28,7 @@ export function ContentPage({
   return (
     <div className="w-full">
       <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950">
-        <header className="max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
+        <header className="public-header max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>

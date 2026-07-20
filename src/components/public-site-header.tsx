@@ -8,7 +8,7 @@ import { PublicNav } from "@/components/public-nav";
  */
 export function PublicSiteHeader() {
   return (
-    <header className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#090d16]">
+    <header className="public-header border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#090d16]">
       <div className="max-w-6xl mx-auto px-4 md:px-8 py-5 flex flex-wrap items-center justify-between gap-4">
         <Link href="/" aria-label="CarreirasMatch">
           <BrandLogo heightClassName="h-11 sm:h-12" />

@@ -818,7 +818,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             className={`animate-aurora-delayed absolute -bottom-40 right-[-6rem] h-[30rem] w-[30rem] rounded-full bg-gradient-to-br ${theme.blob} opacity-20 blur-3xl`}
           />
         </div>
-        <header className="relative max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
+        <header className="public-header relative max-w-6xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
@@ -1416,7 +1416,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
       </main>
 
       {/* Sticky mobile CTA */}
-      <div className="sm:hidden fixed bottom-0 inset-x-0 z-20 border-t border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur px-4 py-3">
+      <div className="public-mobile-cta sm:hidden fixed bottom-0 inset-x-0 z-20 border-t border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 backdrop-blur px-4 py-3">
         <Link
           href={primaryActionHref}
           className={`btn-shine flex items-center justify-center rounded-xl font-semibold px-6 py-3 text-sm transition-all shadow-md ${theme.btnPrimary}`}

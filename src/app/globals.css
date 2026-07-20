@@ -192,6 +192,15 @@ select option {
   transform: none;
 }
 
+/* Header público (logo + nav + Entrar/Criar conta) das páginas de marketing e
+   conteúdo. Quando a página é vista por um usuário logado, ela é renderizada
+   dentro do AppShell (que já traz Topbar + Sidebar), então escondemos o header
+   público para não duplicar a navegação. Deslogado, aparece normalmente. */
+[data-authenticated] .public-header,
+[data-authenticated] .public-mobile-cta {
+  display: none;
+}
+
 /* Cartões sobrepostos do hero: mantidos estáticos (sem flutuar) para um
    visual mais sóbrio; as classes seguem no markup mas não animam. */
 .animate-float-soft,

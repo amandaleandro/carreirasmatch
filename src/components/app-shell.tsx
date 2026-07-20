@@ -36,7 +36,12 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <SidebarNav isAdmin={isAdmin} isInfluencer={isInfluencer} />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar userName={userName} userEmail={userEmail} userImage={userImage} />
-          <main className="flex-1">{children}</main>
+          {/* data-authenticated: o app já tem Topbar + Sidebar, então o CSS esconde
+              o header público (.public-header) das páginas de marketing/conteúdo
+              renderizadas aqui dentro, evitando barra de navegação duplicada. */}
+          <main className="flex-1" data-authenticated>
+            {children}
+          </main>
         </div>
         <GuidedTour segment={segment} />
         <UpcomingFeaturesModal />
