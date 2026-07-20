@@ -856,7 +856,12 @@ export function BehavioralFitCard({
   behavioralResult,
 }: {
   jobTitle: string;
-  behavioralResult?: { skills: string; traits: string } | null;
+  behavioralResult?: {
+    skillScores: string;
+    personalityType: string;
+    personalityLabel: string;
+    summary: string;
+  } | null;
 }) {
   if (!behavioralResult) {
     return (
@@ -883,18 +888,14 @@ export function BehavioralFitCard({
   }
 
   let skills: Record<SoftSkillDimension, number> = {} as any;
-  let traits: Record<PersonalityTrait, number> = {} as any;
   try {
-    skills = JSON.parse(behavioralResult.skills);
-    traits = JSON.parse(behavioralResult.traits);
+    skills = JSON.parse(behavioralResult.skillScores);
   } catch (e) {
     return null;
   }
 
-  const sortedTraits = Object.entries(traits).sort((a, b) => b[1] - a[1]);
-  const primaryTrait = sortedTraits[0]?.[0] as PersonalityTrait;
-  const primaryTraitLabel = PERSONALITY_TRAIT_LABELS[primaryTrait];
-  const primaryTraitDesc = PERSONALITY_TRAIT_DESCRIPTIONS[primaryTrait];
+  const primaryTraitLabel = behavioralResult.personalityLabel;
+  const primaryTraitDesc = behavioralResult.summary;
 
   return (
     <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm space-y-6">
