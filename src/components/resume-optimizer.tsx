@@ -600,6 +600,7 @@ export function ResumeOptimizer({
           {hasBaseline ? (
             <>
               Otimizando para: <span className="font-medium text-neutral-700 dark:text-neutral-300">{jobTitle}</span>{" "}
+              · <Link href={`/report/${analysisId}`} className="text-blue-600 dark:text-blue-400 hover:underline">Voltar para a vaga</Link>{" "}
               · <Link href="/history" className="text-blue-600 dark:text-blue-400 hover:underline">Trocar vaga</Link>
             </>
           ) : (
@@ -1065,6 +1066,12 @@ export function ResumeOptimizer({
                   {scoreDelta >= 0 ? "↑" : "↓"} {Math.abs(scoreDelta)}pp desde a última análise
                 </p>
               )}
+              <Link
+                href={`/report/${analysisId}`}
+                className="mt-4 inline-flex items-center justify-center rounded-xl bg-blue-600 text-white font-semibold px-4 py-2.5 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
+              >
+                Voltar para a vaga
+              </Link>
             </div>
           )}
         </div>
