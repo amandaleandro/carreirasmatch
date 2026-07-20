@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
+import { ExportContactsButton } from "@/components/export-contacts-button";
 
 export const dynamic = "force-dynamic";
 
@@ -49,9 +50,22 @@ export default async function CompanyContactsPage() {
         ) : (
           <div className="space-y-8">
             <section className="space-y-3">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
-                Contatos liberados {accepted.length > 0 && `(${accepted.length})`}
-              </h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">
+                  Contatos liberados {accepted.length > 0 && `(${accepted.length})`}
+                </h2>
+                <ExportContactsButton
+                  contacts={accepted.map((r) => ({
+                    name: r.user.name || "",
+                    email: r.user.email || "",
+                    phone: r.user.phone || "",
+                    area: r.user.professionalArea || "",
+                    city: r.user.city || "",
+                    state: r.user.state || "",
+                    jobTitle: r.jobTitle || "",
+                  }))}
+                />
+              </div>
               {accepted.length === 0 ? (
                 <p className="text-sm text-neutral-500">Nenhum contato liberado ainda.</p>
               ) : (

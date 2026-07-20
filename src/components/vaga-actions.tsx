@@ -24,6 +24,19 @@ export function VagaActions({ vagaId, status }: { vagaId: string; status: string
     }
   }
 
+  async function duplicate() {
+    setBusy(true);
+    try {
+      const res = await fetch(`/api/empresa/vagas/${vagaId}/duplicar`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) throw new Error();
+      router.push(`/empresa/vagas/${data.id}`);
+      router.refresh();
+    } catch {
+      setBusy(false);
+    }
+  }
+
   async function remove() {
     if (!window.confirm("Excluir esta vaga? Essa ação não pode ser desfeita.")) return;
     setBusy(true);
@@ -52,6 +65,14 @@ export function VagaActions({ vagaId, status }: { vagaId: string; status: string
         className="rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50"
       >
         {isOpen ? "Fechar vaga" : "Reabrir vaga"}
+      </button>
+      <button
+        type="button"
+        onClick={duplicate}
+        disabled={busy}
+        className="rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors disabled:opacity-50"
+      >
+        Duplicar
       </button>
       <button
         type="button"
