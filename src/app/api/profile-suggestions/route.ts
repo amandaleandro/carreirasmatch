@@ -90,14 +90,16 @@ async function generateSuggestions(userId: string) {
       title: course.title,
       provider: course.provider,
       free: course.free,
-      modality: course.modality,
-      city: course.city,
+      modality: course.modality ?? undefined,
+      city: course.city ?? undefined,
       certificate: course.certificate,
+      url: course.url,
     }));
   const curatedOptions = [...getCoursesForArea(user?.professionalArea).map((c) => ({
     title: c.title,
     provider: c.provider,
     free: c.free,
+    url: undefined,
   })), ...liveOptions];
 
   const result = await generateProfileSuggestions({

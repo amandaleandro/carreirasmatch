@@ -538,6 +538,7 @@ export async function generateProfileSuggestions(input: {
     modality?: string;
     city?: string;
     certificate?: boolean;
+    url?: string;
   }[];
 }): Promise<ProfileSuggestionsResult> {
   const jsonTemplate = `{
@@ -551,7 +552,7 @@ export async function generateProfileSuggestions(input: {
       "impactReason": string (1 frase curta e específica),
       "gapAddressed": string (lacuna/objetivo curto que o item resolve),
       "modality": string (só para course: "online" | "presencial" | "híbrido"),
-      "url": string (opcional, só se você tiver certeza de que é uma URL real e estável, senão omita o campo)
+      "url": string (Se você escolher um curso das OPCOES_CURADAS que tem Link, você DEVE retornar exatamente a mesma URL correspondente. Caso contrário, omita o campo)
     }
   ]
 }`;
@@ -597,7 +598,7 @@ export async function generateProfileSuggestions(input: {
               c.certificate ? "com certificado" : null,
               c.city ? `em ${c.city}` : null,
             ].filter(Boolean);
-            return `${c.title} (${c.provider}${tags.length ? ", " + tags.join(", ") : ""})`;
+            return `${c.title} (${c.provider}${tags.length ? ", " + tags.join(", ") : ""})${c.url ? " - Link: " + c.url : ""}`;
           })
           .join("\n- ")}`
       : "";

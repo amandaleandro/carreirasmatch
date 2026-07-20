@@ -41,7 +41,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
   { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
-  { href: "/profile", label: "Sugestões de Melhoria", icon: Sparkles },
+  { href: "/profile", label: "Desenvolvimento", icon: Sparkles },
   { href: "/action-plan", label: "Plano de Ação", icon: Target },
   { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
   { href: "/history", label: "Relatórios", icon: BarChart3 },

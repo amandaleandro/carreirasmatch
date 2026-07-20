@@ -87,7 +87,7 @@ export function ProfileSuggestions({
           <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
             Desenvolvimento
           </span>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Sugestões de Melhoria</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Desenvolvimento</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
             Cursos, certificações e livros sugeridos para fortalecer seu perfil, com preço e
             impacto estimados pela IA a partir das lacunas identificadas nas suas análises.
@@ -99,7 +99,7 @@ export function ProfileSuggestions({
           disabled={loading}
           className="shrink-0 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
         >
-          {loading ? "Gerando..." : suggestions.length > 0 ? "Atualizar sugestões" : "Gerar sugestões"}
+          {loading ? "Gerando..." : suggestions.length > 0 ? "Atualizar plano" : "Gerar recomendações"}
         </button>
       </div>
 
@@ -111,7 +111,7 @@ export function ProfileSuggestions({
 
       {suggestions.length === 0 && !loading && (
         <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-10 shadow-sm shadow-slate-900/5 text-center">
-          <p className="font-medium">Você ainda não gerou sugestões de melhoria.</p>
+          <p className="font-medium">Você ainda não gerou seu plano de desenvolvimento.</p>
           <p className="text-sm text-neutral-500 mt-2">
             Clique em &quot;Gerar sugestões&quot; para receber recomendações personalizadas com
             base no seu perfil e nas suas análises de vaga.
@@ -209,7 +209,20 @@ export function ProfileSuggestions({
                     </p>
                   )}
 
-                  <div>
+                  {s.url && (
+                    <div className="pt-1">
+                      <a
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                      >
+                        Acessar {s.type === "course" ? "curso" : s.type === "certification" ? "certificação" : "livro"} ↗
+                      </a>
+                    </div>
+                  )}
+
+                  <div className="mt-auto pt-1">
                     <div className="flex justify-between text-xs mb-1">
                       <span className="text-neutral-500">Impacto estimado</span>
                       <span className="font-medium">{s.impactScore}%</span>
