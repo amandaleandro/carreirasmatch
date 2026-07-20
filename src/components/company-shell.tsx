@@ -8,7 +8,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
   LayoutDashboard,
-  FilePlus2,
+  Briefcase,
   Users,
   CreditCard,
   LogOut,
@@ -21,20 +21,16 @@ type NavItem = { href: string; label: string; icon: LucideIcon };
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/empresa", label: "Triagens", icon: LayoutDashboard },
-  { href: "/empresa/triagem/nova", label: "Nova triagem", icon: FilePlus2 },
+  { href: "/empresa/vagas", label: "Vagas", icon: Briefcase },
   { href: "/empresa/talentos", label: "Banco de talentos", icon: Users },
   { href: "/empresa/billing", label: "Créditos", icon: CreditCard },
 ];
 
 // /empresa é prefixo de tudo, então o ativo do "Triagens" precisa ser explícito:
-// dashboard e a página de resultado de uma triagem (/empresa/triagem/[id]), mas
-// não /empresa/triagem/nova, que tem item próprio.
+// dashboard e a página de resultado de uma triagem (/empresa/triagem/*).
 function itemActive(pathname: string, href: string): boolean {
   if (href === "/empresa") {
-    return (
-      pathname === "/empresa" ||
-      (pathname.startsWith("/empresa/triagem/") && pathname !== "/empresa/triagem/nova")
-    );
+    return pathname === "/empresa" || pathname.startsWith("/empresa/triagem/");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }

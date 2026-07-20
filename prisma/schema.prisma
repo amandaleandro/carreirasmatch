@@ -821,10 +821,34 @@ model Company {
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   jobs           CompanyJob[]
+  vagas          CompanyVaga[]
   contactRequests TalentContactRequest[]
   payments       CompanyPayment[]
 
   @@index([email])
+}
+
+/// Vaga cadastrada pela empresa para puxar candidatos do banco de talentos
+/// (usuários discoverable) automaticamente pela aderência. Diferente de
+/// CompanyJob, que é a triagem de PDFs enviados manualmente pela empresa.
+model CompanyVaga {
+  id            String    @id @default(cuid())
+  companyId     String
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  area          String    @default("")
+  state         String    @default("")
+  status        String    @default("open") // open | closed
+  /// Snapshot do último matching, sem dados de contato: JSON de
+  /// { userId, firstName, professionalArea, city, state, fitScore, reason }.
+  /// O status do contato e o contato em si são resolvidos ao vivo na leitura.
+  matchesJson   String    @default("")
+  lastMatchedAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([companyId, createdAt])
 }
 
 /// Pagamento de empresa (compra de pacote de créditos de triagem). Espelha o
