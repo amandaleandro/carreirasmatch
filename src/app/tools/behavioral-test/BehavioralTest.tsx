@@ -219,7 +219,7 @@ export function BehavioralTest() {
                     <label
                       key={opt.value}
                       title={opt.label}
-                      className={`flex flex-col items-center gap-1 rounded-xl border px-1 py-2 text-[10px] text-center cursor-pointer transition-all ${
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border px-1 py-2 text-center cursor-pointer transition-all min-h-[72px] justify-between ${
                         checked
                           ? "border-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:border-blue-500"
                           : "border-neutral-200 dark:border-neutral-800"
@@ -232,7 +232,10 @@ export function BehavioralTest() {
                         onChange={() => setAnswers((prev) => ({ ...prev, [q.id]: opt.value }))}
                         className="h-3.5 w-3.5 accent-blue-600"
                       />
-                      {opt.value}
+                      <span className="font-bold text-xs">{opt.value}</span>
+                      <span className="text-[8px] sm:text-[9px] text-neutral-500 dark:text-neutral-400 font-medium leading-none block px-0.5">
+                        {opt.label}
+                      </span>
                     </label>
                   );
                 })}
