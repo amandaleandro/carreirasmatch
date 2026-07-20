@@ -57,6 +57,34 @@ export default async function CompanyDashboardPage() {
           ))}
         </div>
 
+        {jobs.length === 0 && openVagas === 0 && (
+          <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-6">
+            <h2 className="font-semibold text-blue-900 dark:text-blue-200">Como funciona</h2>
+            <p className="text-sm text-blue-900/80 dark:text-blue-200/80 mt-1">
+              Três formas de encontrar candidatos. Comece por qualquer uma:
+            </p>
+            <ol className="mt-4 space-y-3">
+              {[
+                { n: 1, h: "/empresa/triagem/nova", t: "Triagem por currículos", d: "Suba os PDFs que você já recebeu e receba um ranking por aderência à vaga." },
+                { n: 2, h: "/empresa/vagas/nova", t: "Cadastrar uma vaga", d: "Descreva a vaga (ou gere com IA) e o sistema traz os candidatos do banco de talentos." },
+                { n: 3, h: "/empresa/talentos", t: "Buscar no banco de talentos", d: "Faça uma busca rápida entre os candidatos que optaram por ser encontrados." },
+              ].map((step) => (
+                <li key={step.n}>
+                  <Link href={step.h} className="flex items-start gap-3 group">
+                    <span className="shrink-0 h-6 w-6 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center">
+                      {step.n}
+                    </span>
+                    <span>
+                      <span className="font-semibold text-blue-900 dark:text-blue-200 group-hover:underline">{step.t}</span>
+                      <span className="block text-sm text-blue-900/70 dark:text-blue-200/70">{step.d}</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
         <div className="flex items-center justify-between gap-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-4 py-3 text-sm text-neutral-600 dark:text-neutral-400">
           {remaining > 0 ? (
             <span>Você tem <strong className="text-neutral-900 dark:text-white">{remaining}</strong> {remaining === 1 ? "triagem" : "triagens"} disponíveis{freeRemaining > 0 && company.screeningCredits > 0 ? ` (${freeRemaining} gratuita(s) + ${company.screeningCredits} compradas)` : ""}.</span>

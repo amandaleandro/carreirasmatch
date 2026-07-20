@@ -897,6 +897,8 @@ model CompanyCandidate {
   reason        String     @default("")
   /// Ação da empresa sobre o candidato: none | favorite | approved | rejected.
   status        String     @default("none")
+  /// Anotação interna da empresa sobre o candidato.
+  note          String     @default("")
   createdAt     DateTime   @default(now())
 
   @@index([jobId, fitScore])

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { ScreeningResults, type ScreeningCandidate } from "@/components/screening-results";
 import { DeleteScreeningButton } from "@/components/delete-screening-button";
+import { AddResumesForm } from "@/components/add-resumes-form";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +34,7 @@ export default async function ScreeningResultPage({
     fitScore: c.fitScore,
     reason: c.reason,
     status: (c.status as CandidateStatus) ?? "none",
+    note: c.note,
     rawText: c.rawText,
   }));
 
@@ -60,6 +62,8 @@ export default async function ScreeningResultPage({
             <p className="text-sm text-blue-900/90 dark:text-blue-200/90 leading-relaxed">{job.recommendation}</p>
           </div>
         )}
+
+        <AddResumesForm jobId={job.id} />
 
         <ScreeningResults jobTitle={job.title} candidates={candidates} />
       </div>

@@ -5,13 +5,29 @@ import { parseStoredMatches } from "@/lib/company-vaga";
 
 export const dynamic = "force-dynamic";
 
-export default async function CompanyVagasPage() {
+export default async function CompanyVagasPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
   const { company } = await requireCompanyPage();
+  const { status } = await searchParams;
+  const filter = status === "abertas" || status === "fechadas" ? status : "todas";
 
   const vagas = await prisma.companyVaga.findMany({
-    where: { companyId: company.id },
-    orderBy: { createdAt: "desc" },
+    where: {
+      companyId: company.id,
+      ...(filter === "abertas" ? { status: "open" } : filter === "fechadas" ? { status: "closed" } : {}),
+    },
+    // status desc coloca "open" antes de "closed" (o > c); depois, mais recentes primeiro.
+    orderBy: [{ status: "desc" }, { createdAt: "desc" }],
   });
+
+  const filters: { key: string; label: string; href: string }[] = [
+    { key: "todas", label: "Todas", href: "/empresa/vagas" },
+    { key: "abertas", label: "Abertas", href: "/empresa/vagas?status=abertas" },
+    { key: "fechadas", label: "Fechadas", href: "/empresa/vagas?status=fechadas" },
+  ];
 
   return (
     <div>
@@ -32,9 +48,27 @@ export default async function CompanyVagasPage() {
           </Link>
         </div>
 
+        <div className="flex items-center gap-1.5">
+          {filters.map((f) => (
+            <Link
+              key={f.key}
+              href={f.href}
+              className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                filter === f.key
+                  ? "bg-blue-600 text-white"
+                  : "border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+              }`}
+            >
+              {f.label}
+            </Link>
+          ))}
+        </div>
+
         {vagas.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 p-10 text-center">
-            <p className="text-neutral-600 dark:text-neutral-400">Você ainda não cadastrou nenhuma vaga.</p>
+            <p className="text-neutral-600 dark:text-neutral-400">
+              {filter === "todas" ? "Você ainda não cadastrou nenhuma vaga." : "Nenhuma vaga nesse filtro."}
+            </p>
             <Link href="/empresa/vagas/nova" className="mt-3 inline-block font-semibold text-blue-600 dark:text-blue-400 hover:underline">
               Cadastrar a primeira vaga →
             </Link>

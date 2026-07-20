@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { useRouter } from "next/navigation";
 
 type ContactStatus = "none" | "pending" | "accepted" | "declined";
 
@@ -23,6 +24,7 @@ function scoreColor(score: number): string {
 }
 
 export function TalentSearch() {
+  const router = useRouter();
   const [jobTitle, setJobTitle] = useState("");
   const [jobText, setJobText] = useState("");
   const [area, setArea] = useState("");
@@ -31,6 +33,26 @@ export function TalentSearch() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [contacting, setContacting] = useState<string | null>(null);
+  const [savingVaga, setSavingVaga] = useState(false);
+
+  async function saveAsVaga() {
+    setSavingVaga(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/empresa/vagas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: jobTitle, description: jobText, area, state }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Erro ao salvar a vaga.");
+      router.push(`/empresa/vagas/${data.id}`);
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      setSavingVaga(false);
+    }
+  }
 
   async function handleSearch(e: FormEvent) {
     e.preventDefault();
@@ -121,6 +143,20 @@ export function TalentSearch() {
             Nenhum candidato disponível no banco de talentos para esses critérios ainda.
           </div>
         ) : (
+          <>
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 px-4 py-3">
+            <p className="text-sm text-blue-900/80 dark:text-blue-200/80">
+              Quer acompanhar esta busca ao longo do tempo? Salve como vaga.
+            </p>
+            <button
+              type="button"
+              onClick={saveAsVaga}
+              disabled={savingVaga}
+              className="shrink-0 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+            >
+              {savingVaga ? "Salvando..." : "Salvar como vaga"}
+            </button>
+          </div>
           <ol className="space-y-3">
             {matches.map((m, index) => (
               <li key={m.userId} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5">
@@ -164,6 +200,7 @@ export function TalentSearch() {
               </li>
             ))}
           </ol>
+          </>
         )
       )}
     </div>

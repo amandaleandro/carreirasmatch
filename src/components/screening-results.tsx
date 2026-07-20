@@ -11,6 +11,7 @@ export type ScreeningCandidate = {
   fitScore: number;
   reason: string;
   status: CandidateStatus;
+  note: string;
   rawText: string;
 };
 
@@ -27,7 +28,7 @@ const STATUS_META: Record<Exclude<CandidateStatus, "none">, { label: string; bad
 };
 
 function toCsv(jobTitle: string, candidates: ScreeningCandidate[]): string {
-  const header = ["Posição", "Candidato", "Arquivo", "Nota", "Status", "Justificativa"];
+  const header = ["Posição", "Candidato", "Arquivo", "Aderência", "Status", "Justificativa", "Anotação"];
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
   const rows = candidates.map((c, i) =>
     [
@@ -37,6 +38,7 @@ function toCsv(jobTitle: string, candidates: ScreeningCandidate[]): string {
       String(c.fitScore),
       c.status === "none" ? "" : STATUS_META[c.status].label,
       c.reason.replace(/\r?\n/g, " "),
+      (c.note ?? "").replace(/\r?\n/g, " "),
     ]
       .map(escape)
       .join(",")
@@ -82,6 +84,22 @@ export function ScreeningResults({
       setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, status: current } : c)));
     } finally {
       setSaving(null);
+    }
+  }
+
+  function updateNoteLocal(id: string, note: string) {
+    setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, note } : c)));
+  }
+
+  async function saveNote(id: string, note: string) {
+    try {
+      await fetch("/api/empresa/triagem/candidato", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ candidateId: id, note }),
+      });
+    } catch {
+      // Silencioso: a nota fica no estado local; nova tentativa no próximo blur.
     }
   }
 
@@ -189,6 +207,15 @@ export function ScreeningResults({
                 {expanded === c.id ? "Ocultar currículo" : "Ver currículo"}
               </button>
             </div>
+
+            <textarea
+              value={c.note}
+              onChange={(e) => updateNoteLocal(c.id, e.target.value)}
+              onBlur={(e) => saveNote(c.id, e.target.value)}
+              rows={1}
+              placeholder="Anotação interna (salva ao sair do campo)..."
+              className="mt-3 w-full rounded-lg border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900/60 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 resize-y"
+            />
 
             {expanded === c.id && (
               <div className="mt-3 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 p-4 max-h-96 overflow-y-auto">
