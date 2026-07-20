@@ -11,6 +11,7 @@ import {
   Briefcase,
   Handshake,
   Users,
+  BarChart3,
   CreditCard,
   LogOut,
   Menu,
@@ -26,6 +27,7 @@ function buildNavItems(contactsBadge: number): NavItem[] {
     { href: "/empresa/vagas", label: "Vagas", icon: Briefcase },
     { href: "/empresa/talentos", label: "Banco de talentos", icon: Users },
     { href: "/empresa/contatos", label: "Contatos", icon: Handshake, badge: contactsBadge },
+    { href: "/empresa/relatorios", label: "Relatórios", icon: BarChart3 },
     { href: "/empresa/billing", label: "Créditos", icon: CreditCard },
   ];
 }
