@@ -29,10 +29,10 @@ export default async function ScreeningResultPage({
   if (!job) notFound();
 
   return (
-    <main>
+    <div>
       <div className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
         <Link href="/empresa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-          ← Voltar
+          ← Voltar para triagens
         </Link>
 
         <header>
@@ -78,6 +78,6 @@ export default async function ScreeningResultPage({
           ))}
         </ol>
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireCompanyPage, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
 import { SCREENING_PACKS } from "@/lib/company-billing";
 import { CompanyBillingCheckout } from "@/components/company-billing-checkout";
@@ -11,11 +10,8 @@ export default async function CompanyBillingPage() {
   const totalAvailable = freeRemaining + company.screeningCredits;
 
   return (
-    <main>
+    <div>
       <div className="max-w-2xl mx-auto px-4 md:px-8 py-10 space-y-6">
-        <Link href="/empresa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-          ← Voltar
-        </Link>
         <header>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Créditos de triagem</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
@@ -36,6 +32,6 @@ export default async function CompanyBillingPage() {
 
         <CompanyBillingCheckout packs={SCREENING_PACKS} payerEmail={company.email} />
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { TalentSearch } from "@/components/talent-search";
 
@@ -8,11 +7,8 @@ export default async function TalentPoolPage() {
   await requireCompanyPage();
 
   return (
-    <main>
+    <div>
       <div className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
-        <Link href="/empresa" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-          ← Voltar
-        </Link>
         <header>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Banco de talentos</h1>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2">
@@ -23,6 +19,6 @@ export default async function TalentPoolPage() {
 
         <TalentSearch />
       </div>
-    </main>
+    </div>
   );
 }

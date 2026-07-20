@@ -17,13 +17,10 @@ export default async function CompanyDashboardPage() {
   const remaining = freeRemaining + company.screeningCredits;
 
   return (
-    <main>
+    <div>
       <div className="max-w-4xl mx-auto px-4 md:px-8 py-10 space-y-8">
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
-              Área da empresa
-            </span>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Triagem de candidatos</h1>
             <p className="text-neutral-600 dark:text-neutral-400 mt-2">
               Descreva a vaga, envie os currículos e receba um ranking por aderência.
@@ -90,6 +87,6 @@ export default async function CompanyDashboardPage() {
           </ul>
         )}
       </div>
-    </main>
+    </div>
   );
 }
