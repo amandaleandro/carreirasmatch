@@ -3,7 +3,7 @@ import { BrandLogo } from "@/components/brand-logo";
 
 export function SiteFooter({ maxWidth = "max-w-7xl" }: { maxWidth?: string }) {
   return (
-    <footer className="public-footer border-t border-neutral-100 dark:border-neutral-900">
+    <footer className="public-footer border-t border-neutral-100 dark:border-neutral-900 bg-background">
       <div className={`${maxWidth} mx-auto px-4 md:px-8 py-12 grid grid-cols-2 md:grid-cols-5 gap-8`}>
         <div className="col-span-2 md:col-span-1">
           <Link href="/">
