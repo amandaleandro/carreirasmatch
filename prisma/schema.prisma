@@ -824,8 +824,26 @@ model Company {
   vagas          CompanyVaga[]
   contactRequests TalentContactRequest[]
   payments       CompanyPayment[]
+  members        CompanyMember[]
 
   @@index([email])
+}
+
+/// Usuário de login de uma empresa. A empresa passa a ser a organização e os
+/// membros são as identidades que autenticam. Company.email/passwordHash ficam
+/// como legado (o membro "owner" espelha o cadastro original).
+model CompanyMember {
+  id           String   @id @default(cuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  name         String   @default("")
+  email        String   @unique
+  passwordHash String
+  role         String   @default("member") // owner | member
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([companyId])
 }
 
 /// Vaga cadastrada pela empresa para puxar candidatos do banco de talentos

@@ -56,13 +56,22 @@ export const authConfig: NextAuthConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        const accountType = (user as { accountType?: "company" }).accountType;
-        if (accountType === "company") {
+        const u = user as {
+          accountType?: "company";
+          companyId?: string;
+          companyRole?: "owner" | "member";
+        };
+        if (u.accountType === "company") {
           token.accountType = "company";
-          token.companyId = user.id;
+          // companyId vem do membro (a Company é a organização); memberId = user.id.
+          token.companyId = u.companyId ?? user.id;
+          token.companyRole = u.companyRole ?? "member";
+          token.memberId = user.id;
         } else {
           token.accountType = "candidate";
           token.companyId = undefined;
+          token.companyRole = undefined;
+          token.memberId = undefined;
         }
       }
       return token;
@@ -72,6 +81,8 @@ export const authConfig: NextAuthConfig = {
         session.user.id = token.id as string;
         session.user.accountType = (token.accountType as "candidate" | "company") ?? "candidate";
         session.user.companyId = token.companyId as string | undefined;
+        session.user.companyRole = token.companyRole as "owner" | "member" | undefined;
+        session.user.memberId = token.memberId as string | undefined;
       }
       return session;
     },

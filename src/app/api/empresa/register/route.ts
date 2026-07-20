@@ -37,14 +37,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "UF inválida." }, { status: 400 });
     }
 
-    const existing = await prisma.company.findUnique({ where: { email }, select: { id: true } });
-    if (existing) {
+    // E-mail precisa ser único tanto como empresa (legado) quanto como membro (login).
+    const [existingCompany, existingMember] = await Promise.all([
+      prisma.company.findUnique({ where: { email }, select: { id: true } }),
+      prisma.companyMember.findUnique({ where: { email }, select: { id: true } }),
+    ]);
+    if (existingCompany || existingMember) {
       return NextResponse.json({ error: "Já existe uma empresa com este e-mail." }, { status: 409 });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    // Cria a organização e o membro "owner" (identidade de login) juntos.
     await prisma.company.create({
-      data: { name, email, passwordHash, cnpj, city, state },
+      data: {
+        name,
+        email,
+        passwordHash,
+        cnpj,
+        city,
+        state,
+        members: { create: { name, email, passwordHash, role: "owner" } },
+      },
     });
 
     return NextResponse.json({ ok: true });

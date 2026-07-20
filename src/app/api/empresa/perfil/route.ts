@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { requireCompanyApi } from "@/lib/company-auth";
 import { prisma } from "@/lib/prisma";
-import { normalizeEmail, isValidEmail } from "@/lib/email";
 
-// Atualiza os dados cadastrais da empresa (inclui e-mail de login).
+// Atualiza os dados cadastrais da empresa (organização). O e-mail/senha de acesso
+// são da conta do membro (ver /api/empresa/conta), não da empresa.
 export async function PATCH(req: Request) {
   const { company, response } = await requireCompanyApi();
   if (!company) return response;
 
-  let body: { name?: string; cnpj?: string; city?: string; state?: string; logoUrl?: string; email?: string };
+  let body: { name?: string; cnpj?: string; city?: string; state?: string; logoUrl?: string };
   try {
     body = await req.json();
   } catch {
@@ -18,18 +18,6 @@ export async function PATCH(req: Request) {
   const name = (body.name ?? "").trim();
   if (name.length < 2) {
     return NextResponse.json({ error: "Informe o nome da empresa." }, { status: 400 });
-  }
-
-  const email = normalizeEmail(body.email);
-  if (!email || !isValidEmail(email)) {
-    return NextResponse.json({ error: "E-mail inválido." }, { status: 400 });
-  }
-  // E-mail é a chave de login: não pode colidir com outra empresa.
-  if (email !== company.email) {
-    const existing = await prisma.company.findUnique({ where: { email }, select: { id: true } });
-    if (existing && existing.id !== company.id) {
-      return NextResponse.json({ error: "Já existe uma empresa com esse e-mail." }, { status: 409 });
-    }
   }
 
   const logoUrl = (body.logoUrl ?? "").trim();
@@ -45,7 +33,6 @@ export async function PATCH(req: Request) {
       city: (body.city ?? "").trim(),
       state: (body.state ?? "").trim().toUpperCase().slice(0, 2),
       logoUrl,
-      email,
     },
   });
 

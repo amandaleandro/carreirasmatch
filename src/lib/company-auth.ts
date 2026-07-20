@@ -19,7 +19,9 @@ export const requireCompanyPage = cache(async () => {
   }
   const company = await prisma.company.findUnique({ where: { id: session.user.companyId } });
   if (!company) redirect("/empresa/login");
-  return { session, company };
+  const memberId = session.user.memberId ?? null;
+  const role = session.user.companyRole ?? "member";
+  return { session, company, memberId, role };
 });
 
 /** Para rotas de API de empresa: exige sessão de empresa, senão devolve 401/403. */
@@ -38,5 +40,7 @@ export async function requireCompanyApi() {
       response: NextResponse.json({ error: "Sua sessão expirou. Entre novamente." }, { status: 401 }),
     };
   }
-  return { company, response: null };
+  const memberId = session.user.memberId ?? null;
+  const role = (session.user.companyRole ?? "member") as "owner" | "member";
+  return { company, memberId, role, response: null };
 }

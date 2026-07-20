@@ -64,14 +64,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const rateLimit = checkRateLimit(`company-login:${ip}:${email}`, LOGIN_LIMIT);
         if (!rateLimit.allowed) return null;
 
-        const company = await prisma.company.findUnique({ where: { email } });
-        if (!company?.passwordHash) return null;
+        // Autentica o MEMBRO da empresa (a Company é a organização). O membro
+        // "owner" espelha o cadastro original, então logins existentes seguem.
+        const member = await prisma.companyMember.findUnique({ where: { email } });
+        if (!member?.passwordHash) return null;
 
-        const valid = await bcrypt.compare(password, company.passwordHash);
+        const valid = await bcrypt.compare(password, member.passwordHash);
         if (!valid) return null;
 
-        // O `accountType` marca esta sessão como de empresa; propagado no callback jwt.
-        return { id: company.id, name: company.name, email: company.email, accountType: "company" as const };
+        // `accountType` marca a sessão como de empresa; `companyId` é da empresa
+        // (não do membro). Propagados no callback jwt.
+        return {
+          id: member.id,
+          name: member.name,
+          email: member.email,
+          accountType: "company" as const,
+          companyId: member.companyId,
+          companyRole: member.role === "owner" ? ("owner" as const) : ("member" as const),
+        };
       },
     }),
   ],

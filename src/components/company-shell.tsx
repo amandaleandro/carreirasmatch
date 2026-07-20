@@ -11,6 +11,7 @@ import {
   Briefcase,
   Handshake,
   Users,
+  UsersRound,
   BarChart3,
   CreditCard,
   LogOut,
@@ -21,13 +22,14 @@ import {
 
 type NavItem = { href: string; label: string; icon: LucideIcon; badge?: number };
 
-function buildNavItems(contactsBadge: number): NavItem[] {
+function buildNavItems(contactsBadge: number, isOwner: boolean): NavItem[] {
   return [
     { href: "/empresa", label: "Triagens", icon: LayoutDashboard },
     { href: "/empresa/vagas", label: "Vagas", icon: Briefcase },
     { href: "/empresa/talentos", label: "Banco de talentos", icon: Users },
     { href: "/empresa/contatos", label: "Contatos", icon: Handshake, badge: contactsBadge },
     { href: "/empresa/relatorios", label: "Relatórios", icon: BarChart3 },
+    ...(isOwner ? [{ href: "/empresa/equipe", label: "Equipe", icon: UsersRound }] : []),
     { href: "/empresa/billing", label: "Créditos", icon: CreditCard },
   ];
 }
@@ -46,17 +48,19 @@ export function CompanyShell({
   logoUrl,
   remaining,
   contactsBadge = 0,
+  isOwner = false,
   children,
 }: {
   companyName: string;
   logoUrl?: string | null;
   remaining: number;
   contactsBadge?: number;
+  isOwner?: boolean;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const navItems = buildNavItems(contactsBadge);
+  const navItems = buildNavItems(contactsBadge, isOwner);
 
   const navLinks = (onNavigate?: () => void) =>
     navItems.map((item) => {

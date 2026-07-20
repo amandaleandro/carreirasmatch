@@ -249,6 +249,26 @@ export async function sendCompanyContactAcceptedEmail(
   );
 }
 
+/** Convida um novo membro da equipe da empresa, com a senha temporária. */
+export async function sendCompanyMemberInviteEmail(
+  to: string,
+  opts: { companyName: string; tempPassword: string }
+) {
+  await send(
+    to,
+    `Você foi adicionado(a) à equipe de ${opts.companyName} no ${BRAND}`,
+    `
+      <h2 style="font-size: 20px;">Bem-vindo(a) à equipe</h2>
+      <p>Você foi adicionado(a) como membro da equipe de <strong>${opts.companyName}</strong> no ${BRAND}.</p>
+      <p>Entre com este e-mail e a senha temporária abaixo, e troque a senha no seu perfil:</p>
+      <p style="background:#f1f5f9;border-radius:10px;padding:12px;font-size:16px;">
+        Senha temporária: <strong>${opts.tempPassword}</strong>
+      </p>
+      ${button(`${APP_URL}/empresa/login`, "Entrar na área da empresa")}
+    `
+  );
+}
+
 /** Avisa o candidato que a empresa agendou uma entrevista. */
 export async function sendInterviewScheduledEmail(
   to: string,
