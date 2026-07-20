@@ -214,6 +214,41 @@ export async function notifyAdminSupportTicket(opts: {
   ]);
 }
 
+/** Avisa o candidato que uma empresa pediu contato pelo banco de talentos. */
+export async function sendTalentContactRequestEmail(
+  to: string,
+  opts: { companyName: string; jobTitle?: string }
+) {
+  const forJob = opts.jobTitle?.trim() ? ` para a vaga de <strong>${opts.jobTitle.trim()}</strong>` : "";
+  await send(
+    to,
+    `${opts.companyName} quer falar com você`,
+    `
+      <h2 style="font-size: 20px;">Uma empresa quer seu contato</h2>
+      <p><strong>${opts.companyName}</strong> encontrou seu perfil no banco de talentos do ${BRAND} e pediu para entrar em contato${forJob}.</p>
+      <p>Seu contato só é liberado se você aceitar. Veja o pedido e decida:</p>
+      ${button(`${APP_URL}/settings`, "Ver pedido de contato")}
+    `
+  );
+}
+
+/** Avisa a empresa que o candidato liberou o contato. */
+export async function sendCompanyContactAcceptedEmail(
+  to: string,
+  opts: { candidateName: string; jobTitle?: string }
+) {
+  const forJob = opts.jobTitle?.trim() ? ` para a vaga de <strong>${opts.jobTitle.trim()}</strong>` : "";
+  await send(
+    to,
+    `${opts.candidateName} liberou o contato`,
+    `
+      <h2 style="font-size: 20px;">Contato liberado 🎉</h2>
+      <p><strong>${opts.candidateName}</strong> aceitou seu pedido de contato${forJob}. Os dados já estão disponíveis na sua central de contatos.</p>
+      ${button(`${APP_URL}/empresa/contatos`, "Ver contato")}
+    `
+  );
+}
+
 export async function sendPaymentConfirmationEmail(
   to: string,
   opts: { kind: string; amountCents: number }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
+import { sendOnce, sendCompanyContactAcceptedEmail } from "@/lib/resend";
 
 // Candidato aceita ou recusa um pedido de contato de empresa.
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -17,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   // Só o dono do pedido pode responder, e só enquanto estiver pendente.
   const request = await prisma.talentContactRequest.findFirst({
     where: { id, userId: session.user.id, status: "pending" },
-    select: { id: true },
+    select: { id: true, jobTitle: true, company: { select: { email: true } }, user: { select: { name: true } } },
   });
   if (!request) {
     return NextResponse.json({ error: "Pedido não encontrado." }, { status: 404 });
@@ -25,6 +26,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const status = action === "accept" ? "accepted" : "declined";
   await prisma.talentContactRequest.update({ where: { id: request.id }, data: { status } });
+
+  // Ao aceitar, avisa a empresa por e-mail (uma vez por pedido).
+  if (status === "accepted" && request.company?.email) {
+    const candidateName = request.user?.name?.trim() || "Um candidato";
+    void sendOnce("talent_contact_accepted", request.id, request.company.email, () =>
+      sendCompanyContactAcceptedEmail(request.company!.email, { candidateName, jobTitle: request.jobTitle })
+    );
+  }
 
   return NextResponse.json({ status });
 }
