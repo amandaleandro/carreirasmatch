@@ -242,7 +242,7 @@ export default async function FeedPage({
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
           <div className="flex items-start gap-3 mb-4">
             <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
@@ -272,6 +272,38 @@ export default async function FeedPage({
           </div>
           <FetchJobsButton />
         </div>
+
+        {behavioralResult && (
+          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-start gap-3 mb-3">
+                <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                  <span className="text-base">🧠</span>
+                </span>
+                <div>
+                  <p className="font-semibold">Seu perfil comportamental</p>
+                  <p className="text-xs text-neutral-500">Última avaliação realizada</p>
+                </div>
+              </div>
+              <div className="space-y-2 mt-4">
+                <p className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                  {behavioralResult.personalityLabel}
+                </p>
+                <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-3 leading-relaxed">
+                  {behavioralResult.summary}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-900 flex items-center justify-between">
+              <Link
+                href="/tools/behavioral-test"
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Ver resultado completo ou refazer →
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
