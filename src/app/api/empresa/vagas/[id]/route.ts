@@ -19,6 +19,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     state?: string;
     status?: string;
     publishedToFeed?: boolean;
+    salaryMin?: unknown;
+    workModel?: string;
+    seniority?: string;
+    jobType?: string;
   };
   try {
     body = await req.json();
@@ -47,6 +51,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     data.state = (body.state ?? "").trim().toUpperCase().slice(0, 2);
   }
 
+  // Campos opcionais do anúncio (aceitos em qualquer edição).
+  if (body.salaryMin !== undefined) {
+    const n = Number(body.salaryMin);
+    data.salaryMin = Number.isFinite(n) && n > 0 ? Math.round(n) : null;
+  }
+  if (body.workModel !== undefined) data.workModel = String(body.workModel).trim();
+  if (body.seniority !== undefined) data.seniority = String(body.seniority).trim();
+  if (body.jobType !== undefined) data.jobType = String(body.jobType).trim();
+
   if (body.publishedToFeed !== undefined) {
     data.publishedToFeed = Boolean(body.publishedToFeed);
   }
@@ -62,7 +75,18 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const shouldBeInFeed = next.publishedToFeed && next.status !== "closed";
   if (shouldBeInFeed) {
     const feedJobId = await publishVagaToFeed(
-      { id: vaga.id, title: next.title, description: next.description, area: next.area, state: next.state, feedJobId: vaga.feedJobId },
+      {
+        id: vaga.id,
+        title: next.title,
+        description: next.description,
+        area: next.area,
+        state: next.state,
+        salaryMin: next.salaryMin,
+        workModel: next.workModel,
+        seniority: next.seniority,
+        jobType: next.jobType,
+        feedJobId: vaga.feedJobId,
+      },
       company.name
     );
     data.feedJobId = feedJobId;

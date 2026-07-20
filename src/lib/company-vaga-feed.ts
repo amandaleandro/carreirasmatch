@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { isEntryLevelVaga } from "@/lib/vaga-fields";
 
 /** URL (relativa) da página pública de uma vaga de empresa no feed. */
 export function vagaFeedUrl(vagaId: string): string {
@@ -11,6 +12,10 @@ type VagaForFeed = {
   description: string;
   area: string;
   state: string;
+  workModel?: string;
+  seniority?: string;
+  jobType?: string;
+  salaryMin?: number | null;
   feedJobId: string | null;
 };
 
@@ -27,6 +32,10 @@ export async function publishVagaToFeed(vaga: VagaForFeed, companyName: string):
     area: vaga.area || "",
     company: companyName,
     source: "empresa",
+    workModel: vaga.workModel || "",
+    seniority: vaga.seniority || "",
+    entryLevel: isEntryLevelVaga(vaga.seniority ?? "", vaga.jobType ?? ""),
+    salaryMin: vaga.salaryMin ?? null,
     active: true,
   };
 

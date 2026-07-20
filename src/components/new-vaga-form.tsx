@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { WORK_MODELS, SENIORITIES, JOB_TYPES } from "@/lib/vaga-fields";
 
 export function NewVagaForm() {
   const router = useRouter();
@@ -9,6 +10,10 @@ export function NewVagaForm() {
   const [description, setDescription] = useState("");
   const [area, setArea] = useState("");
   const [state, setState] = useState("");
+  const [workModel, setWorkModel] = useState("");
+  const [seniority, setSeniority] = useState("");
+  const [jobType, setJobType] = useState("");
+  const [salaryMin, setSalaryMin] = useState("");
   const [publishToFeed, setPublishToFeed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -49,7 +54,17 @@ export function NewVagaForm() {
       const res = await fetch("/api/empresa/vagas", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, description, area, state, publishedToFeed: publishToFeed }),
+        body: JSON.stringify({
+          title,
+          description,
+          area,
+          state,
+          workModel,
+          seniority,
+          jobType,
+          salaryMin,
+          publishedToFeed: publishToFeed,
+        }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao cadastrar a vaga.");
@@ -108,6 +123,40 @@ export function NewVagaForm() {
         <div className="w-24">
           <label className={labelClass}>UF (opcional)</label>
           <input type="text" value={state} onChange={(e) => setState(e.target.value.toUpperCase())} maxLength={2} className={inputClass} />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className={labelClass}>Modelo</label>
+          <select value={workModel} onChange={(e) => setWorkModel(e.target.value)} className={inputClass}>
+            <option value="">Não informar</option>
+            {WORK_MODELS.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Senioridade</label>
+          <select value={seniority} onChange={(e) => setSeniority(e.target.value)} className={inputClass}>
+            <option value="">Não informar</option>
+            {SENIORITIES.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Tipo</label>
+          <select value={jobType} onChange={(e) => setJobType(e.target.value)} className={inputClass}>
+            <option value="">Não informar</option>
+            {JOB_TYPES.map((o) => (
+              <option key={o.value} value={o.value}>{o.label}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className={labelClass}>Salário mínimo (R$)</label>
+          <input type="number" min={0} step={100} value={salaryMin} onChange={(e) => setSalaryMin(e.target.value)} className={inputClass} placeholder="Ex: 2500" />
         </div>
       </div>
 

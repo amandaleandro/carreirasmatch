@@ -9,7 +9,17 @@ export async function POST(req: Request) {
   const { company, response } = await requireCompanyApi();
   if (!company) return response;
 
-  let body: { title?: string; description?: string; area?: string; state?: string; publishedToFeed?: boolean };
+  let body: {
+    title?: string;
+    description?: string;
+    area?: string;
+    state?: string;
+    publishedToFeed?: boolean;
+    salaryMin?: unknown;
+    workModel?: string;
+    seniority?: string;
+    jobType?: string;
+  };
   try {
     body = await req.json();
   } catch {
@@ -21,19 +31,24 @@ export async function POST(req: Request) {
   const area = (body.area ?? "").trim();
   const state = (body.state ?? "").trim().toUpperCase().slice(0, 2);
   const publish = Boolean(body.publishedToFeed);
+  const salaryNum = Number(body.salaryMin);
+  const salaryMin = Number.isFinite(salaryNum) && salaryNum > 0 ? Math.round(salaryNum) : null;
+  const workModel = (body.workModel ?? "").trim();
+  const seniority = (body.seniority ?? "").trim();
+  const jobType = (body.jobType ?? "").trim();
 
   if (!title || !description) {
     return NextResponse.json({ error: "Preencha o cargo e a descrição da vaga." }, { status: 400 });
   }
 
   const vaga = await prisma.companyVaga.create({
-    data: { companyId: company.id, title, description, area, state },
+    data: { companyId: company.id, title, description, area, state, salaryMin, workModel, seniority, jobType },
   });
 
   // Publica no feed já na criação, se marcado.
   if (publish) {
     const feedJobId = await publishVagaToFeed(
-      { id: vaga.id, title, description, area, state, feedJobId: null },
+      { id: vaga.id, title, description, area, state, salaryMin, workModel, seniority, jobType, feedJobId: null },
       company.name
     );
     await prisma.companyVaga.update({ where: { id: vaga.id }, data: { publishedToFeed: true, feedJobId } });

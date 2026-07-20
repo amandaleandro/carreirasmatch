@@ -5,6 +5,8 @@ import { requireCompanyPage } from "@/lib/company-auth";
 import { parseStoredMatches, hydrateMatches } from "@/lib/company-vaga";
 import { VagaMatches } from "@/components/vaga-matches";
 import { VagaActions } from "@/components/vaga-actions";
+import { vagaAttributeChips } from "@/lib/vaga-fields";
+import { VagaApplications } from "@/components/vaga-applications";
 
 export const dynamic = "force-dynamic";
 
@@ -59,6 +61,15 @@ export default async function VagaDetailPage({ params }: { params: Promise<{ id:
               {[vaga.area, vaga.state].filter(Boolean).length > 0 && (
                 <p className="text-sm text-neutral-500 mt-1">{[vaga.area, vaga.state].filter(Boolean).join(" / ")}</p>
               )}
+              {vagaAttributeChips(vaga).length > 0 && (
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  {vagaAttributeChips(vaga).map((chip) => (
+                    <span key={chip} className="rounded-full bg-neutral-100 dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                      {chip}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
             <VagaActions vagaId={vaga.id} status={vaga.status} publishedToFeed={vaga.publishedToFeed} />
           </div>
@@ -77,25 +88,21 @@ export default async function VagaDetailPage({ params }: { params: Promise<{ id:
                 Ninguém se candidatou ainda. Sua vaga está no feed público de vagas dos candidatos.
               </p>
             ) : (
-              <ul className="space-y-3">
-                {applications.map((a) => (
-                  <li key={a.id} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5">
-                    <h3 className="font-semibold">{a.user.name || "Candidato"}</h3>
-                    <p className="text-xs text-neutral-500 mt-0.5">
-                      {[a.user.professionalArea, [a.user.city, a.user.state].filter(Boolean).join("/")]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </p>
-                    <div className="mt-2 text-sm text-neutral-700 dark:text-neutral-300 space-y-0.5">
-                      {a.user.email && <p>{a.user.email}</p>}
-                      {a.user.phone && <p>{a.user.phone}</p>}
-                    </div>
-                    {a.message && (
-                      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-line">{a.message}</p>
-                    )}
-                  </li>
-                ))}
-              </ul>
+              <VagaApplications
+                applications={applications.map((a) => ({
+                  id: a.id,
+                  name: a.user.name || "",
+                  email: a.user.email || "",
+                  phone: a.user.phone || "",
+                  area: a.user.professionalArea || "",
+                  city: a.user.city || "",
+                  state: a.user.state || "",
+                  message: a.message,
+                  status: a.status,
+                  note: a.note,
+                  createdAt: a.createdAt.toISOString(),
+                }))}
+              />
             )}
           </section>
         )}

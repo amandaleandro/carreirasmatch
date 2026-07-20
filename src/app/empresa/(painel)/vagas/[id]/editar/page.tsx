@@ -24,7 +24,17 @@ export default async function EditVagaPage({ params }: { params: Promise<{ id: s
         </header>
 
         <EditVagaForm
-          vaga={{ id: vaga.id, title: vaga.title, description: vaga.description, area: vaga.area, state: vaga.state }}
+          vaga={{
+            id: vaga.id,
+            title: vaga.title,
+            description: vaga.description,
+            area: vaga.area,
+            state: vaga.state,
+            workModel: vaga.workModel,
+            seniority: vaga.seniority,
+            jobType: vaga.jobType,
+            salaryMin: vaga.salaryMin,
+          }}
         />
       </div>
     </div>

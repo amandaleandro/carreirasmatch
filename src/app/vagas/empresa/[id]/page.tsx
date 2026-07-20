@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ApplyVaga } from "@/components/apply-vaga";
+import { vagaAttributeChips } from "@/lib/vaga-fields";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +64,15 @@ export default async function CompanyVagaPublicPage({ params }: { params: Promis
               <p className="flex items-center gap-1.5 text-sm text-neutral-500">
                 <MapPin className="h-4 w-4" strokeWidth={1.75} /> {location}
               </p>
+            )}
+            {vagaAttributeChips(vaga).length > 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {vagaAttributeChips(vaga).map((chip) => (
+                  <span key={chip} className="rounded-full bg-neutral-100 dark:bg-neutral-800 px-2.5 py-0.5 text-xs font-medium text-neutral-600 dark:text-neutral-300">
+                    {chip}
+                  </span>
+                ))}
+              </div>
             )}
           </header>
 

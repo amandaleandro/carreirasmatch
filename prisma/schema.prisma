@@ -859,6 +859,11 @@ model CompanyVaga {
   area          String    @default("")
   state         String    @default("")
   status        String    @default("open") // open | closed
+  /// Campos opcionais que enriquecem o anúncio e o feed.
+  salaryMin     Int?
+  workModel     String    @default("") // presencial | hibrido | remoto
+  seniority     String    @default("") // estagio | junior | pleno | senior
+  jobType       String    @default("") // clt | pj | estagio | temporario
   /// Snapshot do último matching, sem dados de contato: JSON de
   /// { userId, firstName, professionalArea, city, state, fitScore, reason }.
   /// O status do contato e o contato em si são resolvidos ao vivo na leitura.
@@ -883,7 +888,9 @@ model CompanyJobApplication {
   userId    String
   user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   message   String      @default("")
-  status    String      @default("new") // new | reviewed
+  status    String      @default("new") // new | reviewing | interview | approved | rejected
+  /// Anotação interna da empresa sobre a candidatura.
+  note      String      @default("")
   createdAt DateTime    @default(now())
 
   @@unique([vagaId, userId])
