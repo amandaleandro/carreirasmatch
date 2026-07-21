@@ -197,62 +197,66 @@ function FeedCard({
         {error && <p className="text-sm text-red-600 dark:text-red-400 mt-2">{error}</p>}
       </div>
 
-      <div className="flex flex-col gap-2 shrink-0 w-full sm:w-56">
-        <select
-          value={careerTrack}
-          onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
-          className="rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-2 text-xs"
-        >
-          {CAREER_TRACK_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={handleFullAnalysis}
-          disabled={loading}
-          className="rounded-xl bg-blue-600 text-white font-semibold px-4 py-2.5 text-sm shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5"
-        >
-          {loading ? "Analisando..." : "Ver análise completa"}
-          {!loading && (
-            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          )}
-        </button>
-        <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-neutral-900 text-white dark:bg-neutral-100 dark:text-neutral-950 font-semibold px-4 py-2.5 text-sm hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
+      <div className="flex flex-col justify-between gap-2.5 shrink-0 w-full sm:w-60 p-3.5 rounded-2xl bg-neutral-50/70 dark:bg-neutral-900/50 border border-neutral-200/80 dark:border-neutral-800">
+        <div className="space-y-2">
+          <select
+            value={careerTrack}
+            onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
+            className="w-full truncate rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 px-3 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500/20 shadow-2xs cursor-pointer"
           >
-            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
-              <path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4-6 4V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-            </svg>
-            Salvar no Kanban
-          </button>
-        </form>
+            {CAREER_TRACK_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
 
-        <div className="flex gap-2">
-          <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")} className="flex-1">
+          <button
+            onClick={handleFullAnalysis}
+            disabled={loading}
+            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 text-xs sm:text-sm shadow-sm shadow-blue-600/25 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            {loading ? "Analisando..." : "Ver análise completa"}
+            {!loading && (
+              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0">
+                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            )}
+          </button>
+
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
             <button
               type="submit"
-              className="w-full rounded-xl border border-amber-300 dark:border-amber-800 text-amber-700 dark:text-amber-400 font-semibold px-3 py-2 text-xs hover:bg-amber-50 dark:hover:bg-amber-950/40 transition-colors"
+              className="w-full rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 font-semibold px-4 py-2 text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              Ajustar currículo
+              <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 shrink-0">
+                <path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4-6 4V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+              </svg>
+              Salvar no Kanban
             </button>
           </form>
-          <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")} className="flex-1">
-            <button
-              type="submit"
-              className="w-full rounded-xl border border-blue-300 dark:border-blue-800 text-blue-700 dark:text-blue-400 font-semibold px-3 py-2 text-xs hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors"
-            >
-              Aplicada
-            </button>
-          </form>
+
+          <div className="grid grid-cols-2 gap-1.5">
+            <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")}>
+              <button
+                type="submit"
+                className="w-full rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50/80 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 font-semibold px-2 py-1.5 text-xs hover:bg-amber-100 dark:hover:bg-amber-950/70 transition-colors text-center cursor-pointer truncate"
+              >
+                Ajustar currículo
+              </button>
+            </form>
+            <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")}>
+              <button
+                type="submit"
+                className="w-full rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/80 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 font-semibold px-2 py-1.5 text-xs hover:bg-blue-100 dark:hover:bg-blue-950/70 transition-colors text-center cursor-pointer truncate"
+              >
+                Aplicada
+              </button>
+            </form>
+          </div>
         </div>
 
-        <div className="flex items-center justify-between text-xs pt-1">
+        <div className="flex items-center justify-between text-xs pt-2 border-t border-neutral-200/60 dark:border-neutral-800/60">
           <a
             href={match.job.url}
             target="_blank"
@@ -265,7 +269,7 @@ function FeedCard({
             </svg>
           </a>
           <form action={discardFeedMatch.bind(null, match.id)}>
-            <button type="submit" className="text-neutral-400 hover:text-red-500 font-medium">
+            <button type="submit" className="text-neutral-400 hover:text-red-500 font-medium cursor-pointer">
               Descartar ✕
             </button>
           </form>
