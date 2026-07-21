@@ -80,19 +80,15 @@ export async function POST(req: NextRequest) {
       ...(signupCouponId ? { signupCouponId } : {}),
     };
 
-    if (existing) {
-      await prisma.user.update({ where: { id: existing.id }, data });
-    } else {
-      await prisma.user.create({ data: { ...data, email: normalizedEmail } });
-      // Fire-and-forget: nunca bloqueia o cadastro se o e-mail falhar.
-      void sendWelcomeEmail(normalizedEmail, data.name);
-      void notifyAdminNewSignup({
-        name: normalizedName,
-        email: normalizedEmail,
-        phone: normalizedPhone,
-        segment: careerSegment,
-      });
-    }
+    await prisma.user.create({ data: { ...data, email: normalizedEmail } });
+    // Fire-and-forget: nunca bloqueia o cadastro se o e-mail falhar.
+    void sendWelcomeEmail(normalizedEmail, data.name);
+    void notifyAdminNewSignup({
+      name: normalizedName,
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      segment: careerSegment,
+    });
 
     await prisma.lead.create({
       data: { name: normalizedName, email: normalizedEmail, phone: normalizedPhone, source: "registration" },
