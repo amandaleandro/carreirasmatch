@@ -62,6 +62,10 @@ export default function ParceiroLandingPage() {
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />
           </Link>
+          <nav className="hidden items-center gap-6 text-sm font-medium text-white/70 md:flex">
+            <Link href="/empresas" className="hover:text-white">Empresas</Link>
+            <Link href="/freelancers" className="hover:text-white">Freelancers</Link>
+          </nav>
           <div className="flex items-center gap-2">
             <Link
               href="/parceiro/login"

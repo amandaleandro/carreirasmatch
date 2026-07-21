@@ -3,10 +3,12 @@ import {
   ArrowRight,
   BookOpenCheck,
   BriefcaseBusiness,
+  Building2,
   Check,
   Compass,
   FileSearch,
   GraduationCap,
+  Handshake,
   RefreshCw,
   Scale,
   ShieldCheck,
@@ -101,6 +103,36 @@ const journeys = [
   },
 ];
 
+const audiences = [
+  {
+    href: "/empresas",
+    label: "Empresas",
+    title: "Encontre candidatos certos, ranqueados por IA.",
+    description: "Publique vagas, ranqueie currículos por aderência e monte seu banco de talentos.",
+    icon: Building2,
+    accent: "text-blue-600 bg-blue-50 dark:bg-blue-950/30 dark:text-blue-300",
+    cta: "Ver planos para empresas",
+  },
+  {
+    href: "/freelancers",
+    label: "Freelancers",
+    title: "Contrate especialistas ou ofereça seus serviços.",
+    description: "Marketplace para encontrar profissionais qualificados ou divulgar seu trabalho freelancer.",
+    icon: BriefcaseBusiness,
+    accent: "text-cyan-600 bg-cyan-50 dark:bg-cyan-950/30 dark:text-cyan-300",
+    cta: "Explorar marketplace",
+  },
+  {
+    href: "/parceiro",
+    label: "Parceiros",
+    title: "Divulgue cursos para quem busca a próxima vaga.",
+    description: "Escolas e criadores de curso alcançam milhares de profissionais em busca de qualificação.",
+    icon: Handshake,
+    accent: "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 dark:text-emerald-300",
+    cta: "Seja um parceiro",
+  },
+];
+
 const deliverables = [
   "Score de aderência e leitura ATS",
   "Pontos fortes e lacunas prioritárias",
@@ -128,6 +160,9 @@ export function MarketingHome() {
             <a href="#para-voce" className="hover:text-white">Para você</a>
             <Link href="/vagas-de-hoje" className="hover:text-white">Vagas</Link>
             <Link href="/gratuito" className="hover:text-white">Ferramentas grátis</Link>
+            <Link href="/freelancers" className="hover:text-white">Freelancers</Link>
+            <Link href="/empresas" className="hover:text-white">Empresas</Link>
+            <Link href="/parceiro" className="hover:text-white">Parceiros</Link>
           </nav>
           <div className="flex items-center gap-2">
             <Link href="/login" className="rounded-lg border border-white/20 px-4 py-2 text-sm font-semibold hover:bg-white/10">
@@ -265,7 +300,29 @@ export function MarketingHome() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
+        <section className="border-t border-neutral-200 bg-white/70 dark:border-neutral-800 dark:bg-neutral-950/50">
+          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+            <div className="reveal-up text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Não é só para quem busca vaga</p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Feito também para empresas, freelancers e parceiros.</h2>
+            </div>
+            <div className="mt-10 grid gap-5 lg:grid-cols-3">
+              {audiences.map(({ href, label, title, description, icon: Icon, accent, cta }) => (
+                <Link key={href} href={href} className="reveal-up group rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-950">
+                  <span className={`inline-flex rounded-xl p-3 ${accent}`}><Icon className="h-5 w-5" /></span>
+                  <p className="mt-5 text-xs font-bold uppercase tracking-wide text-neutral-400">{label}</p>
+                  <h3 className="mt-2 text-xl font-bold">{title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">{description}</p>
+                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-blue-600">
+                    {cta} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-4 pb-20 pt-20 md:px-8">
           <div className="reveal-up grid gap-8 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white md:px-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="flex items-center gap-2 text-blue-300"><FileSearch className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Sua próxima candidatura</span></div>
