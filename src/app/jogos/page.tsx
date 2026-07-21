@@ -1,7 +1,7 @@
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import Link from "next/link";
-import { Sparkles, Keyboard, Trophy, Brain, Flame, Calendar, CalendarDays } from "lucide-react";
+import { Sparkles, Keyboard, Trophy, Brain, Flame, Calendar, CalendarDays, Type, Skull, Scale, ListOrdered } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -120,6 +120,82 @@ export default async function GamesHubPage() {
               href="/jogos/memoria"
               className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 text-xs font-bold shadow-sm transition-all text-center"
             >
+              Jogar Agora
+            </Link>
+          </div>
+
+          {/* Card Jogo 4: Termo */}
+          <div className="group rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-[0.02] dark:opacity-[0.04] group-hover:scale-110 transition-transform">
+              <Type className="w-40 h-40" />
+            </div>
+            <div className="space-y-4 relative">
+              <div className="rounded-2xl bg-emerald-50 dark:bg-emerald-950/50 p-3.5 text-emerald-600 dark:text-emerald-400 w-fit">
+                <Type className="h-7 w-7" />
+              </div>
+              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Termo</h2>
+              <p className="text-neutral-500 dark:text-neutral-400 text-xs leading-relaxed">
+                Adivinhe a palavra profissional de 5 letras em até 6 tentativas, com pistas de cores. Quanto menos tentativas, mais pontos.
+              </p>
+            </div>
+            <Link href="/jogos/termo" className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 text-xs font-bold shadow-sm transition-all text-center">
+              Jogar Agora
+            </Link>
+          </div>
+
+          {/* Card Jogo 5: Forca */}
+          <div className="group rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-[0.02] dark:opacity-[0.04] group-hover:scale-110 transition-transform">
+              <Skull className="w-40 h-40" />
+            </div>
+            <div className="space-y-4 relative">
+              <div className="rounded-2xl bg-rose-50 dark:bg-rose-950/50 p-3.5 text-rose-600 dark:text-rose-400 w-fit">
+                <Skull className="h-7 w-7" />
+              </div>
+              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Forca Profissional</h2>
+              <p className="text-neutral-500 dark:text-neutral-400 text-xs leading-relaxed">
+                Descubra termos de carreira e tecnologia letra por letra, guiado por dicas. Erre pouco para pontuar mais em cada palavra.
+              </p>
+            </div>
+            <Link href="/jogos/forca" className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-5 py-2.5 text-xs font-bold shadow-sm transition-all text-center">
+              Jogar Agora
+            </Link>
+          </div>
+
+          {/* Card Jogo 6: Verdadeiro ou Falso */}
+          <div className="group rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-[0.02] dark:opacity-[0.04] group-hover:scale-110 transition-transform">
+              <Scale className="w-40 h-40" />
+            </div>
+            <div className="space-y-4 relative">
+              <div className="rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 p-3.5 text-indigo-600 dark:text-indigo-400 w-fit">
+                <Scale className="h-7 w-7" />
+              </div>
+              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Verdadeiro ou Falso</h2>
+              <p className="text-neutral-500 dark:text-neutral-400 text-xs leading-relaxed">
+                Enxurrada de afirmações sobre carreira e mercado contra o relógio. Acerte em sequência para multiplicar sua pontuação.
+              </p>
+            </div>
+            <Link href="/jogos/vf" className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 text-xs font-bold shadow-sm transition-all text-center">
+              Jogar Agora
+            </Link>
+          </div>
+
+          {/* Card Jogo 7: Ordene o Processo */}
+          <div className="group rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-6 opacity-[0.02] dark:opacity-[0.04] group-hover:scale-110 transition-transform">
+              <ListOrdered className="w-40 h-40" />
+            </div>
+            <div className="space-y-4 relative">
+              <div className="rounded-2xl bg-teal-50 dark:bg-teal-950/50 p-3.5 text-teal-600 dark:text-teal-400 w-fit">
+                <ListOrdered className="h-7 w-7" />
+              </div>
+              <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Ordene o Processo</h2>
+              <p className="text-neutral-500 dark:text-neutral-400 text-xs leading-relaxed">
+                Receba as etapas embaralhadas de um processo real (projeto, contratação, vendas) e as coloque na ordem certa.
+              </p>
+            </div>
+            <Link href="/jogos/ordenar" className="mt-6 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 text-xs font-bold shadow-sm transition-all text-center">
               Jogar Agora
             </Link>
           </div>
