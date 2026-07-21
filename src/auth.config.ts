@@ -104,7 +104,9 @@ export const authConfig: NextAuthConfig = {
       const pathname = request.nextUrl.pathname;
 
       // Área de empresa: login/cadastro são públicos; o resto exige sessão de empresa.
-      if (pathname.startsWith("/empresa")) {
+      // Boundary explícito (=== ou +"/") pra não engolir "/empresas", a landing e os
+      // perfis públicos de empresa, que só coincidem no prefixo "/empresa".
+      if (pathname === "/empresa" || pathname.startsWith("/empresa/")) {
         if (pathname === "/empresa/login" || pathname === "/empresa/cadastro") {
           // Empresa já logada não precisa reautenticar; vai direto pro painel.
           if (isCompany) return NextResponse.redirect(new URL("/empresa", request.nextUrl));
@@ -114,9 +116,9 @@ export const authConfig: NextAuthConfig = {
         return NextResponse.redirect(new URL("/empresa/login", request.nextUrl));
       }
 
-      // Área de parceiro: login/cadastro são públicos; o resto exige sessão de parceiro.
-      if (pathname.startsWith("/parceiro")) {
-        if (pathname === "/parceiro/login" || pathname === "/parceiro/cadastro") {
+      // Área de parceiro: landing/login/cadastro são públicos; o resto exige sessão de parceiro.
+      if (pathname === "/parceiro" || pathname.startsWith("/parceiro/")) {
+        if (pathname === "/parceiro" || pathname === "/parceiro/login" || pathname === "/parceiro/cadastro") {
           if (isPartner) return NextResponse.redirect(new URL("/parceiro/dashboard", request.nextUrl));
           return true;
         }

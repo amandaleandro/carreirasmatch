@@ -31,19 +31,36 @@ export default async function FreelancersPage({ searchParams }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 md:px-8 py-10 space-y-8">
+      <section className="rounded-3xl bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950 text-white p-6 sm:p-8">
+        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-500/15 text-blue-300 border border-blue-400/30">
+          Marketplace freelancer
+        </span>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+          Contrate um freelancer ou ofereça seus serviços
+        </h1>
+        <p className="text-white/70 mt-2 max-w-xl text-sm md:text-base">
+          De um lado, profissionais prontos para o seu projeto. Do outro, projetos abertos esperando proposta. Tudo dentro da plataforma, sem taxa para começar.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2">
+          <Link href="/freelancer/perfil" className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-950 hover:bg-blue-50 transition-colors">
+            Sou freelancer, quero oferecer serviços
+          </Link>
+          <Link href="/projetos" className="rounded-xl border border-white/20 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10 transition-colors">
+            Preciso contratar, ver projetos abertos
+          </Link>
+        </div>
+      </section>
+
       <header className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Freelancers</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
+          <h2 className="text-xl font-bold tracking-tight">Freelancers disponíveis</h2>
+          <p className="text-neutral-600 dark:text-neutral-400 mt-1 text-sm">
             Profissionais disponíveis para o seu projeto.
           </p>
         </div>
         <div className="flex gap-2">
-          <Link href="/projetos" className="rounded-xl border border-neutral-200 dark:border-neutral-700 px-4 py-2 text-sm font-medium hover:bg-neutral-50 dark:hover:bg-white/5">
-            Ver projetos
-          </Link>
-          <Link href="/freelancer/perfil" className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
-            Sou freelancer
+          <Link href="/projetos/novo" className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+            Publicar projeto
           </Link>
         </div>
       </header>

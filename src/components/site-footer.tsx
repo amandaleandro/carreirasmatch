@@ -19,8 +19,9 @@ export function SiteFooter({ maxWidth = "max-w-7xl" }: { maxWidth?: string }) {
             <li><Link href="/#como-funciona" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Como funciona</Link></li>
             <li><Link href="/#recursos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Recursos</Link></li>
             <li><Link href="/#planos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Planos</Link></li>
-            <li><Link href="/empresa/cadastro" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Para empresas</Link></li>
-            <li><Link href="/parceiro/cadastro" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Seja parceiro</Link></li>
+            <li><Link href="/empresas" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Para empresas</Link></li>
+            <li><Link href="/parceiro" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Seja parceiro</Link></li>
+            <li><Link href="/freelancers" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Freelancers</Link></li>
           </ul>
         </div>
         <div>

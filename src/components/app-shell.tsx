@@ -14,7 +14,12 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
   if (!session?.user) {
-    return <>{children}</>;
+    return (
+      <>
+        <DesafioBanner />
+        {children}
+      </>
+    );
   }
 
   // Sessão de empresa ou parceiro não usa o shell de candidato (sidebar/topbar): as páginas

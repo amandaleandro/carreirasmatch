@@ -19,7 +19,11 @@ export function DesafioBanner() {
     }
   }, []);
 
-  if (dismissed || pathname.startsWith("/desafio")) return null;
+  // Boundary explícito (=== ou +"/") pra não esconder o banner em rotas que só
+  // coincidem no prefixo, como "/empresas" (landing pública, não é "/empresa/...").
+  const hiddenOn = ["/desafio", "/login", "/register", "/empresa", "/parceiro", "/redefinir-senha", "/esqueci-senha"];
+  const isHidden = hiddenOn.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  if (dismissed || isHidden) return null;
 
   function close() {
     setDismissed(true);
