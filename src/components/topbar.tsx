@@ -114,7 +114,7 @@ export function Topbar({
 
       {/* Mobile Drawer */}
       {mobileNavOpen && (
-        <div className="md:hidden fixed inset-0 z-10 bg-neutral-950/40 backdrop-blur-sm" onClick={() => setMobileNavOpen(false)}>
+        <div className="md:hidden fixed inset-0 z-30 bg-neutral-950/40 backdrop-blur-sm" onClick={() => setMobileNavOpen(false)}>
           <nav 
             className="w-64 h-full bg-[#0b1526] text-white p-5 flex flex-col justify-between border-r border-white/5"
             onClick={(e) => e.stopPropagation()}

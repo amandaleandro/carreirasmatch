@@ -453,19 +453,19 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-3xl font-bold text-blue-600">
-              {journey.daysSearching !== null ? journey.daysSearching : ", "}
+              {journey.daysSearching !== null ? journey.daysSearching : "—"}
             </p>
             <p className="text-xs text-neutral-500 mt-1">Dias em busca</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-blue-600">
-              {journey.responseRate !== null ? `${journey.responseRate}%` : ", "}
+              {journey.responseRate !== null ? `${journey.responseRate}%` : "—"}
             </p>
             <p className="text-xs text-neutral-500 mt-1">Taxa de resposta</p>
           </div>
           <div>
             <p className="text-3xl font-bold text-blue-600">
-              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : ", "}
+              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—"}
             </p>
             <p className="text-xs text-neutral-500 mt-1">Taxa de rejeição</p>
           </div>
@@ -516,8 +516,8 @@ export default async function DashboardPage() {
 
       <div className="card-premium p-6">
         <p className="font-semibold mb-6">Plano de evolução</p>
-        <div className="flex items-center justify-between gap-2 overflow-x-auto pb-2">
-          {[
+        {(() => {
+          const evolutionSteps = [
             { n: 1, label: "Diagnóstico", done: diagnosisDone, status: "Concluído" },
             {
               n: 2,
@@ -532,39 +532,78 @@ export default async function DashboardPage() {
               status: applicationsInProgress ? "Em andamento" : "Próximo passo",
             },
             { n: 4, label: "Entrevistas e ofertas", done: false, status: "Seu objetivo" },
-          ].map((step, i, arr) => (
-            <div key={step.n} className="flex items-center flex-1 last:flex-none min-w-[84px]">
-              <div className="flex flex-col items-center text-center">
-                <span
-                  className={`h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
-                    step.done
-                      ? "bg-emerald-500 text-white"
-                      : step.status === "Em andamento"
-                      ? "bg-blue-600 text-white"
-                      : "bg-neutral-200 dark:bg-neutral-800 text-neutral-500"
-                  }`}
-                >
-                  {step.done ? "✓" : step.n}
-                </span>
-                <p className="text-sm font-medium mt-2 whitespace-nowrap">{step.label}</p>
-                <p
-                  className={`text-xs mt-0.5 whitespace-nowrap ${
-                    step.done
-                      ? "text-emerald-600 dark:text-emerald-400"
-                      : step.status === "Em andamento"
-                      ? "text-blue-600 dark:text-blue-400"
-                      : "text-neutral-500"
-                  }`}
-                >
-                  {step.status}
-                </p>
+          ];
+          return (
+            <>
+              {/* Mobile: stacked 2-column grid, no connecting lines (labels too long to fit a horizontal stepper without overlapping). */}
+              <div className="grid grid-cols-2 gap-4 sm:hidden">
+                {evolutionSteps.map((step) => (
+                  <div key={step.n} className="flex flex-col items-center text-center gap-2">
+                    <span
+                      className={`h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
+                        step.done
+                          ? "bg-emerald-500 text-white"
+                          : step.status === "Em andamento"
+                          ? "bg-blue-600 text-white"
+                          : "bg-neutral-200 dark:bg-neutral-800 text-neutral-500"
+                      }`}
+                    >
+                      {step.done ? "✓" : step.n}
+                    </span>
+                    <p className="text-sm font-medium leading-tight">{step.label}</p>
+                    <p
+                      className={`text-xs ${
+                        step.done
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : step.status === "Em andamento"
+                          ? "text-blue-600 dark:text-blue-400"
+                          : "text-neutral-500"
+                      }`}
+                    >
+                      {step.status}
+                    </p>
+                  </div>
+                ))}
               </div>
-              {i < arr.length - 1 && (
-                <div className="h-0.5 flex-1 mx-2 min-w-[16px] bg-neutral-200 dark:bg-neutral-800" />
-              )}
-            </div>
-          ))}
-        </div>
+
+              {/* Desktop/tablet: horizontal stepper with connecting lines. */}
+              <div className="hidden sm:flex items-center justify-between gap-2 overflow-x-auto pb-2">
+                {evolutionSteps.map((step, i, arr) => (
+                  <div key={step.n} className="flex items-center flex-1 last:flex-none min-w-[84px]">
+                    <div className="flex flex-col items-center text-center">
+                      <span
+                        className={`h-9 w-9 rounded-full flex items-center justify-center text-sm font-semibold shrink-0 ${
+                          step.done
+                            ? "bg-emerald-500 text-white"
+                            : step.status === "Em andamento"
+                            ? "bg-blue-600 text-white"
+                            : "bg-neutral-200 dark:bg-neutral-800 text-neutral-500"
+                        }`}
+                      >
+                        {step.done ? "✓" : step.n}
+                      </span>
+                      <p className="text-sm font-medium mt-2 whitespace-nowrap">{step.label}</p>
+                      <p
+                        className={`text-xs mt-0.5 whitespace-nowrap ${
+                          step.done
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : step.status === "Em andamento"
+                            ? "text-blue-600 dark:text-blue-400"
+                            : "text-neutral-500"
+                        }`}
+                      >
+                        {step.status}
+                      </p>
+                    </div>
+                    {i < arr.length - 1 && (
+                      <div className="h-0.5 flex-1 mx-2 min-w-[16px] bg-neutral-200 dark:bg-neutral-800" />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          );
+        })()}
       </div>
     </div>
   );
