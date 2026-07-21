@@ -139,12 +139,95 @@
       "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"application_status\"}", "legendFormat": "{{value}}" }]
     },
 
-    { "type": "row", "title": "Fora do radar de métricas (checar manualmente)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 }, "collapsed": false, "panels": [] },
+    { "type": "row", "title": "Alertas, blog e radares", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 }, "collapsed": false, "panels": [] },
     {
-      "type": "text", "title": "Jornadas sem telemetria própria", "gridPos": { "h": 6, "w": 24, "x": 0, "y": 18 },
+      "type": "stat", "title": "Alertas de vaga enviados (24h)", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"job_alerts_sent\",period=\"24h\"}" }],
+      "description": "Conta por EmailLog(type=job_alert); e-mail e push saem juntos no mesmo sendOnce (ver email-scheduler.ts)."
+    },
+    {
+      "type": "stat", "title": "Posts de blog publicados (24h)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 1 }, { "color": "green", "value": 3 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"posts\",period=\"24h\"}" }],
+      "description": "Meta padrão é BLOG_POSTS_PER_DAY (default 5/dia) — bem abaixo disso pode indicar blog-scheduler travado."
+    },
+    {
+      "type": "stat", "title": "Radar concursos — desde última coleta OK", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 43200 }, { "color": "red", "value": 129600 } ] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_source_sync_seconds_since_success{key=\"radar-concurso\"}" }],
+      "description": "Feeds RSS de concurso; -1 = nunca teve sucesso registrado."
+    },
+    {
+      "type": "stat", "title": "Radar vestibulares — desde última coleta OK", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 43200 }, { "color": "red", "value": 129600 } ] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_source_sync_seconds_since_success{key=\"radar-vestibular\"}" }],
+      "description": "Feeds RSS de vestibular."
+    },
+    {
+      "type": "stat", "title": "Radar com erro na última tentativa?", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "OK", "color": "green" }, "1": { "text": "ERRO", "color": "red" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["max"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "max(carreiras_source_sync_error{key=~\"radar-.*\"})" }]
+    },
+    {
+      "type": "stat", "title": "Itens ativos nos radares (total)", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 18 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"radar_items_active\"}" }]
+    },
+
+    { "type": "row", "title": "Marketplace freelancer", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Projetos publicados (24h)", "gridPos": { "h": 5, "w": 6, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"freelance_projects\",period=\"24h\"}" }]
+    },
+    {
+      "type": "stat", "title": "Propostas enviadas (24h)", "gridPos": { "h": 5, "w": 6, "x": 6, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"freelance_proposals\",period=\"24h\"}" }]
+    },
+    {
+      "type": "stat", "title": "Contratos fechados (24h)", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"freelance_contracts\",period=\"24h\"}" }]
+    },
+    {
+      "type": "stat", "title": "Total acumulado (projetos/propostas/contratos)", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none", "orientation": "horizontal" },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_total{entity=\"freelance_projects\"}", "legendFormat": "projetos" },
+        { "refId": "B", "expr": "carreiras_business_total{entity=\"freelance_proposals\"}", "legendFormat": "propostas" },
+        { "refId": "C", "expr": "carreiras_business_total{entity=\"freelance_contracts\"}", "legendFormat": "contratos" }
+      ],
+      "description": "Feature nova (2026-07-20) — histórico curto, ainda não dá pra calibrar thresholds de cor."
+    },
+
+    { "type": "row", "title": "Nota", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 29 }, "collapsed": false, "panels": [] },
+    {
+      "type": "text", "title": "Sobre estes números novos", "gridPos": { "h": 4, "w": 24, "x": 0, "y": 30 },
       "options": {
         "mode": "markdown",
-        "content": "Estas jornadas existem e funcionam, mas **não têm métrica Prometheus dedicada** hoje — não aparecem no farol acima porque não há sinal de saúde automatizado, não porque estejam OK:\n\n- **Alertas de vaga (e-mail + push)** — `email-scheduler.ts` (`sendJobAlerts`) e `lib/push.ts`. Checar via `EmailLog` no banco ou logs do container.\n- **Blog/SEO scheduler** — `blog-scheduler.ts`. Checar via tabela `Post` (novos posts recentes).\n- **Radares de concurso/vestibular** — RSS agendado (08h/14h/20h). Checar se rodou nos horários esperados.\n- **Marketplace freelancer** (`FreelanceProject`/`FreelanceProposal`/`FreelanceContract`) — feature nova (2026-07-20), zero instrumentação Prometheus ainda.\n\nSe quiser esses no farol de verdade (com cor vermelha/verde automática), o próximo passo é expor contadores desses fluxos em `src/lib/metrics.ts` como foi feito para análise de CV e pagamentos."
+        "content": "Painéis de alertas de vaga, blog, radares e marketplace freelancer foram instrumentados em 2026-07-21 (`src/lib/metrics.ts`, snapshot de negócio a cada 60s). Como acabaram de entrar, ainda não há baseline histórico — os thresholds de cor são estimativas iniciais; ajuste depois de observar uma semana de dados reais."
       }
     }
   ]

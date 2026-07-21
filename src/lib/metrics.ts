@@ -216,6 +216,28 @@ export const postgresStats = getOrCreate(
     })
 );
 
+export const sourceSyncSecondsSinceSuccess = getOrCreate(
+  "carreiras_source_sync_seconds_since_success",
+  () =>
+    new Gauge({
+      name: "carreiras_source_sync_seconds_since_success",
+      help: "Segundos desde a última coleta bem-sucedida de cada fonte externa (radares, feeds, cursos)",
+      labelNames: ["key"] as const,
+      registers: [registry],
+    })
+);
+
+export const sourceSyncError = getOrCreate(
+  "carreiras_source_sync_error",
+  () =>
+    new Gauge({
+      name: "carreiras_source_sync_error",
+      help: "1 se a última tentativa de coleta da fonte terminou em erro, 0 caso contrário",
+      labelNames: ["key"] as const,
+      registers: [registry],
+    })
+);
+
 export const businessSnapshotSuccess = getOrCreate(
   "carreiras_business_snapshot_success",
   () =>
@@ -260,6 +282,13 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     companies,
     companyScreenings,
     talentContacts,
+    freelanceProjects,
+    freelanceProposals,
+    freelanceContracts,
+    posts,
+    radarItems,
+    jobAlertsSent,
+    sourceSyncs,
     subscriptionGroups,
     applicationGroups,
     paymentGroups,
@@ -279,6 +308,13 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     prisma.company.count(),
     prisma.companyJob.count(),
     prisma.talentContactRequest.count(),
+    prisma.freelanceProject.count(),
+    prisma.freelanceProposal.count(),
+    prisma.freelanceContract.count(),
+    prisma.post.count(),
+    prisma.radarItem.count({ where: { active: true } }),
+    prisma.emailLog.count({ where: { type: "job_alert" } }),
+    prisma.sourceSync.findMany(),
     prisma.subscription.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.application.groupBy({ by: ["status"], _count: { _all: true } }),
     prisma.payment.groupBy({
@@ -310,6 +346,11 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
         applications: await prisma.application.count({ where: { createdAt: { gte: start } } }),
         companies: await prisma.company.count({ where: { createdAt: { gte: start } } }),
         pageViews: await prisma.pageView.count({ where: { createdAt: { gte: start } } }),
+        freelanceProjects: await prisma.freelanceProject.count({ where: { createdAt: { gte: start } } }),
+        freelanceProposals: await prisma.freelanceProposal.count({ where: { createdAt: { gte: start } } }),
+        freelanceContracts: await prisma.freelanceContract.count({ where: { createdAt: { gte: start } } }),
+        posts: await prisma.post.count({ where: { publishedAt: { gte: start } } }),
+        jobAlertsSent: await prisma.emailLog.count({ where: { type: "job_alert", createdAt: { gte: start } } }),
         uniqueSessions: (
           await prisma.pageView.groupBy({
             by: ["sessionId"],
@@ -378,6 +419,12 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     companies,
     company_screenings: companyScreenings,
     talent_contacts: talentContacts,
+    freelance_projects: freelanceProjects,
+    freelance_proposals: freelanceProposals,
+    freelance_contracts: freelanceContracts,
+    posts,
+    radar_items_active: radarItems,
+    job_alerts_sent: jobAlertsSent,
   })) {
     businessTotals.set({ entity }, value);
   }
@@ -395,6 +442,11 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
       applications: snapshot.applications,
       companies: snapshot.companies,
       page_views: snapshot.pageViews,
+      freelance_projects: snapshot.freelanceProjects,
+      freelance_proposals: snapshot.freelanceProposals,
+      freelance_contracts: snapshot.freelanceContracts,
+      posts: snapshot.posts,
+      job_alerts_sent: snapshot.jobAlertsSent,
     })) {
       businessCreated.set({ entity, period: snapshot.label }, value);
     }
@@ -452,6 +504,14 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
       { dimension: "referrer", value: item.referrerHost || "(direto)" },
       item._count._all
     );
+  }
+
+  for (const sync of sourceSyncs) {
+    sourceSyncSecondsSinceSuccess.set(
+      { key: sync.key },
+      sync.lastSuccessAt ? (now.getTime() - sync.lastSuccessAt.getTime()) / 1000 : -1
+    );
+    sourceSyncError.set({ key: sync.key }, sync.lastError ? 1 : 0);
   }
 
   businessBreakdown.reset();
