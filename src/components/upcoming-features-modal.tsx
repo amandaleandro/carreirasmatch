@@ -6,7 +6,9 @@ import { useUiPanels } from "@/components/ui-panels";
 import {
   Bell,
   CheckCircle2,
+  Gamepad2,
   GraduationCap,
+  Handshake,
   Landmark,
   Mail,
   RefreshCw,
@@ -18,10 +20,22 @@ import {
 
 // Sobe a versão sempre que a lista muda de verdade: quem já fechou a modal
 // precisa ver o que saiu depois.
-const STORAGE_KEY = "upcoming-features-modal:v3:seen";
+const STORAGE_KEY = "upcoming-features-modal:v4:seen";
 
 /** Já está no ar - o que a pessoa pode usar agora. */
 const SHIPPED = [
+  {
+    title: "Jogos de carreira",
+    description: "7 minijogos para treinar digitação, vocabulário técnico e conhecimento de mercado, com ranking diário, mensal e anual.",
+    href: "/jogos",
+    icon: Gamepad2,
+  },
+  {
+    title: "Marketplace freelancer",
+    description: "Publique um perfil e ofereça serviços ou publique um projeto e contrate outro profissional - tudo dentro da plataforma.",
+    href: "/freelancer",
+    icon: Handshake,
+  },
   {
     title: "Radar de concursos",
     description: "Novos editais, inscrições e provas de concursos públicos reunidos e atualizados ao longo do dia.",

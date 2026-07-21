@@ -72,6 +72,12 @@ liberadas (`src/lib/tool-access.ts`, `src/lib/entitlements.ts`).
   (`src/lib/entitlements.ts`, `canViewFullDiagnostic`). Usuário sem
   desbloqueio vê um "teaser" (`src/lib/analysis-teaser.ts`) com botão de
   desbloqueio (`unlock-diagnostic-button.tsx`).
+- **UX do formulário**: ao escolher a trilha de carreira no passo 1, a
+  tela rola automaticamente até o passo 2 e foca o campo "Cargo
+  desejado", reduzindo cliques manuais. Durante o processamento da IA,
+  um overlay de carregamento (`analyze-vaga.tsx`) substitui o formulário
+  com uma mensagem rotativa (a cada 3s) descrevendo a etapa atual da
+  análise, para reduzir a percepção de espera nos ~15-30s de resposta.
 
 ### 3.2 Relatórios e histórico
 
@@ -231,7 +237,82 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
     persistido em `AppSetting`);
   - CRUD de cupons de desconto (`admin-coupon-manager.tsx`).
 
-### 3.14 Institucional
+### 3.14 Jogos (gamificação)
+
+- **`/jogos`**: hub com 7 minijogos educativos de carreira/mercado -
+  Speed Typer (digitação), Show do Match (quiz por área), Termos
+  Pareados (memória), Termo (Wordle de termos profissionais), Forca
+  Profissional, Verdadeiro ou Falso e Ordene o Processo. Rota pública,
+  liberada no middleware.
+- Cada partida grava um `GameScore` (`POST /api/jogos/scores`) por
+  jogo/área/usuário, usado para montar rankings **diário, mensal e
+  anual** (Top 10) exibidos no próprio hub.
+- Serve também como gancho de retenção: usuários no Top 10 mensal
+  ganham selo especial e recomendação premium no dashboard corporativo
+  (conforme copy do hub).
+
+### 3.15 Portal de Parceiros (`/parceiro`)
+
+- Programa para instituições de ensino/empresas anunciarem cursos no
+  catálogo `/cursos-gratuitos`. Cadastro próprio (`/parceiro/cadastro`)
+  e login separado (`/parceiro/login`, `accountType: "partner"` em
+  `User`/`session`), com painel dedicado (`PartnerShell`).
+- **Dashboard do parceiro** (`/parceiro/dashboard`): visão geral de
+  cursos publicados, cursos em destaque, cliques e leads recebidos.
+- **Cursos** (`/parceiro/dashboard/cursos`): CRUD de `ExternalCourse`
+  do próprio parceiro; pode marcar curso como `featured` (destaque),
+  consumindo **créditos** (`Partner.credits`).
+- **Comprar créditos de destaque** (`/parceiro/dashboard/anunciar` →
+  `POST /api/partner/billing/comprar`): pacote de anúncio pago via
+  Mercado Pago (`PartnerPayment`, `kind: "ad_pack"`); créditos são
+  concedidos após confirmação do pagamento.
+- **Leads** (`/parceiro/dashboard/leads`): candidatos que demonstraram
+  interesse num curso do parceiro (`PartnerLead`, capturado em
+  `POST /api/cursos-gratuitos/[id]/interesse`); cliques em cursos
+  também são contabilizados (`PartnerCourseClick`).
+- **Perfil** (`/parceiro/dashboard/perfil`): dados institucionais
+  (nome, CNPJ, logo, site, descrição) e status (`pending`/`active`/
+  `suspended`).
+- **Vitrine pública do parceiro** (`/parceiros/[id]`): página com os
+  cursos do parceiro, usada como página de destino a partir do
+  catálogo público.
+
+### 3.16 Marketplace Freelancer
+
+- Segundo lado do produto, aberto a qualquer `User`: qualquer pessoa
+  pode publicar um perfil de freelancer e/ou contratar outra para um
+  projeto - sem papéis fixos de "cliente" vs. "freelancer". Hub em
+  `/freelancer`; ainda sem escrow/pagamento integrado (é combinado
+  fora da plataforma).
+- **Perfil de freelancer** (`/freelancer/perfil` → `FreelancerProfile`):
+  headline, bio, categoria, habilidades, valor/hora (ou "a combinar"),
+  portfólio e toggle `available`/`published` que controla se aparece
+  na vitrine pública (`/freelancers`, `/freelancers/[id]`).
+  Reputação (`ratingSum`/`ratingCount`/`completedCount`) é desnormalizada
+  a partir das avaliações recebidas.
+- **Projetos** (`/projetos`, `/projetos/novo`, `/projetos/[id]` →
+  `FreelanceProject`): contratante publica escopo, categoria,
+  habilidades desejadas, tipo de orçamento (fixo/hora), faixa de valor,
+  modelo de trabalho (remoto/presencial/híbrido) e prazo. Ciclo de
+  status: `open → in_progress → completed | cancelled`.
+- **Propostas** (`/freelancer/propostas` → `FreelanceProposal`):
+  freelancer envia uma proposta por projeto (carta, valor, prazo
+  estimado); status `pending | accepted | rejected | withdrawn`.
+- **Contrato** (`FreelanceContract`): criado automaticamente quando uma
+  proposta é aceita (um por projeto); guarda o valor combinado e o
+  ciclo `active → delivered → completed`/`cancelled`. Habilita a troca
+  de mensagens e as avaliações mútuas.
+- **Mensagens** (`FreelanceThread`/`FreelanceMessage`): conversa por
+  projeto entre contratante e freelancer, com indicador de leitura por
+  lado.
+- **Avaliações** (`FreelanceReview`): ao concluir um contrato, cada
+  parte avalia a outra uma vez (nota 1-5 + comentário), direção
+  `client_to_freelancer` ou `freelancer_to_client`; alimenta a
+  reputação exibida no perfil público.
+- **Meus projetos** (`/freelancer/meus-projetos`): visão do contratante
+  sobre os projetos que publicou e o andamento das propostas recebidas.
+
+### 3.17 Institucional
 
 - **`/termos`**, **`/privacidade`**: Termos de Uso e Política de
   Privacidade (LGPD), cobrindo uso de IA, coleta de dados e pagamentos.
@@ -257,10 +338,13 @@ Acesso a cada ferramenta é controlado por segmento/assinatura via
 - Preparação de entrevista personalizada por análise/candidatura.
 - Painel admin para suporte a usuários (concessão manual de acesso).
 
-**Complementares (aquisição/SEO)**
+**Complementares (aquisição/SEO/retenção)**
 - Catálogo de ferramentas e guias gratuitos por segmento.
 - Captura de lead antes de revelar resultado a visitante anônimo.
 - Landing pages segmentadas por nicho.
+- Jogos de gamificação com ranking, para retenção e engajamento.
+- Portal de parceiros para monetizar o catálogo de cursos.
+- Marketplace freelancer para gerar retenção fora do ciclo de emprego CLT.
 
 ## 5. Requisitos não funcionais e limitações conhecidas
 

@@ -29,6 +29,8 @@ type StepId =
   | "mentorias"
   | "concursos"
   | "vestibulares"
+  | "freelancer"
+  | "jogos"
   | "search"
   | "overview"
   | "closing";
@@ -88,6 +90,18 @@ const BASE_STEPS: Record<StepId, TourStep> = {
     body: "Vestibulares, ENEM, Sisu, ProUni e bolsas mais recentes, tudo num lugar só.",
     placement: "right",
   },
+  freelancer: {
+    target: '[data-tour="nav-freelancer"]',
+    title: "Freelancer",
+    body: "Publique um perfil e ofereça serviços, ou publique um projeto e contrate outro profissional - tudo dentro da plataforma.",
+    placement: "right",
+  },
+  jogos: {
+    target: '[data-tour="nav-jogos"]',
+    title: "Jogos",
+    body: "Treine digitação, vocabulário técnico e conhecimento de mercado em 7 minijogos, com ranking diário, mensal e anual.",
+    placement: "right",
+  },
   search: {
     target: '[data-tour="topbar-search"]',
     title: "Busca rápida",
@@ -115,6 +129,8 @@ const DEFAULT_ORDER: StepId[] = [
   "resume",
   "tools",
   "mentorias",
+  "freelancer",
+  "jogos",
   "search",
   "overview",
   "closing",

@@ -110,6 +110,7 @@ export async function POST(req: NextRequest) {
               rawText: p.rawText,
               fitScore: scored?.fitScore ?? 0,
               reason: scored?.reason ?? "",
+              candidateName: scored?.candidateName || "",
             };
           }),
         },

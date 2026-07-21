@@ -747,6 +747,7 @@ export type CandidateRankingResult = {
     candidateId: string;
     fitScore: number;
     reason: string;
+    candidateName?: string;
   }[];
   recommendation: string;
 };
@@ -763,9 +764,10 @@ export async function rankCandidates(
   const systemPrompt = `Você é um recrutador técnico sênior. Avalie MÚLTIPLOS candidatos para UMA vaga e ranqueie-os pela aderência real do currículo aos requisitos.
 ${BASE_RULES}
 No campo "candidateId" da resposta, repita EXATAMENTE o valor de "ID DO CANDIDATO" fornecido, sem prefixos, numeração ou texto extra. Baseie a nota apenas no que o currículo demonstra frente aos requisitos da vaga; não invente qualificações.
+No campo "candidateName" de cada candidato, extraia o nome completo do candidato a partir do texto do currículo (caso não seja encontrado ou não esteja claro, use o valor de "IDENTIFICAÇÃO").
 Formato de resposta:
 {
-  "ranking": [ { "candidateId": string, "fitScore": number (0-100), "reason": string (1-2 frases explicando a nota, citando pontos fortes e lacunas frente à vaga) } ] (uma entrada por candidato informado, ordenadas da maior para a menor aderência),
+  "ranking": [ { "candidateId": string, "candidateName": string, "fitScore": number (0-100), "reason": string (1-2 frases explicando a nota, citando pontos fortes e lacunas frente à vaga) } ] (uma entrada por candidato informado, ordenadas da maior para a menor aderência),
   "recommendation": string (2-4 frases dizendo quais candidatos chamar primeiro para entrevista e por quê)
 }`;
 

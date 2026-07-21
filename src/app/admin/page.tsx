@@ -162,6 +162,7 @@ export default async function AdminPage() {
         overallScore: true,
         applicationStatus: true,
         createdAt: true,
+        resumeStructured: true,
         resume: { select: { fileName: true, user: { select: { name: true, email: true } } } },
       },
     }),
@@ -512,23 +513,48 @@ export default async function AdminPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-100 dark:divide-neutral-900">
-                {recentAnalyses.map((analysis) => (
-                  <tr key={analysis.id}>
-                    <td className="py-3 pr-4">
-                      <p className="font-medium">{analysis.resume.user?.name ?? "Sem nome"}</p>
-                      <p className="text-xs text-neutral-500">{analysis.resume.user?.email ?? "-"}</p>
-                    </td>
-                    <td className="py-3 pr-4 max-w-[280px]">
-                      <Link href={`/report/${analysis.id}`} className="font-medium hover:underline">
-                        {analysis.jobTitle}
-                      </Link>
-                      <p className="text-xs text-neutral-500 truncate">{analysis.resume.fileName}</p>
-                    </td>
-                    <td className="py-3 pr-4 font-semibold">{analysis.overallScore}%</td>
-                    <td className="py-3 pr-4 text-neutral-600 dark:text-neutral-400">{analysis.applicationStatus}</td>
-                    <td className="py-3 text-neutral-500 whitespace-nowrap">{formatDate(analysis.createdAt)}</td>
-                  </tr>
-                ))}
+                {recentAnalyses.map((analysis) => {
+                  const contactInfo = (() => {
+                    try {
+                      const structured = JSON.parse(analysis.resumeStructured || "{}");
+                      return {
+                        name: (structured?.contact?.name as string | undefined)?.trim() || "",
+                        email: (structured?.contact?.email as string | undefined)?.trim() || "",
+                      };
+                    } catch {
+                      return { name: "", email: "" };
+                    }
+                  })();
+
+                  // Extract and clean up candidate name from the file name as a last resort
+                  const cleanFileName = (fileName: string) => {
+                    let name = fileName.replace(/\.[^/.]+$/, ""); // remove extension
+                    name = name.replace(/^(curriculo|currículo|cv|resume|perfil)\s*(de|do|da)?\s*/i, "");
+                    name = name.replace(/[-_]+/g, " ");
+                    return name.split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ").trim();
+                  };
+
+                  const displayName = analysis.resume.user?.name || contactInfo.name || cleanFileName(analysis.resume.fileName) || "Sem nome";
+                  const displayEmail = analysis.resume.user?.email || contactInfo.email || "-";
+
+                  return (
+                    <tr key={analysis.id}>
+                      <td className="py-3 pr-4">
+                        <p className="font-medium">{displayName}</p>
+                        <p className="text-xs text-neutral-500">{displayEmail}</p>
+                      </td>
+                      <td className="py-3 pr-4 max-w-[280px]">
+                        <Link href={`/report/${analysis.id}`} className="font-medium hover:underline">
+                          {analysis.jobTitle}
+                        </Link>
+                        <p className="text-xs text-neutral-500 truncate">{analysis.resume.fileName}</p>
+                      </td>
+                      <td className="py-3 pr-4 font-semibold">{analysis.overallScore}%</td>
+                      <td className="py-3 pr-4 text-neutral-600 dark:text-neutral-400">{analysis.applicationStatus}</td>
+                      <td className="py-3 text-neutral-500 whitespace-nowrap">{formatDate(analysis.createdAt)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
