@@ -172,7 +172,7 @@ function FeedCard({
               {tags.salary}
             </span>
           )}
-          {[tags.seniority, tags.workModel, tags.area, tags.location].filter(Boolean).map((tag) => (
+          {[tags.contractType, tags.seniority, tags.workModel, tags.area, tags.location].filter(Boolean).map((tag) => (
             <span
               key={tag}
               className="rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-medium px-2.5 py-1"

@@ -30,13 +30,19 @@ export async function register() {
   // One-time backfill for jobs ingested before the job-tags migration.
   // Self-disabling: once every active job is tagged this becomes a no-op.
   try {
-    const { countJobsNeedingTags, backfillJobTags } = await import(
+    const { countJobsNeedingTags, backfillJobTags, backfillContractTypeIfNeeded } = await import(
       "@/lib/backfill-job-tags"
     );
     if ((await countJobsNeedingTags()) > 0) {
       const result = await backfillJobTags();
       console.log(
         `[instrumentation] job tag backfill: scanned ${result.scanned}, updated ${result.updated}`,
+      );
+    }
+    const contractTypeResult = await backfillContractTypeIfNeeded();
+    if (contractTypeResult) {
+      console.log(
+        `[instrumentation] job contractType backfill: scanned ${contractTypeResult.scanned}, updated ${contractTypeResult.updated}`,
       );
     }
   } catch (err) {

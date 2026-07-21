@@ -52,6 +52,18 @@ const WORK_MODEL_PATTERNS: [RegExp, string][] = [
   [/presencial/i, "Presencial"],
 ];
 
+// Regime de contratação. A ordem importa: aprendiz e estágio são regimes
+// legais próprios e devem ganhar de CLT/PJ quando ambos aparecem no texto.
+const CONTRACT_TYPE_PATTERNS: [RegExp, string][] = [
+  [/menor aprendiz|jovem aprendiz|\baprendiz\b/i, "Aprendiz"],
+  [/est[aá]gi[oó]|estagi[aá]ri[oa]/i, "Estagio"],
+  [/\bpj\b|pessoa jur[ií]dica|prestador de servi[cç]o|contrato pj|regime pj/i, "PJ"],
+  [/\bclt\b|carteira assinada|regime clt|efetiv[oa]|contrata[cç][aã]o clt/i, "CLT"],
+  [/tempor[aá]ri[oa]|contrato tempor[aá]rio|contrato por prazo determinado|safra/i, "Temporario"],
+];
+
+export const CONTRACT_TYPE_OPTIONS = ["CLT", "PJ", "Estagio", "Aprendiz", "Temporario"];
+
 const AREA_PATTERNS: [RegExp, string][] = [
   [/produto/i, "Produto"],
   [/marketing/i, "Marketing"],
@@ -97,6 +109,7 @@ export type JobTags = {
   company: string;
   salary?: string;
   salaryValue?: number;
+  contractType?: string;
 };
 
 export function deriveJobTags(job: {
@@ -127,6 +140,7 @@ export function deriveJobTags(job: {
     company,
     salary: salaryInfo?.label,
     salaryValue: salaryInfo?.value,
+    contractType: matchFirst(haystack, CONTRACT_TYPE_PATTERNS),
   };
 }
 
@@ -170,6 +184,7 @@ export function classifyJobForStorage(job: {
   area: string;
   seniority: string;
   workModel: string;
+  contractType: string;
   entryLevel: boolean;
   salaryMin?: number;
 } {
@@ -180,6 +195,7 @@ export function classifyJobForStorage(job: {
     area: tags.area ?? "",
     seniority: tags.seniority ?? "",
     workModel: tags.workModel ?? "",
+    contractType: tags.contractType ?? "",
     entryLevel: isEntryLevelJob(job),
     salaryMin: tags.salaryValue ? Math.round(tags.salaryValue) : undefined,
   };

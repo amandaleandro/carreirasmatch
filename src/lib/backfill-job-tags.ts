@@ -11,11 +11,44 @@ function jobRetentionDays(): number {
  * always returns a non-empty `company` (falling back to "Empresa"), so an active
  * job with an empty company - or a null `expiresAt` - has never been processed.
  * Returns 0 once the backfill is complete, which makes the startup hook a no-op.
+ *
+ * `contractType` is intentionally NOT part of this guard: unlike `company`, an
+ * empty `contractType` is also a legitimate outcome (no CLT/PJ/Estagio/Aprendiz
+ * wording found in the ad), so using it here would make the backfill re-run on
+ * every startup forever. The one-time pass to fill `contractType` on jobs that
+ * predate that column is tracked separately via `countJobsNeedingContractType`.
  */
 export function countJobsNeedingTags(): Promise<number> {
   return prisma.job.count({
     where: { active: true, OR: [{ company: "" }, { expiresAt: null }] },
   });
+}
+
+const CONTRACT_TYPE_BACKFILL_KEY = "job-tags:contract-type-backfilled-v1";
+
+/**
+ * One-time pass (tracked via app-settings, not column contents) to derive
+ * `contractType` for jobs ingested before that column existed.
+ */
+export async function backfillContractTypeIfNeeded(): Promise<{ scanned: number; updated: number } | null> {
+  const { getSetting, setSetting } = await import("@/lib/app-settings");
+  if (await getSetting(CONTRACT_TYPE_BACKFILL_KEY)) return null;
+
+  const jobs = await prisma.job.findMany({
+    where: { active: true, contractType: "" },
+    select: { id: true, jobTitle: true, jobText: true, url: true, location: true },
+  });
+
+  let updated = 0;
+  for (const job of jobs) {
+    const contractType = classifyJobForStorage(job).contractType;
+    if (!contractType) continue;
+    await prisma.job.update({ where: { id: job.id }, data: { contractType } });
+    updated += 1;
+  }
+
+  await setSetting(CONTRACT_TYPE_BACKFILL_KEY, "true");
+  return { scanned: jobs.length, updated };
 }
 
 /**
@@ -37,6 +70,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
       area: true,
       seniority: true,
       workModel: true,
+      contractType: true,
       entryLevel: true,
       salaryMin: true,
       expiresAt: true,
@@ -57,6 +91,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
       tags.area !== job.area ||
       tags.seniority !== job.seniority ||
       tags.workModel !== job.workModel ||
+      tags.contractType !== job.contractType ||
       tags.entryLevel !== job.entryLevel ||
       (tags.salaryMin ?? null) !== job.salaryMin ||
       job.expiresAt === null;
@@ -70,6 +105,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
         area: tags.area,
         seniority: tags.seniority,
         workModel: tags.workModel,
+        contractType: tags.contractType,
         entryLevel: tags.entryLevel,
         salaryMin: tags.salaryMin ?? null,
         expiresAt: nextExpiresAt,

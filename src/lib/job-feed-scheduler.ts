@@ -9,9 +9,22 @@ const TICK_INTERVAL_MS = 15 * 60 * 1000;
 const INITIAL_DELAY_MS = 45 * 1000;
 const TIME_ZONE = "America/Sao_Paulo";
 const DEFAULT_RUN_TIMES = ["08:00", "14:00", "20:00"];
+// Metade das buscas fica dedicada a estagio/aprendiz/primeiro emprego (a maior
+// carencia do feed), o resto cobre outras areas e niveis para nao enviesar o
+// banco só nessas 3 categorias.
 const DEFAULT_QUERIES = [
   "Sem experiencia|Entry Level|sem experiencia,primeiro emprego,nao exige experiencia",
   "Primeiro emprego|First Job|primeiro emprego,sem experiencia,iniciante",
+  "Estagio|Internship|estagio,estagiario,trainee",
+  "Estagio Administrativo|Administrative Internship|estagio,administrativo,escritorio",
+  "Estagio TI|Technology Internship|estagio,tecnologia,desenvolvimento",
+  "Estagio Marketing|Marketing Internship|estagio,marketing,redes sociais",
+  "Estagio Vendas|Sales Internship|estagio,vendas,comercial",
+  "Estagio Recursos Humanos|HR Internship|estagio,rh,recursos humanos",
+  "Jovem Aprendiz|Apprentice|jovem aprendiz,aprendiz,primeiro emprego",
+  "Jovem Aprendiz Administrativo|Administrative Apprentice|jovem aprendiz,administrativo,auxiliar",
+  "Jovem Aprendiz Varejo|Retail Apprentice|jovem aprendiz,loja,atendimento",
+  "Trainee|Trainee Program|trainee,programa de trainee,recem formado",
   "Assistente Administrativo|Administrative Assistant|administrativo,escritorio,rotinas administrativas",
   "Atendimento ao Cliente|Customer Support|atendimento,suporte,cliente",
   "Vendedor Interno|Inside Sales|vendas,comercial,prospeccao",
@@ -19,8 +32,6 @@ const DEFAULT_QUERIES = [
   "Assistente Financeiro|Finance Assistant|financeiro,contas a pagar,Excel",
   "Auxiliar de Logistica|Logistics Assistant|logistica,estoque,expedicao",
   "Recepcionista|Receptionist|recepcao,atendimento,agenda",
-  "Estagio|Internship|estagio,estagiario,trainee",
-  "Jovem Aprendiz|Apprentice|jovem aprendiz,aprendiz,primeiro emprego",
   "Analista de Dados|Data Analyst|SQL,Python,Power BI",
   "Desenvolvedor Frontend|Frontend Developer|React,TypeScript,JavaScript",
 ];

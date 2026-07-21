@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { assertPublicHttpUrl } from "@/lib/url-safety";
 import { PDFParse } from "pdf-parse";
 import { assessOpportunityRisk } from "@/lib/opportunity-safety";
-import { syncYoutubeCareerVideos } from "@/lib/youtube-sync";
+import { syncYoutubeCareerVideos, classifyVideoArea } from "@/lib/youtube-sync";
 import { syncRadars } from "@/lib/radar-sync";
 
 const USER_AGENT = "CarreirasMatch/1.0 (+https://carreirasmatch.com.br/contato)";
@@ -88,6 +88,62 @@ export async function syncAprendaMaisCourses() {
         });
         count += 1;
       }
+    }
+    return count;
+  });
+}
+
+// Escola Virtual (Fundação Bradesco): plataforma nacional de cursos livres 100%
+// gratuitos e com certificado, autoinstrucionais. Diferente da maioria dos sites
+// estaduais de SENAI/SENAC (que são SPAs em Angular/React sem URL própria por
+// curso, inviáveis de raspar sem um browser completo), o ev.org.br renderiza os
+// cards de curso no HTML de cada página de área, com link e título limpos.
+const ESCOLA_VIRTUAL_BASE = "https://www.ev.org.br";
+const ESCOLA_VIRTUAL_AREAS: { slug: string; area: string }[] = [
+  { slug: "analise-de-dados", area: "Análise de Dados" },
+  { slug: "desenvolvimento-pessoal-e-profissional", area: "Desenvolvimento Pessoal" },
+  { slug: "educacao-e-tecnologia", area: "Educação e Tecnologia" },
+  { slug: "inteligencia-artificial", area: "Inteligência Artificial" },
+  { slug: "negocios-e-inovacao", area: "Negócios e Inovação" },
+  { slug: "produtividade", area: "Produtividade" },
+  { slug: "programacao", area: "Programação" },
+  { slug: "tecnologia-da-informacao", area: "Tecnologia da Informação" },
+];
+
+export async function syncEscolaVirtualCourses() {
+  return recordSync("escola-virtual", "Escola Virtual (Fundação Bradesco)", "course", async () => {
+    const seenAt = new Date();
+    const courses = new Map<string, { title: string; area: string }>();
+
+    for (const { slug, area } of ESCOLA_VIRTUAL_AREAS) {
+      const $ = cheerio.load(await fetchHtml(`${ESCOLA_VIRTUAL_BASE}/areas-de-interesse/${slug}`));
+      $('a.m-card_link[href^="/cursos/"]').each((_, element) => {
+        const href = $(element).attr("href");
+        const title = clean($(element).text());
+        if (!href || !title) return;
+        const url = `${ESCOLA_VIRTUAL_BASE}${href}`;
+        if (!courses.has(url)) courses.set(url, { title, area });
+      });
+    }
+
+    let count = 0;
+    for (const [url, { title, area }] of courses) {
+      await prisma.externalCourse.upsert({
+        where: { url },
+        create: {
+          title,
+          provider: "Fundação Bradesco - Escola Virtual",
+          url,
+          area,
+          modality: "online",
+          free: true,
+          certificate: true,
+          source: "escola-virtual",
+          lastSeenAt: seenAt,
+        },
+        update: { title, area, active: true, lastSeenAt: seenAt },
+      });
+      count += 1;
     }
     return count;
   });
@@ -335,10 +391,15 @@ export function courseTitleFromUrl(href: string): string {
  * Fontes de curso presencial verificadas (SSR, cursos como links reais). Semeadas como
  * OpportunitySource kind="course" para aparecerem no admin, onde podem ser editadas/pausadas.
  * Novas fontes regionais podem ser cadastradas pelo admin sem tocar no código.
+ *
+ * A maioria dos portais estaduais de SENAI/SENAC (SP, PR, RS-SENAC, EAD SENAC) são SPAs
+ * em Angular/React que renderizam os cursos via chamada de API no cliente - sem HTML
+ * estático nem URL própria por curso, então não dá pra raspar sem um browser completo
+ * (como fazemos com o Indeed via Playwright). Por isso a lista fica pequena: apenas
+ * fontes validadas manualmente que servem HTML com os cursos já renderizados.
  */
 const DEFAULT_COURSE_SOURCES: { name: string; url: string; state: string; city: string }[] = [
   { name: "SENAI-RS", url: "https://cursos.senairs.org.br/", state: "RS", city: "" },
-  { name: "SENAC-RS", url: "https://www.senacrs.com.br/cursosLivres", state: "RS", city: "" },
 ];
 
 export async function ensureDefaultCourseSources() {
@@ -349,6 +410,14 @@ export async function ensureDefaultCourseSources() {
       update: { name: source.name, kind: "course", official: true },
     });
   }
+
+  // SENAC-RS foi migrado para SPA (Angular) sem HTML estático e sempre retornava
+  // 0 cursos; desativa a fonte cadastrada anteriormente para parar de gastar
+  // ciclos de sync com ela.
+  await prisma.opportunitySource.updateMany({
+    where: { url: "https://www.senacrs.com.br/cursosLivres", kind: "course" },
+    data: { active: false },
+  });
 }
 
 /**
@@ -384,13 +453,14 @@ async function syncCourseSource(source: {
     let count = 0;
     for (const [url, title] of [...items].slice(0, 150)) {
       const free = FREE_TERMS.test(title);
+      const area = classifyVideoArea("", title, "");
       await prisma.externalCourse.upsert({
         where: { url },
         create: {
           title: title.slice(0, 240),
           provider: source.name,
           url,
-          area: "",
+          area,
           city: source.city,
           state: source.state,
           modality,
@@ -402,6 +472,7 @@ async function syncCourseSource(source: {
         update: {
           title: title.slice(0, 240),
           provider: source.name,
+          area,
           city: source.city,
           state: source.state,
           modality,
@@ -462,6 +533,7 @@ export async function syncAllExternalSources() {
     syncRegisteredCourseSources(),
     syncYoutubeCareerVideos(),
     syncRadars(),
+    syncEscolaVirtualCourses(),
   ]);
   const errors = results.flatMap((result) =>
     result.status === "rejected"
@@ -474,8 +546,10 @@ export async function syncAllExternalSources() {
     results[3].status === "fulfilled" && typeof results[3].value === "object"
       ? results[3].value.courses
       : 0;
+  const escolaVirtualCourses = results[6].status === "fulfilled" ? results[6].value : 0;
   return {
-    courses: (results[0].status === "fulfilled" ? results[0].value : 0) + registeredCourses,
+    courses:
+      (results[0].status === "fulfilled" ? results[0].value : 0) + registeredCourses + escolaVirtualCourses,
     bulletins: results[1].status === "fulfilled" ? results[1].value : 0,
     opportunities:
       results[2].status === "fulfilled" && typeof results[2].value === "object"

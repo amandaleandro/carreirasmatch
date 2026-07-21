@@ -57,7 +57,7 @@ export function AllJobsList({ jobs }: { jobs: Job[] }) {
                   {tags.salary}
                 </span>
               )}
-              {[tags.seniority, tags.workModel, tags.area, tags.location]
+              {[tags.contractType, tags.seniority, tags.workModel, tags.area, tags.location]
                 .filter(Boolean)
                 .map((tag) => (
                   <span

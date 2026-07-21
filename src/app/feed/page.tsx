@@ -76,6 +76,7 @@ export default async function FeedPage({
     seniority?: string;
     location?: string;
     entryLevel?: string;
+    contractType?: string;
     sort?: string;
   }>;
 }) {
@@ -166,6 +167,7 @@ export default async function FeedPage({
   const areas = Array.from(new Set(enriched.map((e) => e.tags.area).filter(Boolean))) as string[];
   const seniorities = Array.from(new Set(enriched.map((e) => e.tags.seniority).filter(Boolean))) as string[];
   const locations = Array.from(new Set(enriched.map((e) => e.tags.location).filter(Boolean))) as string[];
+  const contractTypes = Array.from(new Set(enriched.map((e) => e.tags.contractType).filter(Boolean))) as string[];
 
   let filtered = enriched;
   if (params.tier === "strong") filtered = filtered.filter((e) => e.match.fitScore >= 75);
@@ -176,6 +178,7 @@ export default async function FeedPage({
   if (params.workModel) filtered = filtered.filter((e) => e.tags.workModel === params.workModel);
   if (params.area) filtered = filtered.filter((e) => e.tags.area === params.area);
   if (params.seniority) filtered = filtered.filter((e) => e.tags.seniority === params.seniority);
+  if (params.contractType) filtered = filtered.filter((e) => e.tags.contractType === params.contractType);
   if (params.entryLevel === "yes") filtered = filtered.filter((e) => isEntryLevelJob(e.match.job));
   if (params.location) {
     filtered = filtered.filter(
@@ -342,6 +345,7 @@ export default async function FeedPage({
         areas={areas}
         seniorities={seniorities}
         locations={locations}
+        contractTypes={contractTypes}
         current={{
           tier: params.tier,
           workModel: params.workModel,
@@ -349,6 +353,7 @@ export default async function FeedPage({
           seniority: params.seniority,
           location: params.location,
           entryLevel: params.entryLevel,
+          contractType: params.contractType,
           sort: params.sort,
         }}
       />

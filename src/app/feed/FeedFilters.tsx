@@ -20,12 +20,14 @@ export function FeedFilters({
   areas,
   seniorities,
   locations,
+  contractTypes,
   current,
 }: {
   workModels: string[];
   areas: string[];
   seniorities: string[];
   locations: string[];
+  contractTypes: string[];
   current: {
     tier?: string;
     workModel?: string;
@@ -33,6 +35,7 @@ export function FeedFilters({
     seniority?: string;
     location?: string;
     entryLevel?: string;
+    contractType?: string;
     sort?: string;
   };
 }) {
@@ -44,6 +47,7 @@ export function FeedFilters({
   const seniority = current.seniority ?? "all";
   const location = current.location ?? "all";
   const entryLevel = current.entryLevel ?? "all";
+  const contractType = current.contractType ?? "all";
   const sort = current.sort ?? "fit";
 
   const hasActiveFilters =
@@ -52,11 +56,12 @@ export function FeedFilters({
     area !== "all" ||
     seniority !== "all" ||
     location !== "all" ||
-    entryLevel !== "all";
+    entryLevel !== "all" ||
+    contractType !== "all";
 
   function setParam(key: string, value: string) {
     const params = new URLSearchParams();
-    const next = { tier, workModel, area, seniority, location, entryLevel, sort, [key]: value };
+    const next = { tier, workModel, area, seniority, location, entryLevel, contractType, sort, [key]: value };
     for (const [paramKey, paramValue] of Object.entries(next)) {
       if (paramValue && paramValue !== "all") params.set(paramKey, paramValue);
     }
@@ -142,6 +147,15 @@ export function FeedFilters({
       <select value={seniority} onChange={(e) => setParam("seniority", e.target.value)} className={selectClass}>
         <option value="all">Nivel de senioridade</option>
         {seniorities.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+
+      <select value={contractType} onChange={(e) => setParam("contractType", e.target.value)} className={selectClass}>
+        <option value="all">Regime de contratacao</option>
+        {contractTypes.map((option) => (
           <option key={option} value={option}>
             {option}
           </option>

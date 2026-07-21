@@ -193,6 +193,7 @@ model Job {
   area          String     @default("")
   seniority     String     @default("")
   workModel     String     @default("")
+  contractType  String     @default("")
   entryLevel    Boolean    @default(false)
   salaryMin     Int?
   expiresAt     DateTime?
@@ -208,6 +209,7 @@ model Job {
   @@index([active, area, createdAt])
   @@index([active, seniority, createdAt])
   @@index([active, workModel, createdAt])
+  @@index([active, contractType, createdAt])
 }
 
 model JobMatch {

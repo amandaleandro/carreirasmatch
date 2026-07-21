@@ -21,12 +21,19 @@ const PAGE_SIZE = 20;
 export default async function AllJobsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string; area?: string; city?: string; state?: string; workModel?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    area?: string;
+    city?: string;
+    state?: string;
+    workModel?: string;
+    contractType?: string;
+  }>;
 }) {
   const session = await auth();
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
-  const { area, city, state, workModel } = params;
+  const { area, city, state, workModel, contractType } = params;
 
   const andFilters: any[] = [];
   if (area) {
@@ -34,6 +41,9 @@ export default async function AllJobsPage({
   }
   if (workModel) {
     andFilters.push({ workModel: { contains: workModel, mode: "insensitive" } });
+  }
+  if (contractType) {
+    andFilters.push({ contractType: { contains: contractType, mode: "insensitive" } });
   }
   if (city) {
     andFilters.push({ location: { contains: city, mode: "insensitive" } });
@@ -65,7 +75,7 @@ export default async function AllJobsPage({
   const totalPages = Math.ceil(totalJobs / PAGE_SIZE);
 
   const filterForm = (
-    <form method="GET" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/20">
+    <form method="GET" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/20">
       <div>
         <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Área de atuação</label>
         <select
@@ -99,6 +109,22 @@ export default async function AllJobsPage({
       </div>
 
       <div>
+        <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Regime de contratação</label>
+        <select
+          name="contractType"
+          defaultValue={contractType || ""}
+          className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-850 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        >
+          <option value="">Todos os regimes</option>
+          <option value="CLT">CLT</option>
+          <option value="PJ">PJ</option>
+          <option value="Estagio">Estágio</option>
+          <option value="Aprendiz">Jovem aprendiz</option>
+          <option value="Temporario">Temporário</option>
+        </select>
+      </div>
+
+      <div>
         <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Cidade</label>
         <input
           type="text"
@@ -126,7 +152,7 @@ export default async function AllJobsPage({
           >
             Filtrar
           </button>
-          {(area || workModel || city || state) && (
+          {(area || workModel || city || state || contractType) && (
             <Link
               href="/todas-as-vagas"
               className="flex items-center justify-center border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl px-3 py-2 text-sm transition-colors cursor-pointer"
@@ -157,7 +183,7 @@ export default async function AllJobsPage({
 
         <AllJobsList jobs={jobs} />
         <div className="mt-6">
-          <Pagination page={page} totalPages={totalPages} basePath="/todas-as-vagas" searchParams={{ area, workModel, city, state }} />
+          <Pagination page={page} totalPages={totalPages} basePath="/todas-as-vagas" searchParams={{ area, workModel, city, state, contractType }} />
         </div>
       </div>
     );

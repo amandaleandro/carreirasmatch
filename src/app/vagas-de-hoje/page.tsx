@@ -27,6 +27,7 @@ type PublicJob = {
   area: string;
   seniority: string;
   workModel: string;
+  contractType: string;
   entryLevel: boolean;
   createdAt: Date;
 };
@@ -92,6 +93,7 @@ export default async function JobsTodayPage({
     area?: string;
     seniority?: string;
     workModel?: string;
+    contractType?: string;
     entryLevel?: string;
   }>;
 }) {
@@ -102,6 +104,7 @@ export default async function JobsTodayPage({
   const area = params.area?.trim() || "";
   const seniority = params.seniority?.trim() || "";
   const workModel = params.workModel?.trim() || "";
+  const contractType = params.contractType?.trim() || "";
   const entryLevel = params.entryLevel === "yes";
   const todayStart = startOfTodaySaoPaulo();
 
@@ -110,6 +113,7 @@ export default async function JobsTodayPage({
     ...(area ? { area } : {}),
     ...(seniority ? { seniority } : {}),
     ...(workModel ? { workModel } : {}),
+    ...(contractType ? { contractType } : {}),
     ...(entryLevel ? { entryLevel: true } : {}),
     ...(q
       ? {
@@ -130,7 +134,7 @@ export default async function JobsTodayPage({
   const optionWhere = { active: true, createdAt: { gte: effectiveStart } };
   const where = { ...optionWhere, ...baseFilters };
 
-  const [total, allActiveCount, rawJobs, sources, areas, seniorities, workModels] = await Promise.all([
+  const [total, allActiveCount, rawJobs, sources, areas, seniorities, workModels, contractTypes] = await Promise.all([
     prisma.job.count({ where }),
     prisma.job.count({ where: { active: true } }),
     prisma.job.findMany({
@@ -147,6 +151,7 @@ export default async function JobsTodayPage({
         area: true,
         seniority: true,
         workModel: true,
+        contractType: true,
         entryLevel: true,
         createdAt: true,
       },
@@ -175,6 +180,12 @@ export default async function JobsTodayPage({
       orderBy: { workModel: "asc" },
       select: { workModel: true },
     }),
+    prisma.job.findMany({
+      where: { ...optionWhere, contractType: { not: "" } },
+      distinct: ["contractType"],
+      orderBy: { contractType: "asc" },
+      select: { contractType: true },
+    }),
   ]);
 
   const jobs = interleaveByArea(rawJobs).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -183,6 +194,7 @@ export default async function JobsTodayPage({
   const areaOptions = areas.map((item) => item.area);
   const seniorityOptions = seniorities.map((item) => item.seniority);
   const workModelOptions = workModels.map((item) => item.workModel);
+  const contractTypeOptions = contractTypes.map((item) => item.contractType);
 
   function pageHref(nextPage: number): string {
     const next = new URLSearchParams();
@@ -192,6 +204,7 @@ export default async function JobsTodayPage({
     if (area) next.set("area", area);
     if (seniority) next.set("seniority", seniority);
     if (workModel) next.set("workModel", workModel);
+    if (contractType) next.set("contractType", contractType);
     if (entryLevel) next.set("entryLevel", "yes");
     const query = next.toString();
     return query ? `/vagas-de-hoje?${query}` : "/vagas-de-hoje";
@@ -274,6 +287,12 @@ export default async function JobsTodayPage({
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
+        <select name="contractType" defaultValue={contractType} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
+          <option value="">Todos os regimes</option>
+          {contractTypeOptions.map((option) => (
+            <option key={option} value={option}>{option}</option>
+          ))}
+        </select>
         <label className="relative min-w-0">
           <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <select name="source" defaultValue={source} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-500">
@@ -319,6 +338,7 @@ export default async function JobsTodayPage({
                     {job.area && <span>{job.area}</span>}
                     {job.seniority && <span>{job.seniority}</span>}
                     {job.workModel && <span>{job.workModel}</span>}
+                    {job.contractType && <span>{job.contractType}</span>}
                     {job.entryLevel && <span>Entrada</span>}
                   </div>
                 </div>
