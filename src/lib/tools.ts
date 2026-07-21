@@ -10,6 +10,12 @@ import {
 
 const BASE_RULES = `Responda SEMPRE em português do Brasil. Seja específico e baseie-se apenas em fatos fornecidos pelo usuário, nunca invente experiência, ferramentas ou resultados que não foram mencionados. Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois.`;
 
+// Essas ferramentas (mais simples/curtas que a análise de currículo × vaga) usam
+// Cerebras como provedor preferido, para gastar uma cota gratuita separada da do
+// Groq (reservado à análise principal). Só cai pros demais provedores se o
+// Cerebras falhar ou estourar cota (ver AI_DAILY_TOKEN_BUDGET_CEREBRAS).
+const TOOLS_PREFERRED_PROVIDER_ID = "cerebras";
+
 function runToolJsonPrompt<T>(
   operation: string,
   systemPrompt: string,
@@ -24,7 +30,8 @@ function runToolJsonPrompt<T>(
     maxCompletionTokens,
     undefined,
     undefined,
-    operation
+    operation,
+    TOOLS_PREFERRED_PROVIDER_ID
   );
 }
 

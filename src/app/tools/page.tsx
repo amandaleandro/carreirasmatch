@@ -3,6 +3,29 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segments";
 import { toolsForSegment, type ToolCatalogEntry, type ToolIcon, type ToolColor } from "@/lib/tools-catalog";
+import {
+  Sparkles,
+  Lock,
+  ArrowRight,
+  CheckCircle2,
+  Zap,
+  Wrench,
+  Star,
+  Award,
+  SlidersHorizontal,
+  Compass,
+  Mic,
+  FilePlus,
+  Scale,
+  PenTool,
+  Code2,
+  Share2,
+} from "lucide-react";
+
+export const metadata = {
+  title: "Ferramentas & Recursos de Carreira | CarreirasMatch",
+  description: "Ferramentas práticas e simuladores para impulsionar seu desempenho profissional.",
+};
 
 export default async function ToolsPage() {
   const session = await auth();
@@ -13,56 +36,104 @@ export default async function ToolsPage() {
   const { recommended, others } = toolsForSegment(segment);
 
   return (
-    <main className="max-w-5xl mx-auto px-4 py-12 w-full">
-      <Link href="/dashboard" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-        ← Voltar
-      </Link>
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 w-full space-y-10">
+      {/* Top Header / Breadcrumb */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/dashboard"
+          className="text-xs font-semibold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1.5"
+        >
+          <span>← Voltar ao Painel</span>
+        </Link>
 
-      <header className="relative mt-4 mb-10 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 p-5 md:p-8 shadow-lg shadow-blue-950/20">
-        <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-400/20 blur-2xl" />
-        <div className="absolute -left-6 bottom-0 h-28 w-28 rounded-full bg-white/10 blur-2xl" />
-        <p className="relative inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-amber-300">
-          🏆 Recursos do Plano Profissional
-        </p>
-        <h1 className="relative text-2xl md:text-3xl font-bold tracking-tight text-white mt-2">Ferramentas</h1>
-        <p className="relative text-blue-100 mt-2 max-w-xl">
-          Ferramentas extras para complementar seu diagnóstico principal e acelerar sua carreira.
-        </p>
-        {segment && (
-          <p className="relative text-sm text-blue-100/90 mt-3">
-            Mostrando recomendações para: <span className="font-medium text-white">{CAREER_SEGMENT_LABELS[segment]}</span>, {" "}
-            <Link href="/settings" className="text-amber-300 hover:underline">
-              alterar
-            </Link>
-          </p>
-        )}
-        {!segment && (
-          <p className="relative text-sm text-blue-100/90 mt-3">
-            <Link href="/settings" className="text-amber-300 hover:underline font-medium">
-              Conte qual é o seu momento
-            </Link>{" "}
-            para ver recomendações personalizadas.
-          </p>
-        )}
-      </header>
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+          <Award className="w-3.5 h-3.5" />
+          <span>Recursos Profissionais</span>
+        </span>
+      </div>
 
+      {/* Hero Section */}
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white p-6 sm:p-10 shadow-2xl border border-blue-900/40">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 max-w-3xl space-y-4">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider rounded-full px-3.5 py-1 bg-blue-500/15 text-blue-300 border border-blue-400/30 backdrop-blur-md">
+            <Wrench className="w-3.5 h-3.5 text-blue-400" />
+            <span>Hub de Ferramentas</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-200">
+            Ferramentas Práticas de Alta Performance
+          </h1>
+
+          <p className="text-slate-300 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed font-normal">
+            Simuladores de entrevista, revisores de currículo, calculadoras e assistentes desenvolvidos para acelerar cada etapa do seu crescimento.
+          </p>
+
+          {segment ? (
+            <div className="pt-2 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/15">
+              <span className="text-slate-300">Recomendações ativas para:</span>
+              <strong className="text-white font-bold">{CAREER_SEGMENT_LABELS[segment]}</strong>
+              <span className="text-slate-400">•</span>
+              <Link href="/settings" className="text-amber-300 hover:underline font-semibold">
+                Alterar momento
+              </Link>
+            </div>
+          ) : (
+            <div className="pt-2 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/15">
+              <span className="text-slate-300">Quer ver recomendações sob medida?</span>
+              <Link href="/settings" className="text-amber-300 hover:underline font-bold">
+                Configure seu perfil →
+              </Link>
+            </div>
+          )}
+        </div>
+
+        {/* Feature Pill Highlights */}
+        <div className="relative z-10 mt-8 pt-6 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-300">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>Simulações com IA</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
+            <span>Análises em Tempo Real</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Resultado Instantâneo</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Star className="w-4 h-4 text-purple-400 shrink-0" />
+            <span>Ferramentas Gratuitas</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Recommended Tools Grid */}
       {recommended.length > 0 && (
-        <section className="mb-10">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-400 mb-4 flex items-center gap-2">
-            <span className="text-amber-500">★</span> Recomendadas para você
-          </h2>
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+              <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+              Recomendadas para seu perfil ({recommended.length})
+            </h2>
+          </div>
           <ToolGrid tools={recommended} highlight />
         </section>
       )}
 
+      {/* Other Tools Grid */}
       {others.length > 0 && (
-        <section>
+        <section className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
           {recommended.length > 0 && (
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-500 mb-4">
-              Fora do seu perfil
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4" />
+              Outras ferramentas disponíveis ({others.length})
             </h2>
           )}
-          <ToolGrid tools={others} locked />
+          <ToolGrid tools={others} locked={false} />
         </section>
       )}
     </main>
@@ -79,53 +150,48 @@ function ToolGrid({
   locked?: boolean;
 }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => {
-        // Guia aberto nunca aparece bloqueado: é público, então vale a pena
-        // mesmo para quem está fora do segmento recomendado.
         const isLocked = Boolean(locked) && !tool.free && !tool.accountFree;
-        const content = (
-          <>
-            {tool.free ? (
-              <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-950/50 rounded-full px-2 py-0.5">
-                Cadastro grátis
-              </span>
-            ) : tool.accountFree ? (
-              <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/50 rounded-full px-2 py-0.5">
-                Cadastro grátis
-              </span>
-            ) : highlight ? (
-              <span className="absolute right-4 top-4 text-[10px] font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/50 rounded-full px-2 py-0.5">
-                Recomendada
-              </span>
-            ) : isLocked ? (
-              <span className="absolute right-4 top-4 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500 bg-neutral-100 dark:bg-neutral-800 rounded-full px-2 py-0.5">
-                <LockIcon className="h-3 w-3" />
-                Bloqueada
-              </span>
-            ) : null}
-            <ToolIconBadge icon={tool.icon} color={tool.color} locked={isLocked} />
-            <h3 className="font-semibold mt-4 mb-1 pr-16">{tool.title}</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400 flex-1">{tool.description}</p>
-            {isLocked ? (
-              <span className="mt-4 text-sm text-neutral-500">Não disponível para o seu perfil</span>
-            ) : (
-              <span className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400">
-                Abrir ferramenta
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </span>
-            )}
-          </>
-        );
+
+        const badge = tool.free ? (
+          <span className="rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold">
+            100% Grátis
+          </span>
+        ) : tool.accountFree ? (
+          <span className="rounded-md bg-blue-500/10 text-blue-700 dark:text-blue-400 border border-blue-500/20 px-2.5 py-0.5 text-xs font-semibold">
+            Com Cadastro
+          </span>
+        ) : highlight ? (
+          <span className="rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1">
+            <Star className="w-3 h-3 fill-amber-500" />
+            Recomendada
+          </span>
+        ) : isLocked ? (
+          <span className="rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 px-2.5 py-0.5 text-xs font-semibold inline-flex items-center gap-1">
+            <Lock className="h-3 w-3" />
+            Bloqueada
+          </span>
+        ) : null;
 
         if (isLocked) {
           return (
             <div
               key={tool.href}
-              aria-disabled
-              className="group relative flex flex-col rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/60 dark:bg-neutral-900/40 p-5 opacity-70 cursor-not-allowed"
+              className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-6 opacity-60 cursor-not-allowed"
             >
-              {content}
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <ToolIconBadge icon={tool.icon} color={tool.color} locked />
+                  {badge}
+                </div>
+                <h3 className="font-bold text-slate-900 dark:text-white text-base leading-snug">{tool.title}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{tool.description}</p>
+              </div>
+
+              <div className="mt-5 pt-3 border-t border-slate-200/60 dark:border-slate-800/60 text-xs text-slate-400">
+                Não disponível para o perfil atual
+              </div>
             </div>
           );
         }
@@ -134,13 +200,31 @@ function ToolGrid({
           <Link
             key={tool.href}
             href={tool.href}
-            className={`group relative flex flex-col rounded-2xl border p-5 transition-all hover:-translate-y-1 hover:shadow-lg ${
+            className={`group relative flex flex-col justify-between rounded-2xl border p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${
               highlight
-                ? "border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 hover:border-blue-400 dark:hover:border-blue-700 hover:shadow-blue-950/10"
-                : "border-neutral-200 dark:border-neutral-800 hover:border-neutral-400 dark:hover:border-neutral-600"
+                ? "border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-900 hover:border-blue-500 dark:hover:border-blue-600 shadow-sm"
+                : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-400 dark:hover:border-slate-600 shadow-sm"
             }`}
           >
-            {content}
+            <div className="space-y-3.5">
+              <div className="flex items-start justify-between gap-2">
+                <ToolIconBadge icon={tool.icon} color={tool.color} />
+                {badge}
+              </div>
+
+              <h3 className="font-bold text-slate-900 dark:text-white text-base leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                {tool.title}
+              </h3>
+
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                {tool.description}
+              </p>
+            </div>
+
+            <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+              <span>Acessar Ferramenta</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
           </Link>
         );
       })}
@@ -148,95 +232,48 @@ function ToolGrid({
   );
 }
 
-function LockIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <rect x="5" y="10.5" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="1.6" />
-      <path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 const COLOR_CLASSES: Record<ToolColor, string> = {
-  blue: "bg-blue-100 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400",
-  amber: "bg-amber-100 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400",
-  emerald: "bg-emerald-100 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400",
-  indigo: "bg-indigo-100 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400",
-  violet: "bg-violet-100 text-violet-600 dark:bg-violet-950/50 dark:text-violet-400",
-  rose: "bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400",
+  blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20",
+  amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20",
+  emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20",
+  indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20",
+  violet: "bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20",
+  rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20",
 };
 
 function ToolIconBadge({ icon, color, locked }: { icon: ToolIcon; color: ToolColor; locked?: boolean }) {
   return (
     <span
-      className={`inline-flex h-11 w-11 items-center justify-center rounded-xl ${
-        locked ? "bg-neutral-200 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-500" : COLOR_CLASSES[color]
+      className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${
+        locked
+          ? "bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-500"
+          : COLOR_CLASSES[color]
       }`}
     >
-      <ToolSvgIcon icon={icon} className="h-5 w-5" />
+      <ToolLucideIcon icon={icon} className="h-6 w-6" />
     </span>
   );
 }
 
-function ToolSvgIcon({ icon, className }: { icon: ToolIcon; className?: string }) {
+function ToolLucideIcon({ icon, className }: { icon: ToolIcon; className?: string }) {
   switch (icon) {
     case "sparkles":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <path d="M12 3.5 13.5 8l4.5 1.5-4.5 1.5-1.5 4.5-1.5-4.5L6 9.5 10.5 8 12 3.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          <path d="M18.5 15.5 19.3 17.7 21.5 18.5 19.3 19.3 18.5 21.5 17.7 19.3 15.5 18.5 17.7 17.7 18.5 15.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-        </svg>
-      );
+      return <Sparkles className={className} />;
     case "compass":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
-          <path d="m14.5 9.5-1.5 5-5 1.5 1.5-5 5-1.5Z" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-        </svg>
-      );
+      return <Compass className={className} />;
     case "mic":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <rect x="9" y="2.5" width="6" height="11" rx="3" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21.5M8.5 21.5h7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
-      );
+      return <Mic className={className} />;
     case "filePlus":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <path d="M7 3h7l4 4v14a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          <path d="M14 3v4h4" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          <path d="M12 12.5v5M9.5 15h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
-      );
+      return <FilePlus className={className} />;
     case "linkedin":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <rect x="3.5" y="3.5" width="17" height="17" rx="3" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M7.8 10v6.2M7.8 7.7v.01" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-          <path d="M11.5 16.2V10M11.5 12.5c0-1.4 1-2.5 2.4-2.5s2.1 1 2.1 2.7v3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <Share2 className={className} />;
     case "github":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <path d="m9 8-4 4 4 4M15 8l4 4-4 4M13.5 5.5l-3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      );
+      return <Code2 className={className} />;
     case "scale":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <path d="M12 4v16M8 20h8" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          <path d="M12 6 5 8.5m7-2.5 7 2.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          <path d="M5 8.5 3 13a2.5 2.5 0 0 0 4 0L5 8.5ZM19 8.5 17 13a2.5 2.5 0 0 0 4 0l-2-4.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-        </svg>
-      );
+      return <Scale className={className} />;
     case "pen":
-      return (
-        <svg viewBox="0 0 24 24" fill="none" className={className}>
-          <path d="m14.5 4.5 5 5L8 21H3v-5L14.5 4.5Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-          <path d="m12.5 6.5 5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-        </svg>
-      );
+      return <PenTool className={className} />;
+    default:
+      return <Wrench className={className} />;
   }
 }

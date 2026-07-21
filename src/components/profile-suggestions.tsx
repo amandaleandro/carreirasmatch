@@ -1,6 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import {
+  Sparkles,
+  GraduationCap,
+  Award,
+  BookOpen,
+  Filter,
+  ExternalLink,
+  MapPin,
+  Globe,
+  CheckCircle2,
+  TrendingUp,
+  RefreshCw,
+} from "lucide-react";
 
 export type ProfileSuggestionType = "course" | "certification" | "book";
 
@@ -18,21 +31,21 @@ type ProfileSuggestion = {
   city: string;
 };
 
-const TYPE_CONFIG: Record<ProfileSuggestionType, { label: string; icon: string; chip: string }> = {
+const TYPE_CONFIG: Record<ProfileSuggestionType, { label: string; icon: React.ReactNode; chip: string }> = {
   course: {
     label: "Curso",
-    icon: "🎓",
-    chip: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900",
+    icon: <GraduationCap className="w-3.5 h-3.5" />,
+    chip: "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/20",
   },
   certification: {
     label: "Certificação",
-    icon: "📜",
-    chip: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900",
+    icon: <Award className="w-3.5 h-3.5" />,
+    chip: "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20",
   },
   book: {
     label: "Livro",
-    icon: "📖",
-    chip: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900",
+    icon: <BookOpen className="w-3.5 h-3.5" />,
+    chip: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20",
   },
 };
 
@@ -51,6 +64,7 @@ export function ProfileSuggestions({
   const [freeOnly, setFreeOnly] = useState(false);
 
   const isFree = (s: ProfileSuggestion) => /gratuito|grátis|gratis|r\$\s*0/i.test(s.priceLabel);
+
   const filtered = suggestions.filter((s) => {
     if (typeFilter !== "all" && s.type !== typeFilter) return false;
     if (modalityFilter !== "all") {
@@ -81,155 +95,200 @@ export function ProfileSuggestions({
   }
 
   return (
-    <div className="px-4 md:px-8 py-6 max-w-5xl mx-auto w-full space-y-5 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-4">
+    <div className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8 font-sans">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/15">
-            Plano de Desenvolvimento
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+            Plano de Desenvolvimento Profissional
           </span>
-          <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white mt-1">Desenvolvimento</h1>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Cursos, certificações e livros sugeridos pela IA para fortalecer seu perfil profissional.
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Recomendações Personalizadas por IA
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">
+            Cursos, certificações e livros recomendados com base nas lacunas técnicas do seu perfil.
           </p>
         </div>
+
         <button
           type="button"
           onClick={generate}
           disabled={loading}
-          className="inline-flex items-center justify-center rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold px-4 py-2.5 shadow-sm shadow-[#2563EB]/25 transition-all text-center shrink-0 cursor-pointer disabled:opacity-50 active:scale-[0.98]"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold px-5 py-2.5 shadow-md shadow-blue-500/20 transition-all shrink-0 cursor-pointer disabled:opacity-50 active:scale-[0.98]"
         >
-          {loading ? "Gerando..." : suggestions.length > 0 ? "Atualizar plano" : "Gerar recomendações"}
+          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+          <span>{loading ? "Gerando..." : suggestions.length > 0 ? "Atualizar Plano" : "Gerar Recomendações"}</span>
         </button>
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300 text-xs px-4 py-3">
+        <div className="rounded-xl border border-rose-200 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300 text-xs px-4 py-3 font-semibold">
           {error}
         </div>
       )}
 
+      {/* Empty State */}
       {suggestions.length === 0 && !loading && (
-        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-10 shadow-[0_8px_30px_rgb(0,0,0,0.01)] text-center space-y-2">
-          <p className="text-sm font-bold text-[#071827] dark:text-white">Você ainda não gerou seu plano de desenvolvimento.</p>
-          <p className="text-xs text-[#64748B] max-w-sm mx-auto leading-relaxed">
-            Clique em &quot;Gerar recomendações&quot; para receber indicações personalizadas com base nas lacunas do seu currículo.
-          </p>
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-8 sm:p-12 text-center shadow-2xs space-y-4">
+          <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-inner">
+            <GraduationCap className="w-7 h-7" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Você ainda não gerou seu plano de desenvolvimento
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+              Clique em &quot;Gerar Recomendações&quot; para que a IA analise as habilidades desejadas no mercado e recomende os melhores conteúdos.
+            </p>
+          </div>
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={generate}
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 text-sm transition-colors shadow-md shadow-blue-500/20"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Gerar Recomendações Agora</span>
+            </button>
+          </div>
         </div>
       )}
 
+      {/* Suggestions List Grid */}
       {suggestions.length > 0 && (
-        <>
-          <div className="flex flex-wrap items-center gap-2">
-            <FilterGroup
-              value={typeFilter}
-              onChange={setTypeFilter}
-              options={[
-                { value: "all", label: "Todos" },
-                { value: "course", label: "Cursos" },
-                { value: "certification", label: "Certificações" },
-                { value: "book", label: "Livros" },
-              ]}
-            />
-            <FilterGroup
-              value={modalityFilter}
-              onChange={setModalityFilter}
-              options={[
-                { value: "all", label: "Toda modalidade" },
-                { value: "online", label: "Online" },
-                { value: "presencial", label: "Presencial" },
-              ]}
-            />
-            <button
-              type="button"
-              onClick={() => setFreeOnly((v) => !v)}
-              className={`rounded-full border px-3.5 py-1.5 text-xs font-bold transition-all ${
-                freeOnly
-                  ? "border-emerald-300 bg-emerald-500/10 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
-                  : "border-neutral-200 text-neutral-600 hover:border-neutral-300 dark:border-neutral-800 dark:text-neutral-400"
-              }`}
-            >
-              Só gratuitos
-            </button>
+        <div className="space-y-5">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <FilterGroup
+                value={typeFilter}
+                onChange={setTypeFilter}
+                options={[
+                  { value: "all", label: "Todos" },
+                  { value: "course", label: "Cursos" },
+                  { value: "certification", label: "Certificações" },
+                  { value: "book", label: "Livros" },
+                ]}
+              />
+              <FilterGroup
+                value={modalityFilter}
+                onChange={setModalityFilter}
+                options={[
+                  { value: "all", label: "Toda modalidade" },
+                  { value: "online", label: "Online" },
+                  { value: "presencial", label: "Presencial" },
+                ]}
+              />
+              <button
+                type="button"
+                onClick={() => setFreeOnly((v) => !v)}
+                className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                  freeOnly
+                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                    : "border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300"
+                }`}
+              >
+                Só gratuitos
+              </button>
+            </div>
+
+            <span className="text-xs text-slate-400 italic">
+              💡 Estimativas de preço e impacto calculadas por IA.
+            </span>
           </div>
-          <p className="text-[10px] text-[#64748B] italic">
-            💡 Preço e impacto são estimativas geradas por IA, não valores em tempo real.
-          </p>
+
           {filtered.length === 0 ? (
-            <p className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 px-4 py-6 text-center text-xs text-neutral-500">
-              Nenhuma sugestão encontrada com estes filtros.
-            </p>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-8 text-center text-xs text-slate-500">
+              Nenhuma sugestão encontrada para os filtros selecionados.
+            </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filtered.map((s) => {
                 const config = TYPE_CONFIG[s.type];
                 return (
                   <div
                     key={s.id}
-                    className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all flex flex-col gap-3.5"
+                    className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs hover:border-blue-500/60 dark:hover:border-blue-500/60 hover:shadow-md transition-all duration-200 flex flex-col justify-between gap-3.5"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span
-                            className={`inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full border px-2.5 py-0.5 ${config.chip}`}
-                          >
-                            {config.icon} {config.label}
-                          </span>
-                          {s.type === "course" && s.modality && (
-                            <span className="inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wider rounded-full border border-neutral-200 text-neutral-600 px-2.5 py-0.5 dark:border-neutral-800 dark:text-neutral-400">
-                              {s.modality.toLowerCase() === "presencial" ? "📍" : "💻"} {s.modality}
-                              {s.city ? ` · ${s.city}` : ""}
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 space-y-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span
+                              className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded-md border px-2.5 py-0.5 ${config.chip}`}
+                            >
+                              {config.icon} {config.label}
                             </span>
-                          )}
+                            {s.type === "course" && s.modality && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded-md border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-0.5">
+                                {s.modality.toLowerCase() === "presencial" ? (
+                                  <MapPin className="w-3 h-3 text-slate-400" />
+                                ) : (
+                                  <Globe className="w-3 h-3 text-slate-400" />
+                                )}
+                                {s.modality}
+                                {s.city ? ` · ${s.city}` : ""}
+                              </span>
+                            )}
+                          </div>
+
+                          <h3 className="font-bold text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                            {s.url ? (
+                              <a href={s.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                                {s.title}
+                              </a>
+                            ) : (
+                              s.title
+                            )}
+                          </h3>
+
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{s.provider}</p>
                         </div>
-                        <p className="font-bold text-sm text-[#071827] dark:text-white mt-2.5 leading-snug">
-                          {s.url ? (
-                            <a href={s.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                              {s.title}
-                            </a>
-                          ) : (
-                            s.title
-                          )}
-                        </p>
-                        <p className="text-[11px] text-[#64748B] mt-0.5 font-semibold">{s.provider}</p>
+
+                        <span className="text-xs font-extrabold text-blue-600 dark:text-blue-400 shrink-0 bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-md border border-blue-200/50 dark:border-blue-900/50">
+                          {s.priceLabel}
+                        </span>
                       </div>
-                      <span className="text-xs font-black text-[#2563EB] dark:text-blue-400 shrink-0">
-                        {s.priceLabel}
-                      </span>
+
+                      <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {s.impactReason}
+                      </p>
+
+                      {s.gapAddressed && (
+                        <div className="text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/60">
+                          <strong className="text-slate-900 dark:text-white">Gargalo resolvido:</strong>{" "}
+                          {s.gapAddressed}
+                        </div>
+                      )}
                     </div>
 
-                    <p className="text-xs text-[#64748B] dark:text-neutral-300 leading-relaxed">{s.impactReason}</p>
-
-                    {s.gapAddressed && (
-                      <p className="text-[11px] text-[#64748B]">
-                        <span className="font-bold text-[#071827] dark:text-white">Gargalo resolvido:</span>{" "}
-                        {s.gapAddressed}
-                      </p>
-                    )}
-
-                    {s.url && (
-                      <div className="pt-0.5">
+                    <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800/80">
+                      {s.url && (
                         <a
                           href={s.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[11px] font-bold text-[#2563EB] hover:text-[#1D4ED8]"
+                          className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
                         >
-                          Acessar {s.type === "course" ? "curso" : s.type === "certification" ? "certificação" : "livro"} ↗
+                          <span>Acessar {s.type === "course" ? "curso" : s.type === "certification" ? "certificação" : "livro"}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </a>
-                      </div>
-                    )}
+                      )}
 
-                    <div className="mt-auto pt-1.5 border-t border-neutral-100 dark:border-neutral-850">
-                      <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-1">
-                        <span>Impacto estimado</span>
-                        <span>{s.impactScore}%</span>
-                      </div>
-                      <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
-                        <div
-                          className="h-1.5 rounded-full bg-emerald-500"
-                          style={{ width: `${s.impactScore}%` }}
-                        />
+                      <div>
+                        <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
+                          <span className="flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3 text-emerald-500" />
+                            Impacto estimado
+                          </span>
+                          <span className="text-emerald-600 dark:text-emerald-400">{s.impactScore}%</span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                          <div
+                            className="h-1.5 rounded-full bg-emerald-500"
+                            style={{ width: `${s.impactScore}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -237,15 +296,22 @@ export function ProfileSuggestions({
               })}
             </div>
           )}
-        </>
+        </div>
       )}
 
+      {/* External Verified Courses */}
       {externalCourses.length > 0 && (
-        <section className="pt-6 border-t border-[#E2E8F0] dark:border-neutral-800 space-y-4">
+        <section className="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
           <div>
-            <h2 className="text-sm font-bold text-[#071827] dark:text-white">Cursos verificados recentemente</h2>
-            <p className="text-xs text-[#64748B] mt-0.5">Ofertas coletadas de fontes oficiais e relacionadas à sua área.</p>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+              Cursos Verificados Recentemente
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Ofertas coletadas de fontes oficiais e relacionadas à sua área profissional.
+            </p>
           </div>
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {externalCourses.map((course) => (
               <a
@@ -253,21 +319,32 @@ export function ProfileSuggestions({
                 href={course.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all flex flex-col justify-between gap-3"
+                className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs hover:border-blue-500/60 dark:hover:border-blue-500/60 hover:shadow-md transition-all flex flex-col justify-between gap-3"
               >
                 <div>
-                  <span className="text-[9px] font-bold uppercase tracking-wider text-emerald-600 bg-emerald-500/10 border border-emerald-500/15 px-2 py-0.5 rounded-md">
-                    {course.free ? "Gratuito" : "Consulte o valor"} · {course.modality}
-                    {course.modality?.toLowerCase() === "presencial" && course.city ? ` · ${course.city}` : ""}
-                  </span>
-                  <h3 className="mt-2.5 font-bold text-sm text-[#071827] dark:text-white leading-snug">{course.title}</h3>
-                  <p className="mt-1 text-[11px] text-[#64748B] font-semibold">{course.provider} · {course.area}</p>
-                </div>
-                {course.certificate && (
-                  <p className="text-[10px] font-bold uppercase text-[#2563EB] dark:text-blue-400 mt-2">
-                    Certificado disponível ✓
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-md">
+                      {course.free ? "Gratuito" : "Consulte o valor"} · {course.modality}
+                      {course.modality?.toLowerCase() === "presencial" && course.city ? ` · ${course.city}` : ""}
+                    </span>
+                    {course.certificate && (
+                      <span className="text-[10px] font-bold uppercase text-blue-600 dark:text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-md">
+                        Certificado ✓
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="mt-2.5 font-bold text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                    {course.title}
+                  </h3>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-semibold">
+                    {course.provider} · {course.area}
                   </p>
-                )}
+                </div>
+
+                <div className="pt-2 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+                  <span>Ver detalhes do curso</span>
+                  <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
               </a>
             ))}
           </div>
@@ -287,16 +364,16 @@ function FilterGroup<T extends string>({
   options: { value: T; label: string }[];
 }) {
   return (
-    <div className="inline-flex rounded-full border border-neutral-200 p-0.5 dark:border-neutral-800">
+    <div className="inline-flex rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-0.5">
       {options.map((opt) => (
         <button
           key={opt.value}
           type="button"
           onClick={() => onChange(opt.value)}
-          className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+          className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
             value === opt.value
-              ? "bg-blue-600 text-white"
-              : "text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+              ? "bg-blue-600 text-white shadow-xs"
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
           }`}
         >
           {opt.label}

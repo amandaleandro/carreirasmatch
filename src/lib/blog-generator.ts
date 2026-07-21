@@ -80,7 +80,9 @@ Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo
 
   // Temperatura um pouco mais alta e mais tokens: variedade de ângulo e corpo
   // mais longo (~600-900 palavras) pedem folga em relação ao artigo curto antigo.
+  // Gemini como preferencial: geração de blog é interna/não urgente, então usa
+  // uma cota gratuita separada da do Groq (análise) e da do Cerebras (ferramentas).
   return runJsonPrompt<GeneratedPost>(
-    SYSTEM_PROMPT, userMessage, 0.7, 4000, undefined, undefined, "blog_generation"
+    SYSTEM_PROMPT, userMessage, 0.7, 4000, undefined, undefined, "blog_generation", "gemini"
   );
 }

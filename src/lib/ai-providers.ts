@@ -129,8 +129,19 @@ export function orderEndpointsForRouting(
   ];
 }
 
-function endpointsForRequest(endpoints: AiEndpoint[]): AiEndpoint[] {
-  const ordered = orderEndpointsForRouting(endpoints, process.env.AI_ROUTING_MODE, rotationCursor);
+/** Põe `preferredId` na frente da fila (se configurado), preservando os demais como fallback. */
+function withPreferredFirst(endpoints: AiEndpoint[], preferredId: string | undefined): AiEndpoint[] {
+  if (!preferredId) return endpoints;
+  const preferred = endpoints.filter((e) => e.id === preferredId);
+  if (preferred.length === 0) return endpoints;
+  const rest = endpoints.filter((e) => e.id !== preferredId);
+  return [...preferred, ...rest];
+}
+
+function endpointsForRequest(endpoints: AiEndpoint[], preferredProviderId?: string): AiEndpoint[] {
+  const ordered = preferredProviderId
+    ? withPreferredFirst(endpoints, preferredProviderId)
+    : orderEndpointsForRouting(endpoints, process.env.AI_ROUTING_MODE, rotationCursor);
   rotationCursor = (rotationCursor + 1) % endpoints.length;
   return filterAvailableEndpoints(ordered);
 }
@@ -391,7 +402,8 @@ export async function runJsonAcrossProviders(
   maxTokens: number,
   groqModel: string,
   validate?: (value: unknown) => void,
-  operation = "other"
+  operation = "other",
+  preferredProviderId?: string
 ): Promise<string> {
   const endpoints = getConfiguredEndpoints(groqModel);
   if (endpoints.length === 0) {
@@ -434,8 +446,8 @@ export async function runJsonAcrossProviders(
   }
   aiCacheEvents.inc({ operation, result: "miss" });
 
-  const orderedEndpoints = endpointsForRequest(endpoints);
-  console.log(`[AI] routing=${process.env.AI_ROUTING_MODE || "free_first"} order=${orderedEndpoints.map((endpoint) => endpoint.id).join(",")}`);
+  const orderedEndpoints = endpointsForRequest(endpoints, preferredProviderId);
+  console.log(`[AI] routing=${preferredProviderId ? `preferred:${preferredProviderId}` : process.env.AI_ROUTING_MODE || "free_first"} order=${orderedEndpoints.map((endpoint) => endpoint.id).join(",")}`);
 
   const requestPromise = (async () => {
     const retries = boundedEnvNumber("AI_MAX_RETRIES", 2, 0, 3);

@@ -1,7 +1,7 @@
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import Link from "next/link";
-import { Sparkles, Keyboard, Trophy, Brain, Flame, Calendar, CalendarDays, Type, Skull, Scale, ListOrdered } from "lucide-react";
+import { Sparkles, Keyboard, Trophy, Brain, Flame, Calendar, CalendarDays, Type, Skull, Scale, ListOrdered, Search, FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -177,6 +177,38 @@ export default async function GamesHubPage() {
               </p>
             </div>
             <Link href="/jogos/ordenar" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
+              Jogar Agora
+            </Link>
+          </div>
+
+          {/* Card Jogo 8: Caça-Palavras */}
+          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
+            <div className="space-y-4">
+              <div className="rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 p-3.5 w-fit">
+                <Search className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-[#071827] dark:text-white">Caça-Palavras Profissional</h3>
+              <p className="text-[#64748B] text-xs leading-relaxed">
+                Encontre termos de carreira, tecnologia e negócios escondidos na grade de letras antes que o tempo acabe.
+              </p>
+            </div>
+            <Link href="/jogos/cacapalavras" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
+              Jogar Agora
+            </Link>
+          </div>
+
+          {/* Card Jogo 9: Monte o Currículo */}
+          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
+            <div className="space-y-4">
+              <div className="rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 p-3.5 w-fit">
+                <FileText className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-bold text-[#071827] dark:text-white">Monte o Currículo</h3>
+              <p className="text-[#64748B] text-xs leading-relaxed">
+                Reordene as seções de diferentes perfis de currículo até chegar na estrutura ideal para cada situação.
+              </p>
+            </div>
+            <Link href="/jogos/curriculo" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
               Jogar Agora
             </Link>
           </div>

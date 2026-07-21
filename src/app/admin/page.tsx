@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ShieldCheck, Sparkles } from "lucide-react";
 import { requireAdminPage } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { AdminUserLookup } from "@/components/admin-user-lookup";
@@ -62,16 +63,38 @@ function StatCard({
   label,
   value,
   helper,
+  icon: Icon,
+  color = "blue",
 }: {
   label: string;
   value: string | number;
   helper: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  color?: "blue" | "indigo" | "emerald" | "amber" | "purple" | "rose";
 }) {
+  const colorClasses = {
+    blue: "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    indigo: "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-500/20",
+    emerald: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    amber: "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    purple: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+    rose: "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20",
+  };
+
   return (
-    <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950">
-      <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">{label}</p>
-      <p className="mt-2 text-2xl font-semibold tracking-tight">{value}</p>
-      <p className="mt-1 text-xs text-neutral-500">{helper}</p>
+    <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs space-y-2">
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          {label}
+        </p>
+        {Icon && (
+          <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${colorClasses[color]}`}>
+            <Icon className="w-4 h-4" />
+          </div>
+        )}
+      </div>
+      <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{value}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400">{helper}</p>
     </div>
   );
 }
@@ -293,21 +316,34 @@ export default async function AdminPage() {
     : "0,00";
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
-      <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8 font-sans">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <Link href="/dashboard" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-            Voltar para o dashboard
+          <Link
+            href="/dashboard"
+            className="text-xs font-semibold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1 mb-2"
+          >
+            ← Voltar ao painel principal
           </Link>
-          <h1 className="mt-3 text-2xl md:text-3xl font-bold tracking-tight">Admin do sistema</h1>
-          <p className="mt-2 max-w-3xl text-sm text-neutral-600 dark:text-neutral-400">
-            Visão operacional do produto: usuários, análises, pagamentos, vagas, candidaturas e liberações manuais.
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Painel Geral de Controle
+            </span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white mt-1">
+            Administração do Sistema
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">
+            Visão operacional: telemetria em tempo real, métricas de crescimento, liberação de acessos e cupons.
           </p>
         </div>
-        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-200">
-          Atualizado em tempo real a cada carregamento da página.
+
+        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-2 shrink-0">
+          <Sparkles className="w-4 h-4 text-blue-500" />
+          <span>Telemetria ativa em tempo real</span>
         </div>
-      </header>
+      </div>
 
       <section className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 dark:border-blue-900 dark:bg-blue-950/20">
         <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Play, Clock, Video as VideoIcon } from "lucide-react";
 
 type Props = {
   videoId: string;
@@ -25,9 +26,9 @@ export function VideoCard({ videoId, title, channel, area, thumbnail, durationSe
   const duration = formatDuration(durationSec);
 
   return (
-    <div className="overflow-hidden rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/40 dark:bg-neutral-900/40 flex flex-col justify-between w-full">
+    <div className="group overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-blue-500/60 dark:hover:border-blue-500/60 hover:shadow-xl transition-all duration-300 flex flex-col justify-between w-full">
       <div>
-        <div className="relative aspect-video w-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden">
+        <div className="relative aspect-video w-full bg-slate-900 overflow-hidden">
           {playing ? (
             <iframe
               className="absolute inset-0 h-full w-full"
@@ -40,33 +41,50 @@ export function VideoCard({ videoId, title, channel, area, thumbnail, durationSe
             <button
               type="button"
               onClick={() => setPlaying(true)}
-              className="group absolute inset-0 h-full w-full"
+              className="group/btn absolute inset-0 h-full w-full overflow-hidden"
               aria-label={`Assistir: ${title}`}
             >
-              {/* Miniatura vem do YouTube (i.ytimg.com); é apenas exibida, não rehospedada. */}
               {thumbnail && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={thumbnail}
+                  alt={title}
+                  className="h-full w-full object-cover group-hover/btn:scale-105 transition-transform duration-500"
+                  loading="lazy"
+                />
               )}
-              <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
-                <span className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+              <div className="absolute inset-0 bg-slate-950/30 group-hover/btn:bg-slate-950/40 transition-colors flex items-center justify-center">
+                <span className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-xl shadow-red-600/40 group-hover/btn:scale-110 transition-transform">
+                  <Play className="h-6 w-6 fill-white translate-x-0.5" />
                 </span>
-              </span>
+              </div>
               {duration && (
-                <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-[11px] sm:text-xs font-medium text-white">
-                  {duration}
+                <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 rounded-lg bg-slate-950/80 backdrop-blur-md px-2 py-0.5 text-[11px] font-semibold text-white">
+                  <Clock className="w-3 h-3 text-slate-300" />
+                  <span>{duration}</span>
                 </span>
               )}
             </button>
           )}
         </div>
-        <div className="p-3.5 sm:p-4">
-          <span className="text-[11px] sm:text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">{area}</span>
-          <h2 className="mt-1 line-clamp-2 text-xs sm:text-sm font-bold leading-snug text-neutral-900 dark:text-neutral-100">{title}</h2>
-          <p className="mt-1.5 text-xs text-neutral-500">{channel}</p>
+        <div className="p-4 sm:p-5 space-y-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-0.5 rounded-md border border-blue-200/50 dark:border-blue-900/50">
+              {area}
+            </span>
+            <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
+              <VideoIcon className="w-3.5 h-3.5 text-red-500" />
+              <span>YouTube</span>
+            </span>
+          </div>
+
+          <h3 className="line-clamp-2 text-sm font-bold leading-snug text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            {title}
+          </h3>
+
+          <p className="text-xs text-slate-500 dark:text-slate-400 truncate font-medium">
+            {channel}
+          </p>
         </div>
       </div>
     </div>
