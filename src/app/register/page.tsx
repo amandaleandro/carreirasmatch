@@ -117,13 +117,10 @@ export default function RegisterPage() {
                 inputMode="numeric"
                 value={phone}
                 onChange={(e) => setPhone(formatBrazilPhone(e.target.value))}
-                required
-                minLength={15}
-                maxLength={15}
-                placeholder="(11) 99999-9999"
+                placeholder="(11) 99999-9999 (opcional)"
                 className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]"
               />
-              <p className="text-xs text-neutral-500">Contato para comunicações sobre sua carreira e sua conta.</p>
+              <p className="text-xs text-neutral-500">Contato opcional para comunicações sobre sua carreira.</p>
             </div>
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
