@@ -25,47 +25,49 @@ export function VideoCard({ videoId, title, channel, area, thumbnail, durationSe
   const duration = formatDuration(durationSec);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-800">
-      <div className="relative aspect-video bg-neutral-100 dark:bg-neutral-900">
-        {playing ? (
-          <iframe
-            className="absolute inset-0 h-full w-full"
-            src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
-            title={title}
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        ) : (
-          <button
-            type="button"
-            onClick={() => setPlaying(true)}
-            className="group absolute inset-0 h-full w-full"
-            aria-label={`Assistir: ${title}`}
-          >
-            {/* Miniatura vem do YouTube (i.ytimg.com); é apenas exibida, não rehospedada. */}
-            {thumbnail && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />
-            )}
-            <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
+    <div className="overflow-hidden rounded-xl sm:rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/40 dark:bg-neutral-900/40 flex flex-col justify-between w-full">
+      <div>
+        <div className="relative aspect-video w-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden">
+          {playing ? (
+            <iframe
+              className="absolute inset-0 h-full w-full"
+              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0`}
+              title={title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <button
+              type="button"
+              onClick={() => setPlaying(true)}
+              className="group absolute inset-0 h-full w-full"
+              aria-label={`Assistir: ${title}`}
+            >
+              {/* Miniatura vem do YouTube (i.ytimg.com); é apenas exibida, não rehospedada. */}
+              {thumbnail && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />
+              )}
+              <span className="absolute inset-0 flex items-center justify-center bg-black/20 transition-colors group-hover:bg-black/30">
+                <span className="flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-red-600 text-white shadow-lg">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
               </span>
-            </span>
-            {duration && (
-              <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs font-medium text-white">
-                {duration}
-              </span>
-            )}
-          </button>
-        )}
-      </div>
-      <div className="p-4">
-        <span className="text-xs font-semibold text-blue-600">{area}</span>
-        <h2 className="mt-1 line-clamp-2 font-bold leading-snug">{title}</h2>
-        <p className="mt-2 text-sm text-neutral-500">{channel}</p>
+              {duration && (
+                <span className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-[11px] sm:text-xs font-medium text-white">
+                  {duration}
+                </span>
+              )}
+            </button>
+          )}
+        </div>
+        <div className="p-3.5 sm:p-4">
+          <span className="text-[11px] sm:text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">{area}</span>
+          <h2 className="mt-1 line-clamp-2 text-xs sm:text-sm font-bold leading-snug text-neutral-900 dark:text-neutral-100">{title}</h2>
+          <p className="mt-1.5 text-xs text-neutral-500">{channel}</p>
+        </div>
       </div>
     </div>
   );

@@ -64,12 +64,12 @@ export default async function FreeCoursesPage({
   return (
     <ContentPage eyebrow="Qualificação" title="Cursos gratuitos verificados" description="Escolha uma área e encontre cursos gratuitos para fortalecer seu currículo." wide>
       <form className="grid gap-3 rounded-2xl border border-neutral-200 p-4 dark:border-neutral-800 sm:grid-cols-[1fr_1fr_auto]">
-        <input name="q" defaultValue={q} placeholder="Curso, habilidade ou instituição" className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700" />
-        <select name="area" defaultValue={area} className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700">
-          <option value="">Todas as áreas</option>
-          {areas.map((item) => <option key={item.area} value={item.area}>{item.area}</option>)}
+        <input name="q" defaultValue={q} placeholder="Curso, habilidade ou instituição" className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100" />
+        <select name="area" defaultValue={area} className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
+          <option value="" className="dark:bg-neutral-900">Todas as áreas</option>
+          {areas.map((item) => <option key={item.area} value={item.area} className="dark:bg-neutral-900">{item.area}</option>)}
         </select>
-        <button className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white">Buscar</button>
+        <button className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white cursor-pointer">Buscar</button>
       </form>
 
       {/* Seção de Destaques / Patrocinados */}

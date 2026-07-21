@@ -47,10 +47,10 @@ export default async function MentoriasPage({
       wide
     >
       {areas.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-2 sm:flex-wrap sm:overflow-visible">
           <a
             href="/mentorias"
-            className={`rounded-full border px-4 py-1.5 text-sm font-medium ${area === "" ? "border-blue-600 bg-blue-600 text-white" : "border-neutral-300 dark:border-neutral-700"}`}
+            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-colors ${area === "" ? "border-blue-600 bg-blue-600 text-white" : "border-neutral-300 dark:border-neutral-700 hover:border-neutral-400"}`}
           >
             Todas
           </a>
@@ -58,7 +58,7 @@ export default async function MentoriasPage({
             <a
               key={item.area}
               href={`/mentorias?area=${encodeURIComponent(item.area)}`}
-              className={`rounded-full border px-4 py-1.5 text-sm font-medium ${area === item.area ? "border-blue-600 bg-blue-600 text-white" : "border-neutral-300 dark:border-neutral-700"}`}
+              className={`shrink-0 rounded-full border px-3.5 py-1.5 text-xs sm:text-sm font-medium transition-colors ${area === item.area ? "border-blue-600 bg-blue-600 text-white" : "border-neutral-300 dark:border-neutral-700 hover:border-neutral-400"}`}
             >
               {item.area}
             </a>
