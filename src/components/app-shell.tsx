@@ -4,6 +4,7 @@ import { isAdminEmail } from "@/lib/admin";
 import { isInfluencerUser } from "@/lib/influencer";
 import { SidebarNav } from "@/components/sidebar-nav";
 import { Topbar } from "@/components/topbar";
+import { DesafioBanner } from "@/components/desafio-banner";
 import { GuidedTour } from "@/components/guided-tour";
 import { UpcomingFeaturesModal } from "@/components/upcoming-features-modal";
 import { UiPanelsProvider } from "@/components/ui-panels";
@@ -45,6 +46,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <SidebarNav isAdmin={isAdmin} isInfluencer={isInfluencer} />
         <div className="flex-1 flex flex-col min-w-0">
           <Topbar userName={userName} userEmail={userEmail} userImage={userImage} />
+          <DesafioBanner />
           {/* data-authenticated: o app já tem Topbar + Sidebar, então o CSS esconde
               o header público (.public-header) das páginas de marketing/conteúdo
               renderizadas aqui dentro, evitando barra de navegação duplicada. */}
