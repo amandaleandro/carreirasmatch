@@ -4,7 +4,8 @@ import { prisma } from "@/lib/prisma";
 import { isCareerSegment } from "@/lib/career-segments";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendWelcomeEmail, notifyAdminNewSignup } from "@/lib/resend";
-import { validateContact } from "@/lib/contact-validation";
+import { normalizePersonName, isValidFullName, normalizeBrazilPhone, isValidBrazilPhone } from "@/lib/contact-validation";
+import { normalizeEmail, isValidEmail } from "@/lib/email";
 import { normalizeCouponCode } from "@/lib/coupons";
 
 const REGISTER_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
@@ -20,11 +21,20 @@ export async function POST(req: NextRequest) {
     }
 
     const { name, email, phone, password, careerSegment, professionalArea, coupon } = await req.json();
-    const contact = validateContact({ name, email, phone });
-    const { name: normalizedName, email: normalizedEmail, phone: normalizedPhone } = contact.data;
+    const normalizedName = normalizePersonName(name);
+    const normalizedEmail = normalizeEmail(email);
+    const normalizedPhone = normalizeBrazilPhone(phone);
 
-    if (!contact.success) {
-      return NextResponse.json({ error: contact.errors[0], errors: contact.errors }, { status: 400 });
+    if (!isValidFullName(normalizedName)) {
+      return NextResponse.json({ error: "Informe seu nome e sobrenome completos." }, { status: 400 });
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+      return NextResponse.json({ error: "Informe um e-mail válido." }, { status: 400 });
+    }
+
+    if (normalizedPhone && !isValidBrazilPhone(normalizedPhone)) {
+      return NextResponse.json({ error: "Informe um telefone válido com DDD." }, { status: 400 });
     }
 
     if (typeof password !== "string" || password.length < 8) {
