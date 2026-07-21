@@ -259,6 +259,8 @@ export function AnalyzeVagaPage({
   const [resultJobTitle, setResultJobTitle] = useState("");
   const [leadUnlocked, setLeadUnlocked] = useState(() => Boolean(getStoredLeadContact()));
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const step2Ref = useRef<HTMLElement>(null);
+  const jobTitleInputRef = useRef<HTMLInputElement>(null);
 
   const step1Done = careerTrack !== "";
   const currentStep = !step1Done ? 1 : 2;
@@ -533,7 +535,13 @@ export function AnalyzeVagaPage({
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => setCareerTrack(option.value)}
+                    onClick={() => {
+                      setCareerTrack(option.value);
+                      setTimeout(() => {
+                        jobTitleInputRef.current?.focus({ preventScroll: true });
+                        step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }, 50);
+                    }}
                     className={`group relative w-full min-h-[116px] flex items-start gap-4 text-left rounded-2xl border p-4 pr-11 transition-all hover:-translate-y-0.5 ${
                       active
                         ? "border-blue-500 bg-blue-50/80 dark:bg-blue-950/25 text-neutral-900 dark:text-white shadow-[0_12px_30px_rgba(37,99,235,0.13)]"
@@ -650,7 +658,7 @@ export function AnalyzeVagaPage({
         </div>
 
         {/* Step 2: Currículo e Vaga */}
-        <section className="rounded-2xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0d1629]/90 p-5 md:p-6 shadow-sm space-y-5">
+        <section ref={step2Ref} className="rounded-2xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0d1629]/90 p-5 md:p-6 shadow-sm space-y-5">
             <div className="flex items-center gap-3">
               <span className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-bold flex items-center justify-center shadow-md shadow-blue-500/20">2</span>
               <div>
@@ -662,6 +670,7 @@ export function AnalyzeVagaPage({
             <div className="space-y-1.5">
               <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">Cargo desejado</label>
               <input
+                ref={jobTitleInputRef}
                 type="text"
                 value={jobTitle}
                 onChange={(e) => setJobTitle(e.target.value)}
