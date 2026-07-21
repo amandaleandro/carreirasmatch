@@ -29,6 +29,7 @@ export function AllJobsList({ jobs }: { jobs: Job[] }) {
   return (
     <div className="space-y-4">
       {jobs.map((job) => {
+        const tags = deriveJobTags(job);
         const cleanedText = job.jobText
           .replace(/Copiar link|Erro ao copiar link|Compartilhar vaga|Link copiado|Ir para candidatura|Descrição da vaga|Responsável pelo atendimento/gi, " ")
           .replace(/\s+/g, " ")
