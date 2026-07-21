@@ -97,6 +97,7 @@ const CURIOSITIES = [
   "Erros de português ainda são o motivo nº 1 de descarte imediato de currículos no Brasil.",
   "Currículos de 1 página têm taxa de leitura completa maior que os de 2 páginas ou mais.",
   "Personalizar o currículo para cada vaga pode dobrar a taxa de resposta dos recrutadores.",
+  "Como nossa análise mapeia as habilidades reais, ela funciona para qualquer profissão, não apenas tecnologia.",
 ];
 
 const LOADING_MESSAGES = [
@@ -237,11 +238,7 @@ export function AnalyzeVagaPage({
   isAuthenticated = false,
 }: {
   suggestedTrack?: CareerTrack | null;
-  /** Set when the logged-in user has a paid plan and their profile's "momento profissional"
-   * maps unambiguously to a single track: the track selector is hidden and this value is forced. */
   lockedTrack?: CareerTrack | null;
-  /** Set when the logged-in user has a paid plan; restricts the track selector to values
-   * compatible with the "momento profissional" set on their profile. */
   allowedTracks?: CareerTrack[] | null;
   careerSegmentLabel?: string | null;
   isAuthenticated?: boolean;
@@ -304,10 +301,6 @@ export function AnalyzeVagaPage({
       setError("Envie seu currículo em PDF.");
       return;
     }
-    if (!jobTitle.trim()) {
-      setError("Informe o cargo desejado.");
-      return;
-    }
     if (!jobText.trim() && !jobLink.trim()) {
       setError("Cole a descrição da vaga ou informe o link da vaga.");
       return;
@@ -333,10 +326,6 @@ export function AnalyzeVagaPage({
         formData.append("pastFeedback", pastFeedback);
       }
 
-      // Uma única repetição automática quando a IA está momentaneamente
-      // sobrecarregada (todos os provedores no limite): o usuário não precisa
-      // clicar de novo. Só repete quando a API marca a falha como retryable,
-      // nunca em 429 de cota gratuita ou rate limit por acesso.
       let res = await fetch("/api/analyze", { method: "POST", body: formData });
       let data = await res.json();
       if (!res.ok && res.status === 429 && data?.retryable) {
@@ -365,40 +354,106 @@ export function AnalyzeVagaPage({
     }
   }
 
+  // Simulador de progresso realístico para a tela de loading
+  const [activeStep, setActiveStep] = useState(1);
+  useEffect(() => {
+    if (!loading) return;
+    const timers = [
+      setTimeout(() => setActiveStep(2), 3500),
+      setTimeout(() => setActiveStep(3), 7500),
+      setTimeout(() => setActiveStep(4), 12000),
+      setTimeout(() => setActiveStep(5), 18000),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, [loading]);
+
   if (loading) {
+    const loadingSteps = [
+      { id: 1, label: "Lendo e extraindo texto do currículo PDF" },
+      { id: 2, label: "Mapeando requisitos e competências da vaga" },
+      { id: 3, label: "Cruzando habilidades e palavras-chave" },
+      { id: 4, label: "Calculando o score de match de aderência" },
+      { id: 5, label: "Estruturando plano de evolução e dicas" },
+    ];
+
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 max-w-lg mx-auto space-y-6">
-        <div className="relative">
-          {/* Outer glowing pulsing ring */}
-          <div className="absolute inset-0 rounded-full bg-blue-500/20 blur-xl animate-pulse" />
-          {/* Spinner rings */}
-          <div className="relative h-20 w-20 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin dark:border-blue-950 dark:border-t-blue-400" />
+      <div className="min-h-[70vh] flex items-center justify-center p-4 font-sans bg-[#F8FAFC] dark:bg-[#071827]">
+        <div className="max-w-md w-full bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6 animate-in fade-in zoom-in duration-300">
+          
+          {/* Radar Animado */}
+          <div className="flex flex-col items-center text-center">
+            <div className="relative h-14 w-14 flex items-center justify-center mb-3">
+              <div className="absolute inset-0 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/25 animate-ping" />
+              <div className="absolute inset-2 rounded-full bg-[#2563EB]/20 animate-pulse" />
+              <span className="text-xl z-10 animate-bounce">⚡</span>
+            </div>
+            <h2 className="text-base font-title font-bold text-[#071827] dark:text-white">Análise em Andamento</h2>
+            <p className="text-[10px] text-[#64748B] mt-1 max-w-xs">
+              Nossa inteligência artificial está processando seu diagnóstico de match. Isso pode levar alguns segundos.
+            </p>
+          </div>
+
+          {/* Checklist de Etapas */}
+          <div className="space-y-3 bg-[#F8FAFC] dark:bg-neutral-950/60 p-4 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800">
+            {loadingSteps.map((step) => {
+              const isCompleted = activeStep > step.id;
+              const isActive = activeStep === step.id;
+              return (
+                <div key={step.id} className="flex items-center gap-3 text-xs transition-all duration-300">
+                  <span className={`h-5 w-5 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 transition-all ${
+                    isCompleted
+                      ? "bg-[#22C55E] text-white"
+                      : isActive
+                      ? "bg-[#2563EB] text-white animate-pulse"
+                      : "bg-[#E2E8F0] dark:bg-neutral-800 text-neutral-400"
+                  }`}>
+                    {isCompleted ? "✓" : step.id}
+                  </span>
+                  <span className={`font-medium ${
+                    isCompleted
+                      ? "text-[#64748B] line-through decoration-slate-300 dark:decoration-slate-700"
+                      : isActive
+                      ? "text-[#071827] dark:text-white font-semibold"
+                      : "text-slate-400"
+                  }`}>
+                    {step.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Dica Rotativa (Curiosidades) */}
+          <div className="border-t border-[#E2E8F0] dark:border-neutral-800 pt-4 flex gap-2.5 items-start">
+            <span className="text-base">💡</span>
+            <div className="min-w-0 flex-1">
+              <span className="text-[9px] font-bold text-[#2563EB] uppercase tracking-wider block">Você sabia?</span>
+              <p key={curiosityIndex} className="text-[11px] text-[#64748B] leading-relaxed mt-0.5 min-h-[36px] animate-[fadeIn_0.4s_ease]">
+                {CURIOSITIES[curiosityIndex]}
+              </p>
+            </div>
+          </div>
+
+          {/* Barra de progresso genérica */}
+          <div className="h-1 w-full bg-[#E2E8F0] dark:bg-neutral-800 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-[#2563EB] transition-all duration-1000 ease-out" 
+              style={{ width: `${Math.min(activeStep * 20, 95)}%` }}
+            />
+          </div>
         </div>
-        <div className="space-y-3">
-          <h2 className="text-xl font-bold text-neutral-900 dark:text-white font-sans">Analisando seu currículo...</h2>
-          <p key={loadingMessageIndex} className="text-sm text-blue-600 dark:text-blue-400 font-semibold min-h-[20px] animate-[fadeIn_0.3s_ease]">
-            {LOADING_MESSAGES[loadingMessageIndex]}
-          </p>
-          <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto leading-relaxed">
-            Isso pode levar cerca de 15 a 30 segundos. Nossa inteligência artificial está processando o PDF e comparando com os requisitos da vaga.
-          </p>
-        </div>
-        <div className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
-          <div className="bg-blue-600 h-1.5 rounded-full animate-pulse" style={{ width: '85%' }} />
-        </div>
-        <p className="text-[10px] text-neutral-400">Por favor, mantenha esta aba aberta.</p>
       </div>
     );
   }
 
   if (result && resultTrack) {
     return (
-      <div className="max-w-4xl mx-auto px-4 md:px-8 py-12 w-full space-y-6">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 py-10 w-full space-y-5 font-sans bg-[#F8FAFC] dark:bg-[#071827]">
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => setResult(null)}
-            className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] transition-colors cursor-pointer"
           >
             ← Fazer nova análise
           </button>
@@ -407,10 +462,10 @@ export function AnalyzeVagaPage({
               href={`/report/${result.id}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-700 dark:text-neutral-300 hover:text-blue-600 transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#64748B] hover:text-[#2563EB] transition-colors"
             >
               Ver em página cheia
-              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
+              <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3"/></svg>
             </a>
           )}
         </div>
@@ -426,9 +481,9 @@ export function AnalyzeVagaPage({
           />
         ) : !result.loggedIn ? (
           <SimpleFitTeaser result={result}>
-            <div className="rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 space-y-3">
-              <h3 className="font-semibold">Veja exatamente o que ajustar antes de aplicar</h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-5 space-y-3 shadow-sm">
+              <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">Veja exatamente o que ajustar antes de aplicar</h3>
+              <p className="text-xs text-[#64748B]">
                 Libere palavras-chave, ajustes de currículo, plano de evolução, perguntas de entrevista e mensagem para o recrutador.
               </p>
               <UnlockDiagnosticButton
@@ -436,9 +491,9 @@ export function AnalyzeVagaPage({
                 price={result.diagnosticPrice}
                 payerEmail={getStoredLeadContact()?.email}
               />
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="text-[10px] text-[#64748B]">
                 Sem cadastro prévio: você paga e cria sua conta em seguida para acessar. Já tem conta?{" "}
-                <a href="/login" className="font-semibold text-blue-600 dark:text-blue-400 underline">
+                <a href="/login" className="font-bold text-[#2563EB] hover:underline">
                   Entrar
                 </a>
                 .
@@ -447,9 +502,9 @@ export function AnalyzeVagaPage({
           </SimpleFitTeaser>
         ) : (
           <AnalysisTeaserView result={result}>
-            <div className="rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 space-y-3">
-              <h3 className="font-semibold">Veja exatamente o que ajustar antes de aplicar</h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-5 space-y-3 shadow-sm">
+              <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">Veja exatamente o que ajustar antes de aplicar</h3>
+              <p className="text-xs text-[#64748B]">
                 Libere palavras-chave, ajustes de currículo, plano de evolução, perguntas de entrevista e mensagem para o recrutador.
               </p>
               <UnlockDiagnosticButton analysisId={result.id} price={result.diagnosticPrice} />
@@ -461,367 +516,412 @@ export function AnalyzeVagaPage({
   }
 
   return (
-    <div className="px-4 md:px-8 py-7 max-w-[1240px] mx-auto w-full space-y-6">
+    <div className="px-4 md:px-8 py-6 max-w-[1200px] mx-auto w-full space-y-5 font-sans bg-[#F8FAFC] dark:bg-[#071827] text-foreground">
       {!isAuthenticated && (
-        <a href="/gratuito" className="text-sm text-blue-600 hover:underline dark:text-blue-400">
+        <a href="/gratuito" className="text-xs font-bold text-[#2563EB] hover:underline">
           ← Voltar para recursos gratuitos
         </a>
       )}
-      {/* Top Banner and Header */}
-      <div className="relative overflow-hidden rounded-3xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eef5ff_48%,#fff7ed_100%)] px-5 py-6 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#081225_0%,#0f1f3f_52%,#1b1730_100%)] md:px-7 md:py-7">
-        <div className="absolute inset-y-0 right-0 hidden w-2/5 bg-[radial-gradient(circle_at_70%_35%,rgba(37,99,235,0.18),transparent_34%),radial-gradient(circle_at_50%_82%,rgba(245,158,11,0.16),transparent_32%)] lg:block" />
-        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-        <div className="space-y-3">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-white/75 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-700 shadow-sm dark:border-white/10 dark:bg-white/10 dark:text-blue-300">
-            Antes de se candidatar
-          </span>
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-neutral-950 dark:text-white">
-            Descubra o que ajustar para <span className="text-blue-600 dark:text-blue-500">esta vaga</span>
-          </h1>
-          <p className="max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-            Compare seu currículo com os requisitos reais da oportunidade. Você recebe uma leitura inicial gratuita e decide depois se quer liberar o plano completo.
-          </p>
-          <div className="grid max-w-xl grid-cols-3 gap-2 pt-1">
-            {["PDF de até 5 MB", "Resultado inicial grátis", "Sem inventar experiência"].map((item) => (
-              <span key={item} className="rounded-xl border border-white/70 bg-white/70 px-3 py-2 text-[11px] font-semibold text-neutral-700 shadow-sm dark:border-white/10 dark:bg-white/10 dark:text-neutral-200">
-                {item}
-              </span>
+      
+      {/* Cabeçalho Unificado (Banner Limpo) */}
+      <div className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5.5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+        <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#2563EB]/20 bg-[#2563EB]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
+              Antes de se candidatar
+            </span>
+            <h1 className="text-2xl md:text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
+              Descubra o que ajustar para <span className="text-[#2563EB]">esta vaga</span>
+            </h1>
+            <p className="max-w-2xl text-xs leading-relaxed text-[#64748B]">
+              Compare seu currículo com os requisitos reais da oportunidade. Você recebe uma leitura inicial gratuita e decide depois se quer liberar o plano completo.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-1">
+              {["PDF de até 5 MB", "Resultado inicial grátis", "Qualquer profissão"].map((item) => (
+                <span key={item} className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-800 px-3 py-1.5 text-[10px] font-bold text-[#64748B] shadow-sm">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Stepper Display Compacto */}
+          <div className="flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-900/40 p-2 shadow-sm">
+            {STEPS.map((s, i) => (
+              <div key={s.n} className="flex items-center gap-1.5 shrink-0">
+                <span
+                  className={`h-6 w-6 rounded-lg flex items-center justify-center text-[10px] font-bold transition-all shrink-0 ${
+                    s.n === currentStep
+                      ? "bg-[#2563EB] text-white shadow-sm shadow-[#2563EB]/25"
+                      : s.n < currentStep
+                      ? "bg-[#22C55E]/15 text-[#22C55E]"
+                      : "bg-[#E2E8F0] dark:bg-neutral-800 text-neutral-400"
+                  }`}
+                >
+                  {s.n < currentStep ? "✓" : s.n}
+                </span>
+                <span
+                  className={`hidden sm:inline text-[10px] font-bold whitespace-nowrap ${
+                    s.n === currentStep ? "text-[#071827] dark:text-neutral-200" : "text-[#64748B]"
+                  }`}
+                >
+                  {s.label}
+                </span>
+                {i < STEPS.length - 1 && (
+                  <div className="h-px w-4 sm:w-5 bg-[#E2E8F0] dark:bg-neutral-800 shrink-0" />
+                )}
+              </div>
             ))}
           </div>
         </div>
-
-        {/* Steps display */}
-        <div className="flex max-w-full shrink-0 items-center gap-1.5 overflow-x-auto rounded-2xl border border-white/80 bg-white/85 p-2 shadow-sm dark:border-white/10 dark:bg-[#0f172a]/75 sm:gap-2">
-          {STEPS.map((s, i) => (
-            <div key={s.n} className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-              <span
-                className={`h-7 w-7 rounded-lg flex items-center justify-center text-xs font-bold transition-all shrink-0 ${
-                  s.n === currentStep
-                    ? "bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 scale-105"
-                    : s.n < currentStep
-                    ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
-                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-400"
-                }`}
-              >
-                {s.n < currentStep ? "✓" : s.n}
-              </span>
-              <span
-                className={`hidden sm:inline text-xs font-semibold whitespace-nowrap ${
-                  s.n === currentStep ? "text-neutral-800 dark:text-neutral-200" : "text-neutral-400"
-                }`}
-              >
-                {s.label}
-              </span>
-              {i < STEPS.length - 1 && (
-                <div className="h-px w-4 sm:w-6 bg-neutral-200 dark:bg-neutral-800 shrink-0" />
-              )}
-            </div>
-          ))}
-        </div>
-        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_340px] gap-6 items-start">
-        {/* Main interactive area */}
-        <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5 items-start">
+          
+          {/* Lado Esquerdo: Formulário com Etapa 1 e Etapa 2 em sequência */}
+          <div className="space-y-5">
 
-          {/* Step 1: Momento profissional */}
-          <section className="rounded-2xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0d1629]/90 p-5 md:p-6 shadow-sm space-y-5">
-            <div className="flex items-center gap-3">
-              <span className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-bold flex items-center justify-center shadow-md shadow-blue-500/20">1</span>
-              <div>
-                <h2 className="font-bold text-base md:text-lg">Momento profissional</h2>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  {lockedTrack
-                    ? "Definido a partir do momento profissional do seu perfil."
-                    : "Selecione a opção que melhor reflete seu cenário atual de carreira."}
-                </p>
-              </div>
-            </div>
-
-            {lockedTrack ? (
-              <div className="flex items-center gap-4 rounded-2xl border border-blue-200 bg-blue-50/70 p-4 dark:border-blue-900/50 dark:bg-blue-950/20">
-                <span className="p-2.5 rounded-xl shrink-0 bg-blue-600 text-white shadow-md shadow-blue-500/10">
-                  {(() => {
-                    const Icon = TRACK_META[lockedTrack].icon;
-                    return <Icon className="h-5 w-5" />;
-                  })()}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold text-sm md:text-base">{TRACK_META[lockedTrack].title}</p>
-                  <p className="text-xs text-neutral-500 dark:text-slate-400 mt-1">
-                    {careerSegmentLabel ? `Perfil: ${careerSegmentLabel}` : TRACK_META[lockedTrack].description}
+            {/* Etapa 1 */}
+            <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-6 w-6 rounded-full bg-[#2563EB] text-white text-[10px] font-bold flex items-center justify-center shadow-sm">1</span>
+                <div>
+                  <h2 className="font-title font-bold text-sm md:text-base text-[#071827] dark:text-white">Momento profissional</h2>
+                  <p className="text-[10px] text-[#64748B]">
+                    {lockedTrack
+                      ? "Definido a partir do momento profissional do seu perfil."
+                      : "Selecione a opção que melhor reflete seu cenário atual de carreira."}
                   </p>
                 </div>
-                <a
-                  href="/settings"
-                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 whitespace-nowrap shrink-0"
-                >
-                  Alterar em Perfil
-                </a>
               </div>
-            ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {trackOptions.map((option) => {
-                const meta = TRACK_META[option.value];
-                const Icon = meta.icon;
-                const active = careerTrack === option.value;
-                return (
-                  <button
-                    key={option.value}
-                    type="button"
-                    onClick={() => {
-                      setCareerTrack(option.value);
-                      setTimeout(() => {
-                        jobTitleInputRef.current?.focus({ preventScroll: true });
-                        step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }, 50);
-                    }}
-                    className={`group relative w-full min-h-[116px] flex items-start gap-4 text-left rounded-2xl border p-4 pr-11 transition-all hover:-translate-y-0.5 ${
-                      active
-                        ? "border-blue-500 bg-blue-50/80 dark:bg-blue-950/25 text-neutral-900 dark:text-white shadow-[0_12px_30px_rgba(37,99,235,0.13)]"
-                        : "border-neutral-200 dark:border-white/10 bg-white dark:bg-[#101b2e]/70 hover:border-blue-300 hover:shadow-sm text-neutral-700 dark:text-neutral-300"
-                    }`}
-                  >
-                    <span className={`p-2.5 rounded-xl shrink-0 ${active ? "bg-blue-600 text-white shadow-md shadow-blue-500/10" : "bg-neutral-100 dark:bg-slate-700/60 text-neutral-500 dark:text-slate-300 group-hover:bg-blue-50 group-hover:text-blue-600 dark:group-hover:bg-blue-950/40"}`}>
-                      <Icon className="h-5 w-5" />
-                    </span>
-                    <div className="min-w-0 w-full">
-                      <p className="font-semibold text-sm md:text-base leading-tight text-balance">{meta.title}</p>
-                      <p className="text-xs text-neutral-500 dark:text-slate-400 mt-1.5 leading-relaxed">{meta.description}</p>
-                    </div>
-                    <span className={`absolute right-4 top-4 h-5 w-5 rounded-full border flex items-center justify-center shrink-0 ${active ? "border-blue-600 bg-white dark:bg-blue-950" : "border-neutral-300 dark:border-neutral-700"}`}>
-                      {active && <span className="h-2.5 w-2.5 rounded-full bg-blue-600" />}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            )}
 
-            {careerTrack === "reemployment" && (
-              <div className="mt-4 pt-4 border-t border-neutral-100 dark:border-white/10 space-y-1.5">
-                <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">
-                  Feedbacks recebidos (opcional)
-                </label>
-                <textarea
-                  value={pastFeedback}
-                  onChange={(e) => setPastFeedback(e.target.value)}
-                  rows={3}
-                  placeholder="Cole aqui comentários recebidos de entrevistadores para análise de pontos a ajustar"
-                  className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-transparent px-3 py-2.5 text-xs md:text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                />
-              </div>
-            )}
-          </section>
-
-          {/* Curiosidades sobre currículos e recrutamento */}
-          <section className="relative overflow-hidden rounded-2xl border border-blue-100 bg-[linear-gradient(135deg,#f8fbff_0%,#eef5ff_55%,#fff7ed_100%)] p-5 md:p-6 shadow-sm dark:border-white/10 dark:bg-[linear-gradient(135deg,#0d1629_0%,#0f1f3f_60%,#1b1730_100%)]">
-            <div className="flex items-start gap-3">
-              <span className="h-9 w-9 rounded-xl bg-amber-400/90 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
-                <BulbIcon className="h-5 w-5" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Você sabia?</p>
-                <p
-                  key={curiosityIndex}
-                  className="mt-1.5 text-sm leading-relaxed text-neutral-700 dark:text-neutral-200 animate-[fadeIn_0.4s_ease]"
-                >
-                  {CURIOSITIES[curiosityIndex]}
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 flex items-center gap-1.5">
-              {CURIOSITIES.map((_, i) => (
-                <span
-                  key={i}
-                  className={`h-1.5 rounded-full transition-all ${
-                    i === curiosityIndex ? "w-5 bg-blue-600" : "w-1.5 bg-blue-200 dark:bg-white/15"
-                  }`}
-                />
-              ))}
-            </div>
-          </section>
-        </div>
-
-        {/* Sidebar stats panel */}
-        <aside className="rounded-2xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0d1629]/90 p-6 shadow-sm space-y-6 lg:sticky lg:top-6">
-          <div>
-            <h2 className="font-bold text-sm md:text-base flex items-center gap-2">
-              <span>📋</span> O que você vai receber
-            </h2>
-            <p className="text-[11px] text-neutral-400 mt-1">Abaixo estão as análises exclusivas geradas para seu perfil.</p>
-          </div>
-
-          <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 dark:border-blue-900/50 dark:bg-blue-950/20">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Resumo da análise</p>
-            <p className="mt-2 text-sm font-semibold text-neutral-900 dark:text-white">
-              {selectedTrackMeta ? selectedTrackMeta.title : "Escolha seu momento"}
-            </p>
-            <div className="mt-3 grid grid-cols-2 gap-2 text-[11px]">
-              <span className={`rounded-lg px-2.5 py-2 font-semibold ${file ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300" : "bg-white/80 text-neutral-500 dark:bg-white/10 dark:text-neutral-300"}`}>
-                {file ? "PDF anexado" : "PDF pendente"}
-              </span>
-              <span className={`rounded-lg px-2.5 py-2 font-semibold ${jobText.trim() || jobLink.trim() ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300" : "bg-white/80 text-neutral-500 dark:bg-white/10 dark:text-neutral-300"}`}>
-                {jobText.trim() || jobLink.trim() ? "Vaga informada" : "Vaga pendente"}
-              </span>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {RECEIVES.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.title} className="flex gap-3 rounded-xl border border-neutral-100 bg-neutral-50/60 p-3 dark:border-white/10 dark:bg-white/[0.03]">
-                  <span className="h-9 w-9 rounded-lg bg-white dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 border border-blue-100/50 dark:border-blue-900/50">
-                    <Icon className="h-4.5 w-4.5" />
+              {lockedTrack ? (
+                <div className="flex items-center gap-4 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950 p-4">
+                  <span className="p-2.5 rounded-xl shrink-0 bg-[#2563EB] text-white shadow-sm">
+                    {(() => {
+                      const Icon = TRACK_META[lockedTrack].icon;
+                      return <Icon className="h-4.5 w-4.5" />;
+                    })()}
                   </span>
-                  <div>
-                    <p className="text-xs font-bold text-neutral-800 dark:text-white">{item.title}</p>
-                    <p className="text-[10px] text-neutral-500 dark:text-slate-400 mt-0.5 leading-relaxed">{item.description}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-xs md:text-sm">{TRACK_META[lockedTrack].title}</p>
+                    <p className="text-[10px] text-[#64748B] mt-0.5">
+                      {careerSegmentLabel ? `Perfil: ${careerSegmentLabel}` : TRACK_META[lockedTrack].description}
+                    </p>
                   </div>
+                  <a
+                    href="/settings"
+                    className="text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] whitespace-nowrap shrink-0 hover:underline"
+                  >
+                    Alterar em Perfil
+                  </a>
                 </div>
-              );
-            })}
-          </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {trackOptions.map((option) => {
+                    const meta = TRACK_META[option.value];
+                    const Icon = meta.icon;
+                    const active = careerTrack === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          setCareerTrack(option.value);
+                          setTimeout(() => {
+                            jobTitleInputRef.current?.focus({ preventScroll: true });
+                            step2Ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                          }, 50);
+                        }}
+                        className={`group relative w-full min-h-[96px] flex items-start gap-3.5 text-left rounded-2xl border p-3.5 pr-10 transition-all active:scale-[0.99] cursor-pointer ${
+                          active
+                            ? "border-[#2563EB] bg-[#2563EB]/5 dark:bg-blue-950/25 text-[#071827] dark:text-white shadow-sm"
+                            : "border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 hover:border-[#2563EB] text-[#64748B] dark:text-neutral-300"
+                        }`}
+                      >
+                        <span className={`p-2 rounded-xl shrink-0 ${active ? "bg-[#2563EB] text-white" : "bg-[#F8FAFC] dark:bg-slate-700/60 text-slate-400 group-hover:bg-[#2563EB]/10 group-hover:text-[#2563EB]"}`}>
+                          <Icon className="h-4.5 w-4.5" />
+                        </span>
+                        <div className="min-w-0 w-full">
+                          <p className="font-semibold text-xs md:text-sm leading-tight">{meta.title}</p>
+                          <p className="text-[10px] text-[#64748B] mt-1 leading-relaxed">{meta.description}</p>
+                        </div>
+                        <span className={`absolute right-3 top-3 h-4 w-4 rounded-full border flex items-center justify-center shrink-0 ${active ? "border-[#2563EB]" : "border-[#E2E8F0] dark:border-neutral-700"}`}>
+                          {active && <span className="h-2 w-2 rounded-full bg-[#2563EB]" />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
 
-          <div className="border-t border-neutral-100 dark:border-white/10 pt-4 text-[10px] text-neutral-500 dark:text-slate-400 flex items-start gap-2.5 leading-relaxed">
-            <span className="h-4 w-4 rounded-full border border-neutral-300 dark:border-slate-600 flex items-center justify-center shrink-0 text-[8px] font-bold">✓</span>
-            <p>Seus dados estão protegidos com criptografia e não são compartilhados com terceiros.</p>
-          </div>
-        </aside>
-        </div>
-
-        {/* Step 2: Currículo e Vaga */}
-        <section ref={step2Ref} className="rounded-2xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-[#0d1629]/90 p-5 md:p-6 shadow-sm space-y-5">
-            <div className="flex items-center gap-3">
-              <span className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xs font-bold flex items-center justify-center shadow-md shadow-blue-500/20">2</span>
-              <div>
-                <h2 className="font-bold text-base md:text-lg">Currículo e descrição da vaga</h2>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">Insira seu PDF e os detalhes da vaga que deseja analisar.</p>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">Cargo desejado</label>
-              <input
-                ref={jobTitleInputRef}
-                type="text"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="Ex: DevOps Engenheiro Junior"
-                className="w-full rounded-xl border border-neutral-200 bg-neutral-50/40 px-3.5 py-3 text-xs outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03] md:text-sm"
-              />
-            </div>
-
-            {/* Split layout in step 2: 1/3 for file upload, 2/3 for text area */}
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-6">
-              {/* PDF upload box (1/3) */}
-              <div className="space-y-2">
-                <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">Seu currículo (PDF)</label>
-                <div
-                  onDragOver={(e) => {
-                    e.preventDefault();
-                    setDragActive(true);
-                  }}
-                  onDragLeave={() => setDragActive(false)}
-                  onDrop={handleDrop}
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`rounded-2xl border-2 border-dashed p-6 text-center cursor-pointer transition-all h-[260px] flex flex-col justify-center items-center ${
-                    dragActive
-                      ? "border-blue-500 bg-blue-50/50 dark:bg-blue-950/20 scale-[1.01]"
-                      : "border-neutral-300 bg-neutral-50/40 dark:border-slate-600 dark:bg-white/[0.03] hover:border-blue-400 hover:bg-blue-50/30 dark:hover:bg-blue-950/10"
-                  }`}
-                >
-                  <svg className={`h-8 w-8 mx-auto mb-2.5 transition-colors ${dragActive ? "text-blue-500" : "text-neutral-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-                  </svg>
-                  <p className="text-xs text-neutral-600 dark:text-neutral-400 font-bold">
-                    Arraste o PDF aqui ou clique
-                  </p>
-                  <p className="text-[10px] text-neutral-400 mt-1">Formatos suportados: PDF (máx. 10MB)</p>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="application/pdf"
-                    onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                    className="hidden"
+              {careerTrack === "reemployment" && (
+                <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-neutral-800 space-y-1">
+                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
+                    Feedbacks recebidos (opcional)
+                  </label>
+                  <textarea
+                    value={pastFeedback}
+                    onChange={(e) => setPastFeedback(e.target.value)}
+                    rows={2}
+                    placeholder="Cole aqui comentários recebidos de entrevistadores para análise..."
+                    className="w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950 px-3 py-2 text-xs outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 text-[#071827] dark:text-white"
                   />
                 </div>
+              )}
+            </section>
 
-                {file && (
-                  <div className="flex items-center gap-3 rounded-xl border border-emerald-100 dark:border-emerald-950/50 bg-emerald-50/10 p-3">
-                    <PdfIcon className="h-6 w-6 text-emerald-600 shrink-0" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-semibold truncate text-neutral-900 dark:text-white">{file.name}</p>
-                      <p className="text-[10px] text-neutral-400">{Math.round(file.size / 1024)} KB</p>
+            {/* Curiosidades */}
+            <section className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-4 md:p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+              <div className="flex items-start gap-3">
+                <span className="h-8 w-8 rounded-xl bg-[#2563EB]/15 text-[#2563EB] flex items-center justify-center shrink-0">
+                  <BulbIcon className="h-4.5 w-4.5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-[#2563EB]">Dica de carreira</p>
+                  <p
+                    key={curiosityIndex}
+                    className="mt-1 text-xs leading-relaxed text-[#64748B] animate-[fadeIn_0.4s_ease]"
+                  >
+                    {CURIOSITIES[curiosityIndex]}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-1">
+                {CURIOSITIES.map((_, i) => (
+                  <span
+                    key={i}
+                    className={`h-1.5 rounded-full transition-all ${
+                      i === curiosityIndex ? "w-4 bg-[#2563EB]" : "w-1.5 bg-[#E2E8F0] dark:bg-neutral-800"
+                    }`}
+                  />
+                ))}
+              </div>
+            </section>
+
+            {/* Etapa 2 */}
+            <section ref={step2Ref} className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+              <div className="flex items-center gap-3">
+                <span className="h-6 w-6 rounded-full bg-[#2563EB] text-white text-[10px] font-bold flex items-center justify-center shadow-sm">2</span>
+                <div>
+                  <h2 className="font-title font-bold text-sm md:text-base text-[#071827] dark:text-white">Currículo e descrição da vaga</h2>
+                  <p className="text-[10px] text-[#64748B]">Insira seu PDF e os detalhes da vaga que deseja analisar.</p>
+                </div>
+              </div>
+
+              <div className="space-y-1 relative group">
+                <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">Cargo desejado (opcional)</label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                  <input
+                    ref={jobTitleInputRef}
+                    type="text"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="Ex: Auxiliar Administrativo, Analista Financeiro..."
+                    className="w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-4 py-2.5 text-xs outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 text-[#071827] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-5">
+                {/* Upload PDF */}
+                <div className="space-y-1.5">
+                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Seu currículo (PDF)</label>
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setDragActive(true);
+                    }}
+                    onDragLeave={() => setDragActive(false)}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`rounded-2xl border-2 border-dashed p-4 text-center cursor-pointer transition-all h-[220px] flex flex-col justify-center items-center ${
+                      dragActive
+                        ? "border-[#2563EB] bg-[#2563EB]/5 scale-[1.01]"
+                        : "border-[#E2E8F0] bg-[#F8FAFC] dark:border-neutral-700 dark:bg-white/[0.03] hover:border-[#2563EB]/50 hover:bg-[#2563EB]/5"
+                    }`}
+                  >
+                    <svg className={`h-6 w-6 mx-auto mb-2 transition-colors ${dragActive ? "text-[#2563EB]" : "text-slate-400"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <p className="text-xs text-[#071827] dark:text-neutral-300 font-bold">
+                      Arraste o PDF aqui ou clique
+                    </p>
+                    <p className="text-[10px] text-[#64748B] mt-0.5">Apenas PDF (máx. 10MB)</p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="application/pdf"
+                      onChange={(e) => setFile(e.target.files?.[0] ?? null)}
+                      className="hidden"
+                    />
+                  </div>
+
+                  {file && (
+                    <div className="flex items-center gap-2.5 rounded-xl border border-[#22C55E]/15 bg-[#22C55E]/5 p-2.5 mt-2">
+                      <PdfIcon className="h-5 w-5 text-[#22C55E] shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-semibold truncate text-[#071827] dark:text-white">{file.name}</p>
+                        <p className="text-[9px] text-[#64748B]">{Math.round(file.size / 1024)} KB</p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setFile(null)}
+                        className="text-[#64748B] hover:text-red-500 shrink-0 text-xs px-1 hover:scale-115 transition-transform cursor-pointer font-bold"
+                        aria-label="Remover arquivo"
+                      >
+                        ✕
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setFile(null)}
-                      className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 shrink-0 text-sm px-1.5"
-                      aria-label="Remover arquivo"
-                    >
-                      ✕
-                    </button>
+                  )}
+                </div>
+
+                {/* Requisitos Text Area */}
+                <div className="space-y-1.5 flex flex-col">
+                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Requisitos / Descrição da vaga</label>
+                  <textarea
+                    value={jobText}
+                    onChange={(e) => setJobText(e.target.value)}
+                    placeholder="Cole os requisitos, atribuições e detalhes da vaga anunciada aqui..."
+                    className="w-full flex-1 min-h-[220px] rounded-2xl border border-[#E2E8F0] bg-white px-4 py-2.5 text-xs outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 text-[#071827] dark:border-white/10 dark:bg-white/[0.03] dark:text-white resize-none"
+                  />
+                  <p className="text-[9px] text-[#64748B] self-end mt-1">{jobText.length} caracteres digitados</p>
+                </div>
+              </div>
+
+              {/* Link Opcional */}
+              <div className="pt-3 border-t border-[#E2E8F0] dark:border-neutral-800 space-y-1.5">
+                <label className="flex items-center gap-1.5 text-xs font-bold text-[#2563EB] cursor-pointer">
+                  <LinkIcon className="h-3.5 w-3.5" />
+                  Inserir link da vaga (LinkedIn, Gupy, etc.)
+                </label>
+                <div className="relative flex items-center">
+                  <span className="absolute left-3 text-neutral-400">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                  </span>
+                  <input
+                    type="url"
+                    value={jobLink}
+                    onChange={(e) => setJobLink(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-4 py-2.5 text-xs outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 text-[#071827] dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* Botões de Ação integrados dentro do card para evitar elementos soltos/flutuantes */}
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-4 border-t border-[#E2E8F0] dark:border-neutral-800">
+                {error && (
+                  <div className="sm:mr-auto p-2.5 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 text-[11px] font-semibold text-[#EF4444] animate-shake">
+                    ⚠️ {error}
                   </div>
                 )}
+                <div className="flex gap-3 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={saveDraft}
+                    className="flex-1 sm:flex-none rounded-xl border border-[#E2E8F0] bg-white text-[#64748B] font-semibold px-5 py-2 text-xs transition-all hover:bg-[#F8FAFC] active:scale-[0.98] cursor-pointer"
+                  >
+                    {draftSaved ? "Salvo ✓" : "Salvar Rascunho"}
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 sm:flex-none rounded-xl bg-[#2563EB] px-6 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1D4ED8] transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+                  >
+                    {loading ? "Analisando..." : "Analisar Vaga →"}
+                  </button>
+                </div>
               </div>
+            </section>
 
-              {/* Job description input (2/3) - expanded height to allow longer descriptions */}
-              <div className="space-y-2 flex flex-col">
-                <label className="block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider">Requisitos / Descrição da vaga</label>
-                <textarea
-                  value={jobText}
-                  onChange={(e) => setJobText(e.target.value)}
-                  placeholder="Cole os requisitos, atribuições, diferenciais e todos os detalhes da descrição da vaga aqui..."
-                  className="w-full flex-1 min-h-[260px] rounded-2xl border border-neutral-200 bg-neutral-50/40 px-4 py-3.5 text-xs outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03] md:text-sm"
-                />
-                <p className="text-[10px] text-neutral-400">{jobText.length} caracteres adicionados</p>
-              </div>
-            </div>
-
-            {/* Job link fallback */}
-            <div className="pt-3 border-t border-neutral-100 dark:border-white/10 space-y-1.5">
-              <label className="flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 cursor-pointer">
-                <LinkIcon className="h-4 w-4" />
-                Inserir link da vaga (LinkedIn, Gupy, etc.)
-              </label>
-              <input
-                type="url"
-                value={jobLink}
-                onChange={(e) => setJobLink(e.target.value)}
-                placeholder="https://..."
-                className="w-full rounded-xl border border-neutral-200 bg-neutral-50/40 px-3.5 py-3 text-xs outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03] md:text-sm"
-              />
-            </div>
-          </section>
-
-          {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-3 pt-2">
-            {error && (
-              <div className="sm:mr-auto space-y-2 order-first sm:order-none">
-                <p className="text-xs font-semibold text-red-500">{error}</p>
-              </div>
-            )}
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={saveDraft}
-                className="flex-1 sm:flex-none rounded-xl border border-neutral-300 bg-white font-semibold px-6 py-3 text-xs transition-colors hover:bg-neutral-50 dark:border-slate-600 dark:bg-transparent dark:hover:bg-slate-900"
-              >
-                {draftSaved ? "Salvo ✓" : "Salvar Rascunho"}
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 sm:flex-none rounded-xl bg-blue-600 px-7 py-3 text-xs font-semibold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 hover:shadow-md disabled:opacity-50"
-              >
-                {loading ? "Analisando..." : "Analisar Vaga →"}
-              </button>
-            </div>
           </div>
+
+          {/* Lado Direito: O que vai receber + Como Funciona (Sticky) */}
+          <aside className="space-y-4 lg:sticky lg:top-6">
+            
+            {/* Benefícios */}
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+              <div>
+                <h2 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white flex items-center gap-1.5">
+                  <span>📋</span> O que você vai receber
+                </h2>
+                <p className="text-[10px] text-[#64748B] mt-0.5">Diagnósticos estratégicos completos.</p>
+              </div>
+
+              <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950 p-3.5">
+                <p className="text-[9px] font-bold uppercase tracking-wider text-[#2563EB]">Resumo da análise</p>
+                <p className="mt-1 text-xs font-bold text-[#071827] dark:text-white">
+                  {selectedTrackMeta ? selectedTrackMeta.title : "Escolha seu momento"}
+                </p>
+                <div className="mt-2.5 grid grid-cols-2 gap-1.5 text-[9px] text-center font-bold">
+                  <span className={`rounded-lg py-1.5 px-2 ${file ? "bg-[#22C55E]/15 text-[#22C55E]" : "bg-[#F8FAFC] dark:bg-neutral-800 text-[#64748B] border border-[#E2E8F0] dark:border-neutral-700"}`}>
+                    {file ? "PDF anexado ✓" : "PDF pendente"}
+                  </span>
+                  <span className={`rounded-lg py-1.5 px-2 ${jobText.trim() || jobLink.trim() ? "bg-[#22C55E]/15 text-[#22C55E]" : "bg-[#F8FAFC] dark:bg-neutral-800 text-[#64748B] border border-[#E2E8F0] dark:border-neutral-700"}`}>
+                    {jobText.trim() || jobLink.trim() ? "Vaga informada ✓" : "Vaga pendente"}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {RECEIVES.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <div key={item.title} className="flex gap-2.5 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/40 p-2.5">
+                      <span className="h-8 w-8 rounded-lg bg-white dark:bg-blue-950/40 text-[#2563EB] flex items-center justify-center shrink-0 border border-[#E2E8F0] dark:border-neutral-800">
+                        <Icon className="h-4 w-4" />
+                      </span>
+                      <div>
+                        <p className="text-[11px] font-bold text-[#071827] dark:text-white">{item.title}</p>
+                        <p className="text-[9px] text-[#64748B] mt-0.5 leading-relaxed">{item.description}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="border-t border-[#E2E8F0] dark:border-neutral-800 pt-3 text-[9px] text-[#64748B] flex items-start gap-2 leading-relaxed">
+                <span className="h-4 w-4 rounded-full border border-[#E2E8F0] dark:border-slate-600 flex items-center justify-center shrink-0 font-bold text-[9px]">✓</span>
+                <p>Criptografia ativa. Seus dados estão 100% seguros e confidenciais.</p>
+              </div>
+            </div>
+
+            {/* Como Funciona o Algoritmo (Preenche o espaço em branco lateral perfeitamente) */}
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-3.5">
+              <div>
+                <h3 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white">Como a análise funciona?</h3>
+                <p className="text-[10px] text-[#64748B] mt-0.5">Entenda as etapas da nossa tecnologia.</p>
+              </div>
+              <div className="space-y-3 pt-1 text-[11px] text-[#64748B]">
+                <div className="relative pl-5 border-l border-[#E2E8F0] dark:border-neutral-800 space-y-0.5">
+                  <div className="absolute left-[-4.5px] top-1 w-2 h-2 rounded-full bg-[#2563EB]" />
+                  <span className="font-bold text-[#071827] dark:text-white block">1. Processamento de PDF</span>
+                  <span>Extraímos competências, formação e histórico real do seu currículo.</span>
+                </div>
+                <div className="relative pl-5 border-l border-[#E2E8F0] dark:border-neutral-800 space-y-0.5">
+                  <div className="absolute left-[-4.5px] top-1 w-2 h-2 rounded-full bg-[#2563EB]" />
+                  <span className="font-bold text-[#071827] dark:text-white block">2. Mapeamento de Vaga</span>
+                  <span>Lemos as entrelinhas da vaga para mapear diferenciais que recrutadores valorizam.</span>
+                </div>
+                <div className="relative pl-5 space-y-0.5">
+                  <div className="absolute left-[-4.5px] top-1 w-2 h-2 rounded-full bg-[#2563EB]" />
+                  <span className="font-bold text-[#071827] dark:text-white block">3. Relatório Comparativo</span>
+                  <span>Entregamos a porcentagem de Match e apontamos os exatos gaps de habilidades.</span>
+                </div>
+              </div>
+            </div>
+
+          </aside>
+        </div>
       </form>
     </div>
   );

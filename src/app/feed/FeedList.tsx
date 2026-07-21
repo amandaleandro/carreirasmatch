@@ -4,15 +4,12 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveFeedMatchAsApplication } from "@/app/applications/actions";
 import { discardFeedMatch } from "./actions";
-import { CircularScore } from "@/components/circular-score";
 import { CAREER_TRACK_OPTIONS, CareerTrack } from "@/components/analysis-display";
 import {
   deriveJobTags,
   reasonBullets,
   tierFromScore,
   TIER_LABEL,
-  TIER_RING_COLOR,
-  TIER_TEXT_CLASS,
   type ReasonBullet,
 } from "@/lib/feed-tags";
 
@@ -20,20 +17,20 @@ export type FeedMatch = {
   id: string;
   fitScore: number;
   reason: string;
-    job: {
-      id: string;
-      jobTitle: string;
-      jobText: string;
-      url: string;
-      source: string;
-      location?: string | null;
-    };
+  job: {
+    id: string;
+    jobTitle: string;
+    jobText: string;
+    url: string;
+    source: string;
+    location?: string | null;
+  };
 };
 
 function CheckIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M5 12.5 9.5 17 19 6.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M5 12.5 9.5 17 19 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -41,9 +38,9 @@ function CheckIcon({ className }: { className?: string }) {
 function WarningIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M12 4 21.5 20H2.5L12 4Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-      <path d="M12 10v4.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <circle cx="12" cy="17.3" r="0.9" fill="currentColor" />
+      <path d="M12 4 21.5 20H2.5L12 4Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+      <path d="M12 10v4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="12" cy="17" r="1.2" fill="currentColor" />
     </svg>
   );
 }
@@ -51,17 +48,17 @@ function WarningIcon({ className }: { className?: string }) {
 function XIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
     </svg>
   );
 }
 
 function ReasonIcon({ kind }: { kind: ReasonBullet["kind"] }) {
   if (kind === "positive")
-    return <CheckIcon className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />;
+    return <span className="h-5 w-5 rounded-full bg-[#22C55E]/15 flex items-center justify-center shrink-0"><CheckIcon className="h-2.5 w-2.5 text-[#22C55E]" /></span>;
   if (kind === "warning")
-    return <WarningIcon className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />;
-  return <XIcon className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />;
+    return <span className="h-5 w-5 rounded-full bg-[#F59E0B]/15 flex items-center justify-center shrink-0"><WarningIcon className="h-2.5 w-2.5 text-[#F59E0B]" /></span>;
+  return <span className="h-5 w-5 rounded-full bg-[#EF4444]/15 flex items-center justify-center shrink-0"><XIcon className="h-2.5 w-2.5 text-[#EF4444]" /></span>;
 }
 
 export function FeedList({
@@ -75,16 +72,16 @@ export function FeedList({
 }) {
   if (matches.length === 0) {
     return (
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5 text-center">
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          Não achamos nenhuma vaga com esses filtros. Que tal ajustar as opções acima?
+      <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-950 p-8 text-center shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+        <p className="text-xs font-semibold text-[#64748B] dark:text-neutral-400">
+          Nenhuma vaga localizada para os filtros selecionados.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {matches.map((match) => (
         <FeedCard
           key={match.id}
@@ -96,6 +93,36 @@ export function FeedList({
     </div>
   );
 }
+
+const TIER_COLOR_SCHEMES: Record<
+  "excellent" | "good" | "medium" | "low",
+  { badge: string; text: string; ring: string; lightDot: string }
+> = {
+  excellent: {
+    badge: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20",
+    text: "text-[#22C55E]",
+    ring: "#22C55E",
+    lightDot: "bg-[#22C55E]",
+  },
+  good: {
+    badge: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20",
+    text: "text-[#22C55E]",
+    ring: "#22C55E",
+    lightDot: "bg-[#22C55E]",
+  },
+  medium: {
+    badge: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
+    text: "text-[#F59E0B]",
+    ring: "#F59E0B",
+    lightDot: "bg-[#F59E0B]",
+  },
+  low: {
+    badge: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
+    text: "text-[#EF4444]",
+    ring: "#EF4444",
+    lightDot: "bg-[#EF4444]",
+  },
+};
 
 function FeedCard({
   match,
@@ -112,9 +139,10 @@ function FeedCard({
   const [error, setError] = useState<string | null>(null);
 
   const tier = tierFromScore(match.fitScore);
+  const colors = TIER_COLOR_SCHEMES[tier];
   const tags = deriveJobTags(match.job);
   const bullets = reasonBullets(match.reason, tier);
-  const description = match.job.jobText.replace(/\s+/g, " ").trim().slice(0, 180);
+  const description = match.job.jobText.replace(/\s+/g, " ").trim().slice(0, 160);
 
   async function handleFullAnalysis() {
     setError(null);
@@ -128,81 +156,92 @@ function FeedCard({
 
       const res = await fetch("/api/analyze", { method: "POST", body: formData });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Não conseguimos gerar sua análise completa agora. Tente de novo em instantes.");
+      if (!res.ok) throw new Error(data.error ?? "Erro ao processar análise do match.");
 
       router.push(`/report/${data.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Algo deu errado. Tente de novo.");
+      setError(err instanceof Error ? err.message : "Erro ao processar. Tente novamente.");
       setLoading(false);
     }
   }
 
   return (
-    <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 hover:shadow-md transition-shadow flex flex-col sm:flex-row gap-5">
-      <div className="flex sm:flex-col items-center gap-2 shrink-0 sm:w-24">
-        <CircularScore value={match.fitScore} size={72} strokeWidth={7} color={TIER_RING_COLOR[tier]} />
-        <span className={`text-xs font-semibold text-center ${TIER_TEXT_CLASS[tier]}`}>
-          {TIER_LABEL[tier]}
-        </span>
+    <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.035)] hover:-translate-y-[1px] transition-all duration-300 space-y-4">
+      
+      {/* Cabeçalho do Card */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-1.5 min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Badge de Match Integrado */}
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${colors.badge}`}>
+              <span className={`h-1.5 w-1.5 rounded-full ${colors.lightDot} animate-pulse`} />
+              {match.fitScore}% Match · {TIER_LABEL[tier]}
+            </span>
+            <span className="text-[10px] font-bold text-[#64748B]">via {match.job.source}</span>
+          </div>
+          <a
+            href={match.job.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block font-title font-bold text-base md:text-lg text-[#071827] dark:text-white hover:text-[#2563EB] transition-colors leading-tight"
+          >
+            {match.job.jobTitle}
+          </a>
+          <p className="text-xs text-[#64748B] dark:text-neutral-400 font-semibold">
+            {tags.company} · {tags.location || match.job.location || "Remoto / Brasil"}
+          </p>
+        </div>
       </div>
 
-      <div className="min-w-0 flex-1">
-        <a
-          href={match.job.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-base hover:underline"
-        >
-          {match.job.jobTitle}
-        </a>
-        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5 flex items-center gap-1">
-          {tags.company} · via {match.job.source}
-          <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 text-blue-500">
-            <circle cx="12" cy="12" r="9" fill="currentColor" fillOpacity="0.15" />
-            <path d="m8 12.3 2.6 2.6L16.5 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+      {/* Descrição Curta */}
+      {description && (
+        <p className="text-xs text-[#64748B] dark:text-neutral-300 leading-relaxed font-medium">
+          {description}…
         </p>
-        {description && (
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2">{description}…</p>
+      )}
+
+      {/* Tags da Vaga */}
+      <div className="flex flex-wrap gap-1.5">
+        {tags.salary && (
+          <span className="rounded-lg bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] text-[10px] font-bold px-2.5 py-0.5">
+            {tags.salary}
+          </span>
         )}
-
-        <div className="flex flex-wrap gap-2 mt-3">
-          {tags.salary && (
-            <span className="rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold px-2.5 py-1">
-              {tags.salary}
-            </span>
-          )}
-          {[tags.contractType, tags.seniority, tags.workModel, tags.area, tags.location].filter(Boolean).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-medium px-2.5 py-1"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <div className="mt-4">
-          <p className="text-sm font-semibold mb-2">Por que esta vaga combina com você</p>
-          <ul className="space-y-1.5">
-            {bullets.map((bullet, index) => (
-              <li key={index} className="flex items-start gap-2 text-sm text-neutral-700 dark:text-neutral-300">
-                <ReasonIcon kind={bullet.kind} />
-                <span>{bullet.text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {error && <p className="text-sm text-red-600 dark:text-red-400 mt-2">{error}</p>}
+        {[tags.contractType, tags.seniority, tags.workModel, tags.area].filter(Boolean).map((tag, idx) => (
+          <span
+            key={`${tag}-${idx}`}
+            className="rounded-lg bg-[#F8FAFC] dark:bg-neutral-800 border border-[#E2E8F0] dark:border-neutral-750 text-[#64748B] dark:text-neutral-300 text-[10px] font-bold px-2.5 py-0.5"
+          >
+            {tag}
+          </span>
+        ))}
       </div>
 
-      <div className="flex flex-col justify-between gap-2.5 shrink-0 w-full sm:w-60 p-3.5 rounded-2xl bg-neutral-50/70 dark:bg-neutral-900/50 border border-neutral-200/80 dark:border-neutral-800">
-        <div className="space-y-2">
+      {/* Análise de Aderência */}
+      <div className="rounded-2xl border border-[#E2E8F0]/80 dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/40 p-4 space-y-2">
+        <p className="text-xs font-bold text-[#071827] dark:text-white tracking-tight">Análise de Aderência</p>
+        <ul className="space-y-2">
+          {bullets.map((bullet, index) => (
+            <li key={index} className="flex items-start gap-2.5 text-xs text-[#64748B] dark:text-neutral-300 leading-relaxed font-medium">
+              <ReasonIcon kind={bullet.kind} />
+              <span className="flex-1 mt-0.5">{bullet.text}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {error && <p className="text-xs text-[#EF4444] font-semibold">{error}</p>}
+
+      {/* Barra de Ações Horizontal */}
+      <div className="border-t border-[#E2E8F0] dark:border-neutral-800 pt-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        {/* Lado Esquerdo: Filtro de Momento */}
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider shrink-0">Momento:</span>
           <select
             value={careerTrack}
             onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
-            className="w-full truncate rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 px-3 py-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-blue-500/20 shadow-2xs cursor-pointer"
+            className="rounded-xl border border-[#E2E8F0] dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 px-3 py-1.5 text-xs font-semibold outline-none focus:border-[#2563EB] shadow-xs cursor-pointer max-w-[200px]"
           >
             {CAREER_TRACK_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -210,71 +249,69 @@ function FeedCard({
               </option>
             ))}
           </select>
+        </div>
 
-          <button
-            onClick={handleFullAnalysis}
-            disabled={loading}
-            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2.5 text-xs sm:text-sm shadow-sm shadow-blue-600/25 transition-all disabled:opacity-50 flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            {loading ? "Analisando..." : "Ver análise completa"}
-            {!loading && (
-              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            )}
-          </button>
-
-          <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
-            <button
-              type="submit"
-              className="w-full rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-100 font-semibold px-4 py-2 text-xs shadow-2xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 shrink-0">
-                <path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4-6 4V4.5a1 1 0 0 1 1-1Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
-              </svg>
-              Salvar no Kanban
+        {/* Lado Direito: Botões de Ação */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Descartar */}
+          <form action={discardFeedMatch.bind(null, match.id)}>
+            <button type="submit" className="text-xs font-bold text-neutral-400 hover:text-[#EF4444] px-2 py-1.5 rounded-lg transition-colors cursor-pointer">
+              Descartar
             </button>
           </form>
 
-          <div className="grid grid-cols-2 gap-1.5">
-            <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")}>
-              <button
-                type="submit"
-                className="w-full rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50/80 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 font-semibold px-2 py-1.5 text-xs hover:bg-amber-100 dark:hover:bg-amber-950/70 transition-colors text-center cursor-pointer truncate"
-              >
-                Ajustar currículo
-              </button>
-            </form>
-            <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")}>
-              <button
-                type="submit"
-                className="w-full rounded-xl border border-blue-300 dark:border-blue-700 bg-blue-50/80 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 font-semibold px-2 py-1.5 text-xs hover:bg-blue-100 dark:hover:bg-blue-950/70 transition-colors text-center cursor-pointer truncate"
-              >
-                Aplicada
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between text-xs pt-2 border-t border-neutral-200/60 dark:border-neutral-800/60">
+          {/* Vaga Original */}
           <a
             href={match.job.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-300 font-medium flex items-center gap-1"
+            className="text-xs font-bold text-[#64748B] hover:text-[#2563EB] px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-0.5"
           >
-            Ver vaga original
-            <svg viewBox="0 0 24 24" fill="none" className="h-3 w-3">
-              <path d="M7 17 17 7M9 7h8v8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+            Vaga original ↗
           </a>
-          <form action={discardFeedMatch.bind(null, match.id)}>
-            <button type="submit" className="text-neutral-400 hover:text-red-500 font-medium cursor-pointer">
-              Descartar ✕
+
+          {/* Salvar no Kanban */}
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
+            <button
+              type="submit"
+              className="rounded-xl border border-[#E2E8F0] hover:border-[#64748B] dark:border-neutral-700 text-[#071827] dark:text-white bg-white dark:bg-neutral-900 font-bold px-3.5 py-2 text-xs shadow-xs transition-all flex items-center gap-1 cursor-pointer active:scale-[0.98]"
+            >
+              Salvar Kanban
             </button>
           </form>
+
+          {/* Ajustar CV */}
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")}>
+            <button
+              type="submit"
+              className="rounded-xl border border-[#F59E0B]/30 bg-[#F59E0B]/5 hover:bg-[#F59E0B]/10 text-[#F59E0B] font-bold px-3.5 py-2 text-xs transition-colors cursor-pointer"
+            >
+              Ajustar CV
+            </button>
+          </form>
+
+          {/* Candidatou-se */}
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")}>
+            <button
+              type="submit"
+              className="rounded-xl border border-[#2563EB]/30 bg-[#2563EB]/5 hover:bg-[#2563EB]/10 text-[#2563EB] font-bold px-3.5 py-2 text-xs transition-colors cursor-pointer"
+            >
+              Candidatou-se
+            </button>
+          </form>
+
+          {/* Diagnóstico */}
+          <button
+            onClick={handleFullAnalysis}
+            disabled={loading}
+            className="rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold px-4 py-2 text-xs shadow-sm shadow-[#2563EB]/25 transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
+          >
+            {loading ? "Analisando..." : "Diagnóstico completo →"}
+          </button>
         </div>
+
       </div>
+
     </div>
   );
 }

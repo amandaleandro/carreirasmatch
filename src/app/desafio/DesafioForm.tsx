@@ -58,10 +58,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
       setError("Por favor, selecione seu arquivo de currículo em PDF.");
       return;
     }
-    if (!jobTitle.trim()) {
-      setError("Informe o nome do cargo desejado.");
-      return;
-    }
+
     if (!jobText.trim() && !jobLink.trim()) {
       setError("Cole a descrição da vaga ou informe o link da vaga.");
       return;
@@ -71,7 +68,6 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
     setError(null);
 
     try {
-      // Se não estiver logado, cria a conta/captura o lead primeiro
       if (!isLoggedIn) {
         const registerRes = await fetch("/api/register", {
           method: "POST",
@@ -85,7 +81,6 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
 
         if (!registerRes.ok) {
           const regData = await registerRes.json();
-          // Se o e-mail já existe, registra como lead e continua
           if (regData.error && !regData.error.includes("já cadastrado")) {
             throw new Error(regData.error);
           }
@@ -115,7 +110,6 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
         throw new Error(data.error || "Erro ao processar a análise.");
       }
 
-      // Redireciona para o relatório completo com o Card de Story e resultados
       router.push(`/report/${data.id}`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Ocorreu um erro ao analisar. Tente novamente.";
@@ -126,7 +120,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {isLoggedIn && userId && (
         <ReferralRewardBox
           userId={userId}
@@ -135,171 +129,213 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
         />
       )}
 
-      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-      <div className="border-b border-slate-800 pb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <span>Envie seu Currículo e a Vaga Desejada</span>
-          </h2>
-          <p className="text-xs text-slate-400">Preencha os campos para criar seu acesso e gerar seu Match %</p>
-        </div>
-        {isLoggedIn && (
-          <span className="text-xs bg-emerald-500/20 text-emerald-300 font-semibold px-3 py-1 rounded-full border border-emerald-500/30">
-            Conta Conectada
-          </span>
-        )}
-      </div>
-
-      {error && (
-        <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Cadastro Rápido de Lead se não estiver logado */}
-      {!isLoggedIn && (
-        <div className="grid sm:grid-cols-2 gap-4 bg-slate-950/60 p-4 rounded-2xl border border-slate-800">
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-sky-400 uppercase tracking-wider">
-              Seu Nome Completo *
-            </label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Digite seu nome"
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
-              required
-            />
+      <form onSubmit={handleSubmit} className="bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4">
+        
+        <div className="border-b border-[#E2E8F0] dark:border-neutral-800 pb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-title font-bold text-[#071827] dark:text-white">
+              Envie seu Currículo e a Vaga Desejada
+            </h2>
+            <p className="text-[10px] text-[#64748B]">Preencha os campos para calcular seu Match %</p>
           </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-xs font-bold text-sky-400 uppercase tracking-wider">
-              Seu Melhor E-mail *
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seuemail@exemplo.com"
-              className="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
-              required
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Upload de Currículo */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-          1. Seu Currículo (PDF)
-        </label>
-        <div className="relative border-2 border-dashed border-slate-700 hover:border-sky-500/50 rounded-2xl p-6 transition-all text-center bg-slate-950/50 group">
-          <input
-            type="file"
-            accept=".pdf"
-            onChange={handleFileChange}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-          />
-          {file ? (
-            <div className="flex items-center justify-center gap-3 text-sky-400 font-semibold text-sm">
-              <FileText className="w-6 h-6" />
-              <span>{file.name}</span>
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            </div>
-          ) : (
-            <div className="space-y-2 text-slate-400 group-hover:text-slate-300">
-              <Upload className="w-8 h-8 mx-auto text-slate-500 group-hover:text-sky-400 transition-colors" />
-              <p className="text-sm font-medium">Clique para selecionar seu currículo em PDF</p>
-              <p className="text-[11px] text-slate-500">Tamanho máximo: 5MB</p>
-            </div>
+          {isLoggedIn && (
+            <span className="text-[9px] bg-[#22C55E]/15 text-[#22C55E] font-bold px-2.5 py-0.5 rounded-full border border-[#22C55E]/20">
+              Conta Conectada
+            </span>
           )}
         </div>
-      </div>
 
-      {/* Cargo Desejado */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-          2. Nome do Cargo Desejado
-        </label>
-        <input
-          type="text"
-          value={jobTitle}
-          onChange={(e) => setJobTitle(e.target.value)}
-          placeholder="Ex: Desenvolvedor Front-end, Analista Financeiro, Gerente de Vendas..."
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
-          required
-        />
-      </div>
-
-      {/* Texto da Vaga */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-          3. Descrição / Requisitos da Vaga {jobLink.trim() && <span className="text-slate-500 normal-case font-normal">(opcional com link)</span>}
-        </label>
-        <textarea
-          rows={4}
-          value={jobText}
-          onChange={(e) => setJobText(e.target.value)}
-          placeholder="Cole aqui o texto da vaga ou requisitos anunciados..."
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 resize-none"
-          required={!jobLink.trim()}
-        />
-      </div>
-
-      {/* Link da Vaga (alternativa à descrição) */}
-      <div className="space-y-2">
-        <label className="flex items-center gap-1.5 text-xs font-bold text-sky-400 uppercase tracking-wider">
-          <Link2 className="w-3.5 h-3.5" />
-          Ou informe o link da vaga (LinkedIn, Gupy, etc.)
-        </label>
-        <input
-          type="url"
-          value={jobLink}
-          onChange={(e) => setJobLink(e.target.value)}
-          placeholder="https://..."
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
-        />
-      </div>
-
-      {/* Momento Profissional */}
-      <div className="space-y-2">
-        <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-          4. Seu Momento Profissional
-        </label>
-        <select
-          value={careerTrack}
-          onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
-          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-sky-500"
-        >
-          {CAREER_TRACK_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Botão de Envio */}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-slate-950 font-extrabold py-4 px-6 rounded-2xl transition-all shadow-lg shadow-sky-500/25 text-base disabled:opacity-50 active:scale-[0.99]"
-      >
-        {loading ? (
-          <>
-            <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
-            <span>Criando Conta e Calculando Match...</span>
-          </>
-        ) : (
-          <>
-            <Sparkles className="w-5 h-5" />
-            <span>Gerar Meu Match e Card para Story</span>
-            <ArrowRight className="w-5 h-5 ml-1" />
-          </>
+        {error && (
+          <div className="p-3 rounded-lg bg-[#EF4444]/10 border border-[#EF4444]/20 text-[11px] font-semibold text-[#EF4444] animate-shake flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
         )}
-      </button>
+
+        {/* Cadastro Rápido de Lead se não estiver logado */}
+        {!isLoggedIn && (
+          <div className="grid sm:grid-cols-2 gap-3.5 bg-[#F8FAFC] dark:bg-neutral-950/60 p-4 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800">
+            
+            {/* Nome Completo */}
+            <div className="space-y-1 relative group">
+              <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
+                Seu Nome Completo *
+              </label>
+              <div className="relative flex items-center">
+                <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Digite seu nome"
+                  className="w-full bg-white dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-700 rounded-xl pl-9.5 pr-3 py-2 text-xs text-[#071827] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Melhor E-mail */}
+            <div className="space-y-1 relative group">
+              <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
+                Seu Melhor E-mail *
+              </label>
+              <div className="relative flex items-center">
+                <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="seuemail@exemplo.com"
+                  className="w-full bg-white dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-700 rounded-xl pl-9.5 pr-3 py-2 text-xs text-[#071827] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
+                  required
+                />
+              </div>
+            </div>
+
+          </div>
+        )}
+
+        {/* Upload de Currículo */}
+        <div className="space-y-1 relative group">
+          <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
+            1. Seu Currículo (PDF)
+          </label>
+          <div className="relative border-2 border-dashed border-[#E2E8F0] dark:border-neutral-700 hover:border-[#2563EB]/50 rounded-2xl p-5 transition-all text-center bg-[#F8FAFC] dark:bg-neutral-950/50 group cursor-pointer">
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={handleFileChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            />
+            {file ? (
+              <div className="flex items-center justify-center gap-2 text-[#2563EB] font-bold text-xs">
+                <FileText className="w-5 h-5" />
+                <span>{file.name}</span>
+                <CheckCircle2 className="w-4.5 h-4.5 text-[#22C55E]" />
+              </div>
+            ) : (
+              <div className="space-y-1 text-slate-400 group-hover:text-slate-500">
+                <Upload className="w-6 h-6 mx-auto text-slate-400 group-hover:text-[#2563EB] transition-colors" />
+                <p className="text-xs font-semibold">Clique para selecionar seu currículo em PDF</p>
+                <p className="text-[9px] text-[#64748B]">Tamanho máximo: 5MB</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-1.5 relative group">
+          <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
+            2. Nome do Cargo Desejado (opcional)
+          </label>
+          <div className="relative flex items-center">
+            <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </span>
+            <input
+              type="text"
+              value={jobTitle}
+              onChange={(e) => setJobTitle(e.target.value)}
+              placeholder="Ex: Desenvolvedor Front-end, Auxiliar de Logística (opcional)..."
+              className="w-full bg-white dark:bg-neutral-950 border border-[#E2E8F0] dark:border-neutral-800 rounded-xl pl-9.5 pr-4 py-2.5 text-xs text-[#071827] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
+            />
+          </div>
+        </div>
+
+        {/* Texto da Vaga */}
+        <div className="space-y-1.5 relative group">
+          <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
+            3. Descrição / Requisitos da Vaga {jobLink.trim() && <span className="text-slate-400 normal-case font-normal">(opcional com link)</span>}
+          </label>
+          <textarea
+            rows={3}
+            value={jobText}
+            onChange={(e) => setJobText(e.target.value)}
+            placeholder="Cole aqui o texto da vaga ou requisitos..."
+            className="w-full bg-white dark:bg-neutral-950 border border-[#E2E8F0] dark:border-neutral-800 rounded-xl px-4 py-2.5 text-xs text-[#071827] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 resize-none"
+            required={!jobLink.trim()}
+          />
+        </div>
+
+        {/* Link da Vaga */}
+        <div className="space-y-1.5 relative group">
+          <label className="flex items-center gap-1.5 text-[9px] font-bold text-[#2563EB] uppercase tracking-wider">
+            <Link2 className="w-3 h-3" />
+            Ou informe o link da vaga (LinkedIn, Gupy, etc.)
+          </label>
+          <div className="relative flex items-center">
+            <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+            </span>
+            <input
+              type="url"
+              value={jobLink}
+              onChange={(e) => setJobLink(e.target.value)}
+              placeholder="https://..."
+              className="w-full bg-white dark:bg-neutral-950 border border-[#E2E8F0] dark:border-neutral-800 rounded-xl pl-9.5 pr-4 py-2.5 text-xs text-[#071827] dark:text-white placeholder-slate-400 focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
+            />
+          </div>
+        </div>
+
+        {/* Momento Profissional */}
+        <div className="space-y-1.5 relative group">
+          <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
+            4. Seu Momento Profissional
+          </label>
+          <div className="relative flex items-center">
+            <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </span>
+            <select
+              value={careerTrack}
+              onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
+              className="w-full bg-white dark:bg-neutral-950 border border-[#E2E8F0] dark:border-neutral-800 rounded-xl pl-9.5 pr-4 py-2.5 text-xs text-[#071827] dark:text-white focus:outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10"
+            >
+              {CAREER_TRACK_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Botão de Envio */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-2 bg-[#2563EB] hover:bg-[#1D4ED8] hover:shadow-lg hover:shadow-blue-500/15 text-white font-semibold py-3 px-6 rounded-xl transition-all text-xs disabled:opacity-50 active:scale-[0.98] cursor-pointer"
+        >
+          {loading ? (
+            <>
+              <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeDasharray="4 8" className="opacity-40" />
+                <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" className="opacity-60" />
+                <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
+              <span>Processando e Calculando Match...</span>
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-4 h-4" />
+              <span>Gerar Meu Match e Card para Story</span>
+              <ArrowRight className="w-4 h-4 ml-0.5" />
+            </>
+          )}
+        </button>
       </form>
     </div>
   );

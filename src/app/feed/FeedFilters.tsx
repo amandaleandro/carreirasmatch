@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 
 const TIER_OPTIONS = [
+  { value: "aligned", label: "Alinhadas com meu perfil" },
   { value: "all", label: "Fit score: Todos" },
   { value: "strong", label: "Fit: 75% - 100%" },
   { value: "medium", label: "Fit: 50% - 74%" },
@@ -41,7 +42,7 @@ export function FeedFilters({
 }) {
   const router = useRouter();
 
-  const tier = current.tier ?? "all";
+  const tier = current.tier ?? "aligned";
   const workModel = current.workModel ?? "all";
   const area = current.area ?? "all";
   const seniority = current.seniority ?? "all";
@@ -51,7 +52,7 @@ export function FeedFilters({
   const sort = current.sort ?? "fit";
 
   const hasActiveFilters =
-    tier !== "all" ||
+    tier !== "aligned" ||
     workModel !== "all" ||
     area !== "all" ||
     seniority !== "all" ||
@@ -63,7 +64,7 @@ export function FeedFilters({
     const params = new URLSearchParams();
     const next = { tier, workModel, area, seniority, location, entryLevel, contractType, sort, [key]: value };
     for (const [paramKey, paramValue] of Object.entries(next)) {
-      if (paramValue && paramValue !== "all") params.set(paramKey, paramValue);
+      if (paramValue && paramValue !== "all" && paramValue !== "aligned") params.set(paramKey, paramValue);
     }
     router.push(`/feed?${params.toString()}`);
   }

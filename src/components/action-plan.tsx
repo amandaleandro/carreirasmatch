@@ -217,100 +217,103 @@ export function ActionPlan({
   const weekDone = thisWeek.filter((i) => checked.has(i.key)).length;
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-6">
-      <div>
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
-          Próximos passos
-        </span>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Seu plano de ação</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Veja o que você pode fazer nos próximos 15 dias para chegar ao seu
-          próximo objetivo.
-        </p>
+    <div className="px-4 md:px-8 py-6 max-w-5xl mx-auto w-full space-y-5 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-4">
+        <div>
+          <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/15">
+            Próximos Passos
+          </span>
+          <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white mt-1">Plano de Ação</h1>
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Veja o que você pode fazer nos próximos 15 dias para chegar ao seu próximo objetivo.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex gap-3 items-start">
-          <span className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)] flex gap-3.5 items-start">
+          <span className="h-9 w-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <GoalIcon className="h-5 w-5" />
           </span>
           <div>
-            <p className="text-xs text-neutral-500">Objetivo</p>
-            <p className="font-semibold">{jobTitle}</p>
-            <p className="text-xs text-neutral-500 mt-0.5">
-              Cargo-alvo definido com base no seu perfil e aderência.
+            <p className="text-[10px] text-[#64748B] font-bold uppercase tracking-wider">Objetivo</p>
+            <p className="font-bold text-sm text-[#071827] dark:text-white mt-0.5">{jobTitle}</p>
+            <p className="text-[10px] text-[#64748B] mt-1 font-medium">
+              Cargo-alvo definido no seu perfil.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex gap-3 items-start">
-          <span className="h-9 w-9 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)] flex gap-3.5 items-start">
+          <span className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CalendarIcon className="h-5 w-5" />
           </span>
           <div>
-            <p className="text-xs text-neutral-500">Prazo sugerido</p>
-            <p className="font-semibold">15 dias</p>
-            <p className="text-xs text-neutral-500 mt-0.5">
-              Período ideal para ganhos consistentes de aderência.
+            <p className="text-[10px] text-[#64748B] font-bold uppercase tracking-wider">Prazo sugerido</p>
+            <p className="font-bold text-sm text-[#071827] dark:text-white mt-0.5">15 dias</p>
+            <p className="text-[10px] text-[#64748B] mt-1 font-medium">
+              Período ideal para ganhos de aderência.
             </p>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4 shadow-sm shadow-slate-900/5 flex gap-3 items-center">
-          <CircularScore value={overallScore} size={48} strokeWidth={5} />
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)] flex gap-3.5 items-center">
+          <div className="shrink-0">
+            <CircularScore value={overallScore} size={44} strokeWidth={5} />
+          </div>
           <div>
-            <p className="text-xs text-neutral-500">Aderência atual</p>
-            <p className="font-semibold">{overallScore}%</p>
-            <p className="text-xs text-neutral-500 mt-0.5">
+            <p className="text-[10px] text-[#64748B] font-bold uppercase tracking-wider">Aderência atual</p>
+            <p className="font-bold text-sm text-[#071827] dark:text-white mt-0.5">{overallScore}%</p>
+            <p className="text-[10px] text-[#64748B] mt-1 font-medium">
               {deltaPP > 0
-                ? `Você está a ${deltaPP}pp da aderência ideal para seu objetivo.`
-                : "Você já está na faixa ideal de aderência!"}
+                ? `A ${deltaPP}pp da aderência ideal.`
+                : "Você está na faixa de aderência ideal!"}
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <div className="lg:col-span-2 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-          <h2 className="font-semibold mb-4">Plano personalizado</h2>
-          <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
+        <div className="lg:col-span-2 rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+          <h2 className="text-sm font-bold text-[#071827] dark:text-white">Plano personalizado</h2>
+          <div className="space-y-5">
             {buckets.map((bucket) => {
               const Icon = bucket.icon;
               return (
                 <div key={bucket.label} className="flex gap-4">
-                  <div className="flex flex-col items-center">
-                    <span className="h-3 w-3 rounded-full bg-blue-600 mt-1.5" />
-                    <span className="h-10 w-10 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mt-2 text-neutral-500">
-                      <Icon className="h-5 w-5" />
+                  <div className="flex flex-col items-center shrink-0">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#2563EB] mt-1.5" />
+                    <span className="h-9 w-9 rounded-full bg-neutral-50 dark:bg-neutral-850 border border-neutral-100 dark:border-neutral-800 flex items-center justify-center mt-2.5 text-neutral-500">
+                      <Icon className="h-4.5 w-4.5" />
                     </span>
-                    <span className="w-px flex-1 bg-neutral-200 dark:bg-neutral-800 mt-2" />
+                    <span className="w-px flex-1 bg-neutral-100 dark:bg-neutral-850 mt-2.5" />
                   </div>
-                  <div className="flex-1 pb-2">
-                    <p className="text-sm font-semibold text-blue-600 dark:text-blue-400 mb-2">
+                  <div className="flex-1 pb-1">
+                    <p className="text-xs font-bold text-[#2563EB] dark:text-blue-400 mb-2 uppercase tracking-wider">
                       {bucket.label}
                     </p>
                     <div className="space-y-2">
                       {bucket.items.map((item) => (
                         <label
                           key={item.key}
-                          className="flex items-start gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3 cursor-pointer"
+                          className="flex items-start gap-3 rounded-2xl border border-[#E2E8F0] dark:border-neutral-850 p-3 bg-white dark:bg-neutral-900/40 cursor-pointer shadow-[0_4px_20px_rgb(0,0,0,0.005)] hover:border-neutral-300 dark:hover:border-neutral-700 transition-all"
                         >
                           <input
                             type="checkbox"
                             checked={checked.has(item.key)}
                             onChange={() => toggle(item.key)}
-                            className="mt-0.5 h-4 w-4 shrink-0"
+                            className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
                           />
                           <DocIcon className="h-4 w-4 text-neutral-400 mt-0.5 shrink-0" />
                           <div>
                             <p
-                              className={`text-sm font-medium ${
+                              className={`text-xs font-bold text-[#071827] dark:text-white ${
                                 checked.has(item.key) ? "line-through text-neutral-400" : ""
                               }`}
                             >
                               {item.title}
                             </p>
-                            <p className="text-xs text-neutral-500 mt-0.5">{item.description}</p>
+                            <p className="text-[11px] text-[#64748B] mt-0.5 font-medium leading-relaxed">{item.description}</p>
                           </div>
                         </label>
                       ))}
@@ -320,7 +323,7 @@ export function ActionPlan({
               );
             })}
           </div>
-          <p className="text-xs text-neutral-500 flex items-center gap-1.5 mt-2">
+          <p className="text-[10px] text-[#64748B] flex items-center gap-1.5 mt-2 italic font-semibold">
             💡 Dica: marque as ações conforme concluir para manter seu plano sempre atualizado.
           </p>
         </div>
@@ -375,58 +378,56 @@ export function ActionPlan({
             </div>
           )}
 
-          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-            <h2 className="font-semibold mb-4">Lacunas prioritárias</h2>
+          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+            <h3 className="text-xs font-bold text-[#071827] dark:text-white uppercase tracking-wider">Lacunas prioritárias</h3>
             <div className="space-y-3">
               {priorityGaps.map((gap) => (
-                <div key={gap.skill}>
-                  <div className="flex justify-between text-sm mb-1">
+                <div key={gap.skill} className="space-y-1">
+                  <div className="flex justify-between text-xs font-semibold text-[#64748B]">
                     <span>{gap.skill}</span>
-                    <span className="text-neutral-500">{gap.proficiency}%</span>
+                    <span>{gap.proficiency}%</span>
                   </div>
-                  <div className="h-2 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
+                  <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
                     <div
-                      className="h-2 rounded-full bg-blue-600"
+                      className="h-1.5 rounded-full bg-blue-600"
                       style={{ width: `${gap.proficiency}%` }}
                     />
                   </div>
                 </div>
               ))}
               {priorityGaps.length === 0 && (
-                <p className="text-sm text-neutral-500">
+                <p className="text-xs text-[#64748B]">
                   Nenhuma lacuna crítica identificada na última análise.
                 </p>
               )}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold">Cursos e temas recomendados</h2>
-            </div>
-            <div className="grid grid-cols-1 gap-3">
+          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+            <h3 className="text-xs font-bold text-[#071827] dark:text-white uppercase tracking-wider">Cursos recomendados</h3>
+            <div className="grid grid-cols-1 gap-2.5">
               {priorityGaps.slice(0, 4).map((gap, i) => {
                 const course = courseFor(gap.skill);
                 const priority = i === 0 || i === 1 ? "Alta" : "Média";
                 return (
                   <div
                     key={gap.skill}
-                    className="flex items-center gap-3 rounded-lg border border-neutral-200 dark:border-neutral-800 p-3"
+                    className="flex items-center gap-3 rounded-2xl border border-[#E2E8F0] dark:border-neutral-850 p-3 bg-white dark:bg-neutral-900/40"
                   >
-                    <span className="h-9 w-9 rounded-md bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center shrink-0 text-neutral-500">
-                      <ToolIcon className="h-4 w-4" />
+                    <span className="h-9 w-9 rounded-xl bg-neutral-50 dark:bg-neutral-850 flex items-center justify-center shrink-0 text-neutral-500">
+                      <ToolIcon className="h-4.5 w-4.5" />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium truncate">{course.title}</p>
-                      <p className="text-xs text-neutral-500">{course.provider}</p>
+                      <p className="text-xs font-bold text-[#071827] dark:text-white truncate">{course.title}</p>
+                      <p className="text-[10px] text-[#64748B] font-semibold mt-0.5">{course.provider}</p>
                     </div>
                     <div className="text-right shrink-0">
-                      <p className="text-xs text-neutral-500">{course.duration}</p>
+                      <p className="text-[10px] text-[#64748B] font-bold">{course.duration}</p>
                       <span
-                        className={`text-[10px] font-medium rounded px-1.5 py-0.5 ${
+                        className={`inline-block text-[9px] font-bold uppercase tracking-wider rounded px-1.5 py-0.5 mt-1.5 ${
                           priority === "Alta"
-                            ? "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400"
-                            : "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400"
+                            ? "bg-red-500/10 text-red-600 dark:text-red-400"
+                            : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
                         }`}
                       >
                         {priority}
@@ -436,31 +437,31 @@ export function ActionPlan({
                 );
               })}
               {priorityGaps.length === 0 && (
-                <p className="text-sm text-neutral-500">
+                <p className="text-xs text-[#64748B]">
                   Sem recomendações de curso no momento.
                 </p>
               )}
             </div>
           </div>
 
-          <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
             <div className="flex items-center gap-3">
-              <span className="h-9 w-9 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <span className="h-9 w-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <GoalIcon className="h-5 w-5" />
               </span>
               <div className="flex-1">
-                <p className="text-sm font-medium">Meta da semana</p>
-                <p className="text-xs text-neutral-500">
-                  Conclua {weekTotal} de {weekTotal} ações desta semana. Mantenha o foco e avance!
+                <p className="text-xs font-bold text-[#071827] dark:text-white uppercase tracking-wider">Meta da semana</p>
+                <p className="text-[11px] text-[#64748B] mt-0.5 leading-relaxed font-semibold">
+                  Conclua {weekTotal} de {weekTotal} ações desta semana.
                 </p>
-                <div className="h-1.5 w-full rounded-full bg-neutral-200 dark:bg-neutral-800 mt-2">
+                <div className="h-1.5 w-full rounded-full bg-neutral-100 dark:bg-neutral-800 mt-2 overflow-hidden">
                   <div
                     className="h-1.5 rounded-full bg-emerald-500"
                     style={{ width: `${weekTotal ? (weekDone / weekTotal) * 100 : 0}%` }}
                   />
                 </div>
               </div>
-              <span className="text-sm font-semibold shrink-0">
+              <span className="text-xs font-bold text-[#071827] dark:text-white shrink-0">
                 {weekDone}/{weekTotal}
               </span>
             </div>
@@ -473,16 +474,16 @@ export function ActionPlan({
           type="button"
           onClick={() => persist(checked)}
           disabled={saving}
-          className="flex items-center gap-1.5 rounded-xl bg-blue-600 text-white font-semibold px-5 py-3 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-bold px-4 py-2.5 shadow-sm shadow-[#2563EB]/25 transition-all cursor-pointer disabled:opacity-50 active:scale-[0.98]"
         >
-          <CheckIcon className="h-4 w-4" />
+          <CheckIcon className="h-3.5 w-3.5 mr-1" />
           {saved ? "Progresso salvo ✓" : saving ? "Salvando..." : "Marcar progresso"}
         </button>
         <Link
           href="/dashboard"
-          className="flex items-center gap-1.5 rounded-xl border border-neutral-200 dark:border-neutral-700 font-semibold px-5 py-3 hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+          className="inline-flex items-center justify-center rounded-xl border border-[#E2E8F0] dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 text-xs font-bold px-4 py-2.5 hover:bg-neutral-50 dark:hover:bg-neutral-850 transition-all cursor-pointer active:scale-[0.98]"
         >
-          <PersonIcon className="h-4 w-4" />
+          <PersonIcon className="h-3.5 w-3.5 mr-1" />
           Ver evolução do plano
         </Link>
       </div>

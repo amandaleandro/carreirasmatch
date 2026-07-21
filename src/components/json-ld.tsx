@@ -7,6 +7,7 @@ export function JsonLd({ id, data }: { id?: string; data: object }) {
     <script
       id={id}
       type="application/ld+json"
+      suppressHydrationWarning
       // O conteúdo é gerado no servidor a partir de dados nossos, não de input do usuário.
       dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
     />

@@ -47,9 +47,9 @@ const SENIORITY_PATTERNS: [RegExp, string][] = [
 export const ENTRY_LEVEL_SENIORITIES = new Set(["Sem experiencia", "Estagio", "Junior"]);
 
 const WORK_MODEL_PATTERNS: [RegExp, string][] = [
-  [/remot[oa]/i, "Remoto"],
-  [/h[ií]brid[oa]/i, "Hibrido"],
-  [/presencial/i, "Presencial"],
+  [/remot[oae]|remote/i, "Remoto"],
+  [/h[ií]brid[oa]|hybrid/i, "Hibrido"],
+  [/presencial|on[- ]?site/i, "Presencial"],
 ];
 
 // Regime de contratação. A ordem importa: aprendiz e estágio são regimes

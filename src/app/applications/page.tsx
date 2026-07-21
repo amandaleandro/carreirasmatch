@@ -123,55 +123,57 @@ export default async function ApplicationsPage() {
   ];
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+    <main className="px-4 md:px-8 py-6 max-w-5xl mx-auto w-full space-y-5 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
-            Pipeline
+          <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/15">
+            Pipeline de Vagas
           </span>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Candidaturas</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Acompanhe suas vagas salvas, candidaturas, entrevistas, testes e propostas tudo em um lugar só.
+          <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white mt-1">Candidaturas</h1>
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Acompanhe suas vagas salvas, processos seletivos e entrevistas em um só lugar.
           </p>
         </div>
         <Link
           href="/feed"
-          className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
+          className="inline-flex items-center justify-center rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-[#2563EB]/25 transition-all text-center shrink-0"
         >
           Buscar vagas no feed
         </Link>
       </div>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
-        <h2 className="font-semibold">Sua jornada de busca</h2>
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {/* Jornada de Busca */}
+      <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+        <h2 className="text-sm font-bold text-[#071827] dark:text-white">Sua jornada de busca</h2>
+        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           {journeyStats.map((stat) => (
-            <div key={stat.label} className="rounded-xl bg-neutral-50 dark:bg-white/[0.03] px-4 py-3">
-              <p className={`text-3xl font-bold tabular-nums ${stat.tone}`}>{stat.value}</p>
-              <p className="text-xs text-neutral-500 mt-1">{stat.label}</p>
+            <div key={stat.label} className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800/80 bg-[#F8FAFC]/50 dark:bg-white/[0.02] px-4 py-3">
+              <p className={`text-2xl font-black tracking-tight tabular-nums ${stat.tone}`}>{stat.value}</p>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
       </section>
 
+      {/* Metas Semanais */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {metrics.map((metric) => {
           const progress = percent(metric.done, metric.target);
           return (
             <div
               key={metric.label}
-              className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5"
+              className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-4.5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]"
             >
               <div className="flex items-center justify-between gap-3">
-                <p className="text-sm font-medium text-neutral-600 dark:text-neutral-400">
+                <p className="text-xs font-bold text-[#64748B]">
                   {metric.label}
                 </p>
-                <p className="text-sm font-semibold">
+                <p className="text-xs font-black text-[#071827] dark:text-white">
                   {metric.done}/{metric.target}
                 </p>
               </div>
-              <div className="mt-3 h-2 rounded-full bg-neutral-200 dark:bg-neutral-800 overflow-hidden">
-                <div className="h-full bg-emerald-500" style={{ width: `${progress}%` }} />
+              <div className="mt-3.5 h-2 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
+                <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
             </div>
           );
@@ -179,208 +181,216 @@ export default async function ApplicationsPage() {
       </section>
 
       {upcomingDeadlines.length > 0 && (
-        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
-          <h2 className="font-semibold">Prazos próximos</h2>
+        <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+          <h2 className="text-sm font-bold text-[#071827] dark:text-white">Prazos próximos</h2>
           <div className="mt-3 space-y-2">
             {upcomingDeadlines.map((item) => {
               const days = daysUntil(item.deadline!);
               return (
-                <div key={item.id} className="flex items-center justify-between gap-3 text-sm">
+                <div key={item.id} className="flex items-center justify-between gap-3 text-xs p-2 rounded-xl bg-[#F8FAFC]/50 dark:bg-white/[0.01]">
                   <div className="min-w-0">
-                    <p className="font-medium truncate">{item.jobTitle}</p>
-                    {item.company && <p className="text-xs text-neutral-500">{item.company}</p>}
+                    <p className="font-bold text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
+                    {item.company && <p className="text-[10px] text-[#64748B] mt-0.5">{item.company}</p>}
                   </div>
-                  <span className={`text-xs font-semibold rounded-full px-2.5 py-1 shrink-0 ${deadlineBadgeClass(days)}`}>
+                  <span className={`text-[10px] font-bold rounded-lg px-2.5 py-1 shrink-0 ${deadlineBadgeClass(days)}`}>
                     {days <= 0 ? "Encerra hoje" : `Encerra em ${days}d`}
                   </span>
                 </div>
               );
             })}
           </div>
-          <p className="text-xs text-neutral-500 mt-3">
-            Fique de olho no site da empresa: a gente não envia lembrete por e-mail.
+          <p className="text-[10px] text-[#64748B] mt-3 italic">
+            * Fique de olho no site da empresa: a gente não envia lembrete por e-mail.
           </p>
         </section>
       )}
 
-      <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6">
+      {/* Formulários Grid */}
+      <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
         <form
           action={createApplication}
-          className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 space-y-4"
+          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4"
         >
           <div>
-            <h2 className="font-semibold">Adicionar candidatura</h2>
-            <p className="text-sm text-neutral-500 mt-1">
+            <h2 className="text-sm font-bold text-[#071827] dark:text-white">Adicionar candidatura</h2>
+            <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
               Use para registrar vagas que você achou fora do feed ou processos que já começou.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="jobTitle" required placeholder="Cargo" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors" />
-            <input name="company" placeholder="Empresa" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors" />
-            <input name="jobUrl" type="url" placeholder="Link da vaga" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors md:col-span-2" />
-            <select name="status" defaultValue="saved" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
+            <input name="jobTitle" required placeholder="Cargo" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400" />
+            <input name="company" placeholder="Empresa" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400" />
+            <input name="jobUrl" type="url" placeholder="Link da vaga" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400 md:col-span-2" />
+            <select name="status" defaultValue="saved" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-xs font-semibold text-neutral-850 dark:text-neutral-200 outline-none focus:border-[#2563EB] transition-all cursor-pointer">
               {APPLICATION_STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {APPLICATION_STATUS_CONFIG[status].label}
                 </option>
               ))}
             </select>
-            <input name="notes" placeholder="Nota rápida" className="rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors" />
-            <label className="text-xs text-neutral-500 md:col-span-2">
+            <input name="notes" placeholder="Nota rápida" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400" />
+            <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] md:col-span-2 space-y-1">
               Prazo de inscrição (opcional)
-              <input name="deadline" type="date" className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
+              <input name="deadline" type="date" className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
             </label>
           </div>
-          <button type="submit" className="rounded-xl bg-blue-600 text-white px-5 py-2.5 text-sm font-semibold shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all">
+          <button type="submit" className="rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2.5 text-xs font-bold shadow-sm shadow-[#2563EB]/25 transition-all cursor-pointer active:scale-[0.98]">
             Salvar candidatura
           </button>
         </form>
 
         <form
           action={updateWeeklyGoal}
-          className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-6 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 space-y-4"
+          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4 flex flex-col justify-between"
         >
-          <div>
-            <h2 className="font-semibold">Metas da semana</h2>
-            <p className="text-sm text-neutral-500 mt-1">
-              Semana iniciada em {weekStart.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}.
-            </p>
+          <div className="space-y-3.5">
+            <div>
+              <h2 className="text-sm font-bold text-[#071827] dark:text-white">Metas da semana</h2>
+              <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+                Semana iniciada em {weekStart.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] space-y-1">
+                Aplicações <span className="text-[#64748B]/60 text-[9px]">({appliedThisWeek})</span>
+                <input name="targetApplications" type="number" min="1" defaultValue={currentGoal.targetApplications} className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+              </label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] space-y-1">
+                Ajustes <span className="text-[#64748B]/60 text-[9px]">({resumeTweaksThisWeek})</span>
+                <input name="targetResumeTweaks" type="number" min="0" defaultValue={currentGoal.targetResumeTweaks} className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+              </label>
+              <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] space-y-1">
+                Entrevistas <span className="text-[#64748B]/60 text-[9px]">({interviewsActive})</span>
+                <input name="targetInterviews" type="number" min="0" defaultValue={currentGoal.targetInterviews} className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+              </label>
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <label className="text-xs text-neutral-500">
-              Aplicações <span className="text-neutral-400">({appliedThisWeek} feita{appliedThisWeek === 1 ? "" : "s"})</span>
-              <input name="targetApplications" type="number" min="1" defaultValue={currentGoal.targetApplications} className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
-            </label>
-            <label className="text-xs text-neutral-500">
-              Ajustes <span className="text-neutral-400">({resumeTweaksThisWeek} feito{resumeTweaksThisWeek === 1 ? "" : "s"})</span>
-              <input name="targetResumeTweaks" type="number" min="0" defaultValue={currentGoal.targetResumeTweaks} className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
-            </label>
-            <label className="text-xs text-neutral-500">
-              Entrevistas <span className="text-neutral-400">({interviewsActive} ativa{interviewsActive === 1 ? "" : "s"})</span>
-              <input name="targetInterviews" type="number" min="0" defaultValue={currentGoal.targetInterviews} className="mt-1 w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors text-neutral-950 dark:text-neutral-50" />
-            </label>
-          </div>
-          <button type="submit" className="rounded-xl border border-blue-600 px-5 py-2.5 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 transition-colors">
+          <button type="submit" className="rounded-xl border border-[#2563EB] px-4 py-2.5 text-xs font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all cursor-pointer mt-4 active:scale-[0.98]">
             Atualizar metas
           </button>
         </form>
       </section>
 
-      <section className="-mx-4 md:-mx-8 px-4 md:px-8 overflow-x-auto pb-2">
-        <div className="flex gap-4 min-w-max">
-        {APPLICATION_STATUSES.map((status) => {
-          const config = APPLICATION_STATUS_CONFIG[status];
-          const items = applications.filter((item) => item.status === status);
-          return (
-            <div key={status} className={`flex flex-col w-60 shrink-0 rounded-2xl border p-3 shadow-sm shadow-slate-900/5 ${config.column}`}>
-              <div className="mb-3">
-                <div className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full shrink-0 ${config.dot}`} />
-                  <h2 className="min-w-0 flex-1 truncate text-sm font-semibold">{config.label}</h2>
-                  <span className="shrink-0 text-xs font-semibold rounded-full bg-white/70 dark:bg-neutral-950/70 px-2 py-0.5 tabular-nums">
-                    {items.length}
-                  </span>
+      {/* Kanban Board */}
+      <section className="-mx-4 md:-mx-8 px-4 md:px-8 overflow-x-auto pb-4">
+        <div className="flex gap-4 min-w-max pb-1">
+          {APPLICATION_STATUSES.map((status) => {
+            const config = APPLICATION_STATUS_CONFIG[status];
+            const items = applications.filter((item) => item.status === status);
+            return (
+              <div key={status} className={`flex flex-col w-64 shrink-0 rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 p-4 bg-[#FFFFFF]/60 dark:bg-neutral-950/40 shadow-sm ${config.column}`}>
+                <div className="mb-4">
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2.5 w-2.5 rounded-full shrink-0 ${config.dot}`} />
+                    <h2 className="min-w-0 flex-1 truncate text-xs font-bold uppercase tracking-wider text-[#071827] dark:text-white">{config.label}</h2>
+                    <span className="shrink-0 text-[10px] font-bold rounded-full bg-white/90 border border-neutral-200/50 dark:border-neutral-800 dark:bg-neutral-900/90 px-2 py-0.5 tabular-nums text-neutral-600 dark:text-neutral-300">
+                      {items.length}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-[#64748B] mt-1.5 leading-relaxed">{config.description}</p>
                 </div>
-                <p className="text-xs text-neutral-500 mt-1.5 line-clamp-2">{config.description}</p>
-              </div>
-              {items.length === 0 && (
-                <div className="flex-1 min-h-24 rounded-xl border border-dashed border-neutral-300/70 dark:border-neutral-700/70 flex items-center justify-center">
-                  <p className="text-xs text-neutral-400 dark:text-neutral-600">Nada aqui ainda</p>
-                </div>
-              )}
-              <div className="space-y-3">
-                {items.map((item) => (
-                  <article key={item.id} className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5 hover:shadow-md transition-shadow">
-                    <details className="group">
-                      <summary className="cursor-pointer list-none p-3 [&::-webkit-details-marker]:hidden">
-                        <div className="flex items-start justify-between gap-2">
-                          <h3 className="text-sm font-semibold leading-snug">{item.jobTitle}</h3>
-                          <span className="shrink-0 text-neutral-400 text-xs mt-0.5 transition-transform group-open:rotate-180">▾</span>
-                        </div>
-                        {item.company && <p className="text-xs text-neutral-500 mt-0.5 truncate">{item.company}</p>}
-                        <div className="mt-1.5 flex flex-wrap items-center gap-1.5 empty:hidden">
-                          {item.fitScore !== null && (
-                            <span className="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 rounded px-1.5 py-0.5">
-                              {item.fitScore}% aderência
-                            </span>
-                          )}
-                          {item.deadline && item.deadline.getTime() >= Date.now() && (
-                            <span className={`text-[10px] font-semibold rounded px-1.5 py-0.5 ${deadlineBadgeClass(daysUntil(item.deadline))}`}>
-                              {daysUntil(item.deadline) <= 0 ? "Encerra hoje" : `Prazo: ${daysUntil(item.deadline)}d`}
-                            </span>
-                          )}
-                        </div>
-                      </summary>
-                      <div className="px-3 pb-3 border-t border-neutral-100 dark:border-neutral-900 pt-2.5">
-                        {item.notes && <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-3">{item.notes}</p>}
-                        <form action={updateApplicationStatus.bind(null, item.id)} className="mt-2.5 flex gap-2">
-                          <select name="status" defaultValue={item.status} className="min-w-0 flex-1 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-1.5 text-xs">
-                            {APPLICATION_STATUSES.map((option) => (
-                              <option key={option} value={option}>
-                                {APPLICATION_STATUS_CONFIG[option].label}
-                              </option>
-                            ))}
-                          </select>
-                          <button type="submit" className="rounded-lg bg-blue-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition-colors">
-                            Mover
-                          </button>
-                        </form>
-                        {(status === "interview" || status === "technical_test") && (
-                          <form action={scheduleInterview.bind(null, item.id)} className="mt-2 flex gap-2">
-                            <input
-                              type="datetime-local"
-                              name="interviewAt"
-                              defaultValue={item.interviewAt ? toDatetimeLocalValue(item.interviewAt) : ""}
-                              className="min-w-0 flex-1 rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 px-2 py-1.5 text-xs"
-                            />
-                            <button type="submit" className="rounded-lg border border-violet-600 px-2.5 py-1.5 text-xs font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40 transition-colors">
-                              Agendar
+                {items.length === 0 && (
+                  <div className="flex-1 min-h-24 rounded-2xl border border-dashed border-neutral-300/60 dark:border-neutral-800/80 flex items-center justify-center bg-white/20 dark:bg-black/5">
+                    <p className="text-[10px] font-bold text-[#64748B]/50">Nenhuma vaga aqui</p>
+                  </div>
+                )}
+                <div className="space-y-3">
+                  {items.map((item) => (
+                    <article key={item.id} className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-850 bg-white dark:bg-neutral-900/60 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-md transition-all">
+                      <details className="group">
+                        <summary className="cursor-pointer list-none p-3.5 [&::-webkit-details-marker]:hidden">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="text-xs font-bold leading-snug text-[#071827] dark:text-white group-hover:text-[#2563EB] transition-colors">{item.jobTitle}</h3>
+                            <span className="shrink-0 text-[#64748B] text-[10px] mt-0.5 transition-transform group-open:rotate-180">▼</span>
+                          </div>
+                          {item.company && <p className="text-[10px] text-[#64748B] mt-1 font-semibold">{item.company}</p>}
+                          <div className="mt-2 flex flex-wrap items-center gap-1.5 empty:hidden">
+                            {item.fitScore !== null && (
+                              <span className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded px-1.5 py-0.5">
+                                {item.fitScore}% match
+                              </span>
+                            )}
+                            {item.deadline && item.deadline.getTime() >= Date.now() && (
+                              <span className={`text-[9px] font-bold rounded px-1.5 py-0.5 border ${deadlineBadgeClass(daysUntil(item.deadline))}`}>
+                                {daysUntil(item.deadline) <= 0 ? "Hoje" : `${daysUntil(item.deadline)} dias`}
+                              </span>
+                            )}
+                          </div>
+                        </summary>
+                        <div className="px-3.5 pb-3.5 border-t border-neutral-100 dark:border-neutral-850 pt-3 space-y-3">
+                          {item.notes && <p className="text-[11px] text-[#64748B] leading-relaxed bg-[#F8FAFC] dark:bg-neutral-900 p-2.5 rounded-xl border border-neutral-100 dark:border-neutral-800">{item.notes}</p>}
+                          
+                          <form action={updateApplicationStatus.bind(null, item.id)} className="flex gap-1.5">
+                            <select name="status" defaultValue={item.status} className="min-w-0 flex-1 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2 py-1.5 text-[11px] font-semibold text-neutral-850 dark:text-neutral-250 outline-none">
+                              {APPLICATION_STATUSES.map((option) => (
+                                <option key={option} value={option}>
+                                  {APPLICATION_STATUS_CONFIG[option].label}
+                                </option>
+                              ))}
+                            </select>
+                            <button type="submit" className="rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] px-3 py-1.5 text-[10px] font-bold text-white transition-colors cursor-pointer">
+                              Mover
                             </button>
                           </form>
-                        )}
-                        <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-xs empty:hidden">
-                          {item.jobUrl && (
-                            <a href={item.jobUrl} target="_blank" rel="noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">
-                              Abrir vaga
-                            </a>
-                          )}
-                          {item.analysisId && (
-                            <Link href={`/report/${item.analysisId}`} className="text-blue-600 dark:text-blue-400 hover:underline">
-                              Ver análise
-                            </Link>
-                          )}
+
                           {(status === "interview" || status === "technical_test") && (
-                            <Link href={`/interviews/${item.id}`} className="text-blue-600 dark:text-blue-400 hover:underline">
-                              Preparar entrevista
-                            </Link>
+                            <form action={scheduleInterview.bind(null, item.id)} className="flex gap-1.5 border-t border-neutral-100 dark:border-neutral-850 pt-2.5">
+                              <input
+                                type="datetime-local"
+                                name="interviewAt"
+                                defaultValue={item.interviewAt ? toDatetimeLocalValue(item.interviewAt) : ""}
+                                className="min-w-0 flex-1 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 px-2 py-1.5 text-[10px] font-semibold text-neutral-900 dark:text-neutral-100"
+                              />
+                              <button type="submit" className="rounded-xl border border-violet-600 px-2.5 py-1.5 text-[10px] font-bold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-950/40 transition-colors cursor-pointer">
+                                Agendar
+                              </button>
+                            </form>
+                          )}
+
+                          <div className="flex flex-wrap gap-2.5 pt-1 text-[11px] font-semibold">
+                            {item.jobUrl && (
+                              <a href={item.jobUrl} target="_blank" rel="noreferrer" className="text-[#2563EB] hover:underline">
+                                Abrir vaga ↗
+                              </a>
+                            )}
+                            {item.analysisId && (
+                              <Link href={`/report/${item.analysisId}`} className="text-[#2563EB] hover:underline">
+                                Ver análise
+                              </Link>
+                            )}
+                            {(status === "interview" || status === "technical_test") && (
+                              <Link href={`/interviews/${item.id}`} className="text-violet-600 dark:text-violet-400 hover:underline">
+                                Preparar entrevista
+                              </Link>
+                            )}
+                          </div>
+
+                          {item.activities.length > 0 && (
+                            <details className="text-[10px] border-t border-neutral-100 dark:border-neutral-850 pt-2.5">
+                              <summary className="cursor-pointer text-[#64748B] hover:text-neutral-850 dark:hover:text-neutral-250 font-bold uppercase tracking-wider text-[9px]">
+                                Histórico ({item.activities.length})
+                              </summary>
+                              <ul className="mt-2 space-y-1.5">
+                                {item.activities.map((activity) => (
+                                  <li key={activity.id} className="text-[#64748B] leading-relaxed font-medium">
+                                    {activity.fromStatus
+                                      ? `${APPLICATION_STATUS_CONFIG[activity.fromStatus as keyof typeof APPLICATION_STATUS_CONFIG]?.label ?? activity.fromStatus} → `
+                                      : ""}
+                                    {APPLICATION_STATUS_CONFIG[activity.toStatus as keyof typeof APPLICATION_STATUS_CONFIG]?.label ?? activity.toStatus}
+                                    <span className="text-neutral-400 font-normal"> · {activity.createdAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </details>
                           )}
                         </div>
-                        {item.activities.length > 0 && (
-                          <details className="mt-2.5 text-xs">
-                            <summary className="cursor-pointer text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300">
-                              Histórico ({item.activities.length})
-                            </summary>
-                            <ul className="mt-2 space-y-1.5">
-                              {item.activities.map((activity) => (
-                                <li key={activity.id} className="text-neutral-500">
-                                  {activity.fromStatus
-                                    ? `${APPLICATION_STATUS_CONFIG[activity.fromStatus as keyof typeof APPLICATION_STATUS_CONFIG]?.label ?? activity.fromStatus} → `
-                                    : ""}
-                                  {APPLICATION_STATUS_CONFIG[activity.toStatus as keyof typeof APPLICATION_STATUS_CONFIG]?.label ?? activity.toStatus}
-                                  <span className="text-neutral-400"> · {activity.createdAt.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </details>
-                        )}
-                      </div>
-                    </details>
-                  </article>
-                ))}
+                      </details>
+                    </article>
+                  ))}
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
       </section>
     </main>

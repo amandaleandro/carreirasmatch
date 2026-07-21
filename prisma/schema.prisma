@@ -185,6 +185,10 @@ model Analysis {
   resumeOverride          String?
   actionPlanProgress      String   @default("[]")
   interviewProgress       String   @default("{}")
+  grammarErrors           String?
+  structureRating         String?
+  structureFeedback       String?
+  missingBasicInfo        String?
   createdAt      DateTime @default(now())
   applications   Application[]
 }

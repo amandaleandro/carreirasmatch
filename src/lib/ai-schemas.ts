@@ -23,6 +23,10 @@ export const resumeAnalysisSchema = z.object({
     key: z.enum(["formatting", "clarity", "keywords", "results", "seniority", "links"]),
     label: text, description: text, status: z.enum(["pass", "warning", "fail"]),
   })).length(6),
+  grammarErrors: z.array(z.string()).optional(),
+  structureRating: z.enum(["excellent", "good", "needs_improvement"]).optional(),
+  structureFeedback: z.string().optional(),
+  missingBasicInfo: z.array(z.string()).optional(),
 }).passthrough();
 
 export const structuredResumeSchema = z.object({

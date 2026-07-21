@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { Analytics } from "@/components/analytics";
 import { AdsenseScript } from "@/components/adsense-script";
@@ -8,15 +8,16 @@ import { DashSanitizer } from "@/components/dash-sanitizer";
 import { JsonLd } from "@/components/json-ld";
 import { BASE_URL, SITE_NAME, organizationJsonLd, webSiteJsonLd } from "@/lib/seo";
 import { Suspense } from "react";
+import Script from "next/script";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
@@ -63,7 +64,7 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${manrope.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
@@ -72,9 +73,9 @@ export default function RootLayout({
         <JsonLd id="jsonld-website" data={webSiteJsonLd()} />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
-        <script
+        <Script
           id="theme-initializer"
-          suppressHydrationWarning
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();`,
           }}

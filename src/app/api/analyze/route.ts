@@ -81,14 +81,17 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("resume") as File | null;
     const resumeId = formData.get("resumeId") as string | null;
-    const jobTitle = formData.get("jobTitle") as string | null;
+    let jobTitle = (formData.get("jobTitle") as string | null) ?? "";
     const jobText = formData.get("jobText") as string | null;
     const careerTrack = formData.get("careerTrack") as CareerTrack | null;
     const pastFeedback = (formData.get("pastFeedback") as string | null) ?? "";
 
+    if (!jobTitle.trim()) {
+      jobTitle = "Vaga analisada";
+    }
+
     if (
       (!file && !resumeId) ||
-      !jobTitle ||
       !jobText ||
       !careerTrack ||
       !VALID_TRACKS.includes(careerTrack)
@@ -96,7 +99,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Envie o currículo (PDF), o cargo desejado, o texto da vaga e seu momento profissional.",
+            "Envie o currículo (PDF), o texto da vaga e seu momento profissional.",
         },
         { status: 400 }
       );
@@ -218,7 +221,9 @@ export async function POST(req: NextRequest) {
       data: {
         resumeId: resume.id,
         careerTrack: effectiveCareerTrack,
-        jobTitle,
+        jobTitle: (!jobTitle || jobTitle === "Vaga analisada") && (analysis as any).inferredJobTitle
+          ? (analysis as any).inferredJobTitle
+          : jobTitle,
         jobText,
         overallScore: analysis.overallScore,
         technicalScore: analysis.technicalScore,
@@ -255,6 +260,10 @@ export async function POST(req: NextRequest) {
           : null,
         pastFeedback: pastFeedback.trim() || null,
         feedbackAnalysis: analysis.feedbackAnalysis ?? null,
+        grammarErrors: (analysis as any).grammarErrors ? JSON.stringify((analysis as any).grammarErrors) : null,
+        structureRating: (analysis as any).structureRating ?? null,
+        structureFeedback: (analysis as any).structureFeedback ?? null,
+        missingBasicInfo: (analysis as any).missingBasicInfo ? JSON.stringify((analysis as any).missingBasicInfo) : null,
         experienceSuggestions: JSON.stringify(analysis.experienceSuggestions ?? []),
         atsChecklist: JSON.stringify(analysis.atsChecklist ?? []),
         currentSummary: analysis.currentSummary ?? "",

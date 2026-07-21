@@ -2,7 +2,7 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { DesafioForm } from "./DesafioForm";
-import { Sparkles, Trophy, Users, ShieldCheck, ArrowRight } from "lucide-react";
+import { Sparkles, Trophy } from "lucide-react";
 import { getUserReferralStats, registerUserReferral } from "@/lib/referrals";
 
 export const dynamic = "force-dynamic";
@@ -29,42 +29,43 @@ export default async function DesafioPage({
     : null;
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
+    <main className="min-h-screen bg-[#F8FAFC] dark:bg-[#071827] text-foreground font-sans relative overflow-hidden">
       {/* Background Decorativo */}
-      <div className="absolute top-0 inset-x-0 h-96 bg-gradient-to-b from-blue-900/30 via-sky-950/20 to-transparent pointer-events-none" />
-      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 inset-x-0 h-80 bg-gradient-to-b from-[#2563EB]/5 to-transparent pointer-events-none" />
+      <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-7xl h-80 bg-[#2563EB]/5 blur-[100px] rounded-full pointer-events-none" />
 
-      <div className="relative max-w-5xl mx-auto px-4 py-12 sm:py-16 space-y-12">
+      <div className="relative max-w-4xl mx-auto px-4 py-10 sm:py-12 space-y-10 animate-in fade-in duration-300">
+        
         {/* Header Hero */}
-        <header className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/30 text-blue-400 text-xs font-bold uppercase tracking-wider shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
+        <header className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2563EB]/10 border border-[#2563EB]/20 text-[#2563EB] text-[10px] font-bold uppercase tracking-wider shadow-sm">
+            <Sparkles className="w-3 h-3" />
             <span>Desafio do Match de Carreira</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-            Descubra seu <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-300">Match %</span> real com a vaga dos seus sonhos
+          <h1 className="text-2xl sm:text-4xl font-title font-bold tracking-tight text-[#071827] dark:text-white leading-tight">
+            Descubra seu <span className="text-[#2563EB] dark:text-blue-400">Match %</span> real com a vaga dos seus sonhos
           </h1>
 
-          <p className="text-slate-300 text-base sm:text-lg leading-relaxed">
-            Envie seu currículo e a vaga desejada. Nossa IA analisa instantaneamente seu perfil, aponta pontos fortes, lacunas e gera seu <strong>Card para Story</strong> para você convidar amigos!
+          <p className="text-[#64748B] dark:text-slate-400 text-xs sm:text-sm leading-relaxed">
+            Envie seu currículo e a vaga desejada. Nossa IA analisa instantaneamente seu perfil, aponta pontos fortes, lacunas e gera seu card de compartilhamento!
           </p>
         </header>
 
-        {/* Recursos em Destaque */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Recursos em Destaque (Compacto) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[
             { label: "Match de Aderência", desc: "Calculado em % real" },
             { label: "Pontos Fortes", desc: "O que destaca você" },
             { label: "Palavras-chave", desc: "Termos que faltam no CV" },
-            { label: "Perguntas da Entrevista", desc: "Orientações completas" },
+            { label: "Perguntas de Entrevista", desc: "Orientações completas" },
           ].map((item, idx) => (
             <div
               key={idx}
-              className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 text-center space-y-1 backdrop-blur-sm"
+              className="bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-2xl p-3.5 text-center space-y-1 shadow-[0_4px_20px_rgba(0,0,0,0.01)]"
             >
-              <p className="text-xs sm:text-sm font-bold text-sky-400">{item.label}</p>
-              <p className="text-[11px] text-slate-400">{item.desc}</p>
+              <p className="text-xs font-bold text-[#2563EB]">{item.label}</p>
+              <p className="text-[10px] text-[#64748B]">{item.desc}</p>
             </div>
           ))}
         </div>
@@ -77,44 +78,44 @@ export default async function DesafioPage({
         />
 
         {/* Seção explicativa da Recompensa por Indicação */}
-        <section className="bg-slate-900/60 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-sky-500/10 text-sky-400 rounded-2xl border border-sky-500/20">
-              <Trophy className="w-6 h-6" />
+        <section className="bg-[#FFFFFF] dark:bg-[#0e2032] border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 space-y-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+          <div className="flex items-center gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-3">
+            <div className="p-2.5 bg-[#2563EB]/10 text-[#2563EB] rounded-2xl border border-[#2563EB]/25">
+              <Trophy className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Como funciona o Desafio & Recompensas</h3>
-              <p className="text-xs text-slate-400">Ajude seus amigos a saberem o Match deles e ganhe benefícios</p>
+              <h3 className="text-base font-title font-bold text-[#071827] dark:text-white">Como funciona o Desafio & Recompensas</h3>
+              <p className="text-[11px] text-[#64748B]">Ajude seus amigos a saberem o Match deles e ganhe benefícios</p>
             </div>
           </div>
 
-          <div className="grid sm:grid-cols-3 gap-6 pt-2">
-            <div className="space-y-2">
-              <div className="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xs flex items-center justify-center border border-blue-500/30">
+          <div className="grid sm:grid-cols-3 gap-5 pt-1">
+            <div className="space-y-1.5">
+              <div className="w-6 h-6 rounded-full bg-[#2563EB]/15 text-[#2563EB] font-bold text-xs flex items-center justify-center border border-[#2563EB]/25">
                 1
               </div>
-              <h4 className="text-sm font-bold text-white">Faça seu Match</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h4 className="text-xs font-bold text-[#071827] dark:text-white">Faça seu Match</h4>
+              <p className="text-[11px] text-[#64748B] leading-relaxed">
                 Envie o currículo e receba a pontuação de alinhamento com a vaga desejada.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xs flex items-center justify-center border border-blue-500/30">
+            <div className="space-y-1.5">
+              <div className="w-6 h-6 rounded-full bg-[#2563EB]/15 text-[#2563EB] font-bold text-xs flex items-center justify-center border border-[#2563EB]/25">
                 2
               </div>
-              <h4 className="text-sm font-bold text-white">Compartilhe o Card</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h4 className="text-xs font-bold text-[#071827] dark:text-white">Compartilhe o Card</h4>
+              <p className="text-[11px] text-[#64748B] leading-relaxed">
                 Poste seu resultado nos Stories com o card exclusivo e convide seus amigos.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="w-7 h-7 rounded-full bg-blue-500/20 text-blue-400 font-bold text-xs flex items-center justify-center border border-blue-500/30">
+            <div className="space-y-1.5">
+              <div className="w-6 h-6 rounded-full bg-[#2563EB]/15 text-[#2563EB] font-bold text-xs flex items-center justify-center border border-[#2563EB]/25">
                 3
               </div>
-              <h4 className="text-sm font-bold text-white">Indique 3 Amigos</h4>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <h4 className="text-xs font-bold text-[#071827] dark:text-white">Indique 3 Amigos</h4>
+              <p className="text-[11px] text-[#64748B] leading-relaxed">
                 A cada 3 amigos que entrarem pelo seu link, você ganha 1 Diagnóstico Completo grátis!
               </p>
             </div>

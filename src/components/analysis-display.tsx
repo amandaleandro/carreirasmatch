@@ -1,13 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { ChecklistCard } from "@/components/checklist-card";
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
 import {
   SOFT_SKILL_LABELS,
-  PERSONALITY_TRAIT_LABELS,
-  PERSONALITY_TRAIT_DESCRIPTIONS,
   type SoftSkillDimension,
-  type PersonalityTrait,
 } from "@/lib/behavioral-test";
 
 export type ApplicationStatus = "apply_now" | "adjust_first" | "deprioritize";
@@ -71,6 +71,10 @@ export type Analysis = {
   applicationStrategy?: string | null;
   weeklyApplicationPlan?: string[] | null;
   feedbackAnalysis?: string | null;
+  grammarErrors?: string[] | string | null;
+  structureRating?: "excellent" | "good" | "needs_improvement" | string | null;
+  structureFeedback?: string | null;
+  missingBasicInfo?: string[] | string | null;
 };
 
 export const CAREER_TRACK_OPTIONS: { value: CareerTrack; label: string }[] = [
@@ -87,61 +91,39 @@ export const TRACK_LABELS: Record<CareerTrack, string> = Object.fromEntries(
 
 const STATUS_CONFIG: Record<
   ApplicationStatus,
-  { emoji: string; label: string; className: string }
+  { color: string; label: string; chipClass: string; dotClass: string }
 > = {
   apply_now: {
-    emoji: "🟢",
-    label: "Aplicar agora",
-    className: "border-emerald-300 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/40",
+    color: "#22C55E",
+    label: "Recomendado aplicar agora",
+    chipClass: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20",
+    dotClass: "bg-[#22C55E]",
   },
   adjust_first: {
-    emoji: "🟡",
-    label: "Ajustar antes de aplicar",
-    className: "border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40",
+    color: "#F59E0B",
+    label: "Ajustar currículo primeiro",
+    chipClass: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
+    dotClass: "bg-[#F59E0B]",
   },
   deprioritize: {
-    emoji: "🔴",
-    label: "Não priorizar agora",
-    className: "border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40",
+    color: "#EF4444",
+    label: "Não priorizar no momento",
+    chipClass: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
+    dotClass: "bg-[#EF4444]",
   },
 };
 
-export function StatusBanner({
-  status,
-  reason,
-}: {
-  status: ApplicationStatus;
-  reason: string;
-}) {
-  const config = STATUS_CONFIG[status];
-  return (
-    <div className={`rounded-xl border p-5 ${config.className}`}>
-      <p className="font-semibold text-lg">
-        {config.emoji} {config.label}
-      </p>
-      <p className="text-sm text-neutral-700 dark:text-neutral-300 mt-1">{reason}</p>
-    </div>
-  );
-}
-
-/** Superfície de card premium compartilhada por todo o diagnóstico: profundidade
- *  suave e borda discreta, alinhada à identidade das ferramentas (globals.css). */
 const CARD =
-  "rounded-3xl border border-neutral-200/70 dark:border-neutral-850 bg-white dark:bg-neutral-950 p-6 shadow-sm hover:shadow-md hover:-translate-y-[2px] transition-all duration-300";
+  "rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] transition-all duration-300";
 
 type BadgeTone = "primary" | "success" | "danger" | "warning" | "neutral";
 
 const BADGE_TONES: Record<BadgeTone, string> = {
-  primary:
-    "bg-blue-50 text-blue-600 ring-blue-100 dark:bg-blue-950/50 dark:text-blue-300 dark:ring-blue-900/50",
-  success:
-    "bg-emerald-50 text-emerald-600 ring-emerald-100 dark:bg-emerald-950/50 dark:text-emerald-300 dark:ring-emerald-900/50",
-  danger:
-    "bg-red-50 text-red-600 ring-red-100 dark:bg-red-950/50 dark:text-red-300 dark:ring-red-900/50",
-  warning:
-    "bg-amber-50 text-amber-600 ring-amber-100 dark:bg-amber-950/50 dark:text-amber-300 dark:ring-amber-900/50",
-  neutral:
-    "bg-neutral-100 text-neutral-600 ring-neutral-200 dark:bg-neutral-900 dark:text-neutral-300 dark:ring-neutral-800",
+  primary: "bg-[#2563EB]/10 text-[#2563EB] ring-[#2563EB]/20",
+  success: "bg-[#22C55E]/10 text-[#22C55E] ring-[#22C55E]/20",
+  danger: "bg-[#EF4444]/10 text-[#EF4444] ring-[#EF4444]/20",
+  warning: "bg-[#F59E0B]/10 text-[#F59E0B] ring-[#F59E0B]/20",
+  neutral: "bg-[#64748B]/10 text-[#64748B] ring-[#64748B]/20",
 };
 
 function CardHeader({
@@ -156,17 +138,17 @@ function CardHeader({
   aside?: React.ReactNode;
 }) {
   return (
-    <div className="mb-4 flex items-center gap-3">
+    <div className="mb-3.5 flex items-center gap-2.5">
       {icon && (
         <span
           aria-hidden
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm ring-1 ${BADGE_TONES[tone]}`}
+          className={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold ring-1 ${BADGE_TONES[tone]}`}
         >
           {icon}
         </span>
       )}
-      <h3 className="font-semibold tracking-tight">{title}</h3>
-      {aside && <span className="ml-auto text-xs text-neutral-500">{aside}</span>}
+      <h3 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white tracking-tight">{title}</h3>
+      {aside && <span className="ml-auto text-[10px] font-extrabold text-[#64748B]">{aside}</span>}
     </div>
   );
 }
@@ -175,26 +157,26 @@ type ListMarker = "dot" | "check" | "alert" | "number";
 
 function Marker({ marker, index }: { marker: ListMarker; index: number }) {
   const base =
-    "mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold";
+    "mt-0.5 inline-flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold";
   if (marker === "check")
     return (
-      <span className={`${base} bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-300`}>
+      <span className={`${base} bg-[#22C55E]/15 text-[#22C55E]`}>
         ✓
       </span>
     );
   if (marker === "alert")
     return (
-      <span className={`${base} bg-amber-100 text-amber-600 dark:bg-amber-950/60 dark:text-amber-300`}>
+      <span className={`${base} bg-[#F59E0B]/15 text-[#F59E0B]`}>
         !
       </span>
     );
   if (marker === "number")
     return (
-      <span className={`${base} bg-blue-100 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300`}>
+      <span className={`${base} bg-[#2563EB]/15 text-[#2563EB]`}>
         {index + 1}
       </span>
     );
-  return <span className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500/70" />;
+  return <span className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563EB]/60" />;
 }
 
 export function KeywordCard({
@@ -208,9 +190,9 @@ export function KeywordCard({
 }) {
   const chipClass =
     variant === "found"
-      ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300"
-      : "border-red-200 bg-red-50 text-red-700 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300";
-  const dotClass = variant === "found" ? "bg-emerald-500" : "bg-red-500";
+      ? "border-[#22C55E]/20 bg-[#22C55E]/5 text-[#22C55E]"
+      : "border-[#EF4444]/20 bg-[#EF4444]/5 text-[#EF4444]";
+  const dotClass = variant === "found" ? "bg-[#22C55E]" : "bg-[#EF4444]";
   return (
     <div className={CARD}>
       <CardHeader
@@ -220,15 +202,15 @@ export function KeywordCard({
         aside={items.length > 0 ? String(items.length) : undefined}
       />
       {items.length === 0 ? (
-        <p className="text-sm text-neutral-500">Nenhum item identificado.</p>
+        <p className="text-xs text-[#64748B]">Nenhum item identificado.</p>
       ) : (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {items.map((item, i) => (
             <span
               key={i}
-              className={`inline-flex items-center gap-1.5 text-xs font-medium rounded-full border px-3 py-1 ${chipClass}`}
+              className={`inline-flex items-center gap-1.5 text-[10px] font-bold rounded-full border px-2.5 py-0.5 ${chipClass}`}
             >
-              <span className={`h-1.5 w-1.5 rounded-full ${dotClass}`} />
+              <span className={`h-1 w-1 rounded-full ${dotClass}`} />
               {item}
             </span>
           ))}
@@ -240,16 +222,16 @@ export function KeywordCard({
 
 export function ScoreBar({ label, value }: { label: string; value: number }) {
   const color =
-    value >= 75 ? "bg-emerald-500" : value >= 50 ? "bg-amber-500" : "bg-red-500";
+    value >= 75 ? "bg-[#22C55E]" : value >= 50 ? "bg-[#F59E0B]" : "bg-[#EF4444]";
   return (
     <div>
-      <div className="flex justify-between text-sm mb-1">
-        <span className="text-neutral-600 dark:text-neutral-300">{label}</span>
-        <span className="font-semibold">{value}%</span>
+      <div className="flex justify-between text-xs mb-1 font-semibold">
+        <span className="text-[#64748B] dark:text-neutral-300">{label}</span>
+        <span className="text-[#071827] dark:text-white font-extrabold">{value}%</span>
       </div>
-      <div className="h-2 w-full rounded-full bg-neutral-200 dark:bg-neutral-800">
+      <div className="h-1.5 w-full rounded-full bg-[#F8FAFC] dark:bg-neutral-800 border border-[#E2E8F0] dark:border-neutral-700 overflow-hidden">
         <div
-          className={`h-2 rounded-full ${color}`}
+          className={`h-full rounded-full ${color}`}
           style={{ width: `${value}%` }}
         />
       </div>
@@ -274,13 +256,13 @@ export function ListCard({
     <div className={CARD}>
       <CardHeader icon={icon} tone={tone} title={title} />
       {items.length === 0 ? (
-        <p className="text-sm text-neutral-500">Nenhum item identificado nesta análise.</p>
+        <p className="text-xs text-[#64748B]">Nenhum item identificado nesta análise.</p>
       ) : (
-        <ul className="space-y-2.5 text-sm text-neutral-700 dark:text-neutral-300">
+        <ul className="space-y-2 text-xs text-[#64748B] dark:text-neutral-300">
           {items.map((item, i) => (
-            <li key={i} className="flex items-start gap-2.5">
+            <li key={i} className="flex items-start gap-2">
               <Marker marker={marker} index={i} />
-              <span className="leading-relaxed">{item}</span>
+              <span className="leading-relaxed font-medium">{item}</span>
             </li>
           ))}
         </ul>
@@ -303,8 +285,8 @@ export function SummaryCard({
   return (
     <div className={CARD}>
       <CardHeader icon={icon} tone={tone} title={title} />
-      <div className="rounded-xl border border-neutral-200/70 bg-neutral-50 p-4 dark:border-neutral-800/70 dark:bg-neutral-900/50">
-        <p className="text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 whitespace-pre-line">
+      <div className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950 p-4">
+        <p className="text-xs leading-relaxed text-[#64748B] dark:text-slate-300 whitespace-pre-line font-medium">
           {summary}
         </p>
       </div>
@@ -326,11 +308,11 @@ export function OrderedListCard({
   return (
     <div className={CARD}>
       <CardHeader icon={icon} tone={tone} title={title} />
-      <ol className="space-y-2.5 text-sm text-neutral-700 dark:text-neutral-300">
+      <ol className="space-y-2 text-xs text-[#64748B] dark:text-neutral-300">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5">
+          <li key={i} className="flex items-start gap-2">
             <Marker marker="number" index={i} />
-            <span className="leading-relaxed">{item}</span>
+            <span className="leading-relaxed font-medium">{item}</span>
           </li>
         ))}
       </ol>
@@ -343,17 +325,17 @@ export function StudyPlanCard({ plan }: { plan: StudyPlanPhased }) {
     {
       label: "Essencial",
       items: plan.essential,
-      pill: "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-300",
+      pill: "bg-[#EF4444]/15 text-[#EF4444] border border-[#EF4444]/20",
     },
     {
-      label: "Bom ter",
+      label: "Recomendado",
       items: plan.niceToHave,
-      pill: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+      pill: "bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/20",
     },
     {
-      label: "Pode ficar para depois",
+      label: "Para depois",
       items: plan.later,
-      pill: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300",
+      pill: "bg-[#64748B]/10 text-[#64748B] border border-[#64748B]/20",
     },
   ];
   return (
@@ -363,16 +345,16 @@ export function StudyPlanCard({ plan }: { plan: StudyPlanPhased }) {
         {groups.map(
           (group) =>
             group.items.length > 0 && (
-              <div key={group.label}>
+              <div key={group.label} className="space-y-1.5">
                 <span
-                  className={`mb-2 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${group.pill}`}
+                  className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${group.pill}`}
                 >
                   {group.label}
                 </span>
-                <ul className="space-y-1.5 text-sm text-neutral-700 dark:text-neutral-300">
+                <ul className="space-y-1.5 text-xs text-[#64748B] dark:text-neutral-300">
                   {group.items.map((item, i) => (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <span className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500/70" />
+                    <li key={i} className="flex items-start gap-2 font-medium">
+                      <span className="mt-[5px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563EB]" />
                       <span className="leading-relaxed">{item}</span>
                     </li>
                   ))}
@@ -403,14 +385,16 @@ export function AnalysisTeaserView({
   children?: React.ReactNode;
 }) {
   return (
-    <section className="space-y-6">
-      <StatusBanner
-        status={result.applicationStatus}
-        reason={result.applicationStatusReason}
-      />
+    <section className="space-y-4 font-sans">
+      <div className={`rounded-2xl border p-4 ${STATUS_CONFIG[result.applicationStatus].chipClass}`}>
+        <p className="font-title font-bold text-sm">
+          {STATUS_CONFIG[result.applicationStatus].label}
+        </p>
+        <p className="text-xs mt-1 leading-relaxed opacity-90">{result.applicationStatusReason}</p>
+      </div>
 
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 space-y-4">
-        <h2 className="font-semibold text-lg">Primeira análise</h2>
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] p-5 shadow-sm space-y-4">
+        <h2 className="font-title font-bold text-sm text-[#071827]">Análise preliminar</h2>
         <ScoreBar label="Aderência geral" value={result.overallScore} />
         <ScoreBar label="Currículo / ATS" value={result.atsScore} />
       </div>
@@ -451,22 +435,22 @@ const FIT_CONFIG: Record<
   { emoji: string; label: string; message: string; className: string }
 > = {
   fit: {
-    emoji: "✅",
-    label: "Você tem aderência com essa vaga",
-    message: "Seu perfil combina bem com o que a vaga pede. Veja o Kit Candidatura completo para saber exatamente como se destacar.",
-    className: "border-emerald-300 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/40",
+    emoji: "🟢",
+    label: "Boa aderência identificada",
+    message: "Seu perfil é compatível com os requisitos. Libere o Kit Candidatura para obter o plano de ação passo a passo.",
+    className: "border-[#22C55E]/30 bg-[#22C55E]/5 text-[#22C55E]",
   },
   partial: {
     emoji: "🟡",
-    label: "Você tem aderência parcial com essa vaga",
-    message: "Seu perfil tem pontos fortes, mas também gaps importantes. O Kit Candidatura mostra o que ajustar antes de aplicar.",
-    className: "border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40",
+    label: "Aderência parcial",
+    message: "Seu perfil possui gaps que podem ser corrigidos. Libere o Kit para saber como otimizar seu currículo.",
+    className: "border-[#F59E0B]/30 bg-[#F59E0B]/5 text-[#F59E0B]",
   },
   no_fit: {
     emoji: "🔴",
-    label: "Você ainda não tem aderência com essa vaga",
-    message: "Existem gaps relevantes entre seu currículo e essa vaga. O Kit Candidatura mostra um plano para chegar lá.",
-    className: "border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40",
+    label: "Aderência baixa",
+    message: "Gaps relevantes identificados. O plano detalhado mostra as principais prioridades para você fechar essas lacunas.",
+    className: "border-[#EF4444]/30 bg-[#EF4444]/5 text-[#EF4444]",
   },
 };
 
@@ -490,40 +474,38 @@ export function SimpleFitTeaser({
   const topWeakness = result.weaknesses[0];
 
   return (
-    <section className="space-y-6">
-      <div className={`rounded-2xl border p-6 md:p-8 text-center space-y-3 ${config.className}`}>
-        <p className="text-4xl">{config.emoji}</p>
-        <div className="flex items-baseline justify-center gap-2">
-          <span className="text-4xl font-extrabold tracking-tight">{result.overallScore}%</span>
-          <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300">
-            de aderência
+    <section className="space-y-4 font-sans">
+      <div className={`rounded-2xl border p-5 text-center space-y-2.5 ${config.className}`}>
+        <div className="flex items-baseline justify-center gap-1">
+          <span className="text-3xl font-black tracking-tight">{result.overallScore}%</span>
+          <span className="text-[10px] font-bold uppercase tracking-wider opacity-85">
+            de match
           </span>
         </div>
-        <p className="font-bold text-lg md:text-xl">{config.label}</p>
-        <p className="text-sm text-neutral-700 dark:text-neutral-300 max-w-md mx-auto">
+        <p className="font-title font-bold text-sm">{config.label}</p>
+        <p className="text-xs opacity-90 max-w-sm mx-auto leading-relaxed">
           {config.message}
         </p>
       </div>
 
       {previewKeywords.length > 0 && (
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-          <h3 className="font-semibold mb-1">Palavras-chave que faltam no seu currículo</h3>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">
-            Sem elas, seu currículo pode ser barrado pelos filtros automáticos (ATS) antes de um
-            recrutador ver.
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] p-4 shadow-sm">
+          <h3 className="font-title font-bold text-xs mb-1 text-[#071827]">Palavras-chave faltantes</h3>
+          <p className="text-[10px] text-[#64748B] mb-2.5">
+            Termos essenciais para passar nos filtros automáticos (ATS) de triagem.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {previewKeywords.map((item, i) => (
               <span
                 key={i}
-                className="text-xs rounded-full px-3 py-1 bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300"
+                className="text-[10px] font-bold rounded-full px-2.5 py-0.5 bg-[#EF4444]/10 text-[#EF4444]"
               >
                 {item}
               </span>
             ))}
             {hiddenKeywords > 0 && (
-              <span className="text-xs rounded-full px-3 py-1 bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                +{hiddenKeywords} no Kit Candidatura
+              <span className="text-[10px] font-bold rounded-full px-2.5 py-0.5 bg-neutral-100 text-[#64748B]">
+                +{hiddenKeywords} adicionais
               </span>
             )}
           </div>
@@ -531,35 +513,25 @@ export function SimpleFitTeaser({
       )}
 
       {topWeakness && (
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-          <h3 className="font-semibold mb-3">Um ponto que pode te tirar da vaga</h3>
-          <ul className="list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] p-4 shadow-sm">
+          <h3 className="font-title font-bold text-xs mb-2 text-[#071827]">Lacuna crítica identificada</h3>
+          <ul className="list-disc list-inside text-xs text-[#64748B] leading-relaxed">
             <li>{topWeakness}</li>
           </ul>
-          <div className="mt-3 flex items-center gap-2 rounded-lg border border-dashed border-blue-300 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/20 px-3 py-2.5">
-            <span aria-hidden>🔒</span>
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              O plano passo a passo para corrigir este e os demais pontos está no Kit
-              Candidatura.
-            </p>
-          </div>
         </div>
       )}
 
-      <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-        <h3 className="font-semibold mb-3">No Kit Candidatura você ainda recebe:</h3>
-        <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] p-4 shadow-sm">
+        <h3 className="font-title font-bold text-xs mb-2 text-[#071827]">Benefícios do Kit Candidatura:</h3>
+        <ul className="space-y-1.5 text-xs text-[#64748B] leading-relaxed">
           {[
-            "Currículo reescrito e otimizado para esta vaga",
-            "Plano de estudo priorizado para fechar seus gaps",
-            "Perguntas de entrevista com respostas prontas",
-            "Mensagem pronta para enviar ao recrutador",
-            result.keywordsMissing.length > 0
-              ? `As ${result.keywordsMissing.length} palavras-chave que faltam, com onde encaixar cada uma`
-              : "Todas as palavras-chave da vaga, com onde encaixar cada uma",
+            "Roteiro passo a passo para reescrever seu currículo",
+            "Cronograma estruturado para guiar seus estudos",
+            "Simulador de entrevistas interativo com perguntas da vaga",
+            "Carta de apresentação pronta para falar com recrutadores",
           ].map((item, i) => (
-            <li key={i} className="flex items-start gap-2">
-              <span className="text-emerald-500 mt-0.5">✓</span>
+            <li key={i} className="flex items-start gap-1.5">
+              <span className="text-[#22C55E] font-bold">✓</span>
               <span>{item}</span>
             </li>
           ))}
@@ -597,67 +569,39 @@ export function ScoreHero({
   ];
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl border p-6 md:p-8 shadow-xl transition-all duration-300 hover:shadow-2xl ${config.className}`}
+      className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)]"
     >
-      {/* Background decorations */}
-      <div className="absolute -right-16 -top-16 w-44 h-44 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
-      <div className="absolute -left-16 -bottom-16 w-44 h-44 rounded-full bg-amber-500/10 blur-3xl pointer-events-none" />
-
-      {/* vertical gradient bar */}
-      <span
-        aria-hidden
-        className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-blue-600 via-blue-400 to-emerald-400"
-      />
-
-      <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:gap-8 sm:text-left relative z-10">
-        <div className="shrink-0 relative">
-          <div className="absolute inset-0 rounded-full bg-blue-500/10 animate-ping opacity-75" />
-          <div className="relative bg-white dark:bg-neutral-900 p-2 rounded-full shadow-inner">
-            <CircularScore value={overall} size={124} strokeWidth={11} />
-          </div>
+      <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left relative z-10">
+        <div className="shrink-0 relative bg-[#F8FAFC] dark:bg-neutral-950 p-2 rounded-full border border-[#E2E8F0] dark:border-neutral-800">
+          <CircularScore value={overall} size={110} strokeWidth={9} />
         </div>
         <div className="space-y-1.5 min-w-0">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/80 dark:bg-black/20 shadow-sm border border-neutral-100 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400">
-            Diagnóstico de Aderência
+          <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${config.chipClass}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${config.dotClass} animate-pulse`} />
+            {config.label}
           </span>
-          <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight mt-1">
-            {config.emoji} {config.label}
+          <h2 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white tracking-tight">
+            Análise de Match
           </h2>
-          <p className="max-w-prose text-sm leading-relaxed text-neutral-700 dark:text-neutral-300 font-medium">
+          <p className="max-w-prose text-xs leading-relaxed text-[#64748B] dark:text-neutral-300 font-medium">
             {reason}
           </p>
         </div>
       </div>
 
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 relative z-10">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 relative z-10">
         {subScores.map((s) => (
           <div
             key={s.label}
-            className="flex flex-col items-center gap-3 rounded-2xl border border-white/60 bg-white/40 dark:border-neutral-800/50 dark:bg-neutral-900/30 p-4 shadow-sm hover:shadow-md transition-all duration-300 backdrop-blur-md"
+            className="flex flex-col items-center gap-2.5 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/20 p-3 hover:border-[#2563EB] transition-all duration-300"
           >
-            <div className="bg-white dark:bg-neutral-950 p-1.5 rounded-full shadow-inner">
-              <CircularScore value={s.value} size={48} strokeWidth={5} />
-            </div>
-            <span className="px-1 text-center text-xs font-semibold text-neutral-600 dark:text-neutral-300">
+            <CircularScore value={s.value} size={44} strokeWidth={4.5} />
+            <span className="text-[10px] font-bold text-[#64748B] dark:text-neutral-300">
               {s.label}
             </span>
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-function SectionHeading({ icon, title }: { icon: string; title: string }) {
-  return (
-    <div className="flex items-center gap-3 pt-6 pb-2">
-      <div className="flex items-center justify-center h-8 w-8 rounded-xl bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm text-sm">
-        {icon}
-      </div>
-      <h2 className="text-xs font-extrabold uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
-        {title}
-      </h2>
-      <div className="h-[2px] flex-1 bg-gradient-to-r from-neutral-200 to-transparent dark:from-neutral-800" />
     </div>
   );
 }
@@ -679,189 +623,344 @@ export function AnalysisResult({
   } | null;
 }) {
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
+  const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
+
+  const tabs = [
+    { id: "overview", label: "Visão Geral", emoji: "📊" },
+    { id: "gaps", label: "Currículo & Gaps", emoji: "📄" },
+    { id: "preparation", label: "Entrevista", emoji: "🎤" },
+    { id: "study", label: "Plano de Estudo", emoji: "📚" },
+  ] as const;
+
   return (
-    <section className="space-y-6">
-      <ScoreHero
-        status={result.applicationStatus}
-        reason={result.applicationStatusReason}
-        overall={result.overallScore}
-        technical={result.technicalScore}
-        experience={result.experienceScore}
-        seniority={result.seniorityScore}
-        ats={result.atsScore}
-      />
-
-      {/* DIAGNÓSTICO — o que a vaga pede e o que já bate */}
-      <SectionHeading icon="🎯" title="Diagnóstico" />
-      <div className="grid gap-6 md:grid-cols-2">
-        <KeywordCard
-          title="Palavras-chave encontradas"
-          items={result.keywordsFound}
-          variant="found"
-        />
-        <KeywordCard
-          title="Palavras-chave ausentes"
-          items={result.keywordsMissing}
-          variant="missing"
-        />
+    <section className="space-y-5 font-sans">
+      
+      {/* Barra de Abas Premium */}
+      <div className="flex overflow-x-auto gap-1 p-1 rounded-2xl bg-[#F8FAFC] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 shadow-[0_4px_20px_rgba(0,0,0,0.01)] no-scrollbar">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                isActive
+                  ? "bg-[#2563EB] text-white shadow-sm"
+                  : "text-[#64748B] hover:text-[#071827] dark:hover:text-white"
+              }`}
+            >
+              <span>{tab.emoji}</span>
+              <span>{tab.label}</span>
+            </button>
+          );
+        })}
       </div>
-      {careerTrack === "reemployment" &&
-        result.recruiterObjections &&
-        result.recruiterObjections.length > 0 && (
-          <ListCard
-            icon="🧐"
-            tone="warning"
-            marker="alert"
-            title="Objeções prováveis do recrutador"
-            items={result.recruiterObjections}
-          />
-        )}
-      {result.alternativeRoles && result.alternativeRoles.length > 0 && (
-        <ListCard
-          icon="🎯"
-          tone="neutral"
-          title="Vagas mais adequadas para o seu momento agora"
-          items={result.alternativeRoles}
-        />
-      )}
 
-      {/* SEU CURRÍCULO — leitura do que você tem hoje e o que ajustar */}
-      <SectionHeading icon="📄" title="Seu currículo" />
-      <div className="grid gap-6 md:grid-cols-2">
-        <ListCard
-          icon="💪"
-          tone="success"
-          marker="check"
-          title="Pontos fortes"
-          items={result.strengths}
-        />
-        <ListCard
-          icon="⚠️"
-          tone="warning"
-          marker="alert"
-          title="Pontos fracos"
-          items={result.weaknesses}
-        />
+      {/* Conteúdo Dinâmico Baseado na Aba Ativa */}
+      <div className="space-y-5 transition-all duration-300 animate-in fade-in">
+        
+        {/* ABA: Visão Geral */}
+        {activeTab === "overview" && (
+          <>
+            <ScoreHero
+              status={result.applicationStatus}
+              reason={result.applicationStatusReason}
+              overall={result.overallScore}
+              technical={result.technicalScore}
+              experience={result.experienceScore}
+              seniority={result.seniorityScore}
+              ats={result.atsScore}
+            />
+
+            <BehavioralFitCard jobTitle={jobTitle} behavioralResult={behavioralResult} />
+
+            <SummaryCard
+              icon="✉️"
+              tone="primary"
+              title="Mensagem pronta para o recrutador"
+              summary={result.recruiterMessage}
+            />
+          </>
+        )}
+
+        {/* ABA: Currículo & Gaps */}
+        {activeTab === "gaps" && (
+          <>
+            <div className="grid gap-5 md:grid-cols-2">
+              <KeywordCard
+                title="Palavras-chave encontradas"
+                items={result.keywordsFound}
+                variant="found"
+              />
+              <KeywordCard
+                title="Palavras-chave ausentes"
+                items={result.keywordsMissing}
+                variant="missing"
+              />
+            </div>
+
+            {/* Análise Gramatical, Dados Faltantes & Estrutura */}
+            {(() => {
+              const parsedGrammarErrors = typeof result.grammarErrors === "string" 
+                ? (() => { try { return JSON.parse(result.grammarErrors); } catch(e) { return []; } })()
+                : result.grammarErrors || [];
+              const parsedMissingBasicInfo = typeof result.missingBasicInfo === "string"
+                ? (() => { try { return JSON.parse(result.missingBasicInfo); } catch(e) { return []; } })()
+                : result.missingBasicInfo || [];
+              
+              if (parsedGrammarErrors.length === 0 && parsedMissingBasicInfo.length === 0 && !result.structureFeedback) {
+                return null;
+              }
+
+              return (
+                <div className="grid gap-5 md:grid-cols-2">
+                  {/* Gramática e Ortografia */}
+                  <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-blue-50 text-blue-600 ring-blue-100">
+                        ✍️
+                      </span>
+                      <h3 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white">Gramática & Ortografia</h3>
+                    </div>
+                    {parsedGrammarErrors.length === 0 ? (
+                      <p className="text-xs text-[#22C55E] font-semibold flex items-center gap-1">
+                        ✓ Nenhum erro gramatical crítico detectado no currículo!
+                      </p>
+                    ) : (
+                      <ul className="space-y-1.5 text-xs text-[#EF4444]">
+                        {parsedGrammarErrors.map((err: string, i: number) => (
+                          <li key={i} className="flex items-start gap-1.5 font-medium">
+                            <span className="mt-[5px] inline-block h-1.5 w-1.5 rounded-full bg-[#EF4444]" />
+                            <span>{err}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Informações Básicas Faltantes */}
+                  <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+                    <div className="mb-3 flex items-center gap-2">
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-amber-50 text-amber-600 ring-amber-100">
+                        📌
+                      </span>
+                      <h3 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white">Informações Básicas</h3>
+                    </div>
+                    {parsedMissingBasicInfo.length === 0 ? (
+                      <p className="text-xs text-[#22C55E] font-semibold flex items-center gap-1">
+                        ✓ Currículo completo com dados de contato e datas!
+                      </p>
+                    ) : (
+                      <ul className="space-y-1.5 text-xs text-[#F59E0B]">
+                        {parsedMissingBasicInfo.map((info: string, i: number) => (
+                          <li key={i} className="flex items-start gap-1.5 font-medium">
+                            <span className="mt-[5px] inline-block h-1.5 w-1.5 rounded-full bg-[#F59E0B]" />
+                            <span>{info}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Estrutura & Legibilidade */}
+                  {result.structureFeedback && (
+                    <div className="md:col-span-2 rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold ring-1 bg-indigo-50 text-indigo-600 ring-indigo-100">
+                            📐
+                          </span>
+                          <h3 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white">Estrutura & Legibilidade</h3>
+                        </div>
+                        {result.structureRating && (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase border ${
+                            result.structureRating === "excellent"
+                              ? "bg-[#22C55E]/15 text-[#22C55E] border-[#22C55E]/20"
+                              : result.structureRating === "good"
+                              ? "bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/20"
+                              : "bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/20"
+                          }`}>
+                            {result.structureRating === "excellent"
+                              ? "Excelente"
+                              : result.structureRating === "good"
+                              ? "Estrutura Boa"
+                              : "Melhorar Estrutura"}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-[#64748B] leading-relaxed font-medium">
+                        {result.structureFeedback}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <ListCard
+                icon="💪"
+                tone="success"
+                marker="check"
+                title="Pontos fortes"
+                items={result.strengths}
+              />
+              <ListCard
+                icon="⚠️"
+                tone="warning"
+                marker="alert"
+                title="Pontos fracos"
+                items={result.weaknesses}
+              />
+            </div>
+
+            <ListCard
+              icon="🔧"
+              tone="primary"
+              marker="number"
+              title="Antes de aplicar, corrija isso no currículo"
+              items={result.fixes}
+            />
+
+            {isEntryLevel && <ChecklistCard items={result.fixes} />}
+
+            {careerTrack === "career_change" &&
+              result.transferableSkills &&
+              result.transferableSkills.length > 0 && (
+                <ListCard
+                  icon="🔁"
+                  tone="success"
+                  marker="check"
+                  title="Habilidades transferíveis"
+                  items={result.transferableSkills}
+                />
+              )}
+
+            {careerTrack === "reemployment" &&
+              result.recruiterObjections &&
+              result.recruiterObjections.length > 0 && (
+                <ListCard
+                  icon="🧐"
+                  tone="warning"
+                  marker="alert"
+                  title="Objeções prováveis do recrutador"
+                  items={result.recruiterObjections}
+                />
+              )}
+
+            {result.alternativeRoles && result.alternativeRoles.length > 0 && (
+              <ListCard
+                icon="🎯"
+                tone="neutral"
+                title="Vagas alternativas sugeridas"
+                items={result.alternativeRoles}
+              />
+            )}
+
+            <SummaryCard
+              icon="📝"
+              title="Resumo profissional sugerido"
+              summary={result.suggestedSummary}
+            />
+          </>
+        )}
+
+        {/* ABA: Preparação Entrevista */}
+        {activeTab === "preparation" && (
+          <>
+            {isEntryLevel && result.talkAboutYourselfAnswer && (
+              <SummaryCard
+                icon="🗣️"
+                title='Resposta pronta: "Fale sobre você"'
+                summary={result.talkAboutYourselfAnswer}
+              />
+            )}
+
+            {careerTrack === "career_change" && (
+              <>
+                {result.transitionNarrative && (
+                  <SummaryCard
+                    icon="🌉"
+                    title="Narrativa de transição (LinkedIn/entrevista)"
+                    summary={result.transitionNarrative}
+                  />
+                )}
+                {result.whyCareerChangeAnswer && (
+                  <SummaryCard
+                    icon="💬"
+                    title='Resposta pronta: "Por que quer mudar de área?"'
+                    summary={result.whyCareerChangeAnswer}
+                  />
+                )}
+                {result.bridgeRoles && result.bridgeRoles.length > 0 && (
+                  <OrderedListCard
+                    icon="🪜"
+                    title="Cargos-ponte recomendados"
+                    items={result.bridgeRoles}
+                  />
+                )}
+              </>
+            )}
+
+            {careerTrack === "reemployment" && (
+              <>
+                {result.applicationStrategy && (
+                  <SummaryCard
+                    icon="♟️"
+                    title="Estratégia de candidatura"
+                    summary={result.applicationStrategy}
+                  />
+                )}
+                {result.weeklyApplicationPlan && result.weeklyApplicationPlan.length > 0 && (
+                  <OrderedListCard
+                    icon="🗓️"
+                    title="Plano semanal de candidaturas"
+                    items={result.weeklyApplicationPlan}
+                  />
+                )}
+                {result.feedbackAnalysis && (
+                  <SummaryCard
+                    icon="📊"
+                    title="Análise dos feedbacks recebidos"
+                    summary={result.feedbackAnalysis}
+                  />
+                )}
+              </>
+            )}
+
+            <ListCard
+              icon="🎤"
+              tone="primary"
+              title="Perguntas prováveis da entrevista"
+              items={result.interviewQuestions}
+            />
+            <InterviewSimulator questions={result.interviewQuestions} jobTitle={jobTitle} />
+          </>
+        )}
+
+        {/* ABA: Plano de Estudo */}
+        {activeTab === "study" && (
+          <>
+            <StudyPlanCard plan={result.studyPlan} />
+
+            {careerTrack === "career_change" && (
+              <p className="text-xs text-[#64748B] text-center">
+                <Link href="/tools/career-change-guide" className="text-[#2563EB] hover:underline font-bold">
+                  Ver guia completo de transição de carreira →
+                </Link>
+              </p>
+            )}
+            {careerTrack === "reemployment" && (
+              <p className="text-xs text-[#64748B] text-center">
+                <Link href="/tools/reemployment-guide" className="text-[#2563EB] hover:underline font-bold">
+                  Ver guia completo de recolocação →
+                </Link>
+              </p>
+            )}
+          </>
+        )}
+
       </div>
-      <ListCard
-        icon="🔧"
-        tone="primary"
-        marker="number"
-        title="Antes de aplicar, corrija isso"
-        items={result.fixes}
-      />
-      {isEntryLevel && <ChecklistCard items={result.fixes} />}
-      {careerTrack === "career_change" &&
-        result.transferableSkills &&
-        result.transferableSkills.length > 0 && (
-          <ListCard
-            icon="🔁"
-            tone="success"
-            marker="check"
-            title="Habilidades transferíveis da sua experiência anterior"
-            items={result.transferableSkills}
-          />
-        )}
-      <SummaryCard
-        icon="📝"
-        title="Resumo profissional sugerido"
-        summary={result.suggestedSummary}
-      />
-
-      {/* PREPARAÇÃO — entrevista e estudo */}
-      <SectionHeading icon="🎓" title="Preparação" />
-      {isEntryLevel && result.talkAboutYourselfAnswer && (
-        <SummaryCard
-          icon="🗣️"
-          title='Resposta pronta: "Fale sobre você"'
-          summary={result.talkAboutYourselfAnswer}
-        />
-      )}
-      {careerTrack === "career_change" && (
-        <>
-          {result.transitionNarrative && (
-            <SummaryCard
-              icon="🌉"
-              title="Narrativa de transição (LinkedIn/entrevista)"
-              summary={result.transitionNarrative}
-            />
-          )}
-          {result.whyCareerChangeAnswer && (
-            <SummaryCard
-              icon="💬"
-              title='Resposta pronta: "Por que você quer mudar de área?"'
-              summary={result.whyCareerChangeAnswer}
-            />
-          )}
-          {result.bridgeRoles && result.bridgeRoles.length > 0 && (
-            <OrderedListCard
-              icon="🪜"
-              title="Cargos-ponte até seu objetivo"
-              items={result.bridgeRoles}
-            />
-          )}
-        </>
-      )}
-      {careerTrack === "reemployment" && (
-        <>
-          {result.applicationStrategy && (
-            <SummaryCard
-              icon="♟️"
-              title="Estratégia de candidatura"
-              summary={result.applicationStrategy}
-            />
-          )}
-          {result.weeklyApplicationPlan && result.weeklyApplicationPlan.length > 0 && (
-            <OrderedListCard
-              icon="🗓️"
-              title="Plano semanal de candidaturas"
-              items={result.weeklyApplicationPlan}
-            />
-          )}
-          {result.feedbackAnalysis && (
-            <SummaryCard
-              icon="📊"
-              title="Análise dos feedbacks recebidos"
-              summary={result.feedbackAnalysis}
-            />
-          )}
-        </>
-      )}
-      <ListCard
-        icon="🎤"
-        tone="primary"
-        title="Perguntas prováveis da entrevista"
-        items={result.interviewQuestions}
-      />
-      <InterviewSimulator questions={result.interviewQuestions} jobTitle={jobTitle} />
-      <StudyPlanCard plan={result.studyPlan} />
-
-      {/* COMPORTAMENTAL & SOFT SKILLS */}
-      <SectionHeading icon="🧠" title="Mapeamento comportamental" />
-      <BehavioralFitCard jobTitle={jobTitle} behavioralResult={behavioralResult} />
-
-      {/* AÇÃO — o próximo passo concreto */}
-      <SectionHeading icon="✉️" title="Próxima ação" />
-      <SummaryCard
-        icon="✉️"
-        tone="primary"
-        title="Mensagem pronta para o recrutador"
-        summary={result.recruiterMessage}
-      />
-      {careerTrack === "career_change" && (
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          <Link href="/tools/career-change-guide" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-            Ver guia completo de transição de carreira →
-          </Link>
-        </p>
-      )}
-      {careerTrack === "reemployment" && (
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          <Link href="/tools/reemployment-guide" className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-            Ver guia completo de recolocação →
-          </Link>
-        </p>
-      )}
     </section>
   );
 }
@@ -880,20 +979,19 @@ export function BehavioralFitCard({
 }) {
   if (!behavioralResult) {
     return (
-      <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300 border border-blue-200 dark:border-blue-850">
-            <span className="h-1.5 w-1.5 rounded-full bg-blue-500 animate-pulse" />
-            <span>Novo Recurso Premium</span>
-          </div>
-          <h3 className="font-bold text-lg leading-tight">Mapeamento Comportamental & Soft Skills</h3>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 max-w-xl">
-            Descubra como seu perfil comportamental e suas habilidades interpessoais se alinham a esta vaga de <strong>{jobTitle}</strong>. Responda o quiz rápido de 5 minutos para liberar esta análise!
+      <div className="rounded-3xl border border-[#2563EB]/20 bg-[#2563EB]/5 p-5 flex flex-col md:flex-row items-center justify-between gap-5">
+        <div className="space-y-1 text-left">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#2563EB]/15 text-[#2563EB] border border-[#2563EB]/25">
+            Mapeamento Comportamental
+          </span>
+          <h3 className="font-title font-bold text-sm leading-tight text-[#071827] mt-1.5">Mapeamento Comportamental & Soft Skills</h3>
+          <p className="text-xs text-[#64748B] max-w-xl">
+            Descubra como seu perfil comportamental e suas habilidades interpessoais se alinham a esta vaga de <strong>{jobTitle}</strong>.
           </p>
         </div>
         <Link
           href="/tools/behavioral-test"
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-3 shadow-sm shadow-blue-600/25 transition-all shrink-0 cursor-pointer w-full md:w-auto justify-center"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white text-xs font-semibold px-4 py-2.5 transition-all shrink-0 cursor-pointer w-full md:w-auto justify-center active:scale-[0.98]"
         >
           <span>Fazer Teste Comportamental</span>
           <span>→</span>
@@ -902,7 +1000,7 @@ export function BehavioralFitCard({
     );
   }
 
-  let skills: Record<SoftSkillDimension, number> = {} as any;
+  let skills: Record<string, number> = {};
   try {
     skills = JSON.parse(behavioralResult.skillScores);
   } catch (e) {
@@ -912,43 +1010,45 @@ export function BehavioralFitCard({
   const primaryTraitLabel = behavioralResult.personalityLabel;
   const primaryTraitDesc = behavioralResult.summary;
 
+  const labels: Record<string, string> = {
+    comunicacao: "Comunicação",
+    trabalho_em_equipe: "Trabalho em equipe",
+    proatividade: "Proatividade",
+    adaptabilidade: "Adaptabilidade",
+    resolucao_problemas: "Resolução de problemas",
+  };
+
   return (
-    <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-neutral-100 dark:border-neutral-900 pb-4">
+    <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-950 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-3">
         <div>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
+          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#22C55E]/15 text-[#22C55E] border border-[#22C55E]/20">
             Aderência Comportamental
           </span>
-          <h3 className="font-bold text-lg mt-2">Mapeamento Comportamental & Soft Skills</h3>
+          <h3 className="font-title font-bold text-sm mt-1.5 text-[#071827] dark:text-white">Mapeamento Comportamental & Soft Skills</h3>
         </div>
         <Link
           href="/tools/behavioral-test"
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold shrink-0 cursor-pointer"
+          className="text-xs text-[#2563EB] hover:text-[#1D4ED8] hover:underline font-bold shrink-0 cursor-pointer"
         >
           Refazer teste comportamental →
         </Link>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-12">
-        <div className="md:col-span-5 space-y-3 p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-200/50 dark:border-neutral-800/50">
-          <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider font-medium">Seu Perfil Dominante</p>
-          <p className="font-bold text-base text-blue-600 dark:text-blue-400">{primaryTraitLabel}</p>
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+      <div className="grid gap-5 md:grid-cols-12">
+        <div className="md:col-span-5 space-y-2.5 p-4 rounded-2xl bg-[#F8FAFC] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800">
+          <p className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Seu Perfil Dominante</p>
+          <p className="font-bold text-sm text-[#2563EB]">{primaryTraitLabel}</p>
+          <p className="text-xs text-[#64748B] dark:text-slate-400 leading-relaxed">
             {primaryTraitDesc}
           </p>
-          <div className="pt-2">
-            <p className="text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 font-medium">Dica para a Vaga de {jobTitle}:</p>
-            <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed mt-1">
-              Destaque na entrevista como sua personalidade de {primaryTraitLabel.toLowerCase()} o ajudará a gerar valor imediato como <strong>{jobTitle}</strong>.
-            </p>
-          </div>
         </div>
 
-        <div className="md:col-span-7 space-y-4">
-          <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider font-medium">Pontuação de Soft Skills</p>
+        <div className="md:col-span-7 space-y-3">
+          <p className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Pontuação de Soft Skills</p>
           <div className="grid gap-3">
             {Object.entries(skills).map(([dim, score]) => (
-              <ScoreBar key={dim} label={SOFT_SKILL_LABELS[dim as SoftSkillDimension]} value={score} />
+              <ScoreBar key={dim} label={labels[dim] || dim} value={score} />
             ))}
           </div>
         </div>
