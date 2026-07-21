@@ -43,6 +43,7 @@ export const metadata: Metadata = {
     title: SITE_NAME,
     statusBarStyle: "default",
   },
+  manifest: "/manifest.webmanifest",
   // Verificação de propriedade do Google Search Console. O valor vem do env
   // (runtime, não precisa rebuild): pegar o "content" da meta tag que o Search
   // Console gera e definir GOOGLE_SITE_VERIFICATION no .env da VPS. Sem a var,
