@@ -83,6 +83,12 @@ export function FeedFilters({
   const selectClass =
     "w-full h-9 rounded-xl border border-neutral-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-1.5 text-xs font-semibold text-neutral-700 dark:text-neutral-200 outline-none focus:ring-2 focus:ring-blue-500/20 hover:border-neutral-300 dark:hover:border-neutral-700 transition-all cursor-pointer truncate shadow-2xs";
 
+  const sortedWorkModels = [...workModels].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const sortedAreas = [...areas].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const sortedSeniorities = [...seniorities].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const sortedContractTypes = [...contractTypes].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const sortedLocations = [...locations].sort((a, b) => a.localeCompare(b, "pt-BR"));
+
   return (
     <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3.5 sm:p-4 shadow-sm shadow-slate-900/5 space-y-3">
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-900 pb-3">
@@ -160,7 +166,7 @@ export function FeedFilters({
 
         <select value={workModel} onChange={(e) => setParam("workModel", e.target.value)} className={selectClass}>
           <option value="all">Modelo de trabalho</option>
-          {workModels.map((option) => (
+          {sortedWorkModels.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -169,7 +175,7 @@ export function FeedFilters({
 
         <select value={area} onChange={(e) => setParam("area", e.target.value)} className={selectClass}>
           <option value="all">Área profissional</option>
-          {areas.map((option) => (
+          {sortedAreas.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -178,7 +184,7 @@ export function FeedFilters({
 
         <select value={seniority} onChange={(e) => setParam("seniority", e.target.value)} className={selectClass}>
           <option value="all">Senioridade</option>
-          {seniorities.map((option) => (
+          {sortedSeniorities.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -187,7 +193,7 @@ export function FeedFilters({
 
         <select value={contractType} onChange={(e) => setParam("contractType", e.target.value)} className={selectClass}>
           <option value="all">Regime de contratação</option>
-          {contractTypes.map((option) => (
+          {sortedContractTypes.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
@@ -201,7 +207,7 @@ export function FeedFilters({
           title="Vagas remotas e híbridas aparecem para qualquer localidade"
         >
           <option value="all">Localidade</option>
-          {locations.map((option) => (
+          {sortedLocations.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>
