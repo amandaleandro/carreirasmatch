@@ -30,16 +30,16 @@ export function FetchJobsButton() {
   }
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+    <div className="flex flex-col gap-2.5 w-full">
       <button
         onClick={handleClick}
         disabled={loading}
-        className="rounded-xl border border-neutral-200 dark:border-neutral-800 font-semibold px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50 whitespace-nowrap"
+        className="w-full rounded-xl border border-neutral-200 dark:border-neutral-800 font-semibold px-4 py-2.5 text-sm hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50 text-center"
       >
         {loading ? "Buscando..." : "Buscar novas vagas"}
       </button>
       {message && (
-        <p className="text-sm text-neutral-600 dark:text-neutral-400">{message}</p>
+        <p className="text-xs text-neutral-600 dark:text-neutral-400">{message}</p>
       )}
     </div>
   );

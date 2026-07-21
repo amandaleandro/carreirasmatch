@@ -38,8 +38,8 @@ export function AddJobForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      <div className="flex flex-col sm:flex-row gap-3">
+    <form onSubmit={handleSubmit} className="space-y-3.5 w-full">
+      <div className="flex flex-col gap-2.5 w-full">
         <input
           type="url"
           value={url}
@@ -50,12 +50,12 @@ export function AddJobForm() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50 whitespace-nowrap"
+          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-4 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50 text-center text-sm"
         >
           {loading ? "Adicionando..." : "Adicionar ao feed"}
         </button>
       </div>
-      {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
     </form>
   );
 }

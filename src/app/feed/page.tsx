@@ -246,34 +246,42 @@ export default async function FeedPage({
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-          <div className="flex items-start gap-3 mb-4">
-            <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <LinkIcon className="h-4.5 w-4.5" />
-            </span>
-            <div>
-              <p className="font-semibold">Achou uma vaga por aí?</p>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                Cole o link aqui que a gente coloca na sua lista.
-              </p>
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
+          <div>
+            <div className="flex items-start gap-3 mb-4">
+              <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <LinkIcon className="h-4.5 w-4.5" />
+              </span>
+              <div>
+                <p className="font-semibold">Achou uma vaga por aí?</p>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  Cole o link aqui que a gente coloca na sua lista.
+                </p>
+              </div>
             </div>
           </div>
-          <AddJobForm />
+          <div className="mt-4">
+            <AddJobForm />
+          </div>
         </div>
 
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-          <div className="flex items-start gap-3 mb-4">
-            <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-              <SparkleIcon className="h-4.5 w-4.5" />
-            </span>
-            <div>
-              <p className="font-semibold">Deixe com a gente</p>
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                Buscamos vagas novas que têm tudo a ver com o seu perfil.
-              </p>
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5 flex flex-col justify-between">
+          <div>
+            <div className="flex items-start gap-3 mb-4">
+              <span className="h-9 w-9 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                <SparkleIcon className="h-4.5 w-4.5" />
+              </span>
+              <div>
+                <p className="font-semibold">Deixe com a gente</p>
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  Buscamos vagas novas que têm tudo a ver com o seu perfil.
+                </p>
+              </div>
             </div>
           </div>
-          <FetchJobsButton />
+          <div className="mt-4">
+            <FetchJobsButton />
+          </div>
         </div>
 
         {behavioralResult && (
