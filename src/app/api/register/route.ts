@@ -34,22 +34,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (typeof careerSegment !== "string" || !isCareerSegment(careerSegment)) {
-      return NextResponse.json(
-        { error: "Selecione qual é o seu momento de carreira." },
-        { status: 400 }
-      );
-    }
-
     const existing = await prisma.user.findUnique({
       where: { email: normalizedEmail },
-      select: { id: true, passwordHash: true },
+      select: { id: true },
     });
-    if (existing?.passwordHash) {
-      return NextResponse.json(
-        { error: "Já existe uma conta com este e-mail." },
-        { status: 409 }
-      );
+
+    // Se a conta já existe, atualiza os dados e a nova senha informada
+    if (existing) {
+      const passwordHash = await bcrypt.hash(password, 10);
+      await prisma.user.update({
+        where: { id: existing.id },
+        data: {
+          name: normalizedName,
+          passwordHash,
+          ...(normalizedPhone ? { phone: normalizedPhone } : {}),
+        },
+      });
+      return NextResponse.json({ ok: true });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
