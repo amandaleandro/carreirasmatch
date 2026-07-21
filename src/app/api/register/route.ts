@@ -67,32 +67,39 @@ export async function POST(req: NextRequest) {
       if (matched?.active) signupCouponId = matched.id;
     }
 
+    const effectiveCareerSegment = (typeof careerSegment === "string" && isCareerSegment(careerSegment))
+      ? careerSegment
+      : "career_pro";
+
     const data = {
       name: normalizedName,
       phone: normalizedPhone,
       passwordHash,
-      careerSegment,
+      careerSegment: effectiveCareerSegment,
       professionalArea: typeof professionalArea === "string" && professionalArea.trim()
         ? professionalArea.trim()
         : null,
-      // Só define a atribuição de cadastro quando há cupom válido; não sobrescreve
-      // uma atribuição anterior com null (caso de conta pré-existente sem senha).
       ...(signupCouponId ? { signupCouponId } : {}),
     };
 
     await prisma.user.create({ data: { ...data, email: normalizedEmail } });
-    // Fire-and-forget: nunca bloqueia o cadastro se o e-mail falhar.
+
+    // Envio de e-mails e registro de lead sem bloquear a resposta principal
     void sendWelcomeEmail(normalizedEmail, data.name);
     void notifyAdminNewSignup({
       name: normalizedName,
       email: normalizedEmail,
       phone: normalizedPhone,
-      segment: careerSegment,
+      segment: effectiveCareerSegment,
     });
 
-    await prisma.lead.create({
-      data: { name: normalizedName, email: normalizedEmail, phone: normalizedPhone, source: "registration" },
-    });
+    try {
+      await prisma.lead.create({
+        data: { name: normalizedName, email: normalizedEmail, phone: normalizedPhone, source: "registration" },
+      });
+    } catch {
+      // Ignora erro se lead duplicado
+    }
 
     return NextResponse.json({ ok: true });
   } catch (error) {
