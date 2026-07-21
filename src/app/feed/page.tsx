@@ -224,6 +224,28 @@ export default async function FeedPage({
         </span>
       </div>
 
+      {/* Banner de Destaque do Desafio do Match */}
+      <div className="rounded-3xl border border-sky-400/40 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+        <div className="space-y-2 z-10">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full px-3 py-1 bg-sky-500/20 text-sky-300 border border-sky-400/30">
+            ⚡ NOVIDADE: Desafio do Match de Carreira
+          </span>
+          <h3 className="font-extrabold text-xl text-white leading-tight">
+            Descubra seu Match % com qualquer vaga e gere seu Card para Story!
+          </h3>
+          <p className="text-sm text-slate-300 max-w-2xl leading-relaxed">
+            Envie o currículo + vaga que deseja. A IA calcula a aderência, mostra os pontos fortes e cria a imagem perfeita para postar no Instagram e indicar 3 amigos para ganhar mais diagnósticos grátis.
+          </p>
+        </div>
+        <Link
+          href="/desafio"
+          className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-sky-400 to-blue-500 hover:from-sky-300 hover:to-blue-400 text-slate-950 font-extrabold text-sm px-6 py-3.5 shadow-lg shadow-sky-500/20 transition-all shrink-0 cursor-pointer w-full md:w-auto justify-center"
+        >
+          <span>Participar do Desafio</span>
+          <span>→</span>
+        </Link>
+      </div>
+
       {!behavioralResult && (
         <div className="rounded-3xl border border-blue-200 dark:border-blue-900 bg-gradient-to-r from-blue-50/60 to-indigo-50/40 dark:from-blue-950/20 dark:to-indigo-950/10 p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm">
           <div className="space-y-2">

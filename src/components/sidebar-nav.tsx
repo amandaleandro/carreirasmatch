@@ -25,6 +25,7 @@ import {
   Briefcase,
   Handshake,
   Gamepad2,
+  Flame,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -38,6 +39,7 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame },
   { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
   { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
   { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },

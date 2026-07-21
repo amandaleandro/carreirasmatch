@@ -10,6 +10,7 @@ import Link from "next/link";
  * long menu never wraps awkwardly on small screens.
  */
 const NAV_LINKS: { href: string; label: string; show: string }[] = [
+  { href: "/desafio", label: "⚡ Desafio do Match", show: "" },
   { href: "/vagas-de-hoje", label: "Vagas de hoje", show: "" },
   { href: "/freelancers", label: "Freelancers", show: "" },
   { href: "/blog", label: "Blog", show: "hidden sm:inline" },
