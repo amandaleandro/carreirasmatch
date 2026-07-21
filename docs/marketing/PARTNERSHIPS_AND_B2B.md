@@ -1,146 +1,90 @@
-# Parcerias, influenciadores e B2B
+# Parcerias e B2B — o que existe de fato
 
-## Programa de criadores
+Quatro frentes com rotas e fluxos reais no código: empresas, parceiros de
+curso, influencer e marketplace freelancer. Todas gratuitas hoje (nenhuma
+delas tem uma tela de preço/plano pago no fluxo de cadastro).
 
-### Perfil ideal
+## Empresas — recrutamento (`/empresas`, `/empresa/*`)
 
-- microcriadores de carreira, faculdade, estágio, concursos e área profissional;
-- audiência brasileira coerente e comentários reais;
-- capacidade de ensinar, não apenas divulgar;
-- histórico sem promessas enganosas de emprego.
+- **Landing pública:** `/empresas` (`src/app/empresas/page.tsx`) — "Encontre
+  os candidatos certos, ranqueados por IA". Lista 6 recursos (triagem
+  automática por IA, ranking por aderência, Kanban de candidaturas, banco de
+  talentos, perfil público da empresa, equipe multiusuário) e 3 passos
+  ("Publique a vaga" → "IA ranqueia os candidatos" → "Fale com os
+  melhores"). CTA: "Cadastrar empresa grátis", com nota "Comece grátis, sem
+  cartão de crédito."
+- **Cadastro/login:** `src/app/empresa/cadastro`, `src/app/empresa/login`.
+- **Painel autenticado:** `src/app/empresa/(painel)/` com sub-rotas
+  `billing`, `contatos`, `equipe`, `perfil`, `relatorios`, `talentos`,
+  `triagem`, `vagas` — ou seja, o painel cobre publicação de vaga, triagem
+  por IA, gestão de equipe (dono/membro), banco de talentos com pedidos de
+  contato, relatórios e billing.
+- **Perfil público por empresa:** `/empresas/[slug]` — página com marca da
+  empresa e vagas abertas, compartilhável.
+- **E-mails relacionados** (`src/lib/resend.ts`): `sendCompanyMemberInviteEmail`
+  (convite de equipe com senha temporária), `sendCompanyNewApplicationEmail`
+  (nova candidatura recebida), `sendCompanyContactAcceptedEmail` (candidato
+  liberou contato do banco de talentos), `sendInterviewScheduledEmail`
+  (aviso ao candidato quando a empresa agenda entrevista).
 
-### Oferta
+## Parceiros de curso (`/parceiro`, não confundir com `/parceiros`)
 
-- link/cupom individual;
-- desconto claro para a audiência;
-- comissão sobre receita líquida atribuída;
-- acesso completo para demonstrar o produto;
-- kit de conteúdo e exemplos;
-- painel de resultados já suportado pelo produto.
+- **Landing pública:** `/parceiro` (`src/app/parceiro/page.tsx`) — "Divulgue
+  seus cursos para quem está buscando a próxima vaga". Recursos: cursos em
+  destaque, leads qualificados, painel de cliques e interesse, faturamento
+  no painel. Passos: "Cadastre-se grátis" → "Publique seus cursos" →
+  "Receba leads". CTA: "Cadastrar como parceiro", nota "Cadastro grátis,
+  sem cartão de crédito", checkout de cursos pagos via Mercado Pago.
+- **Cadastro/login/dashboard:** `src/app/parceiro/cadastro`,
+  `src/app/parceiro/login`, `src/app/parceiro/dashboard`.
+- **Perfil público do parceiro:** `/parceiros/[id]` (plural) — página com
+  nome, descrição e cursos ativos do parceiro (`prisma.partner.findUnique`
+  com `courses`).
 
-### Brief
+### Atenção: `/parceiros` (plural, sem id) é outra coisa
 
-O criador deve:
+`src/app/parceiros/page.tsx` **não é** uma listagem de parceiros — é um
+formulário público de submissão de oportunidades: "Publique vagas, cursos e
+parcerias" / "Empresas, prefeituras, escolas e instituições podem enviar
+vagas, cursos ou propostas. Toda publicação passa por revisão antes de
+aparecer no sistema." (`PartnerSubmissionForm`). É um canal de captação de
+conteúdo, não o diretório de parceiros — o diretório real está nas páginas
+individuais `/parceiros/[id]`.
 
-1. mostrar um problema real;
-2. demonstrar o fluxo com dados fictícios;
-3. explicar o que o produto entrega e o que não garante;
-4. usar disclosure de publicidade/parceria;
-5. levar a uma ferramenta ou análise específica.
+## Influencer (`/influencer`)
 
-Evitar roteiro rígido. Autenticidade vale mais que leitura de anúncio.
+- Não tem landing pública própria (rota única, autenticada via
+  `requireInfluencerPage`, `src/lib/influencer.ts`) — é o painel de quem já
+  tem um cupom atribuído.
+- Mostra: link de indicação próprio (`InfluencerReferralLink`), vendas
+  confirmadas com o cupom, cadastros feitos com o cupom (pagos ou não),
+  receita gerada, e comissão calculada por `commissionCents(grossRevenueCents,
+  coupon.commissionPercent)` (`src/lib/coupon-report.ts`).
+- Texto confirmado no painel: "Você tem acesso total ao sistema, sem
+  pagamento." — ou seja, o influencer testa o produto de graça.
 
-### Mensagem de prospecção
+## Marketplace freelancer (`/freelancer`, `/freelancers`, `/projetos`)
 
-**Assunto:** Parceria útil para quem está buscando estágio/emprego
+- **Hub autenticado do freelancer:** `/freelancer` (`src/app/freelancer/page.tsx`)
+  — "Ofereça seus serviços ou contrate profissionais para os seus
+  projetos." Qualquer usuário autenticado acessa as quatro seções: "Meu
+  perfil" (`/freelancer/perfil`, publicado ou rascunho), "Minhas propostas"
+  (`/freelancer/propostas`), "Buscar projetos" (`/projetos`), "Projetos que
+  publiquei" (`/freelancer/meus-projetos`).
+- **Vitrine pública de freelancers:** `/freelancers` (com filtro por
+  categoria via `FREELANCE_CATEGORIES`, `src/lib/freelance.ts`) e perfil
+  individual em `/freelancers/[id]`.
+- Marketplace de dois lados: o mesmo usuário pode publicar um projeto (como
+  cliente) e enviar proposta a outro projeto (como freelancer) — não há
+  separação de tipo de conta.
+- Sem cobrança de comissão/escrow no código: pagamento entre cliente e
+  freelancer acontece fora da plataforma.
 
-Olá, {{nome}}.
+## O que não existe
 
-Gosto da forma como você ajuda {{público}} com conteúdo prático. Criamos o
-CarreirasMatch, uma plataforma que compara currículo e vaga, mostra lacunas e
-ajuda a pessoa a preparar currículo e entrevista.
-
-Quero propor um piloto simples: acesso completo para você testar, link/cupom
-próprio e comissão pelas vendas atribuídas. A ideia é você só divulgar se o
-produto realmente fizer sentido para sua audiência.
-
-Posso enviar uma demonstração curta e o modelo do piloto?
-
-## Escolas, faculdades e cursos
-
-### Proposta
-
-“Camada digital de empregabilidade para alunos e egressos.”
-
-Entregas possíveis:
-
-- página co-branded;
-- currículo e análise de vagas;
-- workshops de empregabilidade;
-- desafio de sete dias;
-- relatório agregado e anonimizado de uso;
-- cupons ou licenças patrocinadas.
-
-### Piloto de 30 dias
-
-- uma turma ou curso;
-- onboarding de 30 minutos;
-- acesso/cupom identificado;
-- encontro de currículo e encontro de entrevista;
-- relatório final com ativação, análises e satisfação;
-- sem compartilhar dados individuais com a instituição sem base adequada.
-
-### E-mail de prospecção
-
-**Assunto:** Piloto de empregabilidade para alunos de {{instituição}}
-
-Olá, {{nome}}.
-
-O CarreirasMatch ajuda alunos a comparar currículo e vaga, transformar projetos
-em evidências e se preparar para entrevistas. Gostaria de propor um piloto de
-30 dias com uma turma, incluindo onboarding, ferramenta e relatório agregado de
-participação.
-
-O objetivo é simples: medir se os alunos saem de orientações genéricas para
-candidaturas mais direcionadas.
-
-Podemos marcar 20 minutos para avaliar a aderência ao programa de carreira da
-{{instituição}}?
-
-## Empresas e RH
-
-O produto B2B atual suporta triagem e banco de talentos. A comunicação deve
-focar eficiência com responsabilidade:
-
-> “Organize a triagem inicial e encontre evidências de aderência sem substituir
-> a decisão humana.”
-
-### ICP B2B
-
-- pequenas e médias empresas sem ATS robusto;
-- consultorias e agências de emprego;
-- programas de estágio/aprendiz;
-- recrutamento de volume moderado.
-
-### Oferta-piloto
-
-- primeira triagem dentro da franquia;
-- pacote de créditos;
-- demonstração com currículos fictícios;
-- critérios definidos pela empresa;
-- revisão humana obrigatória;
-- canal de suporte.
-
-### Guardrails
-
-- não vender IA como decisão final;
-- não inferir atributos protegidos;
-- exigir critérios ligados à vaga;
-- informar limites do score;
-- manter acesso ao currículo restrito;
-- definir retenção e exclusão;
-- não liberar contato de talento sem aceite.
-
-## Parceiros de distribuição
-
-- cursinhos, bootcamps e escolas técnicas;
-- sindicatos e associações profissionais;
-- prefeituras e programas de empregabilidade;
-- comunidades de tecnologia, vendas e administração;
-- escritórios-modelo e comunidades OAB;
-- portais de vagas locais.
-
-Cada parceria deve ter owner, público, oferta, UTM/cupom, prazo, meta e revisão.
-Não considerar “parceria fechada” sem ativação mensurável.
-
-## Kit do parceiro
-
-- one-page institucional;
-- demo de 60 segundos;
-- três criativos editáveis;
-- cinco textos curtos;
-- FAQ e guardrails;
-- link com UTM e cupom;
-- política de comissão;
-- calendário de divulgação;
-- relatório mensal.
+Não há um portal ou API de parceria formalizada com escolas/faculdades além
+do formulário de submissão pública (`/parceiros`) e do programa de cursos
+(`/parceiro`) — não há contrato, relatório white-label ou pacote
+institucional dedicado no código. Não há tela de precificação paga para
+nenhum dos quatro perfis (empresa, parceiro de curso, influencer,
+freelancer): todos operam em modo gratuito hoje.

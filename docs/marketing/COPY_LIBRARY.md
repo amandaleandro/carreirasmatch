@@ -1,286 +1,109 @@
 # Biblioteca de copy
 
-Textos-base prontos para adaptação. Preços devem ser puxados da oferta do
-segmento no produto; não grave preço em criativo permanente sem rotina de
-revisão.
+Trechos reais extraídos do código-fonte das páginas e dos templates de
+e-mail. Não são sugestões — são o texto que já está em produção. Onde o texto
+depende de uma variável (nome, valor, data), isso é indicado.
+
+## Home (`src/components/marketing-home.tsx`)
+
+- Eyebrow: "Candidaturas mais estratégicas"
+- H1: "Pare de se candidatar no escuro."
+- Subtítulo: "Compare seu currículo com uma vaga real, descubra o que está
+  ajudando ou atrapalhando e receba um plano claro antes de aplicar."
+- CTA primário: "Analisar currículo e vaga" → `/analise`
+- CTA secundário: "Ver vagas de hoje" → `/vagas-de-hoje`
+- Selos de apoio: "Resultado inicial gratuito" · "Sem promessa de
+  contratação"
+- Seção "como funciona": eyebrow "Da vaga ao próximo passo", H2 "Clareza em
+  três etapas.", texto de apoio: "Você não precisa mudar toda a sua história.
+  Precisa mostrar as evidências mais relevantes para a oportunidade certa."
+- Nav do header: Para você · Vagas · Ferramentas grátis · Freelancers ·
+  Empresas · Parceiros (cross-links adicionados no commit `fee7922`).
+- `<title>` da home (via `title.absolute`, `src/app/page.tsx`): "Compare seu
+  currículo com a vaga | CarreirasMatch".
+
+## `/comece` (`src/app/comece/page.tsx`)
+
+- `<title>`: "Análise de currículo com IA para o seu momento"
+- Descrição: "Estágio, primeiro emprego, transição de carreira, recolocação,
+  jovem aprendiz ou estágio na faculdade: compare seu currículo com a vaga e
+  veja exatamente o que ajustar antes de aplicar."
+
+## `/gratuito` (`src/app/gratuito/page.tsx`)
+
+- Eyebrow: "Central gratuita"
+- Título: "Recursos práticos para conseguir emprego."
+- Descrição: "Currículo, análise de vaga e teste vocacional básico abrem sem
+  cadastro. As outras ferramentas pedem apenas uma conta gratuita, sem
+  cartão."
+- Bloco final (CTA de conta): "Salve seu progresso gratuitamente" / "Tenha
+  checklist, teste comportamental e experiências gratuitas de IA na sua
+  conta." → botão "Criar conta grátis" (`/register`)
+- Labels de card: "Sem cadastro" e "Cadastro grátis"; botão de card "Abrir
+  recurso"
+
+## `/assinar` (`src/app/assinar/page.tsx`)
+
+- `<title>`: "Planos para o seu momento profissional"
+- Descrição: "Escolha um plano de carreira com análises, preparação para
+  entrevistas e acompanhamento adequado ao seu momento."
+- O plano exibido depende do parâmetro `?segment=`, com `career_pro` como
+  padrão (`isCareerSegment`, `src/lib/career-segments.ts`).
+
+## `/desafio` — Desafio do Match (`src/app/desafio/page.tsx` + `DesafioForm.tsx`)
+
+- Badge: "Desafio do Match de Carreira"
+- H1: "Descubra seu **Match %** real com a vaga dos seus sonhos"
+- Subtítulo: "Envie seu currículo e a vaga desejada. Nossa IA analisa
+  instantaneamente seu perfil, aponta pontos fortes, lacunas e gera seu
+  **Card para Story** para você convidar amigos!"
+- Cards de destaque: Match de Aderência ("Calculado em % real") · Pontos
+  Fortes ("O que destaca você") · Palavras-chave ("Termos que faltam no CV")
+  · Perguntas da Entrevista ("Orientações completas")
+- Título do formulário: "Envie seu Currículo e a Vaga Desejada" / "Preencha
+  os campos para criar seu acesso e gerar seu Match %"
+- CTA do formulário: "Gerar Meu Match e Card para Story"
+- Explicação do mecanismo de indicação (texto real, 3 passos):
+  1. "Faça seu Match" — "Envie o currículo e receba a pontuação de
+     alinhamento com a vaga desejada."
+  2. "Compartilhe o Card" — "Poste seu resultado nos Stories com o card
+     exclusivo e convide seus amigos."
+  3. "Indique 3 Amigos" — "A cada 3 amigos que entrarem pelo seu link, você
+     ganha 1 Diagnóstico Completo grátis!"
+- A regra "3 indicações = 1 diagnóstico completo grátis" é real, não só
+  copy: `REFERRALS_NEEDED_FOR_REWARD = 3` em `src/lib/referrals.ts`.
+
+## E-mails (`src/lib/resend.ts`) — assunto e corpo reais
+
+Todos os e-mails usam o mesmo layout (`layout()`), remetente configurável via
+`RESEND_FROM_EMAIL`, e passam por `sendOnce()`/`EmailLog` quando fazem parte
+do ciclo de vida, para nunca duplicar envio.
+
+| Função | Assunto | Trecho do corpo |
+| --- | --- | --- |
+| `sendWelcomeEmail` | "Bem-vindo(a) ao CarreirasMatch 🎉" | "Sua conta no CarreirasMatch está pronta. A partir de agora você pode analisar seu currículo contra qualquer vaga..." → CTA "Analisar meu currículo" |
+| `sendLeadFollowUpEmail` | "Seu diagnóstico de carreira está esperando" | "Você começou uma análise no CarreirasMatch e ficou faltando pouco para ver o resultado completo..." → CTA "Ver minha análise completa" |
+| `sendOnboardingNudgeEmail` | "Vamos fazer sua primeira análise?" | "Você criou sua conta no CarreirasMatch mas ainda não fez sua primeira análise..." → CTA "Analisar meu currículo" |
+| `sendConvertToSubscriptionEmail` | "Você já sabe seu score. Falta o plano de ação." | "Você analisou seu currículo no CarreirasMatch e viu onde está sua aderência. Esse é o diagnóstico, a parte que dói. A parte que resolve é o que vem depois." → CTA "Ver o que muda com o plano" |
+| `sendDiagnosticUpgradeEmail` | "Leve seu diagnóstico para as próximas vagas" | "Agora que você já viu o que ajustar nesta oportunidade, o próximo passo é repetir o processo nas próximas vagas..." → CTA "Conhecer o plano mensal" |
+| `sendCheckoutRecoveryEmail` | "Quer continuar sua assinatura?" | "Você começou o pagamento, mas a assinatura ainda não foi confirmada..." → CTA "Retomar assinatura" |
+| `sendPaymentConfirmationEmail` | "Pagamento confirmado ✅" | "Recebemos seu pagamento de {valor} e liberamos {diagnóstico/análise}." |
+| `sendSubscriptionConfirmationEmail` | "Assinatura ativada 🚀" | "Tudo certo! Sua assinatura do CarreirasMatch está ativa e você já tem acesso completo às análises, feed de vagas, preparação de entrevista..." |
+| `sendPaymentFailedEmail` | "Não conseguimos processar seu pagamento" | "Isso costuma acontecer por limite, dados divergentes ou uma trava de segurança do banco." |
+| `sendSubscriptionCancelledEmail` | "Sua assinatura foi cancelada" | "Você continua com acesso até o fim do período já pago... Se puder, responda contando o que faltou pra gente." |
+| `sendRenewalReminderEmail` | "Sua assinatura renova em breve" / "Seu acesso expira em breve" | Varia conforme `autoRenews` |
+| `sendSubscriptionExpiredEmail` | "Seu acesso expirou" | "Seu período de assinatura chegou ao fim e sua conta voltou ao plano gratuito." |
+| `sendJobAlertEmail` | "Novas vagas em {local}" | Lista de até 10 vagas com título, fonte e link, CTA "Ver todas as vagas" |
+| `sendTalentContactRequestEmail` | "{empresa} quer falar com você" | Notifica candidato de pedido de contato do banco de talentos (B2B) |
+
+A régua "cadastrou, analisou, não assinou" (`sendLeadFollowUpEmail` →
+`sendOnboardingNudgeEmail` → `sendConvertToSubscriptionEmail` →
+`sendDiagnosticUpgradeEmail`/`sendCheckoutRecoveryEmail`) é o fluxo de
+conversão pós-cadastro real do produto, todo com dedupe via `EmailLog`.
+
+## O que não existe
 
-## Home
-
-### Hero principal
-
-**Eyebrow:** Candidaturas mais estratégicas
-
-**Título:** Pare de se candidatar no escuro.
-
-**Subtítulo:** Compare seu currículo com uma vaga real, descubra o que está
-ajudando ou atrapalhando e receba um plano claro para se apresentar melhor.
-
-**CTA principal:** Analisar currículo e vaga
-
-**CTA secundário:** Ver vagas de hoje
-
-**Apoio:** Resultado inicial gratuito. Diagnóstico completo a partir de R$ 4,90.
-
-### Bloco “como funciona”
-
-1. **Envie seu currículo** — PDF ou texto.
-2. **Cole a vaga desejada** — usamos os requisitos reais da oportunidade.
-3. **Veja seu diagnóstico** — aderência, palavras-chave, ajustes e preparação.
-
-### Bloco de diferenciação
-
-**Título:** Não é um currículo genérico. É estratégia para a vaga que você quer.
-
-**Texto:** O CarreirasMatch conecta sua experiência aos requisitos da
-oportunidade. Você entende onde já está bem, o que precisa melhorar e qual é o
-próximo passo mais útil.
-
-## Landing de estágio
-
-**Título:** Transforme projetos, cursos e faculdade em experiência relevante.
-
-**Subtítulo:** Descubra como apresentar o que você já fez para a vaga de estágio
-que deseja — sem inventar e sem usar o mesmo currículo para tudo.
-
-**CTA:** Comparar com uma vaga de estágio
-
-Bullets:
-
-- veja as palavras-chave que estão faltando;
-- transforme projeto acadêmico em evidência;
-- pratique perguntas ligadas à vaga;
-- monte um plano curto para fechar seus gaps.
-
-## Landing de recolocação
-
-**Título:** Experiência você já tem. Falta ela chegar com clareza ao recrutador.
-
-**Subtítulo:** Compare currículo e vaga para entender por que seu perfil pode
-estar ficando para trás na triagem e o que ajustar antes da próxima candidatura.
-
-**CTA:** Descobrir meus pontos de ajuste
-
-## Landing de transição
-
-**Título:** Mudar de área não significa jogar sua história fora.
-
-**Subtítulo:** Identifique habilidades transferíveis, cargos-ponte e a narrativa
-que conecta sua experiência anterior à carreira que você quer construir.
-
-**CTA:** Mapear minha transição
-
-## Google Search Ads
-
-### Grupo: análise de currículo
-
-Títulos:
-
-- Analise Seu Currículo e a Vaga
-- Veja Sua Aderência Antes de Aplicar
-- Descubra o Que Ajustar no Currículo
-- Currículo Direcionado Para a Vaga
-- Diagnóstico a Partir de R$ 4,90
-- Pare de Se Candidatar no Escuro
-- Palavras-Chave Que Estão Faltando
-- Prepare-se Melhor Para a Vaga
-- CarreirasMatch
-
-Descrições:
-
-- Compare seu currículo com uma vaga real e veja os ajustes mais importantes
-  antes de se candidatar.
-- Receba análise de aderência, palavras-chave, pontos fortes e próximos passos
-  para sua candidatura.
-- Entenda como apresentar melhor sua experiência sem inventar informações.
-  Comece pelo resultado inicial.
-- Da análise do currículo à preparação para entrevista em um só lugar.
-
-### Grupo: primeiro emprego/estágio
-
-Títulos:
-
-- Currículo Para Primeiro Emprego
-- Valorize Projetos e Cursos
-- Análise de Currículo Para Estágio
-- Pouca Experiência? Mostre Potencial
-- Prepare Seu Currículo Para a Vaga
-
-Descrições:
-
-- Descubra como transformar cursos, projetos e atividades em experiência
-  relevante para a vaga.
-- Compare currículo e vaga e veja o que melhorar antes da candidatura de
-  estágio ou primeiro emprego.
-
-## Meta, Reels e TikTok
-
-### Criativo 1 — dor direta
-
-**Texto na tela:** “Você envia currículo e ninguém responde?”
-
-**Roteiro:** “Talvez o problema não seja falta de experiência. Pode ser que seu
-currículo não esteja falando a linguagem da vaga. No CarreirasMatch, você envia
-o currículo, cola a vaga e vê o que está alinhado, o que falta e o que ajustar
-antes de aplicar.”
-
-**Legenda:** Seu currículo não precisa servir para todas as vagas. Precisa fazer
-sentido para a vaga certa. Analise antes de enviar.
-
-**CTA:** Fazer análise
-
-### Criativo 2 — estágio
-
-**Hook:** “Não tenho experiência para colocar no currículo.”
-
-**Corpo:** “Projeto da faculdade, monitoria, curso, trabalho em grupo,
-voluntariado e até atividade pessoal podem virar evidências — quando são
-descritos do jeito certo para a vaga.”
-
-**CTA:** Veja como seu currículo conversa com a vaga.
-
-### Criativo 3 — transição
-
-**Hook:** “Mudar de carreira não apaga tudo o que você já aprendeu.”
-
-**Corpo:** “O desafio é traduzir sua experiência para os problemas da nova área.
-Mapeie habilidades transferíveis, cargos-ponte e sua narrativa de transição.”
-
-**CTA:** Começar diagnóstico
-
-### Criativo 4 — demonstração
-
-Tela dividida:
-
-- antes: “Responsável por atendimento.”
-- depois: “Atendi clientes, organizei demandas e resolvi problemas sob prazo.”
-
-Texto: “Não é inventar. É tornar o valor visível.”
-
-CTA: “Analise seu currículo para uma vaga real.”
-
-### Criativo 5 — vaga
-
-**Hook:** “Achou uma vaga boa? Faça isso antes de clicar em candidatar.”
-
-Passos na tela:
-
-1. salve a descrição;
-2. compare com seu currículo;
-3. identifique requisitos prioritários;
-4. ajuste palavras e evidências reais;
-5. prepare exemplos para entrevista.
-
-## Posts orgânicos
-
-### LinkedIn — autoridade
-
-“O mesmo currículo não deveria ser enviado para 30 vagas diferentes.
-
-Não porque a pessoa precisa mudar sua história, mas porque cada vaga procura
-evidências diferentes dentro dessa história.
-
-Uma vaga pode valorizar relacionamento com clientes. Outra, análise de dados.
-Outra, organização de processos.
-
-Personalizar não é inventar. É selecionar e explicar melhor o que é relevante.
-
-Antes de aplicar, responda:
-
-1. Quais são os três requisitos centrais?
-2. Onde meu currículo prova cada um?
-3. Que exemplo eu daria em uma entrevista?
-
-Se essas respostas não estão claras, o recrutador provavelmente também não vai
-enxergá-las.”
-
-### Instagram — carrossel
-
-Slide 1: 5 motivos para seu currículo não passar da primeira triagem  
-Slide 2: O cargo desejado não está claro  
-Slide 3: As experiências descrevem tarefas, não resultados  
-Slide 4: Faltam palavras-chave reais da vaga  
-Slide 5: O resumo é genérico  
-Slide 6: O mesmo arquivo vai para oportunidades diferentes  
-Slide 7: Compare currículo e vaga antes de aplicar
-
-## E-mails lifecycle
-
-### Lead capturado
-
-**Assunto:** Seu próximo passo está aqui
-
-Olá, {{nome}}.
-
-Você começou a buscar mais clareza para sua carreira. O passo mais útil agora é
-escolher uma oportunidade real e comparar os requisitos com o que seu currículo
-já mostra.
-
-Quando estiver com a vaga em mãos, faça sua análise:
-
-**CTA:** Comparar currículo e vaga
-
-### Análise iniciada e não concluída
-
-**Assunto:** Falta pouco para ver sua aderência
-
-Sua análise ficou incompleta. Retome de onde parou para descobrir os pontos que
-mais merecem atenção antes de se candidatar.
-
-**CTA:** Continuar análise
-
-### Diagnóstico visto e não comprado
-
-**Assunto:** Você já viu o sinal. Agora veja o plano.
-
-O resultado inicial mostra sua aderência. O diagnóstico completo organiza o que
-fazer com essa informação: palavras-chave, ajustes de currículo, preparação
-para entrevista e próximos passos.
-
-**CTA:** Liberar diagnóstico completo
-
-### Pós-compra
-
-**Assunto:** Seu diagnóstico está liberado — comece por aqui
-
-Não tente mudar tudo de uma vez.
-
-1. revise os três gaps mais importantes;
-2. ajuste as evidências reais no currículo;
-3. pratique duas respostas de entrevista;
-4. só então envie a candidatura.
-
-**CTA:** Abrir meu diagnóstico
-
-### Retenção
-
-**Assunto:** Encontrou outra vaga? Não envie o mesmo currículo ainda.
-
-Cada oportunidade muda a prioridade. Compare a nova vaga, adapte o que for
-relevante e acompanhe a evolução das suas candidaturas.
-
-**CTA:** Analisar nova vaga
-
-## WhatsApp com consentimento
-
-**Boas-vindas:** Oi, {{nome}}! Aqui é o CarreirasMatch. Você pediu para receber
-seus próximos passos por aqui. Quando encontrar uma vaga, compare com seu
-currículo antes de aplicar: {{link}}. Para não receber mais mensagens, responda
-SAIR.
-
-**Retomada:** Oi, {{nome}}. Sua análise ficou incompleta. Se ainda quiser
-entender sua aderência à vaga, você pode continuar aqui: {{link}}.
-
-## Respostas para atendimento e comentários
-
-**“Garante emprego?”**  
-Não. Nenhuma ferramenta séria pode garantir uma contratação. O CarreirasMatch
-ajuda você a entender melhor a vaga, apresentar evidências relevantes e se
-preparar com mais estratégia.
-
-**“A IA inventa coisas?”**  
-Ela não deve criar experiências. A proposta é organizar e traduzir informações
-reais do seu currículo. Você sempre deve revisar antes de usar.
-
-**“Meus dados ficam seguros?”**  
-Usamos seus dados para entregar os recursos solicitados e aplicamos controles
-de acesso. Você pode consultar os detalhes na Política de Privacidade.
+Não há copy de anúncio pago (Google Search Ads, Meta/Reels/TikTok) no
+código nem em qualquer configuração de campanha versionada — ver
+`PAID_MEDIA.md`. Não há template de WhatsApp no código (nenhuma integração
+de WhatsApp Business encontrada em `src/lib`).

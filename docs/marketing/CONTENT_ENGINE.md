@@ -1,134 +1,86 @@
 # Motor de conteúdo
 
-## Objetivo
+Este documento descreve como o conteúdo de SEO é gerado hoje, com base direto
+no código dos schedulers e nas rotas de blog/radar. Não é um plano editorial
+manual — as três frentes abaixo (blog, radar de concursos, radar de
+vestibulares) já rodam de forma automatizada em produção.
 
-Transformar dúvidas de carreira em ativos que:
+## Blog — gerado por IA, agendado, sem CMS
 
-1. geram descoberta;
-2. entregam uma microvitória;
-3. levam a uma ferramenta ou vaga;
-4. capturam um relacionamento consentido;
-5. conduzem à análise de uma oportunidade real.
+- Fonte: `src/lib/blog-scheduler.ts` + `src/lib/blog-generator.ts`.
+- Não existe CMS nem arquivos MDX: os posts moram na tabela `Post` (Postgres,
+  via Prisma) e são renderizados dinamicamente em `src/app/blog/page.tsx` e
+  `src/app/blog/[slug]/page.tsx` (ambos com `export const dynamic =
+  "force-dynamic"`, sem `generateStaticParams`).
+- `generateNextPost()` percorre uma lista fixa de **32 áreas vocacionais**
+  (`VOCATION_AREAS`, `src/lib/vocation-areas.ts`) por um cursor persistido em
+  `AppSetting` (`blog:niche_cursor`), gerando um post por área por vez, em
+  round-robin.
+- O prompt de geração (`generateBlogPost` em `src/lib/blog-generator.ts`)
+  passa a área, a descrição da área, as subáreas e os títulos dos 15 posts
+  mais recentes daquela área ("TEMAS_JA_PUBLICADOS (não repetir nenhum
+  destes)") para evitar repetição de pauta. A resposta esperada é um JSON com
+  `title`, `excerpt`, `coverEmoji` e blocos de conteúdo.
+- Meta diária de publicação: `BLOG_POSTS_PER_DAY` (env), com fallback para
+  **5 posts/dia** (`postsPerDay()` em `blog-scheduler.ts`). `runDailyTick()`
+  só gera um novo post se a contagem de posts publicados hoje (fuso
+  America/Sao_Paulo) ainda não bateu essa meta.
+- Página de listagem tem paginação de 9 posts por página e filtro por área
+  (`areaSlug`).
 
-## Pilares editoriais
+Isso significa que o volume de conteúdo do blog é limitado pela meta diária
+configurada, não por produção manual — o gargalo, quando existe, é a
+qualidade/curadoria do que a IA gera em escala, não a capacidade de
+escrever. Não há revisão humana automatizada visível no fluxo (o post vai
+direto para `prisma.post.create`, sem um estado de rascunho/aprovação no
+código do scheduler).
 
-| Pilar | Exemplos | CTA natural |
-| --- | --- | --- |
-| Currículo e ATS | resumo, palavras-chave, experiências, erros | Analisar currículo |
-| Vagas e candidatura | onde buscar, como escolher, como acompanhar | Ver vagas de hoje |
-| Entrevista | perguntas, método STAR, objeções | Simular entrevista |
-| Início de carreira | projetos, cursos, estágio, aprendiz | Criar currículo |
-| Recolocação | gaps, senioridade, LinkedIn, networking | Comparar com vaga |
-| Transição | habilidades transferíveis, cargos-ponte | Mapear transição |
-| Estudos | concurso, OAB, faculdade, técnico | Usar ferramenta específica |
-| Mercado local | vagas/cursos por cidade e estado | Página local |
+## Radares de concurso e vestibular — RSS, agendado 3x/dia
 
-## Matriz de formatos
+- Fonte: `src/lib/radar-sync.ts` (parser de RSS/Atom, puro e testável — ver
+  `src/lib/radar-sync.test.ts`) e `src/lib/external-source-sync.ts`
+  (orquestração, grava em `SourceSync`/oportunidades/boletins via Prisma).
+- Agendamento confirmado em `src/lib/external-source-scheduler.ts`:
+  - `DEFAULT_RUN_TIMES = ["08:00", "14:00", "20:00"]`, fuso
+    `America/Sao_Paulo`, sobrescrevível pela env `EXTERNAL_SOURCES_RUN_TIMES`;
+  - um "tick" roda a cada 15 minutos (`TICK_INTERVAL_MS`) e só executa a
+    sincronização quando o horário agendado já passou e ainda não rodou
+    naquele dia (ledger salvo em `AppSetting` sob a chave
+    `external-sources:runs`);
+  - a sincronização real (`syncAllExternalSources`) também dispara
+    `syncRadars` (radar-sync.ts) além de cursos (Aprenda Mais/MEC) e
+    oportunidades públicas.
+- As páginas públicas que consomem esse dado são `/concursos` e
+  `/vestibulares` (mencionadas no produto; alimentadas pelos radares) e
+  `/concurso` (landing de segmento).
 
-Uma pauta deve virar:
+## Páginas de segmento/guia — estáticas, mantidas manualmente
 
-- 1 artigo ou página de busca;
-- 1 vídeo de 3–8 minutos;
-- 3 vídeos curtos;
-- 1 carrossel;
-- 1 post LinkedIn;
-- 1 e-mail;
-- 3 respostas curtas para comentários/comunidades.
+Diferente do blog, as landings por segmento (`/estagio`, `/jovem-aprendiz`,
+`/primeiro-emprego`, `/transicao`, `/recolocacao`, `/oab`, `/concurso`,
+`/curriculo-sem-experiencia`, `/faculdade-ou-tecnico`,
+`/como-fazer-curriculo`, etc.) são código React versionado no repositório
+(`src/app/<segmento>/page.tsx`), não conteúdo gerado por IA. Mudar o texto
+delas é uma mudança de código, não uma tarefa editorial recorrente.
 
-## Calendário de quatro semanas
+## Ferramentas gratuitas como imã de SEO/lead
 
-### Semana 1 — currículo
+`/gratuito` (`src/app/gratuito/page.tsx`) organiza o catálogo de
+`src/lib/tools-catalog.ts` em duas camadas:
 
-| Dia | Peça |
-| --- | --- |
-| Segunda | Artigo: “Como adaptar o currículo para uma vaga sem inventar” |
-| Terça | Reel: três palavras que deixam uma experiência genérica |
-| Quarta | Carrossel: currículo antes/depois |
-| Quinta | LinkedIn: o mesmo currículo para 30 vagas |
-| Sexta | Live/vídeo: análise comentada de currículo fictício |
+- **sem cadastro:** criador de currículo grátis (`/curriculo-gratis`),
+  análise simples de vaga (`/analise`), teste vocacional
+  (`/tools/vocation-test`), vagas de hoje (`/vagas-de-hoje`);
+- **com cadastro gratuito:** as demais ferramentas marcadas `free` ou
+  `accountFree` no catálogo (`TOOLS_CATALOG.filter((tool) => tool.free ||
+  tool.accountFree)`).
 
-### Semana 2 — primeiro emprego e estágio
+Essa separação é o funil de captura: ferramenta aberta para tráfego SEO,
+cadastro grátis como primeiro compromisso, análise paga como conversão.
 
-| Dia | Peça |
-| --- | --- |
-| Segunda | Guia: experiências que não parecem experiência |
-| Terça | Reel: “não tenho nada para colocar” |
-| Quarta | Carrossel: projeto acadêmico no currículo |
-| Quinta | Lista de vagas/cursos da semana |
-| Sexta | História real autorizada ou estudo de caso composto e identificado |
+## O que não existe
 
-### Semana 3 — recolocação
-
-| Dia | Peça |
-| --- | --- |
-| Segunda | Artigo: por que bons profissionais não passam no ATS |
-| Terça | Reel: tarefa versus resultado |
-| Quarta | Checklist de candidatura estratégica |
-| Quinta | LinkedIn: senioridade precisa de evidência |
-| Sexta | E-mail com exercício de três requisitos |
-
-### Semana 4 — transição
-
-| Dia | Peça |
-| --- | --- |
-| Segunda | Guia de cargos-ponte |
-| Terça | Reel sobre habilidades transferíveis |
-| Quarta | Carrossel: narrativa de transição em quatro partes |
-| Quinta | Entrevista com profissional que mudou de área |
-| Sexta | Ferramenta/quiz com CTA para diagnóstico |
-
-## 30 hooks
-
-1. Você talvez tenha mais experiência do que aparece no seu currículo.
-2. O mesmo currículo para todas as vagas está custando oportunidades.
-3. Achou uma vaga boa? Não clique em candidatar ainda.
-4. Três sinais de que seu resumo profissional está genérico.
-5. ATS não é um monstro, mas precisa entender seu currículo.
-6. Esta frase não prova nada para um recrutador.
-7. Pare de listar tarefas. Mostre evidências.
-8. Seu projeto da faculdade pode valer como experiência.
-9. Como explicar transição sem pedir desculpas.
-10. Uma vaga não exige 100% dos requisitos para valer a candidatura.
-11. O que fazer quando você não tem o cargo exato no histórico.
-12. Cinco palavras que enfraquecem seu currículo.
-13. A pergunta de entrevista que seu currículo já deveria responder.
-14. Currículo bonito não é necessariamente currículo claro.
-15. O erro de copiar palavras-chave sem contexto.
-16. O que um recrutador precisa entender em dez segundos.
-17. Como escolher entre aplicar agora ou estudar primeiro.
-18. Você não começa do zero numa mudança de carreira.
-19. Três cargos-ponte que talvez você não esteja considerando.
-20. Curso no currículo: quando ajuda e quando só ocupa espaço.
-21. O que colocar no currículo de primeiro emprego.
-22. Como transformar trabalho informal em experiência.
-23. O silêncio depois da candidatura também é dado.
-24. Quantas vagas você deveria analisar por semana?
-25. Antes de mandar mensagem ao recrutador, faça isto.
-26. A diferença entre habilidade e prova de habilidade.
-27. Por que seu LinkedIn e currículo contam histórias diferentes.
-28. O que adaptar sem mentir.
-29. Como usar a descrição da vaga como roteiro de preparação.
-30. Seu score não é sentença; é ponto de partida.
-
-## SEO
-
-Clusters prioritários:
-
-- “analisar currículo”, “currículo para [cargo]”, “currículo sem experiência”;
-- “como saber se tenho perfil para a vaga”, “palavras-chave ATS”;
-- “vagas [cargo] [cidade]”, “vagas sem experiência [cidade]”;
-- “perguntas de entrevista [cargo]”;
-- “transição de [área A] para [área B]”;
-- “curso gratuito [área] [cidade]”.
-
-Cada página deve responder a intenção antes do CTA, ter autoria/revisão,
-atualização visível e evitar centenas de páginas locais sem conteúdo útil.
-
-## Produção e governança
-
-- Banco de pautas ligado a dúvidas, buscas e tickets.
-- Brief com público, intenção, promessa, prova, CTA e risco.
-- Revisão factual e de linguagem antes da publicação.
-- Conteúdo de IA nunca é publicado automaticamente sem revisão.
-- Atualizar peças vencedoras; retirar conteúdo obsoleto.
-- Medir visita → ferramenta → análise → pagamento, não apenas alcance.
+Não há um "banco de pautas" editorial, calendário de mídia social, ou
+integração com ferramenta de SEO (Ahrefs/Semrush) no código. Todo o
+conteúdo do blog e dos radares roda por scheduler automático descrito acima —
+não há indício de processo humano de revisão de pauta antes da publicação.

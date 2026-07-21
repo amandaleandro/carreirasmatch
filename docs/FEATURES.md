@@ -1,385 +1,315 @@
-# Funcionalidades e Requisitos
+# Inventário de funcionalidades
 
-Documentação funcional do produto **CarreirasMatch**: o que o sistema faz,
-para quem, e sob quais regras de negócio. Para arquitetura técnica, modelo
-de dados resumido e fluxos internos, ver [`ARCHITECTURE.md`](ARCHITECTURE.md).
-Para variáveis de ambiente, [`ENV.md`](ENV.md). Para o estado atual de
-prontidão para lançamento, [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md).
+Catálogo funcional do CarreirasMatch: o que cada área faz, para quem e por
+qual rota principal. Para segmentação de público e regras free/pago, ver
+[PRODUCT_OVERVIEW.md](PRODUCT_OVERVIEW.md). Para jornadas ponta a ponta, ver
+[USER_FLOWS.md](USER_FLOWS.md). Para arquitetura técnica e modelo de dados,
+ver [ARCHITECTURE.md](ARCHITECTURE.md) e [DATABASE.md](DATABASE.md).
 
-## 1. Visão de produto
+## 1. Dashboard
 
-Plataforma web em pt-BR que usa IA (Groq/LLM) para ajudar pessoas a:
+- **Rota**: `/dashboard` (exige login).
+- **Para quem**: candidato autenticado.
+- **O que faz**: tela inicial pós-login. Mostra a análise mais recente
+  (score circular, `applicationStatus` recomendado), atalhos para as
+  ferramentas do segmento de carreira do usuário (`toolsForSegment`),
+  métricas de jornada de candidatura (`computeJourneyMetrics`), resultado do
+  teste comportamental se houver, e o ranking mensal de jogos em destaque.
+  É o ponto de partida do tour guiado.
 
-1. entender o quão aderente seu currículo é a uma vaga específica;
-2. corrigir e otimizar o currículo;
-3. se preparar para entrevistas;
-4. montar e acompanhar um plano de ação de carreira;
-5. organizar candidaturas em um funil (kanban);
-6. descobrir vagas relevantes automaticamente (feed com matching).
+## 2. Análise de vaga (núcleo do produto)
 
-Monetização por **assinatura recorrente** (segmentada por perfil de
-carreira) e **pagamentos avulsos** (diagnóstico completo de uma análise
-específica), via Mercado Pago. Uma camada grande de conteúdo/ferramentas
-gratuitas (`/tools/*`) funciona como porta de entrada de SEO/geração de
-leads.
-
-## 2. Segmentação de usuário (`careerSegment`)
-
-Todo usuário (ou visitante) se encaixa em um segmento de carreira, que
-governa preço, oferta, ferramentas visíveis e a trilha de análise padrão
-(`src/lib/career-segments.ts`, `src/lib/career-offers.ts`):
-
-| Segmento | Público-alvo |
-|---|---|
-| `apprentice` | Jovem aprendiz |
-| `internship` | Estagiário/candidato a estágio |
-| `first_job` | Primeiro emprego |
-| `student` | Estudante (ensino médio/vestibular) |
-| `career_change` | Transição/mudança de carreira |
-| `career_pro` | Profissional buscando recolocação/crescimento |
-
-O segmento define: preço da assinatura e do avulso, limite mensal de
-análises com diagnóstico completo, e quais ferramentas de `/tools` estão
-liberadas (`src/lib/tool-access.ts`, `src/lib/entitlements.ts`).
-
-## 3. Features por área
-
-### 3.1 Análise de currículo x vaga (núcleo do produto)
-
-- **Onde**: `/analise` (`src/components/analyze-vaga.tsx`) → API
-  `POST /api/analyze`.
-- **O que faz**: usuário envia um PDF de currículo (ou reaproveita um já
-  enviado) + descreve a vaga (texto livre ou colada). O backend extrai o
-  texto do PDF (`pdf-parse`) e chama a Groq em paralelo para (a) analisar
-  aderência currículo x vaga e (b) extrair o currículo em formato
-  estruturado.
+- **Rota**: `/analise` (`analyze-vaga.tsx`) → `POST /api/analyze`.
+- **Para quem**: qualquer visitante, mesmo sem login (limitado por rate
+  limit de IP), e candidatos autenticados.
+- **O que faz**: usuário envia um PDF de currículo (ou reaproveita o já
+  enviado) e descreve/cola a vaga. O backend extrai o texto do PDF
+  (`pdf-parse`) e chama a Groq para (a) avaliar aderência currículo x vaga e
+  (b) extrair o currículo em formato estruturado.
 - **Resultado (`Analysis`)**: scores (geral, técnico, experiência,
   senioridade, ATS), pontos fortes/fracos, correções sugeridas, palavras-
-  chave faltantes, checklist de compatibilidade com ATS, perguntas de
-  entrevista prováveis, plano de estudo, mensagem sugerida para o
-  recrutador, cargos alternativos, possíveis objeções do recrutador,
-  estratégia de aplicação, e um `applicationStatus` recomendado
-  (`apply_now` / `adjust_first` / `deprioritize`) com justificativa.
-- **Trilha de mudança de carreira**: quando aplicável, a análise também
-  gera habilidades transferíveis, narrativa de transição, resposta para
-  "por que você está mudando de carreira" e cargos-ponte
-  (`bridgeRoles`).
-- **Acesso**: funciona até para **visitante anônimo** (sem login),
-  limitado por rate limit de IP (10 análises/hora). O **score simples é
-  sempre gratuito**; o **diagnóstico completo** (todo o restante) é
-  liberado por assinatura ativa (dentro do limite mensal do segmento) ou
-  por pagamento avulso (`diagnostic`) vinculado àquela análise específica
-  (`src/lib/entitlements.ts`, `canViewFullDiagnostic`). Usuário sem
-  desbloqueio vê um "teaser" (`src/lib/analysis-teaser.ts`) com botão de
-  desbloqueio (`unlock-diagnostic-button.tsx`).
-- **UX do formulário**: ao escolher a trilha de carreira no passo 1, a
-  tela rola automaticamente até o passo 2 e foca o campo "Cargo
-  desejado", reduzindo cliques manuais. Durante o processamento da IA,
-  um overlay de carregamento (`analyze-vaga.tsx`) substitui o formulário
-  com uma mensagem rotativa (a cada 3s) descrevendo a etapa atual da
-  análise, para reduzir a percepção de espera nos ~15-30s de resposta.
+  chave faltantes, checklist ATS, perguntas de entrevista prováveis, plano
+  de estudo, mensagem sugerida ao recrutador, cargos alternativos, possíveis
+  objeções, estratégia de aplicação e um `applicationStatus` recomendado
+  (`apply_now` / `adjust_first` / `deprioritize`).
+- **Trilha de transição de carreira**: quando aplicável, a análise também
+  gera habilidades transferíveis, narrativa de transição, resposta padrão
+  para "por que está mudando de carreira" e cargos-ponte (`bridgeRoles`).
+- **Acesso**: o score simples é sempre gratuito. O diagnóstico completo é
+  liberado automaticamente na primeira análise de qualquer usuário; depois
+  disso, por assinatura ativa (dentro do limite mensal do segmento) ou
+  pagamento avulso `diagnostic` vinculado à análise (ver
+  [PRODUCT_OVERVIEW.md](PRODUCT_OVERVIEW.md)).
+- **Relatórios**: `/report` lista o histórico de análises; `/report/[id]`
+  mostra o relatório completo ou o teaser + CTA de compra; `/history` é o
+  histórico paginado com filtro por status.
 
-### 3.2 Relatórios e histórico
+## 3. Feed de vagas
 
-- **`/report`**: lista cronológica de todas as análises do usuário
-  (evolução ao longo do tempo).
-- **`/report/[id]`**: relatório detalhado de uma análise específica -
-  completo se desbloqueado, teaser + CTA de compra se não.
-- **`/report/[id]/map`**: visão adicional ("mapa de oportunidade") gated
-  pela mesma regra de desbloqueio.
-- **`/history`**: histórico paginado (12 por página), com filtro por
-  `applicationStatus`.
-- Análises podem ser excluídas (`delete-analysis-button.tsx` →
-  `DELETE /api/analysis/[id]`).
+- **Rota**: `/feed`.
+- **Para quem**: candidato autenticado.
+- **O que faz**: lista vagas agregadas de múltiplas fontes externas, cada
+  uma pontuada por fit score de IA contra o currículo mais recente do
+  usuário (`JobMatch`). Suporta filtro, paginação e busca manual de novas
+  vagas (`POST /api/feed/fetch-jobs`). Usuário também pode adicionar uma
+  vaga manualmente por URL, com scraping do texto (`src/lib/scrape-job.ts`,
+  com checagem anti-SSRF).
+- **Fontes**: Adzuna, Jooble, Gupy, Sólides, Himalayas, RemoteOK,
+  RemoteJobs.org, TheMuse, LinkedIn, Indeed (scraping via Playwright);
+  Glassdoor implementado mas não homologado. Cada fonte é opcional e
+  configurada por env var própria.
 
-### 3.3 Otimização de currículo
+## 4. Todas as vagas (sem curadoria)
 
-- **`/resume`** redireciona para a análise mais recente do usuário;
-  **`/resume/[id]`** (`resume-optimizer.tsx`) permite editar resumo e
-  experiências sugeridos pela IA, salvando um "override" em JSON
-  (`Analysis.resumeOverride`, via `PATCH /api/resume/[id]`).
-- **Geração de PDF**: `GET/POST /api/resume/[id]/pdf` monta um PDF final
-  (`pdf-lib` + template em `src/lib/resume-template.ts`) a partir do
-  currículo estruturado + edições do usuário.
-- **`/curriculo-gratis`** (`free-resume-builder.tsx`): gerador de
-  currículo do zero, fora do fluxo de análise paga - usado como isca de
-  topo de funil.
+- **Rota**: `/todas-as-vagas`.
+- **Para quem**: candidato autenticado (e visitante, dependendo da liberação
+  no middleware).
+- **O que faz**: catálogo completo de vagas abertas na plataforma, sem o
+  filtro de matching por currículo do feed — com filtro manual por área e
+  nível. Complementa `/feed` para quem quer ver tudo, não só o recomendado.
 
-### 3.4 Preparação de entrevistas
+## 5. Candidaturas (kanban)
 
-- **`/interviews`**: simulação/preparação baseada na análise mais
-  recente (exige assinatura ativa).
-- **`/interviews/[applicationId]`**: mesma funcionalidade vinculada a
-  uma candidatura específica do kanban.
-- Perguntas podem ser regeradas (`POST /api/interviews/[id]/regenerate`)
-  e o progresso salvo (`PATCH /api/interviews/[id]`).
+- **Rota**: `/applications`.
+- **Para quem**: candidato autenticado.
+- **O que faz**: quadro kanban com status `saved → applied → interview →
+  technical_test → offer / rejected / archived`. Cada mudança grava um
+  registro em `ApplicationActivity` (histórico auditável). Suporta prazos
+  (`deadline`), data de entrevista (`interviewAt`) e vínculo opcional com
+  uma vaga do feed e/ou uma análise. Também acompanha **metas semanais**
+  (`WeeklyGoal`): candidaturas, ajustes de currículo e entrevistas por
+  semana, com progresso calculado.
 
-### 3.5 Plano de ação
+## 6. Currículo (resume)
 
-- **`/action-plan`**: checklist derivado do `studyPlan` gerado na
-  análise, organizado em fases (essencial / bom ter / depois). Progresso
-  persistido via `PATCH /api/action-plan/[id]`.
+- **Rota**: `/resume` (redireciona para a análise mais recente),
+  `/resume/[id]` (editor).
+- **Para quem**: candidato autenticado.
+- **O que faz**: permite editar resumo e experiências sugeridos pela IA,
+  salvando um "override" (`Analysis.resumeOverride`). Gera PDF final
+  (`pdf-lib` + template) a partir do currículo estruturado + edições.
+- **`/curriculo-gratis`**: gerador de currículo do zero, fora do fluxo de
+  análise paga, usado como isca de topo de funil (também sem login).
 
-### 3.6 Funil de candidaturas (kanban)
+## 7. Ferramentas (`/tools/*`)
 
-- **`/applications`**: quadro kanban com status
-  `saved → applied → interview → technical_test → offer / rejected / archived`.
-  Cada mudança de status grava um registro em `ApplicationActivity`
-  (histórico auditável do funil).
-- Suporta prazos (`deadline`), data de entrevista (`interviewAt`), e
-  vínculo opcional com uma `Job` (do feed) e/ou uma `Analysis`.
-- **Metas semanais** (`WeeklyGoal`): metas de candidaturas, ajustes de
-  currículo e entrevistas por semana, com métricas de progresso
-  (`src/lib/applications.ts`, `computeJourneyMetrics`).
+- **Rota**: `/tools` (hub) e mais de 25 sub-rotas.
+- **Para quem**: varia por ferramenta — algumas são 100% públicas (`free`),
+  outras liberadas para qualquer conta logada (`accountFree`), e as demais
+  seguem a assinatura do segmento do usuário. Cada ferramenta lista os
+  segmentos aos quais se aplica (`src/lib/tools-catalog.ts`).
+- **O que faz**: catálogo de guias, testes, calculadoras e geradores por
+  segmento — checklist ATS, calculadora de salário, teste comportamental,
+  carta de apresentação, comparador de vagas, corretor/vitrine de redação,
+  revisão de LinkedIn/GitHub, currículo/perfil do zero, projeto→experiência,
+  teste vocacional, guias de carreira por segmento (aprendiz, primeiro
+  emprego, estágio, transição, recolocação, entrevista), calculadora e
+  checklist de estágio, verificador de conflito de horário, dicas de
+  empreendedorismo, e preparação específica para concurso e OAB.
+- Acesso controlado por `ToolAccessGate` (componente) e
+  `requireToolAccess`/`hasToolAccess` (lib).
 
-### 3.7 Feed de vagas
+## 8. Mentorias
 
-- **`/feed`**: lista vagas agregadas de múltiplas fontes externas, cada
-  uma pontuada por fit score (IA) contra o currículo mais recente do
-  usuário (`JobMatch`). Suporta filtros, paginação e busca manual de
-  novas vagas (`POST /api/feed/fetch-jobs`).
-- **Fontes de vaga** (`src/lib/job-sources/`), cada uma opcional e
-  configurada por env var própria: Adzuna, Jooble, Gupy, Sólides,
-  Himalayas, RemoteOK, RemoteJobs.org, TheMuse, LinkedIn, Indeed (via
-  scraping com Playwright). Glassdoor está implementado mas **não
-  homologado**.
-- Usuário também pode adicionar uma vaga manualmente por URL
-  (`POST /api/feed/add-job`), com scraping do texto da vaga
-  (`src/lib/scrape-job.ts`, com checagem de segurança de URL em
-  `url-safety.ts` contra SSRF).
-- Vagas ganham tags/tiers de relevância (`src/lib/feed-tags.ts`).
+- **Rota**: `/mentorias`.
+- **Para quem**: qualquer usuário (conteúdo aberto).
+- **O que faz**: vídeos educativos, mentorias e cursos gratuitos de
+  carreira, entrevista, currículo e outras habilidades, curados a partir do
+  YouTube.
 
-### 3.8 Sugestões de perfil
+## 9. Radar de concursos
 
-- **`/profile`** (gated por assinatura): sugestões geradas por IA de
-  cursos, certificações e livros, cada uma com um `impactScore` (0-100)
-  estimando o ganho de empregabilidade (`profile-suggestions.tsx`,
-  `POST/GET /api/profile-suggestions`).
+- **Rota**: `/concursos` (e `/concurso` para conteúdo relacionado).
+- **Para quem**: qualquer usuário, com destaque para o segmento
+  `concurseiro`.
+- **O que faz**: agrega editais, inscrições e provas de concursos públicos
+  via RSS, atualizados ao longo do dia (agendador roda às 08h, 14h e 20h,
+  horário de São Paulo). Não há alerta por e-mail hoje — ver
+  [ROADMAP_FEATURES.md](ROADMAP_FEATURES.md).
 
-### 3.9 Catálogo de ferramentas gratuitas (`/tools/*`)
+## 10. Radar de vestibulares
 
-Mais de 25 sub-rotas de conteúdo/IA, usadas tanto como benefício do plano
-profissional quanto como geração de leads/SEO. Cada uma tem endpoint de IA
-correspondente em `/api/tools/*` quando é interativa:
+- **Rota**: `/vestibulares`.
+- **Para quem**: qualquer usuário, com destaque para o segmento `student`.
+- **O que faz**: reúne vestibulares, ENEM, Sisu, ProUni e bolsas mais
+  recentes via RSS, no mesmo esquema de atualização do radar de concursos.
+  Também sem alerta por e-mail hoje.
 
-| Ferramenta | Rota | Descrição |
-|---|---|---|
-| Teste comportamental | `behavioral-test` | Perfil de soft skills |
-| Carta de apresentação | `cover-letter` | Geração de cover letter via IA |
-| Comparador de vagas | `compare-jobs` | Compara currículo contra múltiplas vagas |
-| Corretor de redação | `essay-grader` / `essay-showcase` | Correção e vitrine de redações (ENEM/vestibular) |
-| Revisão de perfil | `github-review`, `linkedin-review` | Auditoria de perfil via IA |
-| Currículo/perfil do zero | `resume-from-scratch`, `profile-from-scratch` | Construção guiada por IA |
-| Projeto → experiência | `project-to-experience` | Converte projeto pessoal em item de currículo |
-| Teste vocacional | `vocation-test/*` | Descoberta de área, nota de corte estimada, cronograma de estudo, banco de provas, escolha de faculdade |
-| Guias de carreira | `apprentice-guide`, `career-change-guide`, `career-growth-guide`, `career-guide`, `first-job-guide`, `interview-guide`, `reemployment-guide` | Conteúdo estático segmentado |
-| Estágio/aprendiz | `apprentice-areas`, `apprentice-companies`, `internship-calculator`, `internship-checklist`, `internship-guide` | Conteúdo + calculadoras + checklists |
-| Verificador de conflito de horário | `schedule-conflict-checker` | Cruza grade de aulas com horário de trabalho/estágio |
-| Empreendedorismo | `entrepreneurship-tips` | Conteúdo estático |
+## 11. Marketplace freelancer
 
-Acesso a cada ferramenta é controlado por segmento/assinatura via
-`ToolAccessGate` (componente) e `requireToolAccess`/`hasToolAccess` (lib).
+- **Rotas**: `/freelancer` (hub), `/freelancer/perfil`,
+  `/freelancer/propostas`, `/freelancer/meus-projetos`, `/projetos`,
+  `/projetos/novo`, `/projetos/[id]`, vitrine pública `/freelancers`,
+  `/freelancers/[id]`.
+- **Para quem**: qualquer `User` — sem papéis fixos de "cliente" vs.
+  "freelancer"; a mesma pessoa pode publicar um perfil e/ou contratar.
+- **O que faz**:
+  - **Perfil** (`FreelancerProfile`): headline, bio, categoria, habilidades,
+    valor/hora (ou "a combinar"), portfólio, toggle `available`/`published`
+    que controla a visibilidade na vitrine pública. Reputação
+    (`ratingSum`/`ratingCount`/`completedCount`) é desnormalizada a partir
+    das avaliações.
+  - **Projetos** (`FreelanceProject`): contratante publica escopo,
+    categoria, habilidades desejadas, orçamento (fixo/hora), faixa de
+    valor, modelo de trabalho e prazo. Ciclo: `open → in_progress →
+    completed | cancelled`.
+  - **Propostas** (`FreelanceProposal`): freelancer envia carta + valor +
+    prazo por projeto; status `pending | accepted | rejected | withdrawn`.
+  - **Contrato** (`FreelanceContract`): criado ao aceitar uma proposta;
+    guarda valor combinado e ciclo `active → delivered → completed` /
+    `cancelled`; habilita mensagens e avaliação mútua.
+  - **Mensagens** (`FreelanceThread`/`FreelanceMessage`): conversa por
+    projeto entre as partes, com indicador de leitura.
+  - **Avaliações** (`FreelanceReview`): nota 1-5 + comentário ao concluir
+    contrato, nas duas direções.
+- Ainda sem escrow/pagamento integrado — o valor é combinado fora da
+  plataforma.
 
-### 3.10 Landing pages e captação
+## 12. Jogos de carreira
 
-- **`/`** e **`/comece`**: landing pública segmentada por nicho de
-  carreira (`niche-landing.tsx`), redireciona usuário logado direto para
-  `/analise`.
-- **`/curriculo-gratis`**: isca de geração de currículo grátis.
-- **Captura de lead** (`lead-gate.tsx` → `POST /api/leads/route`): antes
-  de revelar o resultado de um teste vocacional ou de uma análise simples
-  a um visitante sem conta, o sistema pede nome/e-mail/telefone.
+- **Rota**: `/jogos` (hub) e sub-rotas `digitar`, `forca`, `memoria`,
+  `ordenar`, `quiz`, `termo`, `vf`. Rota pública, liberada no middleware.
+- **Para quem**: qualquer usuário, logado ou não.
+- **O que faz**: 7 minijogos educativos de carreira e mercado — Speed Typer
+  (digitação), Show do Match (quiz por área), Termos Pareados (memória),
+  Termo (Wordle de termos profissionais), Forca Profissional, Verdadeiro ou
+  Falso e Ordene o Processo. Cada partida grava um `GameScore`
+  (`POST /api/jogos/scores`) por jogo/área/usuário, usado para montar
+  rankings diário, mensal e anual (Top 10) exibidos no hub. Usuários no Top
+  10 mensal ganham destaque especial e aparecem no dashboard.
 
-### 3.11 Conta e configurações
+## 13. Desafio do Match (indicação)
 
-- **`/login`, `/register`**: autenticação por e-mail/senha (bcrypt) ou
-  Google OAuth (se configurado). Cadastro coleta segmento de carreira e
-  área profissional para já personalizar a experiência.
-- **`/settings`**: edição de perfil, papéis de interesse
-  (`interested-roles-form.tsx`), cursos concluídos
-  (`course-list-form.tsx`), tema claro/escuro, e seção de cobrança
-  (`billing-section.tsx`) com status da assinatura e opção de assinar/
-  cancelar.
+- **Rota**: `/desafio`.
+- **Para quem**: qualquer usuário, logado ou anônimo.
+- **O que faz**: envia currículo + vaga e recebe o "Match %" e um card
+  compartilhável para stories. Ao mesmo tempo, é o hub do programa de
+  indicação: usuário compartilha um link com seu `userId` como `?ref=`; a
+  cada novo usuário logado que abre `/desafio?ref=<id>`, a indicação é
+  registrada (`registerUserReferral`, em `src/lib/referrals.ts`); a cada 3
+  indicações confirmadas, o indicador ganha 1 crédito de diagnóstico
+  completo (`unlockedFullDiagnosticCredits`). Detalhe completo do fluxo em
+  [USER_FLOWS.md](USER_FLOWS.md).
 
-### 3.12 Pagamentos (Mercado Pago)
+## 14. Configurações (settings)
 
-- **Pagamento avulso** (`POST /api/billing/payment`, Payment Brick):
-  para `first_analysis` (desbloqueio da primeira análise) ou
-  `diagnostic` (desbloqueio de diagnóstico de uma análise específica),
-  com suporte a cupom de desconto. **Funciona sem login** (mesmo padrão da
-  assinatura): o visitante paga com e-mail, a conta é criada/recuperada por
-  e-mail e ele é levado a `/register?email=…` para definir a senha. No
-  diagnóstico anônimo, a análise só pode ser desbloqueada se estiver **sem
-  dono** (`resume.userId == null`) - e nesse caso é reivindicada para o
-  usuário ao confirmar o pagamento (síncrono no cartão, via webhook no PIX);
-  análise já pertencente a uma conta exige login. Preço do avulso é uniforme
-  entre segmentos, então o segmento default do fluxo anônimo não altera o
-  valor cobrado.
-- **Assinatura recorrente** (`POST /api/billing/subscription`,
-  Preapproval/Subscription Brick): cria `Subscription` vinculada ao
-  usuário (1:1), com `currentPeriodEnd` e status.
-- **Webhook** (`POST /api/billing/webhook`): recebe eventos `payment` e
-  `subscription_preapproval` do Mercado Pago, valida assinatura HMAC
-  (`x-signature`) e atualiza `Payment`/`Subscription`. Sem o segredo
-  correto (`MERCADOPAGO_WEBHOOK_SECRET`), pagamentos reais nunca são
-  confirmados automaticamente (ver [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md)).
-- **Cupons** (`Coupon`): código único por influenciador, com desconto
-  diferente para compra avulsa e assinatura, contagem de uso.
+- **Rota**: `/settings`.
+- **Para quem**: candidato autenticado.
+- **O que faz**: edição de perfil, papéis de interesse, cursos concluídos,
+  tema claro/escuro, e seção de cobrança (`billing-section.tsx`) com status
+  da assinatura e opção de assinar ou cancelar.
 
-### 3.13 Administração
+## 15. Administração
 
-- **`/admin`** (gated por `ADMIN_EMAILS` ou `hasFullAccessEmail`):
-  - busca de usuário por e-mail e concessão manual de crédito de
-    análise, desbloqueio de diagnóstico ou assinatura
-    (`grant-analysis-credit`, `grant-diagnostic`, `grant-subscription`);
-  - troca do modelo Groq ativo em produção sem redeploy
-    (`admin-groq-model.tsx` → `GET/POST /api/admin/groq-model`,
-    persistido em `AppSetting`);
-  - CRUD de cupons de desconto (`admin-coupon-manager.tsx`).
+- **Rota**: `/admin` (gated por `ADMIN_EMAILS` ou `hasFullAccessEmail`), com
+  `/admin/suporte` para tickets.
+- **Para quem**: administrador do sistema.
+- **O que faz**: busca de usuário por e-mail e concessão manual de crédito
+  de análise, desbloqueio de diagnóstico ou assinatura; troca do modelo Groq
+  ativo em produção sem redeploy (`AppSetting`); CRUD de cupons de desconto;
+  gestão de fontes externas de vaga; revisão de denúncias de oportunidades;
+  atendimento de tickets de suporte.
 
-### 3.14 Jogos (gamificação)
+## 16. Influenciador
 
-- **`/jogos`**: hub com 7 minijogos educativos de carreira/mercado -
-  Speed Typer (digitação), Show do Match (quiz por área), Termos
-  Pareados (memória), Termo (Wordle de termos profissionais), Forca
-  Profissional, Verdadeiro ou Falso e Ordene o Processo. Rota pública,
-  liberada no middleware.
-- Cada partida grava um `GameScore` (`POST /api/jogos/scores`) por
-  jogo/área/usuário, usado para montar rankings **diário, mensal e
-  anual** (Top 10) exibidos no próprio hub.
-- Serve também como gancho de retenção: usuários no Top 10 mensal
-  ganham selo especial e recomendação premium no dashboard corporativo
-  (conforme copy do hub).
+- **Rota**: `/influencer`.
+- **Para quem**: usuário marcado como dono de cupom (`isInfluencerUser`).
+- **O que faz**: painel com link de indicação próprio, estatísticas de uso
+  do cupom (cadastros e pagamentos atribuídos: primeira análise,
+  diagnóstico, assinatura) e comissão calculada por venda. Influenciador tem
+  acesso total ao produto sem pagar.
 
-### 3.15 Portal de Parceiros (`/parceiro`)
+## 17. Empresa (B2B)
 
-- Programa para instituições de ensino/empresas anunciarem cursos no
-  catálogo `/cursos-gratuitos`. Cadastro próprio (`/parceiro/cadastro`)
-  e login separado (`/parceiro/login`, `accountType: "partner"` em
-  `User`/`session`), com painel dedicado (`PartnerShell`).
-- **Dashboard do parceiro** (`/parceiro/dashboard`): visão geral de
-  cursos publicados, cursos em destaque, cliques e leads recebidos.
-- **Cursos** (`/parceiro/dashboard/cursos`): CRUD de `ExternalCourse`
-  do próprio parceiro; pode marcar curso como `featured` (destaque),
-  consumindo **créditos** (`Partner.credits`).
-- **Comprar créditos de destaque** (`/parceiro/dashboard/anunciar` →
-  `POST /api/partner/billing/comprar`): pacote de anúncio pago via
-  Mercado Pago (`PartnerPayment`, `kind: "ad_pack"`); créditos são
-  concedidos após confirmação do pagamento.
-- **Leads** (`/parceiro/dashboard/leads`): candidatos que demonstraram
-  interesse num curso do parceiro (`PartnerLead`, capturado em
-  `POST /api/cursos-gratuitos/[id]/interesse`); cliques em cursos
-  também são contabilizados (`PartnerCourseClick`).
-- **Perfil** (`/parceiro/dashboard/perfil`): dados institucionais
-  (nome, CNPJ, logo, site, descrição) e status (`pending`/`active`/
-  `suspended`).
-- **Vitrine pública do parceiro** (`/parceiros/[id]`): página com os
-  cursos do parceiro, usada como página de destino a partir do
-  catálogo público.
+- **Rotas**: `/empresa/cadastro`, `/empresa/login` (conta separada,
+  `accountType: "company"`), painel em `/empresa/(painel)/*`: visão geral,
+  `vagas` (CRUD de vagas próprias + `vagas/nova`, `vagas/[id]`), `triagem`
+  (envio de currículos em lote + `triagem/nova`, `triagem/[id]`),
+  `talentos` (busca no banco de talentos), `contatos` (pedidos de contato
+  com candidatos), `relatorios`, `equipe` (membros da conta), `perfil`,
+  `billing`.
+- **Para quem**: empresas que querem triar currículos e/ou publicar vagas.
+- **O que faz**: a empresa cria uma triagem, envia currículos; o sistema
+  extrai e classifica os candidatos, consumindo uma franquia gratuita e
+  depois créditos comprados. A busca no banco de talentos só alcança
+  candidatos com `discoverable` ativo; contato com um candidato exige um
+  `TalentContactRequest` aceito por ele — dados de contato não são
+  liberados sem esse aceite.
+- **Vitrine pública**: `/empresas` (catálogo) e `/empresas/[slug]` (página
+  da empresa).
 
-### 3.16 Marketplace Freelancer
+## 18. Portal de parceiros
 
-- Segundo lado do produto, aberto a qualquer `User`: qualquer pessoa
-  pode publicar um perfil de freelancer e/ou contratar outra para um
-  projeto - sem papéis fixos de "cliente" vs. "freelancer". Hub em
-  `/freelancer`; ainda sem escrow/pagamento integrado (é combinado
-  fora da plataforma).
-- **Perfil de freelancer** (`/freelancer/perfil` → `FreelancerProfile`):
-  headline, bio, categoria, habilidades, valor/hora (ou "a combinar"),
-  portfólio e toggle `available`/`published` que controla se aparece
-  na vitrine pública (`/freelancers`, `/freelancers/[id]`).
-  Reputação (`ratingSum`/`ratingCount`/`completedCount`) é desnormalizada
-  a partir das avaliações recebidas.
-- **Projetos** (`/projetos`, `/projetos/novo`, `/projetos/[id]` →
-  `FreelanceProject`): contratante publica escopo, categoria,
-  habilidades desejadas, tipo de orçamento (fixo/hora), faixa de valor,
-  modelo de trabalho (remoto/presencial/híbrido) e prazo. Ciclo de
-  status: `open → in_progress → completed | cancelled`.
-- **Propostas** (`/freelancer/propostas` → `FreelanceProposal`):
-  freelancer envia uma proposta por projeto (carta, valor, prazo
-  estimado); status `pending | accepted | rejected | withdrawn`.
-- **Contrato** (`FreelanceContract`): criado automaticamente quando uma
-  proposta é aceita (um por projeto); guarda o valor combinado e o
-  ciclo `active → delivered → completed`/`cancelled`. Habilita a troca
-  de mensagens e as avaliações mútuas.
-- **Mensagens** (`FreelanceThread`/`FreelanceMessage`): conversa por
-  projeto entre contratante e freelancer, com indicador de leitura por
-  lado.
-- **Avaliações** (`FreelanceReview`): ao concluir um contrato, cada
-  parte avalia a outra uma vez (nota 1-5 + comentário), direção
-  `client_to_freelancer` ou `freelancer_to_client`; alimenta a
-  reputação exibida no perfil público.
-- **Meus projetos** (`/freelancer/meus-projetos`): visão do contratante
-  sobre os projetos que publicou e o andamento das propostas recebidas.
+- **Rotas**: `/parceiro/cadastro`, `/parceiro/login` (conta separada,
+  `accountType: "partner"`), painel `/parceiro/dashboard` com sub-rotas de
+  cursos, leads, anunciar (compra de créditos) e perfil.
+- **Para quem**: instituições de ensino/empresas que querem anunciar cursos
+  gratuitos no catálogo público.
+- **O que faz**: CRUD de `ExternalCourse` do próprio parceiro; pode marcar
+  curso como `featured`, consumindo créditos (`Partner.credits`); créditos
+  são comprados via Mercado Pago (`PartnerPayment`, `kind: "ad_pack"`) e
+  concedidos após confirmação de pagamento; painel mostra cliques
+  (`PartnerCourseClick`) e leads (`PartnerLead`) recebidos por curso.
+- **Vitrine pública**: `/parceiros` (catálogo) e `/parceiros/[id]` (página
+  do parceiro com seus cursos), além do catálogo geral em
+  `/cursos-gratuitos`.
 
-### 3.17 Institucional
+## 19. Landing pages e captação
 
-- **`/termos`**, **`/privacidade`**: Termos de Uso e Política de
-  Privacidade (LGPD), cobrindo uso de IA, coleta de dados e pagamentos.
-  Linkados no cadastro.
+- **Rotas**: `/`, `/comece`, e páginas segmentadas (`/jovem-aprendiz`,
+  `/primeiro-emprego`, `/estagio`, `/faculdade-ou-tecnico`,
+  `/transicao`, `/recolocacao`, `/oab`), além de `/curriculo-gratis`,
+  `/curriculo-sem-experiencia`, `/como-fazer-curriculo`.
+- **Para quem**: visitante não autenticado; usuário logado é redirecionado
+  direto para `/analise`.
+- **O que faz**: landing por nicho de carreira, cada uma com copy e CTA
+  ajustados ao segmento. Captura de lead (`lead-gate.tsx` →
+  `POST /api/leads`) antes de revelar resultado de teste vocacional ou
+  análise simples a visitante sem conta.
 
-## 4. Requisitos funcionais (resumo por prioridade)
+## 20. Conteúdo institucional
 
-**Essenciais (core do produto)**
-- Upload de currículo em PDF e extração de texto confiável.
-- Geração de análise de aderência currículo x vaga via IA, com score e
-  diagnóstico estruturado.
-- Controle de acesso ao diagnóstico completo por assinatura ou pagamento
-  avulso, por análise.
-- Persistência de histórico de análises por usuário (e por visitante
-  anônimo, associável a lead).
-- Autenticação por e-mail/senha com rate limiting.
-- Processamento de pagamento e confirmação via webhook assinado.
+- **Rotas**: `/blog`, `/blog/[slug]`, `/mercado-de-trabalho`, `/sobre`,
+  `/contato`, `/suporte`, `/suporte/[id]`, `/ajuda`, `/termos`,
+  `/privacidade`, `/vagas-de-hoje`, `/vagas/[slug]`, `/vagas-publicas`,
+  `/vagas-publicas/[state]`, `/cursos-gratuitos`,
+  `/cursos-gratuitos/[state]`.
+- **O que faz**: blog, páginas SEO de mercado de trabalho, institucionais
+  (termos, privacidade — LGPD), suporte ao usuário, e páginas indexáveis de
+  vagas/cursos por estado/cidade alimentadas pelas fontes públicas
+  oficiais.
 
-**Importantes (retenção e valor percebido)**
-- Otimização e exportação de currículo em PDF.
-- Kanban de candidaturas com histórico de mudança de status.
-- Feed de vagas com matching automático por fit score.
-- Preparação de entrevista personalizada por análise/candidatura.
-- Painel admin para suporte a usuários (concessão manual de acesso).
+## 21. Pagamentos (Mercado Pago)
 
-**Complementares (aquisição/SEO/retenção)**
-- Catálogo de ferramentas e guias gratuitos por segmento.
-- Captura de lead antes de revelar resultado a visitante anônimo.
-- Landing pages segmentadas por nicho.
-- Jogos de gamificação com ranking, para retenção e engajamento.
-- Portal de parceiros para monetizar o catálogo de cursos.
-- Marketplace freelancer para gerar retenção fora do ciclo de emprego CLT.
+- **Rotas de API**: `POST /api/billing/payment` (avulso — Payment Brick,
+  aceita cartão e Pix), `POST /api/billing/subscription` (recorrente —
+  Preapproval/Subscription Brick), `POST /api/billing/webhook` (eventos
+  `payment` e `subscription_preapproval`, validados por HMAC).
+- **O que faz**: pagamento avulso desbloqueia `first_analysis` ou
+  `diagnostic` de uma análise específica, com suporte a cupom; funciona sem
+  login — o visitante paga com e-mail e a conta é criada/recuperada por
+  e-mail. Assinatura recorrente cria uma `Subscription` 1:1 com o usuário.
+  Cupons (`Coupon`) atribuem cadastros/pagamentos a influenciadores.
 
-## 5. Requisitos não funcionais e limitações conhecidas
+## Requisitos não funcionais e limitações conhecidas
 
 - **Idioma**: produto 100% em pt-BR, sem i18n.
-- **Persistência**: PostgreSQL 17 via Prisma, com volume e backup periódico no
-  Docker Compose.
-- **Rate limiting**: em memória (não distribuído) - não sobrevive a
-  múltiplas instâncias/reinícios; aplicado a análise anônima, login,
-  cadastro e ações autenticadas.
-- **Confiabilidade da IA**: timeout, retry/backoff, fallback multi-provedor e
-  validação Zod nas respostas estruturadas principais.
-- **Segurança de webhook**: validação HMAC falha fechado (rejeita se mal
-  configurado), o que é seguro mas exige configuração correta antes de
-  aceitar pagamentos reais.
-- **Scraping**: depende de Playwright/Chromium (imagem Docker específica)
-  e checagem de segurança de URL (`url-safety.ts`) para evitar SSRF ao
+- **Persistência**: PostgreSQL via Prisma, com volume e backup periódico.
+- **Rate limiting**: em memória, não distribuído — aplicado a análise
+  anônima, login, cadastro e outras ações sensíveis.
+- **Scraping**: depende de Playwright/Chromium e checagem anti-SSRF ao
   buscar vaga por link.
-- Ver [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) para o levantamento
+- Ver [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md) para o levantamento
   completo de débito técnico e bloqueadores de lançamento.
 
-## 6. Oportunidades públicas e cursos externos
-
-- `/vagas-publicas` pesquisa oportunidades oficiais por cargo, estado e cidade.
-- As páginas locais de vagas e cursos são indexáveis por estado e cidade.
-- `/cursos-gratuitos` oferece um catálogo pesquisável por área e instituição.
-- Usuários podem criar alertas diários ou semanais por cargo e localização.
-- O administrador cadastra e pausa fontes, acompanha erros e resolve denúncias.
-- A coleta consolida links repetidos, desativa itens antigos e registra acessos.
-- A sincronização padrão ocorre às 08:00, 14:00 e 20:00 em São Paulo.
-
-## 7. Referências cruzadas
+## Referências cruzadas
 
 | Assunto | Documento |
-|---|---|
-| Stack técnica, autenticação, modelo de dados resumido, fluxos internos | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
-| Variáveis de ambiente | [`ENV.md`](ENV.md) |
-| Estado de prontidão para lançamento / débito técnico | [`LAUNCH_CHECKLIST.md`](LAUNCH_CHECKLIST.md) |
-| Modelo de dados completo (models, campos, relações) | [`prisma/schema.prisma`](../prisma/schema.prisma) |
+| --- | --- |
+| Segmentos, free vs. pago, módulos | [PRODUCT_OVERVIEW.md](PRODUCT_OVERVIEW.md) |
+| Jornadas ponta a ponta | [USER_FLOWS.md](USER_FLOWS.md) |
+| O que ainda não existe | [ROADMAP_FEATURES.md](ROADMAP_FEATURES.md) |
+| Stack técnica, modelo de dados resumido | [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Modelo de dados completo | [`prisma/schema.prisma`](../prisma/schema.prisma) |
+| Todas as rotas de página | [ROUTES.md](ROUTES.md) |
+| Todos os endpoints de API | [API.md](API.md) |

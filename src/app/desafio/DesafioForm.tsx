@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, FileText, Sparkles, AlertCircle, ArrowRight, CheckCircle2, Link2 } from "lucide-react";
 import { CAREER_TRACK_OPTIONS, CareerTrack } from "@/components/analysis-display";
+import { ReferralRewardBox } from "@/components/referral-reward-box";
 
 interface DesafioFormProps {
   isLoggedIn: boolean;
@@ -125,7 +126,16 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+    <div className="space-y-6">
+      {isLoggedIn && userId && (
+        <ReferralRewardBox
+          userId={userId}
+          totalReferrals={referralStats?.totalReferrals ?? 0}
+          credits={referralStats?.credits ?? 0}
+        />
+      )}
+
+      <form onSubmit={handleSubmit} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
       <div className="border-b border-slate-800 pb-4 flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
@@ -290,6 +300,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
           </>
         )}
       </button>
-    </form>
+      </form>
+    </div>
   );
 }

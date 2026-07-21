@@ -9,7 +9,13 @@ import {
   sendDiagnosticUpgradeEmail,
   sendCheckoutRecoveryEmail,
   sendConvertToSubscriptionEmail,
+  sendConvertSecondNudgeEmail,
+  sendUrgencyCouponEmail,
+  sendFirstAnalysisMilestoneEmail,
+  sendScoreImprovedEmail,
+  sendAnalysisCountMilestoneEmail,
 } from "@/lib/resend";
+import { createUrgencyCoupon } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/push";
 
 // O scheduler roda algumas vezes ao dia; a idempotência (sendOnce + EmailLog)
@@ -157,14 +163,16 @@ async function sendConvertToSubscriptionEmails(now: Date): Promise<void> {
   const to = new Date(now.getTime() - 4 * DAY_MS);
   if (from > to) return;
 
-  // Usuários com análise na janela. `distinct` evita repetir quem analisou várias
-  // vezes; o sendOnce (keyed por userId) é a trava final de "uma vez por pessoa".
+  // Usuários com análise na janela. `distinct` + `orderBy desc` garante que a
+  // primeira ocorrência de cada userId é a análise mais recente dele, usada
+  // pra personalizar o e-mail com o score/vaga reais.
   const analyses = await prisma.analysis.findMany({
     where: {
       createdAt: { gte: from, lte: to },
       resume: { user: { email: { not: null } } },
     },
-    select: { resume: { select: { userId: true } } },
+    select: { overallScore: true, jobTitle: true, resume: { select: { userId: true } } },
+    orderBy: { createdAt: "desc" },
     distinct: ["resumeId"],
   });
 
@@ -188,7 +196,209 @@ async function sendConvertToSubscriptionEmails(now: Date): Promise<void> {
     if (!user?.email || user.subscription?.status === "active" || user._count.payments > 0) continue;
 
     await sendOnce("convert_to_subscription", userId, user.email, () =>
-      sendConvertToSubscriptionEmail(user.email!, { name: user.name, segment: user.careerSegment })
+      sendConvertToSubscriptionEmail(user.email!, {
+        name: user.name,
+        segment: user.careerSegment,
+        score: analysis.overallScore,
+        jobTitle: analysis.jobTitle,
+      })
+    );
+  }
+}
+
+/**
+ * Segundo toque da régua de conversão: mesma condição do primeiro (analisou,
+ * não comprou nada), mas numa janela mais tardia (10-13 dias) e com um ângulo
+ * diferente, pra quem ignorou o primeiro e-mail.
+ */
+async function sendConvertSecondNudgeEmails(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 13 * DAY_MS);
+  const from = windowStart > CONVERT_EMAIL_START ? windowStart : CONVERT_EMAIL_START;
+  const to = new Date(now.getTime() - 10 * DAY_MS);
+  if (from > to) return;
+
+  const analyses = await prisma.analysis.findMany({
+    where: {
+      createdAt: { gte: from, lte: to },
+      resume: { user: { email: { not: null } } },
+    },
+    select: { resume: { select: { userId: true } } },
+    distinct: ["resumeId"],
+  });
+
+  const seen = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || seen.has(userId)) continue;
+    seen.add(userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        careerSegment: true,
+        subscription: { select: { status: true } },
+        _count: { select: { payments: { where: { status: "paid" } } } },
+      },
+    });
+    if (!user?.email || user.subscription?.status === "active" || user._count.payments > 0) continue;
+
+    await sendOnce("convert_second_nudge", userId, user.email, () =>
+      sendConvertSecondNudgeEmail(user.email!, { segment: user.careerSegment })
+    );
+  }
+}
+
+/**
+ * Terceiro e último toque da régua de conversão: mesma condição, janela mais
+ * tardia (16-18 dias), e desta vez com um cupom pessoal de uso único gerado
+ * na hora do envio (não antes, pra não criar cupons de quem converteu entre
+ * o disparo do segundo toque e este).
+ */
+async function sendUrgencyCouponEmails(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 18 * DAY_MS);
+  const from = windowStart > CONVERT_EMAIL_START ? windowStart : CONVERT_EMAIL_START;
+  const to = new Date(now.getTime() - 16 * DAY_MS);
+  if (from > to) return;
+
+  const analyses = await prisma.analysis.findMany({
+    where: {
+      createdAt: { gte: from, lte: to },
+      resume: { user: { email: { not: null } } },
+    },
+    select: { resume: { select: { userId: true } } },
+    distinct: ["resumeId"],
+  });
+
+  const seen = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || seen.has(userId)) continue;
+    seen.add(userId);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        careerSegment: true,
+        subscription: { select: { status: true } },
+        _count: { select: { payments: { where: { status: "paid" } } } },
+      },
+    });
+    if (!user?.email || user.subscription?.status === "active" || user._count.payments > 0) continue;
+
+    await sendOnce("urgency_coupon", userId, user.email, async () => {
+      const { code, expiresAt } = await createUrgencyCoupon({ percent: 20, hours: 48 });
+      await sendUrgencyCouponEmail(user.email!, { code, expiresAt, segment: user.careerSegment });
+    });
+  }
+}
+
+/**
+ * Piso de data para os e-mails de marco/gamificação, mesmo motivo do
+ * CONVERT_EMAIL_START: evita disparar de uma vez pra toda a base histórica de
+ * análises na primeira execução em produção.
+ */
+const MILESTONE_START = new Date("2026-07-21T00:00:00Z");
+
+/** Comemora a primeira análise concluída por cada usuário, uma vez por usuário. */
+async function sendFirstAnalysisMilestones(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 2 * DAY_MS);
+  const from = windowStart > MILESTONE_START ? windowStart : MILESTONE_START;
+  if (from > now) return;
+
+  const analyses = await prisma.analysis.findMany({
+    where: { createdAt: { gte: from, lte: now } },
+    select: { createdAt: true, resume: { select: { userId: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const seen = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || seen.has(userId)) continue;
+    seen.add(userId);
+
+    const priorCount = await prisma.analysis.count({
+      where: { resume: { userId }, createdAt: { lt: analysis.createdAt } },
+    });
+    if (priorCount > 0) continue; // não é a primeira análise do usuário
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
+    if (!user?.email) continue;
+
+    await sendOnce("milestone_first_analysis", userId, user.email, () =>
+      sendFirstAnalysisMilestoneEmail(user.email!, { name: user.name })
+    );
+  }
+}
+
+/** Comemora quando uma análise supera a anterior do mesmo usuário por uma margem relevante. */
+async function sendScoreImprovedMilestones(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 2 * DAY_MS);
+  const from = windowStart > MILESTONE_START ? windowStart : MILESTONE_START;
+  if (from > now) return;
+
+  const SCORE_IMPROVEMENT_THRESHOLD = 15;
+
+  const analyses = await prisma.analysis.findMany({
+    where: { createdAt: { gte: from, lte: now } },
+    select: { id: true, overallScore: true, jobTitle: true, createdAt: true, resume: { select: { userId: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId) continue;
+
+    const previous = await prisma.analysis.findFirst({
+      where: { resume: { userId }, createdAt: { lt: analysis.createdAt } },
+      orderBy: { createdAt: "desc" },
+      select: { overallScore: true },
+    });
+    if (!previous || analysis.overallScore - previous.overallScore < SCORE_IMPROVEMENT_THRESHOLD) continue;
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+    if (!user?.email) continue;
+
+    await sendOnce("milestone_score_improved", analysis.id, user.email, () =>
+      sendScoreImprovedEmail(user.email!, {
+        previousScore: previous.overallScore,
+        newScore: analysis.overallScore,
+        jobTitle: analysis.jobTitle,
+      })
+    );
+  }
+}
+
+/** Comemora marcos de volume: a cada 10 análises acumuladas por um usuário. */
+async function sendAnalysisCountMilestones(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 2 * DAY_MS);
+  const from = windowStart > MILESTONE_START ? windowStart : MILESTONE_START;
+  if (from > now) return;
+
+  const analyses = await prisma.analysis.findMany({
+    where: { createdAt: { gte: from, lte: now } },
+    select: { createdAt: true, resume: { select: { userId: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const handled = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || handled.has(userId)) continue;
+
+    const totalCount = await prisma.analysis.count({
+      where: { resume: { userId }, createdAt: { lte: analysis.createdAt } },
+    });
+    if (totalCount < 10 || totalCount % 10 !== 0) continue;
+    handled.add(userId);
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+    if (!user?.email) continue;
+
+    await sendOnce("milestone_analysis_count", `${userId}:${totalCount}`, user.email, () =>
+      sendAnalysisCountMilestoneEmail(user.email!, { count: totalCount })
     );
   }
 }
@@ -293,8 +503,13 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["lead_followups", () => sendLeadFollowUps(now)],
     ["diagnostic_upgrades", () => sendDiagnosticUpgradeEmails(now)],
     ["convert_to_subscription", () => sendConvertToSubscriptionEmails(now)],
+    ["convert_second_nudge", () => sendConvertSecondNudgeEmails(now)],
+    ["urgency_coupon", () => sendUrgencyCouponEmails(now)],
     ["checkout_recovery", () => sendCheckoutRecoveryEmails(now)],
     ["job_alerts", () => sendJobAlerts(now)],
+    ["milestone_first_analysis", () => sendFirstAnalysisMilestones(now)],
+    ["milestone_score_improved", () => sendScoreImprovedMilestones(now)],
+    ["milestone_analysis_count", () => sendAnalysisCountMilestones(now)],
   ];
   for (const [name, step] of steps) {
     try {

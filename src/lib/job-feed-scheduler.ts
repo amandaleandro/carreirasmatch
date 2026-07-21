@@ -5,6 +5,7 @@ import type { JobSearchTerms } from "@/lib/job-sources/types";
 
 const RUNS_SETTING_KEY = "job-feed:runs";
 const CURSOR_SETTING_KEY = "job-feed:query_cursor";
+const LOCATION_CURSOR_SETTING_KEY = "job-feed:location_cursor";
 const TICK_INTERVAL_MS = 15 * 60 * 1000;
 const INITIAL_DELAY_MS = 45 * 1000;
 const TIME_ZONE = "America/Sao_Paulo";
@@ -34,6 +35,20 @@ const DEFAULT_QUERIES = [
   "Recepcionista|Receptionist|recepcao,atendimento,agenda",
   "Analista de Dados|Data Analyst|SQL,Python,Power BI",
   "Desenvolvedor Frontend|Frontend Developer|React,TypeScript,JavaScript",
+];
+
+// Busca nacional (sem "where"/"l") tende a devolver so as vagas mais visiveis,
+// concentradas nas capitais/regioes metropolitanas, porque Adzuna/Indeed limitam
+// resultados por pagina e a competicao por espaco nesse ranking favorece quem
+// publica mais. Girar por ESTADO (nao por capital) e o jeito de alcancar cidades
+// menores dentro de cada UF sem precisar listar milhares de municipios: cada
+// consulta de estado devolve vagas de qualquer cidade daquele estado.
+const DEFAULT_LOCATIONS = [
+  "Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Distrito Federal",
+  "Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul",
+  "Minas Gerais", "Pará", "Paraíba", "Paraná", "Pernambuco", "Piauí",
+  "Rio de Janeiro", "Rio Grande do Norte", "Rio Grande do Sul", "Rondônia",
+  "Roraima", "Santa Catarina", "São Paulo", "Sergipe", "Tocantins",
 ];
 
 type RunLedger = {
@@ -120,6 +135,23 @@ async function nextSearchTerms(): Promise<JobSearchTerms> {
   };
 }
 
+function configuredLocations(): string[] {
+  const raw = process.env.JOB_FEED_LOCATIONS;
+  return raw ? raw.split(";").map((value) => value.trim()).filter(Boolean) : DEFAULT_LOCATIONS;
+}
+
+async function nextLocation(): Promise<string> {
+  const locations = configuredLocations();
+  const stored = await getSetting(LOCATION_CURSOR_SETTING_KEY);
+  const cursor = stored ? Number.parseInt(stored, 10) : 0;
+  const safeCursor = Number.isFinite(cursor) && cursor >= 0 ? cursor : 0;
+  const location = locations[safeCursor % locations.length] ?? DEFAULT_LOCATIONS[0];
+
+  await setSetting(LOCATION_CURSOR_SETTING_KEY, String((safeCursor + 1) % locations.length));
+
+  return location;
+}
+
 function jobRetentionDays(): number {
   const raw = Number(process.env.JOB_RETENTION_DAYS);
   return Number.isFinite(raw) && raw > 0 ? raw : 45;
@@ -158,13 +190,15 @@ export async function runJobFeedTick(): Promise<void> {
   try {
     await deactivateExpiredJobs();
     const searchTerms = await nextSearchTerms();
-    const result = await fetchNewJobsFromAllSources(searchTerms, {
-      userIp: "127.0.0.1",
-      userAgent: "CarreirasMatchJobFeedScheduler/1.0",
-    });
+    const location = await nextLocation();
+    const result = await fetchNewJobsFromAllSources(
+      searchTerms,
+      { userIp: "127.0.0.1", userAgent: "CarreirasMatchJobFeedScheduler/1.0" },
+      location
+    );
 
     await setSetting(RUNS_SETTING_KEY, JSON.stringify({ date, slots: [...ledger.slots, slot] }));
-    console.log(`job-feed-scheduler: slot=${slot} added=${result.added} errors=${result.errors.length}`);
+    console.log(`job-feed-scheduler: slot=${slot} location=${location} added=${result.added} errors=${result.errors.length}`);
   } catch (error) {
     console.error("job-feed-scheduler: failed to fetch jobs", error);
   } finally {

@@ -85,9 +85,8 @@ async function mapWithConcurrency<T, R>(
   return results;
 }
 
-export async function fetchLinkedInJobs(searchTerms?: JobSearchTerms): Promise<FetchedJob[]> {
+export async function fetchLinkedInJobs(searchTerms?: JobSearchTerms, location = "Brasil"): Promise<FetchedJob[]> {
   const keywords = searchTerms?.titlePt || searchTerms?.titleEn || "";
-  const location = "Brasil";
 
   const candidatesByUrl = new Map<string, LinkedInCandidate>();
   for (let page = 0; page < MAX_PAGES; page++) {

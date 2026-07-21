@@ -13,6 +13,7 @@ export function PublicSiteHeader() {
           <BrandLogo heightClassName="h-10 sm:h-12" />
         </Link>
         <nav className="hidden items-center gap-6 text-sm font-medium text-neutral-600 dark:text-neutral-300 md:flex">
+          <Link href="/assinar" className="hover:text-neutral-950 dark:hover:text-white">Planos</Link>
           <Link href="/freelancers" className="hover:text-neutral-950 dark:hover:text-white">Freelancers</Link>
           <Link href="/empresas" className="hover:text-neutral-950 dark:hover:text-white">Empresas</Link>
           <Link href="/parceiro" className="hover:text-neutral-950 dark:hover:text-white">Parceiros</Link>

@@ -15,26 +15,33 @@ import {
   Rss,
   ScrollText,
   Sparkles,
+  Trophy,
   X,
 } from "lucide-react";
 
 // Sobe a versão sempre que a lista muda de verdade: quem já fechou a modal
 // precisa ver o que saiu depois.
-const STORAGE_KEY = "upcoming-features-modal:v4:seen";
+const STORAGE_KEY = "upcoming-features-modal:v5:seen";
 
 /** Já está no ar - o que a pessoa pode usar agora. */
 const SHIPPED = [
   {
-    title: "Jogos de carreira",
-    description: "7 minijogos para treinar digitação, vocabulário técnico e conhecimento de mercado, com ranking diário, mensal e anual.",
-    href: "/jogos",
-    icon: Gamepad2,
+    title: "Desafio do Match",
+    description: "Indique amigos com seu link e desbloqueie créditos de diagnóstico completo a cada 3 indicações confirmadas.",
+    href: "/desafio",
+    icon: Trophy,
   },
   {
     title: "Marketplace freelancer",
     description: "Publique um perfil e ofereça serviços ou publique um projeto e contrate outro profissional - tudo dentro da plataforma.",
     href: "/freelancer",
     icon: Handshake,
+  },
+  {
+    title: "Jogos de carreira",
+    description: "7 minijogos para treinar digitação, vocabulário técnico e conhecimento de mercado, com ranking diário, mensal e anual.",
+    href: "/jogos",
+    icon: Gamepad2,
   },
   {
     title: "Radar de concursos",
@@ -55,9 +62,9 @@ const SHIPPED = [
     icon: GraduationCap,
   },
   {
-    title: "Feed aberto a todos",
-    description: "Agora dá para ver todas as vagas disponíveis mesmo antes de enviar o currículo.",
-    href: "/feed",
+    title: "Todas as vagas, sem curadoria",
+    description: "Além do feed selecionado para o seu momento, veja o catálogo completo de vagas abertas na plataforma.",
+    href: "/todas-as-vagas",
     icon: Rss,
   },
 ];

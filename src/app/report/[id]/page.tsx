@@ -140,6 +140,7 @@ export default async function ReportPage({
         jobTitle={record.jobTitle}
         overallScore={record.overallScore}
         userName={user?.name}
+        userId={session.user.id}
       />
 
       {analysis ? (
@@ -150,7 +151,7 @@ export default async function ReportPage({
             jobTitle={record.jobTitle}
             behavioralResult={behavioralResult}
           />
-          {!subscribed && <SubscriptionUpsell segment={segment ?? "career_pro"} />}
+          {!subscribed && segment !== "student" && <SubscriptionUpsell segment={segment ?? "career_pro"} />}
         </div>
       ) : (
         <div className="space-y-6">
@@ -180,15 +181,15 @@ export default async function ReportPage({
               <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
             </div>
           </AnalysisTeaserView>
-
-          {/* Recompensa de Indicação para liberar sem pagar */}
-          <ReferralRewardBox
-            userId={session.user.id}
-            totalReferrals={referralStats.totalReferrals}
-            credits={referralStats.credits}
-          />
         </div>
       )}
+
+      {/* Recompensa de Indicação para liberar sem pagar */}
+      <ReferralRewardBox
+        userId={session.user.id}
+        totalReferrals={referralStats.totalReferrals}
+        credits={referralStats.credits}
+      />
     </main>
   );
 }

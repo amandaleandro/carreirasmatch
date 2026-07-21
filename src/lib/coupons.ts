@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 
 export type PaymentKind = "first_analysis" | "diagnostic" | "subscription";
@@ -93,4 +94,38 @@ export async function registerCouponUsage(couponId: string | null) {
     where: { id: couponId },
     data: { usageCount: { increment: 1 } },
   });
+}
+
+/**
+ * Cupom pessoal e descartável usado pela régua de urgência de e-mail (não por
+ * influenciador): desconto percentual só na assinatura, validade curta e uso
+ * único. O prefixo `PLANO{percent}-` deixa esses cupons reconhecíveis no
+ * /admin, separados dos cupons de indicação.
+ */
+export async function createUrgencyCoupon(opts: { percent: number; hours: number }): Promise<{
+  code: string;
+  expiresAt: Date;
+}> {
+  const expiresAt = new Date(Date.now() + opts.hours * 60 * 60 * 1000);
+
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = `PLANO${opts.percent}-${crypto.randomBytes(5).toString("hex").toUpperCase()}`;
+    try {
+      await prisma.coupon.create({
+        data: {
+          code,
+          influencerName: "Oferta automática (e-mail de urgência)",
+          discountType: "percent",
+          subscriptionDiscountPercent: opts.percent,
+          oneOffDiscountPercent: 0,
+          maxRedemptions: 1,
+          expiresAt,
+        },
+      });
+      return { code, expiresAt };
+    } catch {
+      continue; // colisão de código (rara): tenta outro sufixo
+    }
+  }
+  throw new Error("Não foi possível gerar um cupom único após várias tentativas.");
 }

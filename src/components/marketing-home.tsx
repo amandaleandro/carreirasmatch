@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
+import { prisma } from "@/lib/prisma";
 
 const steps = [
   {
@@ -142,7 +143,25 @@ const deliverables = [
   "Plano de evolução e próximos passos",
 ];
 
-export function MarketingHome() {
+async function getLiveStats() {
+  const [openJobs, cities] = await Promise.all([
+    prisma.publicOpportunity.count({ where: { active: true } }),
+    prisma.publicOpportunity.groupBy({
+      by: ["city"],
+      where: { active: true, city: { not: "" } },
+    }),
+  ]);
+  return { openJobs, cityCount: cities.length };
+}
+
+function formatCount(value: number) {
+  if (value >= 1000) return `${Math.floor(value / 100) / 10}mil`.replace(".0mil", "mil");
+  return String(value);
+}
+
+export async function MarketingHome() {
+  const { openJobs, cityCount } = await getLiveStats();
+
   return (
     <div className="w-full overflow-hidden">
       <section className="relative bg-[linear-gradient(135deg,#061522_0%,#0d2f61_55%,#111827_100%)] text-white">
@@ -160,6 +179,7 @@ export function MarketingHome() {
             <a href="#para-voce" className="hover:text-white">Para você</a>
             <Link href="/vagas-de-hoje" className="hover:text-white">Vagas</Link>
             <Link href="/gratuito" className="hover:text-white">Ferramentas grátis</Link>
+            <Link href="/assinar" className="hover:text-white">Planos</Link>
             <Link href="/freelancers" className="hover:text-white">Freelancers</Link>
             <Link href="/empresas" className="hover:text-white">Empresas</Link>
             <Link href="/parceiro" className="hover:text-white">Parceiros</Link>
@@ -177,21 +197,22 @@ export function MarketingHome() {
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-12 md:px-8 lg:grid-cols-[1.08fr_.92fr] lg:items-center lg:pb-28 lg:pt-20">
           <div>
             <span className="animate-rise inline-block text-xs font-semibold uppercase tracking-[0.2em] text-blue-300/90">
-              Candidaturas mais estratégicas
+              Currículo x vaga, em segundos
             </span>
             <h1 className="animate-rise mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight md:text-6xl" style={{ animationDelay: "80ms" }}>
-              Pare de se candidatar no escuro.
+              Descubra por que você não é chamado — antes de aplicar de novo.
             </h1>
             <p className="animate-rise mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-xl" style={{ animationDelay: "160ms" }}>
-              Compare seu currículo com uma vaga real, descubra o que está ajudando ou
-              atrapalhando e receba um plano claro antes de aplicar.
+              Cole o link da vaga, envie seu currículo e veja em segundos o que está
+              pesando contra você, o que já joga a seu favor e o que ajustar para
+              virar o jogo.
             </p>
             <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "240ms" }}>
               <Link
                 href="/analise"
                 className="btn-shine group inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold shadow-lg shadow-blue-950/30 transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-xl hover:shadow-blue-900/40"
               >
-                Analisar currículo e vaga
+                Analisar meu currículo agora
                 <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
               </Link>
               <Link
@@ -203,8 +224,23 @@ export function MarketingHome() {
             </div>
             <div className="animate-rise mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55" style={{ animationDelay: "320ms" }}>
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Resultado inicial gratuito</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Diagnóstico completo a partir de R$9,90</span>
               <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Sem promessa de contratação</span>
             </div>
+            {openJobs > 0 && (
+              <div className="animate-rise mt-8 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-white/10 pt-6" style={{ animationDelay: "380ms" }}>
+                <div>
+                  <p className="text-2xl font-extrabold text-white">{formatCount(openJobs)}</p>
+                  <p className="text-xs text-white/55">vagas monitoradas agora</p>
+                </div>
+                {cityCount > 0 && (
+                  <div>
+                    <p className="text-2xl font-extrabold text-white">{cityCount}+</p>
+                    <p className="text-xs text-white/55">cidades cobertas</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="animate-rise relative" style={{ animationDelay: "300ms" }}>
@@ -326,8 +362,8 @@ export function MarketingHome() {
           <div className="reveal-up grid gap-8 overflow-hidden rounded-3xl bg-slate-950 px-6 py-10 text-white md:px-10 lg:grid-cols-[1fr_auto] lg:items-center">
             <div>
               <div className="flex items-center gap-2 text-blue-300"><FileSearch className="h-5 w-5" /><span className="text-xs font-bold uppercase tracking-[0.18em]">Sua próxima candidatura</span></div>
-              <h2 className="mt-4 text-3xl font-bold tracking-tight">Encontrou uma vaga? Não envie o mesmo currículo ainda.</h2>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">Faça a comparação, identifique os requisitos centrais e ajuste apenas o que for verdadeiro e relevante.</p>
+              <h2 className="mt-4 text-3xl font-bold tracking-tight">Encontrou uma vaga? Não envie o mesmo currículo de novo.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">Faça a comparação, identifique os requisitos centrais e ajuste apenas o que for verdadeiro e relevante. Leva menos tempo do que escrever uma carta de apresentação.</p>
             </div>
             <Link href="/analise" className="btn-shine group inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-bold transition-all duration-200 hover:-translate-y-0.5 hover:bg-blue-500 hover:shadow-xl hover:shadow-blue-900/40">
               Analisar antes de aplicar <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />

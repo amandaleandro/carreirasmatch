@@ -11,10 +11,16 @@ import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 type PlanId = "card_recurring" | "monthly_oneoff" | "annual";
 
-export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment: CareerSegment }) {
+export function PublicSubscriptionCheckout({
+  initialSegment,
+  initialCouponCode = "",
+}: {
+  initialSegment: CareerSegment;
+  initialCouponCode?: string;
+}) {
   const [segment, setSegment] = useState<CareerSegment>(initialSegment);
   const [email, setEmail] = useState("");
-  const [couponCode, setCouponCode] = useState("");
+  const [couponCode, setCouponCode] = useState(initialCouponCode.toUpperCase());
   const [plan, setPlan] = useState<PlanId>("card_recurring");
   const [showBrick, setShowBrick] = useState(false);
 
@@ -106,7 +112,8 @@ export function PublicSubscriptionCheckout({ initialSegment }: { initialSegment:
                 onChange={(e) => setSegment(e.target.value as CareerSegment)}
                 className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 px-3 py-2 text-sm"
               >
-                {CAREER_SEGMENT_OPTIONS.map((option) => (
+                {/* Faculdade/técnico ainda não tem assinatura mensal — vende só o diagnóstico avulso. */}
+                {CAREER_SEGMENT_OPTIONS.filter((option) => option.value !== "student").map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>

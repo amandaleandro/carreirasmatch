@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { Prisma } from "@/generated/prisma/client";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
@@ -6,6 +7,7 @@ import { ContentPage } from "@/components/content-page";
 import { JobAlertForm } from "@/components/job-alert-form";
 import { PublicOpportunityActions } from "@/components/public-opportunity-actions";
 import { locationSlug } from "@/lib/location-slug";
+import { locationSearchVariants } from "@/lib/brazil-locations";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -39,14 +41,27 @@ export default async function PublicJobsPage({
     }
   })();
 
+  const andFilters: Prisma.PublicOpportunityWhereInput[] = [];
+  if (state) andFilters.push({ state });
+  if (city) {
+    andFilters.push({
+      OR: locationSearchVariants(city).map((variant) => ({ city: { contains: variant, mode: "insensitive" } })),
+    });
+  }
+  if (query) {
+    andFilters.push({
+      OR: [
+        { title: { contains: query, mode: "insensitive" } },
+        { area: { contains: query, mode: "insensitive" } },
+        { description: { contains: query, mode: "insensitive" } },
+      ],
+    });
+  }
+
   const opportunities = await prisma.publicOpportunity.findMany({
     where: {
       active: true,
-      ...(state ? { state } : {}),
-      ...(city ? { city: { contains: city } } : {}),
-      ...(query
-        ? { OR: [{ title: { contains: query } }, { area: { contains: query } }, { description: { contains: query } }] }
-        : {}),
+      ...(andFilters.length > 0 ? { AND: andFilters } : {}),
     },
     include: { source: { select: { name: true } }, _count: { select: { clicks: true, reports: true } } },
     orderBy: [{ publishedAt: "desc" }, { lastSeenAt: "desc" }],

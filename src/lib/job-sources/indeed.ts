@@ -33,7 +33,7 @@ function sleep(ms: number): Promise<void> {
 // playwright-extra + puppeteer-extra-plugin-stealth (patches conhecidos de
 // fingerprint) sobre um Chromium real, e abrimos cada vaga clicando no card
 // de resultado (como um usuário faria) em vez de navegar direto pra URL.
-export async function fetchIndeedJobs(searchTerm?: string): Promise<FetchedJob[]> {
+export async function fetchIndeedJobs(searchTerm?: string, location = "Brasil"): Promise<FetchedJob[]> {
   const browser = await chromium.launch({
     executablePath: process.env.CHROMIUM_EXECUTABLE_PATH,
     // Sem isso o Chromium falha ao iniciar quando o container roda como usuário
@@ -66,7 +66,7 @@ export async function fetchIndeedJobs(searchTerm?: string): Promise<FetchedJob[]
 
       const url = new URL(SEARCH_URL);
       if (searchTerm) url.searchParams.set("q", searchTerm);
-      url.searchParams.set("l", "Brasil");
+      url.searchParams.set("l", location);
       if (pageIndex > 0) url.searchParams.set("start", String(pageIndex * RESULTS_PER_PAGE));
 
       try {

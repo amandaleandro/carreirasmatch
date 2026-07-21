@@ -6,6 +6,7 @@ import { ContentPage } from "@/components/content-page";
 import { AllJobsList } from "@/app/feed/AllJobsList";
 import { Pagination } from "@/components/Pagination";
 import { AllJobsFilterForm } from "./AllJobsFilterForm";
+import { locationSearchVariants, stateSearchVariants } from "@/lib/brazil-locations";
 
 export const dynamic = "force-dynamic";
 
@@ -40,10 +41,10 @@ export default async function AllJobsPage({
   const andFilters: any[] = [];
   if (q?.trim()) {
     andFilters.push({
-      OR: [
-        { jobTitle: { contains: q.trim(), mode: "insensitive" } },
-        { jobText: { contains: q.trim(), mode: "insensitive" } },
-      ],
+      OR: locationSearchVariants(q.trim()).flatMap((variant) => [
+        { jobTitle: { contains: variant, mode: "insensitive" } },
+        { jobText: { contains: variant, mode: "insensitive" } },
+      ]),
     });
   }
   if (area) {
@@ -56,10 +57,14 @@ export default async function AllJobsPage({
     andFilters.push({ contractType: { contains: contractType, mode: "insensitive" } });
   }
   if (city) {
-    andFilters.push({ location: { contains: city, mode: "insensitive" } });
+    andFilters.push({
+      OR: locationSearchVariants(city).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+    });
   }
   if (state) {
-    andFilters.push({ location: { contains: state, mode: "insensitive" } });
+    andFilters.push({
+      OR: stateSearchVariants(state).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+    });
   }
 
   const whereClause = andFilters.length > 0 ? { active: true, AND: andFilters } : { active: true };

@@ -39,10 +39,10 @@ type NavItem = {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame },
+  { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame, tour: "nav-desafio" },
   { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
   { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
-  { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
+  { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
   { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   { href: "/freelancer", label: "Freelancer", icon: Handshake, tour: "nav-freelancer" },
   { href: "/jogos", label: "Jogos", icon: Gamepad2, tour: "nav-jogos" },

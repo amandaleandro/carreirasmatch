@@ -17,12 +17,16 @@ type TourStep = {
   route?: string;
 };
 
-const STORAGE_KEY = "guided-tour:v1:done";
+// Sobe a versão sempre que a lista de passos muda de verdade: quem já viu o
+// tour precisa ver o roteiro novo (ex: passo do Desafio do Match).
+const STORAGE_KEY = "guided-tour:v2:done";
 
 type StepId =
   | "welcome"
+  | "desafio"
   | "analise"
   | "feed"
+  | "todas_vagas"
   | "applications"
   | "resume"
   | "tools"
@@ -41,6 +45,13 @@ const BASE_STEPS: Record<StepId, TourStep> = {
     title: "Bem-vindo(a)! 👋",
     body: "Em 1 minuto eu te mostro por onde a mágica acontece. Pode continuar usando a tela normalmente - nada fica bloqueado.",
   },
+  desafio: {
+    target: '[data-tour="nav-desafio"]',
+    title: "Desafio do Match ⚡",
+    body: "Indique amigos com o seu link e desbloqueie recompensas conforme eles se cadastram. Vale a pena dar uma olhada logo de cara.",
+    placement: "right",
+    route: "/dashboard",
+  },
   analise: {
     target: '[data-tour="nav-analise"]',
     title: "Comece por aqui: Análise de Vaga",
@@ -52,6 +63,12 @@ const BASE_STEPS: Record<StepId, TourStep> = {
     target: '[data-tour="nav-feed"]',
     title: "Feed de Vagas",
     body: "Vagas selecionadas para o seu momento de carreira. Salve as interessantes com um clique - elas viram candidaturas.",
+    placement: "right",
+  },
+  todas_vagas: {
+    target: '[data-tour="nav-todas-vagas"]',
+    title: "Todas as Vagas",
+    body: "Quer ver o feed completo, sem curadoria? Aqui ficam todas as vagas abertas na plataforma, com filtro por área e nível.",
     placement: "right",
   },
   applications: {
@@ -123,8 +140,10 @@ const BASE_STEPS: Record<StepId, TourStep> = {
 
 const DEFAULT_ORDER: StepId[] = [
   "welcome",
+  "desafio",
   "analise",
   "feed",
+  "todas_vagas",
   "applications",
   "resume",
   "tools",
@@ -190,7 +209,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
   },
   student: {
     // Estudante escolhendo faculdade/técnico: foco em ferramentas e radar de vestibulares.
-    order: ["welcome", "tools", "vestibulares", "mentorias", "analise", "resume", "overview", "closing"],
+    order: ["welcome", "desafio", "tools", "vestibulares", "mentorias", "analise", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como escolher sua faculdade ou curso técnico com segurança. Pode usar a tela normalmente.",
@@ -209,7 +228,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
   },
   concurseiro: {
     // Concurseiro: radar de concursos e ferramentas de preparação no centro; vagas são plano B.
-    order: ["welcome", "concursos", "tools", "mentorias", "analise", "resume", "overview", "closing"],
+    order: ["welcome", "desafio", "concursos", "tools", "mentorias", "analise", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como a plataforma turbina a sua preparação para concursos. Pode usar a tela normalmente.",
@@ -228,7 +247,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
   },
   oab: {
     // Estudante de OAB: ferramentas do exame e conteúdo de estudo no centro.
-    order: ["welcome", "tools", "mentorias", "analise", "resume", "overview", "closing"],
+    order: ["welcome", "desafio", "tools", "mentorias", "analise", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como a plataforma apoia a sua preparação para o Exame da OAB. Pode usar a tela normalmente.",

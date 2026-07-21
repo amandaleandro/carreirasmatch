@@ -7,12 +7,42 @@ interface ShareMatchCardProps {
   jobTitle: string;
   overallScore: number;
   userName?: string | null;
+  userId?: string;
 }
 
-export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchCardProps) {
+function truncateToWidth(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+  if (ctx.measureText(text).width <= maxWidth) return text;
+  let truncated = text;
+  while (truncated.length > 1 && ctx.measureText(`${truncated}…`).width > maxWidth) {
+    truncated = truncated.slice(0, -1);
+  }
+  return `${truncated.trimEnd()}…`;
+}
+
+function copyTextFallback(value: string): boolean {
+  const textarea = document.createElement("textarea");
+  textarea.value = value;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  let succeeded = false;
+  try {
+    succeeded = document.execCommand("copy");
+  } catch {
+    succeeded = false;
+  }
+  document.body.removeChild(textarea);
+  return succeeded;
+}
+
+export function ShareMatchCard({ jobTitle, overallScore, userName, userId }: ShareMatchCardProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+  const ringColorClass =
+    overallScore >= 70 ? "border-emerald-400" : overallScore >= 50 ? "border-amber-400" : "border-red-400";
 
   const generateCanvasImage = (): string | null => {
     const canvas = canvasRef.current;
@@ -51,8 +81,10 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
     ctx.lineWidth = 3;
     ctx.stroke();
 
+    const emojiFontStack = 'Inter, "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+
     ctx.fillStyle = "#38BDF8";
-    ctx.font = "bold 28px Inter, sans-serif";
+    ctx.font = `bold 28px ${emojiFontStack}`;
     ctx.textAlign = "center";
     ctx.fillText("⚡ MATCH DE CARREIRA", 540, 265);
 
@@ -63,7 +95,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
 
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "bold 52px Inter, sans-serif";
-    const truncatedJob = jobTitle.length > 30 ? jobTitle.slice(0, 30) + "..." : jobTitle;
+    const truncatedJob = truncateToWidth(ctx, jobTitle, 900);
     ctx.fillText(truncatedJob, 540, 490);
 
     // Anel Central com Percentual de Match
@@ -83,16 +115,21 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
     const startAngle = -Math.PI / 2;
     const endAngle = startAngle + (Math.PI * 2 * (overallScore / 100));
 
+    // Glow suave atrás do anel para destacar o score
+    ctx.save();
+    ctx.shadowColor = scoreColor;
+    ctx.shadowBlur = 30;
     ctx.beginPath();
     ctx.arc(ringCenterX, ringCenterY, ringRadius, startAngle, endAngle);
     ctx.strokeStyle = scoreColor;
     ctx.lineWidth = 36;
     ctx.lineCap = "round";
     ctx.stroke();
+    ctx.restore();
 
     // Texto do Score
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "black 140px Inter, sans-serif";
+    ctx.font = "900 140px Inter, sans-serif";
     ctx.fillText(`${overallScore}%`, ringCenterX, ringCenterY + 40);
 
     ctx.fillStyle = "#94A3B8";
@@ -108,12 +145,11 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
     ctx.lineWidth = 2;
     ctx.stroke();
 
+    ctx.font = "bold 44px Inter, sans-serif";
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "bold 44px Inter, sans-serif";
-    ctx.fillText(`"Meu Match com essa vaga foi de ${overallScore}%!`, 540, 1270);
-    ctx.font = "bold 44px Inter, sans-serif";
+    ctx.fillText(`"Meu Match com essa vaga foi de ${overallScore}%!`, 540, 1290);
     ctx.fillStyle = "#38BDF8";
-    ctx.fillText("E o seu?" + '"', 540, 1340);
+    ctx.fillText('E o seu?"', 540, 1360);
 
     // Chamada para Ação e Rodapé
     ctx.fillStyle = "#E2E8F0";
@@ -151,7 +187,8 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
     const dataUrl = generateCanvasImage();
     setIsGenerating(false);
 
-    const shareUrl = typeof window !== "undefined" ? window.location.href : "https://carreirasmatch.com.br/desafio";
+    const origin = typeof window !== "undefined" ? window.location.origin : "https://carreirasmatch.com.br";
+    const shareUrl = userId ? `${origin}/desafio?ref=${userId}` : `${origin}/desafio`;
     const text = `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch! Faça o seu teste também:`;
 
     if (navigator.share && dataUrl) {
@@ -169,15 +206,45 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
           });
           return;
         }
-      } catch {
-        // Fallback para compartilhamento de link simples
+
+        if (navigator.canShare && navigator.canShare({ text, url: shareUrl })) {
+          await navigator.share({
+            title: "Desafio do Match de Carreira",
+            text,
+            url: shareUrl,
+          });
+          return;
+        }
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") {
+          return;
+        }
+        // Segue para o fallback de copiar link
       }
     }
 
-    // Copiar link fallback
-    navigator.clipboard.writeText(`${text} ${shareUrl}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
+    const fullText = `${text} ${shareUrl}`;
+    let copySucceeded = false;
+
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(fullText);
+        copySucceeded = true;
+      } catch {
+        copySucceeded = false;
+      }
+    }
+
+    if (!copySucceeded) {
+      copySucceeded = copyTextFallback(fullText);
+    }
+
+    if (copySucceeded) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } else {
+      window.prompt("Copie seu link de convite:", fullText);
+    }
   };
 
   return (
@@ -208,7 +275,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userName }: ShareMatchC
             <p className="text-[10px] text-slate-400 font-medium uppercase">Vaga</p>
             <p className="text-xs font-bold text-white line-clamp-2">{jobTitle}</p>
 
-            <div className="my-3 inline-flex items-center justify-center w-24 h-24 rounded-full border-4 border-emerald-400 bg-slate-950/40 text-2xl font-black text-white">
+            <div className={`my-3 inline-flex items-center justify-center w-24 h-24 rounded-full border-4 ${ringColorClass} bg-slate-950/40 text-2xl font-black text-white`}>
               {overallScore}%
             </div>
 

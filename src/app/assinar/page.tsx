@@ -12,10 +12,12 @@ export const metadata: Metadata = {
 export default async function SubscribePage({
   searchParams,
 }: {
-  searchParams: Promise<{ segment?: string }>;
+  searchParams: Promise<{ segment?: string; coupon?: string }>;
 }) {
   const params = await searchParams;
-  const segment: CareerSegment = params.segment && isCareerSegment(params.segment) ? params.segment : "career_pro";
+  const requested = params.segment && isCareerSegment(params.segment) ? params.segment : "career_pro";
+  // Faculdade/técnico ainda não tem assinatura mensal — vende só o diagnóstico avulso.
+  const segment: CareerSegment = requested === "student" ? "career_pro" : requested;
 
-  return <PublicSubscriptionCheckout initialSegment={segment} />;
+  return <PublicSubscriptionCheckout initialSegment={segment} initialCouponCode={params.coupon?.trim() ?? ""} />;
 }

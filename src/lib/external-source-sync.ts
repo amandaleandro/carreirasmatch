@@ -192,19 +192,28 @@ export async function syncSinePiBulletins() {
   });
 }
 
+// Portais oficiais de emprego (SINE estadual/prefeitura) verificados manualmente:
+// servem HTML estatico com os links de vaga/boletim ja renderizados (o parser
+// "links" so funciona nesse caso - ver aviso sobre SPAs em DEFAULT_COURSE_SOURCES).
+// Cada fonte cobre o estado inteiro, nao so a capital.
+const DEFAULT_OPPORTUNITY_SOURCES: { name: string; url: string; state: string; city: string }[] = [
+  { name: "SINE Piauí", url: SINE_PI, state: "PI", city: "" },
+  {
+    name: "SINE Belo Horizonte (PBH)",
+    url: "https://prefeitura.pbh.gov.br/desenvolvimento/vagas-de-emprego-nos-postos-municipais-do-sine",
+    state: "MG",
+    city: "Belo Horizonte",
+  },
+];
+
 export async function ensureDefaultOpportunitySources() {
-  await prisma.opportunitySource.upsert({
-    where: { url: SINE_PI },
-    create: {
-      name: "SINE Piauí",
-      url: SINE_PI,
-      kind: "job",
-      parser: "links",
-      state: "PI",
-      official: true,
-    },
-    update: { name: "SINE Piauí", official: true },
-  });
+  for (const source of DEFAULT_OPPORTUNITY_SOURCES) {
+    await prisma.opportunitySource.upsert({
+      where: { url: source.url },
+      create: { ...source, kind: "job", parser: "links", official: true },
+      update: { name: source.name, state: source.state, city: source.city, official: true },
+    });
+  }
 }
 
 function absoluteUrl(value: string, base: string) {

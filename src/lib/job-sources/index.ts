@@ -46,7 +46,8 @@ function fingerprint(job: { jobTitle: string; company?: string; location?: strin
 
 export async function fetchNewJobsFromAllSources(
   searchTerms?: JobSearchTerms,
-  requestContext?: RequestContext
+  requestContext?: RequestContext,
+  location?: string
 ): Promise<{ added: number; errors: string[] }> {
   const errors: string[] = [];
   const filterKeywords = searchTerms
@@ -55,7 +56,7 @@ export async function fetchNewJobsFromAllSources(
   const sources: { name: string; fetch: () => Promise<FetchedJob[]> }[] = [
     { name: "arbeitnow", fetch: () => fetchArbeitnowJobs(filterKeywords) },
     { name: "remoteok", fetch: () => fetchRemoteOkJobs(filterKeywords) },
-    { name: "linkedin", fetch: () => fetchLinkedInJobs(searchTerms) },
+    { name: "linkedin", fetch: () => fetchLinkedInJobs(searchTerms, location) },
     { name: "themuse", fetch: () => fetchTheMuseJobs(filterKeywords) },
     { name: "himalayas", fetch: () => fetchHimalayasJobs(filterKeywords) },
     { name: "remotejobsorg", fetch: () => fetchRemoteJobsOrgJobs(filterKeywords) },
@@ -63,10 +64,10 @@ export async function fetchNewJobsFromAllSources(
     { name: "remotive", fetch: () => fetchRemotiveJobs(filterKeywords) },
   ];
   if (isIndeedConfigured()) {
-    sources.push({ name: "indeed", fetch: () => fetchIndeedJobs(searchTerms?.titlePt) });
+    sources.push({ name: "indeed", fetch: () => fetchIndeedJobs(searchTerms?.titlePt, location) });
   }
   if (isAdzunaConfigured()) {
-    sources.push({ name: "adzuna", fetch: () => fetchAdzunaJobs(searchTerms?.titlePt) });
+    sources.push({ name: "adzuna", fetch: () => fetchAdzunaJobs(searchTerms?.titlePt, location) });
   }
   if (isGupyConfigured()) {
     sources.push({ name: "gupy", fetch: () => fetchGupyJobs() });

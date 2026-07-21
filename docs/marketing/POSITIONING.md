@@ -1,148 +1,90 @@
 # Posicionamento e marca
 
-## Problema de mercado
+## O que o código diz que o produto é
 
-Quem procura oportunidade costuma operar no escuro:
+`src/lib/seo.ts` define a descrição oficial (usada no JSON-LD de organização,
+em todas as páginas): "Copiloto de carreira que compara currículo e vaga,
+mostra as lacunas que mais importam e transforma o diagnóstico em ações."
 
-- não sabe se combina com a vaga;
-- envia o mesmo currículo para tudo;
-- não traduz experiência para a linguagem do recrutador;
-- estuda sem saber qual lacuna priorizar;
-- chega à entrevista sem praticar situações reais;
-- perde o histórico e repete os mesmos erros.
+A home (`src/components/marketing-home.tsx`) resume isso na headline: **"Pare
+de se candidatar no escuro."**, com o subtítulo "Compare seu currículo com
+uma vaga real, descubra o que está ajudando ou atrapalhando e receba um plano
+claro antes de aplicar." CTA primário: "Analisar currículo e vaga" (`/analise`).
 
-O concorrente real não é apenas outro analisador de currículo. É a soma de
-tentativa e erro, planilhas, modelos genéricos, vídeos soltos e candidaturas em
-massa.
+## Para quem é (fonte: `/sobre`)
 
-## Posicionamento
+`src/app/sobre/page.tsx` nomeia o público diretamente: "estudantes,
+estagiários, quem busca o primeiro emprego, quem está mudando de área e quem
+está se recolocando no mercado." Três pilares de marca, no texto real da
+página:
 
-> Para pessoas que querem uma oportunidade melhor, o CarreirasMatch é o
-> copiloto de carreira que compara currículo e vaga, mostra as lacunas que mais
-> importam e transforma o diagnóstico em ações para currículo, entrevista e
-> candidatura. Diferente de ferramentas genéricas, parte de uma oportunidade
-> real e adapta a orientação ao momento profissional da pessoa.
+1. **Clareza em vez de jargão** — "cada análise devolve o que está bom, o
+   que falta e o próximo passo, em linguagem direta."
+2. **Feito para cada momento** — "Estagiário, primeiro emprego, transição de
+   carreira, recolocação ou jovem aprendiz: a experiência muda porque o
+   desafio de cada fase é diferente."
+3. **Sem julgamento** — "Gap no currículo, pouca experiência, mudança de
+   área, a gente lê sua história como ela é e ajuda a contar isso a seu
+   favor."
 
-## Essência da marca
+Isso se reflete em rotas reais por segmento em `src/app`: `jovem-aprendiz`,
+`primeiro-emprego`, `estagio`, `transicao`, `recolocacao`, `oab`, `concurso`,
+`curriculo-sem-experiencia`, `faculdade-ou-tecnico`. `/comece`
+(`src/app/comece/page.tsx`) funciona como porta de entrada guarda-chuva para
+todos: "Estágio, primeiro emprego, transição de carreira, recolocação, jovem
+aprendiz ou estágio na faculdade: compare seu currículo com a vaga e veja
+exatamente o que ajustar antes de aplicar."
 
-| Elemento | Definição |
-| --- | --- |
-| Propósito | Tornar orientação profissional prática mais acessível |
-| Inimigo | Candidatura no escuro |
-| Transformação | De “não sei por que não me chamam” para “sei o que ajustar agora” |
-| Personalidade | Clara, acolhedora, direta, criteriosa e otimista sem ilusão |
-| Arquétipo | Guia competente, não guru |
-| Prova | Diagnóstico vinculado a uma vaga e plano acionável |
+## Diferencial funcional
 
-## Taglines
+`/sobre` nega a categoria genérica de propósito: "Não somos só um analisador
+de currículo, somos um copiloto para as decisões que mais pesam na sua
+trajetória profissional." Na prática (motor usado em `/analise` e no Desafio
+do Match, `src/app/desafio/DesafioForm.tsx`), a entrega por vaga é:
 
-Principal:
+- score de aderência (%);
+- pontos fortes / lacunas prioritárias;
+- palavras-chave que faltam;
+- perguntas prováveis de entrevista;
+- plano de ação.
 
-> Sua próxima candidatura começa com clareza.
+A vaga pode ser informada por texto colado **ou por link** (LinkedIn, Gupy
+etc.) — campo `jobLink` adicionado ao formulário do Desafio.
 
-Alternativas:
+## Prova de dado real, não copy
 
-- Entenda a vaga. Ajuste seu currículo. Chegue mais preparado.
-- Pare de se candidatar no escuro.
-- Seu currículo, visto pela lógica da vaga.
-- Da vaga desejada ao próximo passo.
-- Mais estratégia em cada candidatura.
+`src/app/mercado-de-trabalho/page.tsx` é uma página pública alimentada em
+tempo real pelo Postgres (`prisma.publicOpportunity.groupBy`), mostrando
+cidades, cargos mais publicados e salário médio agregados das vagas públicas
+coletadas — funciona como prova social baseada em dado e gancho de SEO local.
 
-## Pilares de mensagem
+## Outros dois lados do produto (não é só B2C candidato)
 
-### 1. Clareza antes de aplicar
+Além do candidato, existem três públicos adicionais com landing e painel
+dedicados (detalhado em `PARTNERSHIPS_AND_B2B.md`):
 
-“Descubra onde seu perfil combina com a vaga e o que merece ajuste antes de
-enviar o currículo.”
+- **empresas** (`/empresas`) — "Encontre os candidatos certos, ranqueados por
+  IA", com triagem automática, ranking por aderência e Kanban de
+  candidaturas;
+- **parceiros de curso** (`/parceiro`) — "Divulgue seus cursos para quem está
+  buscando a próxima vaga", com painel de leads/cliques/faturamento;
+- **freelancers e clientes de projeto** (`/freelancer`, `/freelancers`,
+  `/projetos`) — marketplace de dois lados: qualquer usuário pode publicar um
+  projeto ou se candidatar a um.
 
-### 2. Personalização por oportunidade
+## O que a marca evita (confirmado pelo texto real das páginas)
 
-“A mesma pessoa precisa se apresentar de formas diferentes para vagas
-diferentes. O CarreirasMatch ajuda a adaptar sem inventar experiência.”
+Nenhuma página pública lida promete emprego, aprovação ou aumento salarial —
+o vocabulário é sempre "aderência", "score", "lacunas" e "plano de ação". A
+home reforça isso com o selo "Sem promessa de contratação" ao lado do CTA
+principal, ao lado de "Resultado inicial gratuito".
 
-### 3. Ação, não apenas nota
+## Tom de voz observado nas páginas
 
-“Além do score, receba palavras-chave, ajustes, preparação para entrevista e
-próximos passos.”
-
-### 4. Orientação para cada momento
-
-“Primeiro emprego, estágio, recolocação ou transição pedem estratégias
-diferentes.”
-
-## ICPs prioritários
-
-### ICP A — Primeiro emprego/estágio
-
-- 16–26 anos, pouca experiência formal;
-- sente que “não tem o que colocar” no currículo;
-- usa TikTok, Instagram, YouTube e pesquisa Google;
-- responde a linguagem simples, exemplos e resultado imediato;
-- entrada: currículo grátis, vagas de hoje, teste vocacional;
-- oferta: diagnóstico de R$ 4,90 e planos de R$ 19,90/R$ 24,90.
-
-Mensagem: “Você pode ter mais experiência do que imagina. Aprenda a mostrar
-projetos, cursos e atividades do jeito certo para a vaga.”
-
-### ICP B — Recolocação/carreira pro
-
-- profissional com experiência, desempregado ou buscando vaga melhor;
-- frustração com silêncio após candidaturas;
-- valoriza privacidade, objetividade e ganho de tempo;
-- usa Google, LinkedIn, YouTube e comunidades profissionais;
-- entrada: análise de vaga, LinkedIn, currículo/ATS;
-- oferta: diagnóstico de R$ 4,90 e Carreira Pro.
-
-Mensagem: “Sua experiência precisa chegar ao recrutador na linguagem da vaga.”
-
-### ICP C — Transição
-
-- quer mudar de área e teme parecer iniciante;
-- precisa traduzir experiência anterior e encontrar cargo-ponte;
-- pesquisa cursos, carreira e histórias de transição;
-- entrada: guia de transição, teste e análise;
-- oferta: diagnóstico e plano Transição.
-
-Mensagem: “Você não começa do zero. Começa com habilidades que precisam ser
-traduzidas para a nova área.”
-
-## Jobs to be done
-
-| Situação | Trabalho que o produto resolve |
-| --- | --- |
-| Encontrei uma vaga interessante | Quero saber se vale aplicar |
-| Meu currículo não gera retorno | Quero identificar o que está me prejudicando |
-| Tenho pouca experiência | Quero transformar projetos e cursos em evidências |
-| Quero mudar de área | Quero explicar minha trajetória sem parecer incoerente |
-| Fui chamado para entrevista | Quero treinar respostas ligadas à vaga |
-| Estou aplicando muito | Quero organizar e melhorar meu processo |
-
-## Objeções e respostas
-
-| Objeção | Resposta |
-| --- | --- |
-| “É só mais uma IA?” | A IA é o mecanismo; a entrega é um diagnóstico vinculado à vaga e um plano de ação |
-| “Vai inventar informação?” | A orientação deve reorganizar e traduzir fatos reais, nunca criar experiência |
-| “Isso garante entrevista?” | Não. Melhora clareza e preparação, mas decisões pertencem às empresas |
-| “Meu currículo tem dados pessoais” | Explicar tratamento, finalidade e controles com linguagem acessível |
-| “Posso fazer sozinho?” | Sim; o valor está em reduzir tentativa e erro e priorizar o que ajustar |
-| “Por que pagar?” | Para sair de dicas genéricas e aplicar um diagnóstico à oportunidade específica |
-
-## Tom de voz
-
-Use:
-
-- frases curtas e verbos de ação;
-- exemplos concretos;
-- “você” com respeito;
-- esperança baseada em preparo;
-- explicação simples de termos como ATS.
-
-Evite:
-
-- “vaga garantida”, “currículo perfeito”, “hack do RH”;
-- culpabilizar a pessoa;
-- jargão de startup;
-- excesso de emojis;
-- tratar score como verdade absoluta;
-- fazer a IA parecer uma recrutadora real.
+- frases curtas, linguagem direta ("Nada de termo difícil ou relatório
+  genérico" — `/sobre`);
+- reconhecimento da dificuldade sem culpabilizar quem procura vaga ("a
+  maioria das pessoas não perde uma vaga por falta de capacidade, e sim por
+  não saber como se apresentar para ela" — `/sobre`);
+- pouco ou nenhum uso de jargão de startup ou emoji em excesso no corpo do
+  texto (emojis aparecem pontualmente em cards/labels, não no copy principal).

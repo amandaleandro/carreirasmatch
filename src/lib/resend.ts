@@ -11,31 +11,52 @@ const BRAND = "CarreirasMatch";
 
 /**
  * Envelopa o conteúdo num layout de e-mail consistente. `bodyHtml` já vem com os
- * parágrafos/botões prontos.
+ * parágrafos/botões prontos. Usa tabelas (não só divs) porque clientes como o
+ * Outlook desktop ignoram boa parte do CSS em divs soltas.
  */
 function layout(bodyHtml: string) {
   return `
-    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #0f172a;">
-      <div style="padding: 8px 0 20px;">
-        <a href="${APP_URL}" style="font-size: 18px; font-weight: 700; color: #2563eb; text-decoration: none;">${BRAND}</a>
-      </div>
-      ${bodyHtml}
-      <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 28px 0 14px;" />
-      <p style="font-size: 12px; color: #64748b;">
-        Você recebeu este e-mail porque tem uma conta no ${BRAND}.
-        <a href="${APP_URL}" style="color: #64748b;">${APP_URL.replace(/^https?:\/\//, "")}</a>
-      </p>
-    </div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f9;padding:32px 16px;font-family:-apple-system,'Segoe UI',sans-serif;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.08);">
+            <tr>
+              <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:22px 28px;">
+                <a href="${APP_URL}" style="font-size:18px;font-weight:800;color:#ffffff;text-decoration:none;">✨ ${BRAND}</a>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:28px 28px 6px;color:#0f172a;font-size:15px;line-height:1.65;">
+                ${bodyHtml}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:12px 28px 26px;">
+                <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0 16px;" />
+                <p style="font-size:12px;color:#64748b;margin:0;line-height:1.5;">
+                  Você recebeu este e-mail porque tem uma conta no ${BRAND} 💙<br/>
+                  <a href="${APP_URL}" style="color:#64748b;">${APP_URL.replace(/^https?:\/\//, "")}</a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   `;
 }
 
 function button(href: string, label: string) {
   return `
-    <p style="margin: 24px 0;">
-      <a href="${href}" style="background:#2563eb;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:600;display:inline-block;">
-        ${label}
-      </a>
-    </p>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0;">
+      <tr>
+        <td style="border-radius:12px;background:linear-gradient(135deg,#2563eb,#1e40af);">
+          <a href="${href}" style="display:inline-block;padding:14px 26px;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;border-radius:12px;">
+            ${label} →
+          </a>
+        </td>
+      </tr>
+    </table>
   `;
 }
 
@@ -109,7 +130,7 @@ async function sendAdmin(subject: string, rows: Array<[string, string]>) {
     return;
   }
   const body = `
-    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #0f172a;">
+    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #0f172a; background:#ffffff; border-radius:16px; padding:20px 24px; border:1px solid #e2e8f0;">
       <h2 style="font-size: 18px; margin: 0 0 12px;">${subject}</h2>
       <table style="border-collapse: collapse; font-size: 14px;">
         ${rows
@@ -163,29 +184,29 @@ export async function notifyAdminPurchase(opts: {
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   await send(
     to,
-    "Redefinir sua senha",
+    "🔐 Redefinir sua senha",
     `
-      <h2 style="font-size: 20px;">Redefinir sua senha</h2>
+      <h2 style="font-size: 20px;">🔐 Redefinir sua senha</h2>
       <p>Recebemos um pedido para redefinir a senha da sua conta. Clique no botão abaixo para escolher uma nova senha:</p>
       ${button(resetUrl, "Redefinir senha")}
       <p>Se o botão não funcionar, copie e cole este link no navegador:</p>
       <p><a href="${resetUrl}">${resetUrl}</a></p>
-      <p>Este link expira em 1 hora. Se você não pediu essa redefinição, pode ignorar este e-mail.</p>
+      <p>Este link expira em 1 hora. Se você não pediu essa redefinição, pode ignorar este e-mail 🙂</p>
     `
   );
 }
 
 export async function sendWelcomeEmail(to: string, name?: string | null) {
-  const greeting = name?.trim() ? `Olá, ${name.trim().split(" ")[0]}!` : "Olá!";
+  const greeting = name?.trim() ? `Olá, ${name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   await send(
     to,
     `Bem-vindo(a) ao ${BRAND} 🎉`,
     `
       <h2 style="font-size: 20px;">${greeting}</h2>
       <p>Sua conta no ${BRAND} está pronta. A partir de agora você pode analisar seu currículo contra qualquer vaga e descobrir, com IA, o quanto você está aderente e como melhorar.</p>
-      <p>Comece pela sua primeira análise:</p>
+      <p>Comece pela sua primeira análise 🚀</p>
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
-      <p>Dica: quanto mais específica for a descrição da vaga, mais preciso fica o diagnóstico.</p>
+      <p>💡 Dica: quanto mais específica for a descrição da vaga, mais preciso fica o diagnóstico.</p>
     `
   );
 }
@@ -193,9 +214,9 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
 export async function sendSupportReplyEmail(to: string, opts: { ticketId: string; subject: string }) {
   await send(
     to,
-    `Nova resposta no suporte: ${opts.subject}`,
+    `💬 Nova resposta no suporte: ${opts.subject}`,
     `
-      <h2 style="font-size: 20px;">Você recebeu uma resposta</h2>
+      <h2 style="font-size: 20px;">💬 Você recebeu uma resposta</h2>
       <p>Nossa equipe respondeu ao chamado <strong>${opts.subject}</strong>.</p>
       ${button(`${APP_URL}/suporte/${opts.ticketId}`, "Ver resposta")}
     `
@@ -222,9 +243,9 @@ export async function sendTalentContactRequestEmail(
   const forJob = opts.jobTitle?.trim() ? ` para a vaga de <strong>${opts.jobTitle.trim()}</strong>` : "";
   await send(
     to,
-    `${opts.companyName} quer falar com você`,
+    `👀 ${opts.companyName} quer falar com você`,
     `
-      <h2 style="font-size: 20px;">Uma empresa quer seu contato</h2>
+      <h2 style="font-size: 20px;">👀 Uma empresa quer seu contato</h2>
       <p><strong>${opts.companyName}</strong> encontrou seu perfil no banco de talentos do ${BRAND} e pediu para entrar em contato${forJob}.</p>
       <p>Seu contato só é liberado se você aceitar. Veja o pedido e decida:</p>
       ${button(`${APP_URL}/settings`, "Ver pedido de contato")}
@@ -240,7 +261,7 @@ export async function sendCompanyContactAcceptedEmail(
   const forJob = opts.jobTitle?.trim() ? ` para a vaga de <strong>${opts.jobTitle.trim()}</strong>` : "";
   await send(
     to,
-    `${opts.candidateName} liberou o contato`,
+    `🔓 ${opts.candidateName} liberou o contato`,
     `
       <h2 style="font-size: 20px;">Contato liberado 🎉</h2>
       <p><strong>${opts.candidateName}</strong> aceitou seu pedido de contato${forJob}. Os dados já estão disponíveis na sua central de contatos.</p>
@@ -258,7 +279,7 @@ export async function sendCompanyNewApplicationEmail(
   for (const recipient of to) {
     await send(
       recipient,
-      `Nova candidatura: ${opts.vagaTitle}`,
+      `🎯 Nova candidatura: ${opts.vagaTitle}`,
       `
         <h2 style="font-size: 20px;">Nova candidatura 🎯</h2>
         <p><strong>${opts.candidateName}</strong> se candidatou à sua vaga <strong>${opts.vagaTitle}</strong>.</p>
@@ -276,13 +297,13 @@ export async function sendCompanyMemberInviteEmail(
 ) {
   await send(
     to,
-    `Você foi adicionado(a) à equipe de ${opts.companyName} no ${BRAND}`,
+    `🤝 Você foi adicionado(a) à equipe de ${opts.companyName} no ${BRAND}`,
     `
-      <h2 style="font-size: 20px;">Bem-vindo(a) à equipe</h2>
+      <h2 style="font-size: 20px;">Bem-vindo(a) à equipe 🤝</h2>
       <p>Você foi adicionado(a) como membro da equipe de <strong>${opts.companyName}</strong> no ${BRAND}.</p>
       <p>Entre com este e-mail e a senha temporária abaixo, e troque a senha no seu perfil:</p>
       <p style="background:#f1f5f9;border-radius:10px;padding:12px;font-size:16px;">
-        Senha temporária: <strong>${opts.tempPassword}</strong>
+        🔑 Senha temporária: <strong>${opts.tempPassword}</strong>
       </p>
       ${button(`${APP_URL}/empresa/login`, "Entrar na área da empresa")}
     `
@@ -299,12 +320,12 @@ export async function sendInterviewScheduledEmail(
     : "";
   await send(
     to,
-    `${opts.companyName} agendou uma entrevista com você`,
+    `📅 ${opts.companyName} agendou uma entrevista com você`,
     `
       <h2 style="font-size: 20px;">Entrevista agendada 📅</h2>
       <p><strong>${opts.companyName}</strong> agendou uma entrevista com você para <strong>${opts.whenText}</strong>.</p>
       ${noteHtml}
-      <p>Fique atento(a) ao seu e-mail e telefone: a empresa pode entrar em contato com mais detalhes.</p>
+      <p>Fique atento(a) ao seu e-mail e telefone, a empresa pode entrar em contato com mais detalhes. 📞</p>
     `
   );
 }
@@ -323,10 +344,10 @@ export async function sendPaymentConfirmationEmail(
     to,
     "Pagamento confirmado ✅",
     `
-      <h2 style="font-size: 20px;">Pagamento confirmado</h2>
-      <p>Recebemos seu pagamento de <strong>${formatCentsToBRL(opts.amountCents)}</strong> e liberamos ${what}.</p>
+      <h2 style="font-size: 20px;">Pagamento confirmado ✅</h2>
+      <p>Recebemos seu pagamento de <strong>${formatCentsToBRL(opts.amountCents)}</strong> e liberamos ${what} 🎉</p>
       ${button(cta.href, cta.label)}
-      <p>Se tiver qualquer dúvida, é só responder este e-mail.</p>
+      <p>Se tiver qualquer dúvida, é só responder este e-mail 💬</p>
     `
   );
 }
@@ -340,8 +361,8 @@ export async function sendSubscriptionConfirmationEmail(
     to,
     "Assinatura ativada 🚀",
     `
-      <h2 style="font-size: 20px;">Sua assinatura está ativa</h2>
-      <p>Tudo certo! Sua assinatura do ${BRAND} está ativa e você já tem acesso completo às análises, feed de vagas, preparação de entrevista e às ferramentas do plano.</p>
+      <h2 style="font-size: 20px;">Sua assinatura está ativa 🚀</h2>
+      <p>Tudo certo! Sua assinatura do ${BRAND} está ativa e você já tem acesso completo às análises, feed de vagas, preparação de entrevista e às ferramentas do plano ✨</p>
       <p>Próxima renovação em <strong>${renew}</strong>. Você pode gerenciar ou cancelar quando quiser em Configurações.</p>
       ${button(`${APP_URL}/dashboard`, "Acessar minha conta")}
     `
@@ -360,13 +381,13 @@ export async function sendPaymentFailedEmail(
 
   await send(
     to,
-    "Não conseguimos processar seu pagamento",
+    "⚠️ Não conseguimos processar seu pagamento",
     `
-      <h2 style="font-size: 20px;">Seu pagamento não foi aprovado</h2>
+      <h2 style="font-size: 20px;">⚠️ Seu pagamento não foi aprovado</h2>
       <p>Tentamos processar ${what} no valor de <strong>${formatCentsToBRL(opts.amountCents)}</strong>, mas o pagamento não foi autorizado pela operadora do cartão.</p>
-      <p>Isso costuma acontecer por limite, dados divergentes ou uma trava de segurança do banco. Você pode tentar de novo com outro cartão ou via Pix:</p>
+      <p>Isso costuma acontecer por limite, dados divergentes ou uma trava de segurança do banco. Você pode tentar de novo com outro cartão ou via Pix 💳</p>
       ${button(cta.href, cta.label)}
-      <p>Se precisar de ajuda, é só responder este e-mail.</p>
+      <p>Se precisar de ajuda, é só responder este e-mail 💬</p>
     `
   );
 }
@@ -374,14 +395,14 @@ export async function sendPaymentFailedEmail(
 export async function sendSubscriptionCancelledEmail(to: string) {
   await send(
     to,
-    "Sua assinatura foi cancelada",
+    "👋 Sua assinatura foi cancelada",
     `
-      <h2 style="font-size: 20px;">Assinatura cancelada</h2>
+      <h2 style="font-size: 20px;">👋 Assinatura cancelada</h2>
       <p>Confirmamos o cancelamento da sua assinatura do ${BRAND}. Não faremos novas cobranças.</p>
-      <p>Você continua com acesso até o fim do período já pago. Depois disso, sua conta volta ao plano gratuito, mas seus dados e análises ficam salvos.</p>
-      <p>Mudou de ideia? Você pode reativar a qualquer momento:</p>
+      <p>Você continua com acesso até o fim do período já pago. Depois disso, sua conta volta ao plano gratuito, mas seus dados e análises ficam salvos 💾</p>
+      <p>Mudou de ideia? Você pode reativar a qualquer momento 🔄</p>
       ${button(`${APP_URL}/settings`, "Reativar assinatura")}
-      <p>Se puder, responda contando o que faltou pra gente, seu feedback ajuda muito.</p>
+      <p>Se puder, responda contando o que faltou pra gente, seu feedback ajuda muito 🙏</p>
     `
   );
 }
@@ -393,27 +414,27 @@ export async function sendRenewalReminderEmail(
   const date = formatBrazilDate(opts.currentPeriodEnd);
   const body = opts.autoRenews
     ? `
-      <h2 style="font-size: 20px;">Sua renovação está chegando</h2>
-      <p>Passando para lembrar que sua assinatura do ${BRAND} renova automaticamente em <strong>${date}</strong>. Você não precisa fazer nada, o acesso continua sem interrupção.</p>
+      <h2 style="font-size: 20px;">🔔 Sua renovação está chegando</h2>
+      <p>Passando para lembrar que sua assinatura do ${BRAND} renova automaticamente em <strong>${date}</strong>. Você não precisa fazer nada, o acesso continua sem interrupção ✅</p>
       <p>Se quiser revisar seu plano ou gerenciar a assinatura, é só acessar Configurações:</p>
       ${button(`${APP_URL}/settings`, "Gerenciar assinatura")}
     `
     : `
-      <h2 style="font-size: 20px;">Seu acesso vai expirar em breve</h2>
+      <h2 style="font-size: 20px;">⏰ Seu acesso vai expirar em breve</h2>
       <p>Seu acesso ao ${BRAND} vai até <strong>${date}</strong>. Como seu plano é pago de forma avulsa (sem débito automático), o acesso não renova sozinho.</p>
       <p>Para continuar sem interrupção, renove seu plano em Configurações:</p>
       ${button(`${APP_URL}/settings`, "Renovar meu acesso")}
     `;
-  await send(to, opts.autoRenews ? "Sua assinatura renova em breve" : "Seu acesso expira em breve", body);
+  await send(to, opts.autoRenews ? "🔔 Sua assinatura renova em breve" : "⏰ Seu acesso expira em breve", body);
 }
 
 export async function sendSubscriptionExpiredEmail(to: string) {
   await send(
     to,
-    "Seu acesso expirou",
+    "⌛ Seu acesso expirou",
     `
-      <h2 style="font-size: 20px;">Seu acesso ao ${BRAND} expirou</h2>
-      <p>Seu período de assinatura chegou ao fim e sua conta voltou ao plano gratuito. Seus dados e análises continuam salvos, mas os recursos completos (feed de vagas, preparação de entrevista e ferramentas do plano) ficam bloqueados.</p>
+      <h2 style="font-size: 20px;">⌛ Seu acesso ao ${BRAND} expirou</h2>
+      <p>Seu período de assinatura chegou ao fim e sua conta voltou ao plano gratuito. Seus dados e análises continuam salvos, mas os recursos completos (feed de vagas, preparação de entrevista e ferramentas do plano) ficam bloqueados 🔒</p>
       <p>Quer retomar de onde parou? Reative em poucos cliques:</p>
       ${button(`${APP_URL}/settings`, "Reativar meu acesso")}
     `
@@ -424,17 +445,17 @@ export async function sendLeadFollowUpEmail(
   to: string,
   opts: { name?: string | null; checkoutUrl?: string }
 ) {
-  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   const checkoutUrl = opts.checkoutUrl?.startsWith("/") ? opts.checkoutUrl : "/analise";
   await send(
     to,
-    "Seu diagnóstico de carreira está esperando",
+    "📊 Seu diagnóstico de carreira está esperando",
     `
       <h2 style="font-size: 20px;">${greeting}</h2>
       <p>Você começou uma análise no ${BRAND} e ficou faltando pouco para ver o resultado completo: seu score de aderência, o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
-      <p>Leva menos de 2 minutos para desbloquear:</p>
+      <p>Leva menos de 2 minutos para desbloquear ⏱️</p>
       ${button(`${APP_URL}${checkoutUrl}`, "Ver minha análise completa")}
-      <p>Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
+      <p>💡 Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
     `
   );
 }
@@ -446,13 +467,13 @@ export async function sendDiagnosticUpgradeEmail(
   const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
   await send(
     to,
-    "Leve seu diagnóstico para as próximas vagas",
+    "🚀 Leve seu diagnóstico para as próximas vagas",
     `
-      <h2 style="font-size: 20px;">Um diagnóstico é o começo</h2>
+      <h2 style="font-size: 20px;">Um diagnóstico é só o começo 🌱</h2>
       <p>Agora que você já viu o que ajustar nesta oportunidade, o próximo passo é repetir o processo nas próximas vagas e acompanhar sua evolução.</p>
-      <p>Com o plano mensal, você reúne novas análises, currículo otimizado, preparação de entrevista, plano de ação e acompanhamento das candidaturas.</p>
+      <p>Com o plano mensal, você reúne novas análises, currículo otimizado, preparação de entrevista, plano de ação e acompanhamento das candidaturas ✨</p>
       ${button(href, "Conhecer o plano mensal")}
-      <p>Você pode cancelar quando quiser.</p>
+      <p>Você pode cancelar quando quiser 🙂</p>
     `
   );
 }
@@ -464,12 +485,12 @@ export async function sendCheckoutRecoveryEmail(
   const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
   await send(
     to,
-    "Quer continuar sua assinatura?",
+    "💳 Quer continuar sua assinatura?",
     `
       <h2 style="font-size: 20px;">Seu plano ainda não foi ativado</h2>
       <p>Você começou o pagamento, mas a assinatura ainda não foi confirmada. Se o Pix expirou ou o cartão não foi aprovado, pode retomar com outra forma de pagamento.</p>
       ${button(href, "Retomar assinatura")}
-      <p>Se já pagou por Pix, aguarde alguns instantes: a confirmação é automática.</p>
+      <p>Se já pagou por Pix, aguarde alguns instantes, a confirmação é automática ⏳</p>
     `
   );
 }
@@ -478,37 +499,140 @@ export async function sendOnboardingNudgeEmail(
   to: string,
   opts: { name?: string | null }
 ) {
-  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   await send(
     to,
-    "Vamos fazer sua primeira análise?",
+    "✍️ Vamos fazer sua primeira análise?",
     `
       <h2 style="font-size: 20px;">${greeting}</h2>
-      <p>Você criou sua conta no ${BRAND} mas ainda não fez sua primeira análise. É o passo que mostra, com IA, o quanto seu currículo está aderente a uma vaga e exatamente o que melhorar.</p>
-      <p>Comece agora, leva menos de 2 minutos:</p>
+      <p>Você criou sua conta no ${BRAND} mas ainda não fez sua primeira análise. É o passo que mostra, com IA, o quanto seu currículo está aderente a uma vaga e exatamente o que melhorar 🔍</p>
+      <p>Comece agora, leva menos de 2 minutos ⏱️</p>
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
-      <p>Se tiver qualquer dúvida, é só responder este e-mail.</p>
+      <p>Se tiver qualquer dúvida, é só responder este e-mail 💬</p>
     `
   );
 }
 
 export async function sendConvertToSubscriptionEmail(
   to: string,
-  opts: { name?: string | null; segment?: string | null }
+  opts: { name?: string | null; segment?: string | null; score?: number | null; jobTitle?: string | null }
 ) {
   const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
   const href = opts.segment?.trim()
     ? `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment.trim())}`
     : `${APP_URL}/assinar`;
+  const forJob = opts.jobTitle?.trim() ? ` pra vaga de <strong>${opts.jobTitle.trim()}</strong>` : "";
+  const subject =
+    opts.score != null ? `🏟️ Seu currículo fez ${opts.score}. Você já sabe o que fazer com isso?` : "🎯 Você já sabe seu score. Falta o plano de ação.";
+  const scoreLine =
+    opts.score != null
+      ? `<p>Você analisou seu currículo no ${BRAND} e o placar fechou em <strong>${opts.score} de aderência</strong>${forJob}. Não foi vexame, foi quase, e "quase" é exatamente o que o plano resolve 💪</p>`
+      : `<p>Você analisou seu currículo no ${BRAND} e viu onde está sua aderência. Esse é o diagnóstico, a parte que dói. A parte que resolve é o que vem depois ✨</p>`;
   await send(
     to,
-    "Você já sabe seu score. Falta o plano de ação.",
+    subject,
     `
-      <h2 style="font-size: 20px;">${greeting}</h2>
-      <p>Você analisou seu currículo no ${BRAND} e viu onde está sua aderência. Esse é o diagnóstico, a parte que dói. A parte que resolve é o que vem depois.</p>
+      <h2 style="font-size: 20px;">${greeting} 👋</h2>
+      ${scoreLine}
       <p>Com o plano você transforma aquele score em ação: currículo reescrito ponto a ponto, simulação de entrevista para aquela vaga, e uma nova análise a cada oportunidade que aparecer, porque cada vaga pede um ajuste diferente.</p>
       ${button(href, "Ver o que muda com o plano")}
-      <p>Sem fidelidade, cancela quando quiser. E se faltou algo para você decidir, é só responder este e-mail.</p>
+      <p>Sem fidelidade, cancela quando quiser. E se faltou algo para você decidir, é só responder este e-mail 💬</p>
+    `
+  );
+}
+
+/** Segundo toque da régua de conversão, alguns dias após o primeiro, com um ângulo diferente. */
+export async function sendConvertSecondNudgeEmail(
+  to: string,
+  opts: { segment?: string | null }
+) {
+  const href = opts.segment?.trim()
+    ? `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment.trim())}`
+    : `${APP_URL}/assinar`;
+  await send(
+    to,
+    "🔎 Elementar: seu currículo tem 7 segundos pra convencer alguém",
+    `
+      <h2 style="font-size: 20px;">Modo detetive 🕵️</h2>
+      <p>Investigamos o caso do seu currículo contra a vaga. Evidência 1: as primeiras linhas não mencionam a palavra que o recrutador vai procurar primeiro. Evidência 2: a experiência mais relevante costuma ficar no meio da página, não no topo.</p>
+      <p>O plano reabre o caso 📂 reorganiza, reescreve e realça exatamente o que os 7 segundos de leitura de um recrutador precisam encontrar primeiro.</p>
+      ${button(href, "Reabrir meu caso")}
+    `
+  );
+}
+
+/** Comemora a primeira análise concluída pelo usuário. */
+export async function sendFirstAnalysisMilestoneEmail(
+  to: string,
+  opts: { name?: string | null }
+) {
+  const greeting = opts.name?.trim() ? `${opts.name.trim().split(" ")[0]}, ` : "";
+  await send(
+    to,
+    "🏁 Conquista desbloqueada: sua primeira análise",
+    `
+      <h2 style="font-size: 20px;">Primeira análise: feita ✅🎉</h2>
+      <p>${greeting}muita gente cria conta e nunca chega a rodar a primeira análise. Você já rodou, isso já te coloca na fração que realmente usa a ferramenta pra evoluir, não só pra olhar 🙌</p>
+      <p>Próxima conquista: comparar seu score em duas vagas diferentes e ver o que muda 📈</p>
+      ${button(`${APP_URL}/analise`, "Analisar outra vaga")}
+    `
+  );
+}
+
+/** Comemora quando um usuário melhora o score em relação à análise anterior. */
+export async function sendScoreImprovedEmail(
+  to: string,
+  opts: { previousScore: number; newScore: number; jobTitle?: string | null }
+) {
+  const forJob = opts.jobTitle?.trim() ? ` pra <strong>${opts.jobTitle.trim()}</strong>` : "";
+  await send(
+    to,
+    `📈 De ${opts.previousScore} pra ${opts.newScore}: seu currículo evoluiu de verdade`,
+    `
+      <h2 style="font-size: 20px;">📈 Seu score subiu, e a gente reparou</h2>
+      <p>Sua última análise${forJob} fechou em <strong>${opts.newScore} de aderência</strong>, ${opts.newScore - opts.previousScore} pontos a mais que a anterior. O currículo é o mesmo currículo, mas ajustado 🎯 Prova de que o processo funciona quando repetido.</p>
+      <p>Guarda essa versão como referência pra próxima vaga parecida 💾</p>
+      ${button(`${APP_URL}/dashboard`, "Ver o que mudou")}
+    `
+  );
+}
+
+/** Terceiro e último toque da régua de conversão: cupom pessoal, uso único e com prazo real. */
+export async function sendUrgencyCouponEmail(
+  to: string,
+  opts: { code: string; expiresAt: Date; segment?: string | null }
+) {
+  const segmentParam = opts.segment?.trim() ? `segment=${encodeURIComponent(opts.segment.trim())}&` : "";
+  const href = `${APP_URL}/assinar?${segmentParam}coupon=${encodeURIComponent(opts.code)}`;
+  const until = formatBrazilDate(opts.expiresAt);
+  await send(
+    to,
+    "⏳ Esta oferta se autodestrói em 48h (não, sério)",
+    `
+      <h2 style="font-size: 20px;">Sua missão, caso decida aceitar 🎯</h2>
+      <p>Assinar o plano com <strong>20% de desconto</strong> 🎁, válido até <strong>${until}</strong>. Depois disso o cupom expira sozinho (esta mensagem não se autodestrói, relaxa 😉).</p>
+      <p style="background:#f1f5f9;border-radius:10px;padding:12px;font-size:16px;">
+        🎟️ Cupom: <strong>${opts.code}</strong>
+      </p>
+      ${button(href, "Usar meu cupom agora")}
+      <p>O código já vem preenchido se você clicar no botão. Vale só uma vez e só até o prazo acima ⏰</p>
+    `
+  );
+}
+
+/** Comemora marcos de volume: a cada 10 análises concluídas pelo usuário. */
+export async function sendAnalysisCountMilestoneEmail(
+  to: string,
+  opts: { count: number }
+) {
+  await send(
+    to,
+    `🏅 ${opts.count} vagas analisadas. Isso já é maratona, não corrida de 100m`,
+    `
+      <h2 style="font-size: 20px;">🏅 ${opts.count} análises concluídas</h2>
+      <p>Testar o currículo contra ${opts.count} vagas diferentes é o tipo de persistência que separa quem só espera resposta de quem constrói a própria sorte 💪</p>
+      <p>Bônus: dá pra ver, no seu histórico, qual tipo de vaga seu currículo casa melhor 📊</p>
+      ${button(`${APP_URL}/dashboard`, "Ver meu histórico de scores")}
     `
   );
 }
@@ -526,13 +650,13 @@ export async function sendJobAlertEmail(
   `).join("");
   await send(
     to,
-    `Novas vagas${opts.location ? ` em ${opts.location}` : ""}`,
+    `📬 Novas vagas${opts.location ? ` em ${opts.location}` : ""}`,
     `
-      <h2 style="font-size:20px;">Encontramos novas oportunidades</h2>
+      <h2 style="font-size:20px;">📬 Encontramos novas oportunidades</h2>
       <p>${opts.query ? `Busca: <strong>${opts.query}</strong>. ` : ""}${opts.location ? `Local: <strong>${opts.location}</strong>.` : ""}</p>
       ${rows}
       ${button(`${APP_URL}/vagas-publicas`, "Ver todas as vagas")}
-      <p>Você pode alterar seus alertas nas configurações da sua conta.</p>
+      <p>Você pode alterar seus alertas nas configurações da sua conta ⚙️</p>
     `,
   );
 }
