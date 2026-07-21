@@ -60,5 +60,27 @@ export async function canViewFullDiagnostic(userId: string, analysisId: string):
   const unlock = await prisma.payment.findFirst({
     where: { userId, kind: "diagnostic", status: "paid", analysisId },
   });
-  return !!unlock;
+  if (unlock) return true;
+
+  // A PRIMEIRA análise criada por qualquer usuário é 100% GRATUITA e completa!
+  // Isso reduz o atrito, gera engajamento imediato e estimula o compartilhamento do Card.
+  const firstAnalysis = await prisma.analysis.findFirst({
+    where: { resume: { userId } },
+    orderBy: { createdAt: "asc" },
+    select: { id: true },
+  });
+  if (firstAnalysis && firstAnalysis.id === analysisId) {
+    return true;
+  }
+
+  // Verifica se o usuário possui créditos de diagnóstico obtidos indicando 3 amigos
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { unlockedFullDiagnosticCredits: true },
+  });
+  if (user && user.unlockedFullDiagnosticCredits > 0) {
+    return true;
+  }
+
+  return false;
 }

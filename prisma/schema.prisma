@@ -74,7 +74,14 @@ model User {
   /// Cupom que este usuário é dono (perfil de influenciador). null para usuários comuns.
   ownedCoupon        Coupon?   @relation("InfluencerCoupon")
 
+  /// Indicação direta entre usuários (Desafio do Match e convites)
+  referredById       String?
+  referredBy         User?     @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals          User[]    @relation("UserReferrals")
+  unlockedFullDiagnosticCredits Int @default(0)
+
   @@index([signupCouponId])
+  @@index([referredById])
 }
 
 model Account {

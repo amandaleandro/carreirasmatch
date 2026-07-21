@@ -15,6 +15,9 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
 import { FunnelImpression, TEASER_VIEWED_EVENT } from "@/components/funnel-impression";
 import { SubscriptionUpsell } from "@/components/subscription-upsell";
+import { ShareMatchCard } from "@/components/share-match-card";
+import { ReferralRewardBox } from "@/components/referral-reward-box";
+import { getUserReferralStats } from "@/lib/referrals";
 
 export const dynamic = "force-dynamic";
 
@@ -28,13 +31,14 @@ export default async function ReportPage({
 
   const { id } = await params;
 
-  const [record, user, behavioralResult] = await Promise.all([
+  const [record, user, behavioralResult, referralStats] = await Promise.all([
     prisma.analysis.findUnique({ where: { id }, include: { resume: true } }),
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { careerSegment: true } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { careerSegment: true, name: true } }),
     prisma.softSkillTestResult.findFirst({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
     }),
+    getUserReferralStats(session.user.id),
   ]);
 
   if (!record || record.resume.userId !== session.user.id) {
@@ -95,11 +99,18 @@ export default async function ReportPage({
     : null;
 
   return (
-    <main className="max-w-3xl mx-auto px-4 py-12 w-full">
-      <header className="mb-10">
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
-          Relatório gerado por CarreirasMatch
-        </span>
+    <main className="max-w-3xl mx-auto px-4 py-12 w-full space-y-10">
+      <header>
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+            Relatório gerado por CarreirasMatch
+          </span>
+          {unlocked && (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800">
+              🎁 Sua 1ª Análise Completa é 100% Grátis!
+            </span>
+          )}
+        </div>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">
           {record.jobTitle}
         </h1>
@@ -124,6 +135,13 @@ export default async function ReportPage({
         )}
       </header>
 
+      {/* Card Gerado para Compartilhamento em Stories */}
+      <ShareMatchCard
+        jobTitle={record.jobTitle}
+        overallScore={record.overallScore}
+        userName={user?.name}
+      />
+
       {analysis ? (
         <div className="space-y-6">
           <AnalysisResult
@@ -135,32 +153,41 @@ export default async function ReportPage({
           {!subscribed && <SubscriptionUpsell segment={segment ?? "career_pro"} />}
         </div>
       ) : (
-        <AnalysisTeaserView result={teaser}>
-          <FunnelImpression
-            event={TEASER_VIEWED_EVENT}
-            analysisId={id}
-            segment={segment ?? undefined}
+        <div className="space-y-6">
+          <AnalysisTeaserView result={teaser}>
+            <FunnelImpression
+              event={TEASER_VIEWED_EVENT}
+              analysisId={id}
+              segment={segment ?? undefined}
+            />
+            <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
+                Próximo passo recomendado
+              </p>
+              <h3 className="font-semibold text-lg">Veja exatamente o que ajustar antes de aplicar</h3>
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                Libere o diagnóstico desta vaga com palavras-chave, ajustes de currículo,
+                plano de evolução, perguntas de entrevista e mensagem para o recrutador.
+              </p>
+              <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
+                {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
+            </div>
+          </AnalysisTeaserView>
+
+          {/* Recompensa de Indicação para liberar sem pagar */}
+          <ReferralRewardBox
+            userId={session.user.id}
+            totalReferrals={referralStats.totalReferrals}
+            credits={referralStats.credits}
           />
-          <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
-              Próximo passo recomendado
-            </p>
-            <h3 className="font-semibold text-lg">Veja exatamente o que ajustar antes de aplicar</h3>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
-              Libere o diagnóstico desta vaga com palavras-chave, ajustes de currículo,
-              plano de evolução, perguntas de entrevista e mensagem para o recrutador.
-            </p>
-            <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
-              {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (
-                <li key={item} className="flex items-center gap-2">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
-          </div>
-        </AnalysisTeaserView>
+        </div>
       )}
     </main>
   );
