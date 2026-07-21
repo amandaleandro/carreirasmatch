@@ -29,8 +29,11 @@ export function AllJobsList({ jobs }: { jobs: Job[] }) {
   return (
     <div className="space-y-4">
       {jobs.map((job) => {
-        const tags = deriveJobTags(job);
-        const description = job.jobText.replace(/\s+/g, " ").trim().slice(0, 180);
+        const cleanedText = job.jobText
+          .replace(/Copiar link|Erro ao copiar link|Compartilhar vaga|Link copiado|Ir para candidatura|Descrição da vaga|Responsável pelo atendimento/gi, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+        const description = cleanedText.slice(0, 200);
         return (
           <div
             key={job.id}

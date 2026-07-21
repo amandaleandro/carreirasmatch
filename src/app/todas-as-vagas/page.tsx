@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { AllJobsList } from "@/app/feed/AllJobsList";
 import { Pagination } from "@/components/Pagination";
+import { AllJobsFilterForm } from "./AllJobsFilterForm";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ export default async function AllJobsPage({
 }: {
   searchParams: Promise<{
     page?: string;
+    q?: string;
     area?: string;
     city?: string;
     state?: string;
@@ -33,9 +35,17 @@ export default async function AllJobsPage({
   const session = await auth();
   const params = await searchParams;
   const page = Math.max(1, Number(params.page) || 1);
-  const { area, city, state, workModel, contractType } = params;
+  const { q, area, city, state, workModel, contractType } = params;
 
   const andFilters: any[] = [];
+  if (q?.trim()) {
+    andFilters.push({
+      OR: [
+        { jobTitle: { contains: q.trim(), mode: "insensitive" } },
+        { jobText: { contains: q.trim(), mode: "insensitive" } },
+      ],
+    });
+  }
   if (area) {
     andFilters.push({ area: { contains: area, mode: "insensitive" } });
   }
@@ -74,96 +84,7 @@ export default async function AllJobsPage({
 
   const totalPages = Math.ceil(totalJobs / PAGE_SIZE);
 
-  const filterForm = (
-    <form method="GET" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/20">
-      <div>
-        <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Área de atuação</label>
-        <select
-          name="area"
-          defaultValue={area || ""}
-          className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-850 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        >
-          <option value="">Todas as áreas</option>
-          <option value="tecnologia">Tecnologia / TI</option>
-          <option value="marketing">Marketing / Comunicação</option>
-          <option value="administrativo">Administrativo</option>
-          <option value="vendas">Vendas / Comercial</option>
-          <option value="atendimento">Atendimento / Suporte</option>
-          <option value="financeiro">Financeiro / Contabilidade</option>
-          <option value="operacional">Operacional / Serviços Gerais</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Modelo de trabalho</label>
-        <select
-          name="workModel"
-          defaultValue={workModel || ""}
-          className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-850 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        >
-          <option value="">Todos os modelos</option>
-          <option value="presencial">Presencial</option>
-          <option value="remoto">Remoto</option>
-          <option value="hibrido">Híbrido</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Regime de contratação</label>
-        <select
-          name="contractType"
-          defaultValue={contractType || ""}
-          className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-850 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        >
-          <option value="">Todos os regimes</option>
-          <option value="CLT">CLT</option>
-          <option value="PJ">PJ</option>
-          <option value="Estagio">Estágio</option>
-          <option value="Aprendiz">Jovem aprendiz</option>
-          <option value="Temporario">Temporário</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Cidade</label>
-        <input
-          type="text"
-          name="city"
-          defaultValue={city || ""}
-          placeholder="Ex: São Paulo"
-          className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-850 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-        />
-      </div>
-
-      <div>
-        <label className="block text-xs font-semibold text-neutral-500 dark:text-neutral-400 mb-1.5">Estado (UF)</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            name="state"
-            defaultValue={state || ""}
-            maxLength={2}
-            placeholder="Ex: SP"
-            className="w-full px-3 py-2 rounded-xl border border-neutral-200 dark:border-neutral-850 bg-white dark:bg-neutral-900 text-sm uppercase focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl px-4 py-2 text-sm transition-colors cursor-pointer shrink-0"
-          >
-            Filtrar
-          </button>
-          {(area || workModel || city || state || contractType) && (
-            <Link
-              href="/todas-as-vagas"
-              className="flex items-center justify-center border border-neutral-200 dark:border-neutral-800 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl px-3 py-2 text-sm transition-colors cursor-pointer"
-            >
-              Limpar
-            </Link>
-          )}
-        </div>
-      </div>
-    </form>
-  );
+  const initialValues = { q, area, city, state, workModel, contractType };
 
   if (session?.user?.id) {
     // Logado: exibe a interface interna completa sem filtros/desfoques
@@ -179,11 +100,11 @@ export default async function AllJobsPage({
           <p className="text-sm text-neutral-500 shrink-0 font-medium">{totalJobs} vaga(s) encontrada(s).</p>
         </div>
 
-        {filterForm}
+        <AllJobsFilterForm initialValues={initialValues} />
 
         <AllJobsList jobs={jobs} />
         <div className="mt-6">
-          <Pagination page={page} totalPages={totalPages} basePath="/todas-as-vagas" searchParams={{ area, workModel, city, state, contractType }} />
+          <Pagination page={page} totalPages={totalPages} basePath="/todas-as-vagas" searchParams={{ q, area, workModel, city, state, contractType }} />
         </div>
       </div>
     );
@@ -202,7 +123,7 @@ export default async function AllJobsPage({
       wide
     >
       <div className="mb-6">
-        {filterForm}
+        <AllJobsFilterForm initialValues={initialValues} />
       </div>
 
       <AllJobsList jobs={visible} />
