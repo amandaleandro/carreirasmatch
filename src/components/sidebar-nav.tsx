@@ -24,6 +24,7 @@ import {
   ScrollText,
   Briefcase,
   Handshake,
+  Gamepad2,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -42,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
   { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   { href: "/freelancer", label: "Freelancer", icon: Handshake },
+  { href: "/jogos", label: "Jogos", icon: Gamepad2 },
   { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
   { href: "/profile", label: "Desenvolvimento", icon: Sparkles },
   { href: "/action-plan", label: "Plano de Ação", icon: Target },
