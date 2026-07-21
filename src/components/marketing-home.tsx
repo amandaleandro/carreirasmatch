@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -246,11 +247,22 @@ export async function MarketingHome() {
             <div className="rounded-3xl border border-white/15 bg-white/[0.08] p-4 shadow-2xl backdrop-blur-md transition-transform duration-500 hover:-translate-y-1 md:p-6">
               <div className="rounded-2xl bg-white p-5 text-slate-950 shadow-xl md:p-6">
                 <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Prévia do diagnóstico</p>
-                    <p className="mt-1 font-bold">Analista de Marketing</p>
+                  <div className="flex items-center gap-3">
+                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-slate-200">
+                      <Image
+                        src="/niche-hero/primeiro-emprego.png"
+                        alt=""
+                        fill
+                        sizes="40px"
+                        className="object-cover object-top"
+                      />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-400">Prévia do diagnóstico</p>
+                      <p className="mt-1 font-bold">Analista de Marketing</p>
+                    </div>
                   </div>
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full border-[6px] border-blue-100 text-xl font-extrabold text-blue-600">
+                  <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-[6px] border-blue-100 text-xl font-extrabold text-blue-600">
                     78
                   </div>
                 </div>
