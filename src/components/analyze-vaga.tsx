@@ -99,6 +99,15 @@ const CURIOSITIES = [
   "Personalizar o currículo para cada vaga pode dobrar a taxa de resposta dos recrutadores.",
 ];
 
+const LOADING_MESSAGES = [
+  "Lendo as informações do seu currículo...",
+  "Analisando os requisitos e diferenciais da vaga...",
+  "Cruzando suas competências com as palavras-chave...",
+  "Avaliando score de aderência...",
+  "Preparando recomendações de melhorias personalizadas...",
+  "Gerando possíveis perguntas de entrevista..."
+];
+
 function useRotatingIndex(length: number, intervalMs: number) {
   const [index, setIndex] = useState(0);
   useEffect(() => {
@@ -247,6 +256,7 @@ export function AnalyzeVagaPage({
     ? CAREER_TRACK_OPTIONS.filter((o) => allowedTracks.includes(o.value))
     : CAREER_TRACK_OPTIONS;
   const curiosityIndex = useRotatingIndex(CURIOSITIES.length, 7000);
+  const loadingMessageIndex = useRotatingIndex(LOADING_MESSAGES.length, 3000);
   const [jobTitle, setJobTitle] = useState(initialDraft.jobTitle ?? "");
   const [jobText, setJobText] = useState(initialDraft.jobText ?? "");
   const [jobLink, setJobLink] = useState(initialDraft.jobLink ?? "");
@@ -353,6 +363,32 @@ export function AnalyzeVagaPage({
     } finally {
       setLoading(false);
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center p-6 max-w-lg mx-auto space-y-6">
+        <div className="relative">
+          {/* Outer glowing pulsing ring */}
+          <div className="absolute inset-0 rounded-full bg-blue-500/20 blur-xl animate-pulse" />
+          {/* Spinner rings */}
+          <div className="relative h-20 w-20 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin dark:border-blue-950 dark:border-t-blue-400" />
+        </div>
+        <div className="space-y-3">
+          <h2 className="text-xl font-bold text-neutral-900 dark:text-white font-sans">Analisando seu currículo...</h2>
+          <p key={loadingMessageIndex} className="text-sm text-blue-600 dark:text-blue-400 font-semibold min-h-[20px] animate-[fadeIn_0.3s_ease]">
+            {LOADING_MESSAGES[loadingMessageIndex]}
+          </p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto leading-relaxed">
+            Isso pode levar cerca de 15 a 30 segundos. Nossa inteligência artificial está processando o PDF e comparando com os requisitos da vaga.
+          </p>
+        </div>
+        <div className="w-full bg-neutral-100 dark:bg-neutral-800 rounded-full h-1.5 overflow-hidden">
+          <div className="bg-blue-600 h-1.5 rounded-full animate-pulse" style={{ width: '85%' }} />
+        </div>
+        <p className="text-[10px] text-neutral-400">Por favor, mantenha esta aba aberta.</p>
+      </div>
+    );
   }
 
   if (result && resultTrack) {
