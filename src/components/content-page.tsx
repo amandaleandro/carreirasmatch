@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/brand-logo";
-import { PublicNav } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 
 export function ContentPage({
@@ -9,9 +8,10 @@ export function ContentPage({
   title,
   description,
   wide = false,
+  maxWidthClass,
   backHref,
   backLabel,
-  hideNav = false,
+  hideNav = true,
   children,
 }: {
   eyebrow: string;
@@ -19,6 +19,7 @@ export function ContentPage({
   description?: string;
   /** Widens the hero copy and the content card for pages with grid layouts. */
   wide?: boolean;
+  maxWidthClass?: string;
   /** Optional secondary link (e.g. "← Voltar") shown next to the logo instead of "Entrar". */
   backHref?: string;
   backLabel?: string;
@@ -26,28 +27,16 @@ export function ContentPage({
   hideNav?: boolean;
   children: ReactNode;
 }) {
-  const maxWidthClassName = wide ? "max-w-4xl" : "max-w-3xl";
+  const maxWidthClassName = maxWidthClass ?? (wide ? "max-w-5xl" : "max-w-3xl");
 
   return (
     <div className="w-full overflow-x-hidden">
       <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950">
-        <header className="public-header max-w-7xl mx-auto px-4 md:px-8 py-4 sm:py-6 flex flex-wrap items-center justify-between gap-3">
+        <header className="public-header max-w-7xl mx-auto px-4 md:px-8 py-4 sm:py-5 flex items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-9 sm:h-12 md:h-14" onDark />
           </Link>
-          {!hideNav && <PublicNav onDark />}
           <div className="flex items-center gap-2">
-            {!backHref && (
-              <>
-                <Link
-                  href="/empresa/cadastro"
-                  className="hidden sm:inline text-sm font-medium text-white/70 hover:text-white transition-colors whitespace-nowrap"
-                >
-                  Para empresas
-                </Link>
-                <span className="hidden sm:inline h-4 w-px bg-white/20" aria-hidden />
-              </>
-            )}
             <Link
               href={backHref ?? "/login"}
               className="rounded-lg border border-white/20 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-white/10 transition-colors whitespace-nowrap"

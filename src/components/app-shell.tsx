@@ -28,7 +28,12 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   // o header público de "Entrar / Criar conta" aparece nas páginas de conteúdo
   // público (blog, vagas públicas) mesmo com a conta de empresa/parceiro logada.
   if (session.user.accountType === "company" || session.user.accountType === "partner") {
-    return <div data-authenticated>{children}</div>;
+    return (
+      <div data-authenticated>
+        <DesafioBanner />
+        {children}
+      </div>
+    );
   }
 
   const dbUser = session.user.id

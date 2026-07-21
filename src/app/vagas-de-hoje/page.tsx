@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Briefcase, ExternalLink, Filter, MapPin, Search } from "lucide-react";
+import {
+  Briefcase,
+  ExternalLink,
+  Filter,
+  MapPin,
+  Search,
+  Sparkles,
+  Clock,
+  ChevronLeft,
+  ChevronRight,
+  Globe,
+  Layers,
+  CheckCircle2,
+  Building2,
+  ArrowRight,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { ContentPage } from "@/components/content-page";
@@ -9,7 +24,7 @@ import { cleanJobSnippet } from "@/lib/job-snippet";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Vagas de hoje",
+  title: "Vagas de hoje | CarreirasMatch",
   description: "Veja vagas novas e recentes coletadas pelo CarreirasMatch, sem precisar criar conta.",
 };
 
@@ -212,167 +227,371 @@ export default async function JobsTodayPage({
 
   return (
     <ContentPage
-      eyebrow="Atualizado automaticamente"
-      title={usingFallback ? "Vagas recentes" : "Vagas de hoje"}
+      eyebrow="Atualizado em tempo real"
+      title={usingFallback ? "Vagas recentes da semana" : "Vagas de hoje"}
       description={
         usingFallback
-          ? "A busca de hoje ainda não rodou; enquanto isso, mostramos vagas recentes já salvas, misturadas por área."
-          : "Uma lista gratuita com vagas novas coletadas hoje, misturadas por área. Para ver aderência ao seu currículo, use o feed personalizado."
+          ? "A busca de hoje está em processamento. Exibimos vagas recentes coletadas nos últimos dias, organizadas por área."
+          : "Oportunidades em aberto coletadas hoje em portais e fontes públicas. Gratuito e sem necessidade de cadastro para visualizar."
       }
-      wide
+      maxWidthClass="max-w-6xl"
     >
-      <div className="flex flex-wrap gap-3">
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 px-5 py-3">
-          <p className="text-xs text-neutral-500">{usingFallback ? "Vagas recentes" : "Vagas hoje"}</p>
-          <p className="mt-1 text-2xl font-bold">{total}</p>
-        </div>
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 px-5 py-3">
-          <p className="text-xs text-neutral-500">Fontes</p>
-          <p className="mt-1 text-2xl font-bold">{sourceOptions.length}</p>
-        </div>
-      </div>
+      <div className="space-y-8">
+        {/* Stat Cards Header */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-4 flex items-center gap-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <Briefcase className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                {usingFallback ? "Vagas Recentes" : "Vagas Hoje"}
+              </p>
+              <p className="text-xl font-bold text-slate-900 dark:text-white">{total}</p>
+            </div>
+          </div>
 
-      <div className="mt-6 rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50 dark:bg-blue-950/40 p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <p className="font-semibold">Estas são só as vagas de hoje.</p>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-            Temos <strong>{allActiveCount.toLocaleString("pt-BR")} vagas</strong> no total. Crie sua conta grátis para ver todas e receber as que combinam com você.
-          </p>
-        </div>
-        <Link
-          href="/todas-as-vagas"
-          className="shrink-0 rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 hover:bg-blue-700 transition-colors text-center whitespace-nowrap"
-        >
-          Ver todas as vagas
-        </Link>
-      </div>
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-4 flex items-center gap-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+              <Globe className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Fontes Coletadas</p>
+              <p className="text-xl font-bold text-slate-900 dark:text-white">{sourceOptions.length}</p>
+            </div>
+          </div>
 
-      <div className="mt-6 flex flex-wrap gap-2 text-sm">
-        {PUBLIC_JOB_CATEGORIES.slice(0, 8).map((category) => (
+          <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-4 flex items-center gap-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <Layers className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Áreas Diferentes</p>
+              <p className="text-xl font-bold text-slate-900 dark:text-white">{areaOptions.length || "Várias"}</p>
+            </div>
+          </div>
+
+          <div className="col-span-2 sm:col-span-1 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 p-4 flex items-center gap-3 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total no Radar</p>
+              <p className="text-xl font-bold text-slate-900 dark:text-white">
+                {allActiveCount.toLocaleString("pt-BR")}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Global CTA Notice Banner */}
+        <div className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 shadow-sm">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <p className="font-bold text-slate-900 dark:text-white text-base">
+                Procurando vagas específicas para seu perfil?
+              </p>
+            </div>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              Temos mais de <strong>{allActiveCount.toLocaleString("pt-BR")} oportunidades</strong> ativas. Crie sua conta grátis para receber recomendações com IA.
+            </p>
+          </div>
           <Link
-            key={category.slug}
-            href={`/vagas/${category.slug}`}
-            className="rounded-full border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-neutral-700 dark:text-neutral-300 hover:border-blue-300 hover:text-blue-700 dark:hover:text-blue-300"
+            href="/todas-as-vagas"
+            className="shrink-0 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 transition-colors shadow-md shadow-blue-500/20 text-center whitespace-nowrap inline-flex items-center justify-center gap-2"
           >
-            {category.h1.replace(/^Vagas\s*/i, "")}
+            <span>Ver todas as vagas</span>
+            <ArrowRight className="w-4 h-4" />
           </Link>
-        ))}
-      </div>
+        </div>
 
-      <form className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-4">
-        <label className="relative min-w-0 sm:col-span-2 lg:col-span-3">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Buscar por cargo, área ou local"
-            className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-500"
-          />
-        </label>
-        <select name="area" defaultValue={area} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
-          <option value="">Todas as áreas</option>
-          {areaOptions.map((option) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="seniority" defaultValue={seniority} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
-          <option value="">Todos os níveis</option>
-          {seniorityOptions.map((option) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="workModel" defaultValue={workModel} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
-          <option value="">Todos os modelos</option>
-          {workModelOptions.map((option) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <select name="contractType" defaultValue={contractType} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent px-3 py-2.5 text-sm outline-none focus:border-blue-500">
-          <option value="">Todos os regimes</option>
-          {contractTypeOptions.map((option) => (
-            <option key={option} value={option}>{option}</option>
-          ))}
-        </select>
-        <label className="relative min-w-0">
-          <Filter className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-          <select name="source" defaultValue={source} className="w-full min-w-0 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-transparent pl-9 pr-3 py-2.5 text-sm outline-none focus:border-blue-500">
-            <option value="">Todas as fontes</option>
-            {sourceOptions.map((option) => (
-              <option key={option} value={option}>{option}</option>
+        {/* Popular Categories Pill Bar */}
+        <div className="space-y-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+            <Filter className="w-3.5 h-3.5" />
+            Categorias populares:
+          </span>
+          <div className="flex flex-wrap gap-2">
+            {PUBLIC_JOB_CATEGORIES.slice(0, 10).map((categoryItem) => (
+              <Link
+                key={categoryItem.slug}
+                href={`/vagas/${categoryItem.slug}`}
+                className="rounded-full border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-3.5 py-1.5 text-xs font-medium text-slate-700 dark:text-slate-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shadow-2xs"
+              >
+                {categoryItem.h1.replace(/^Vagas\s*/i, "")}
+              </Link>
             ))}
-          </select>
-        </label>
-        <button className="rounded-xl bg-blue-600 text-white px-5 py-2.5 text-sm font-semibold hover:bg-blue-700 transition-colors">
-          Filtrar
-        </button>
-        <label className="sm:col-span-2 lg:col-span-3 inline-flex items-center gap-2 text-sm text-neutral-700 dark:text-neutral-300">
-          <input type="checkbox" name="entryLevel" value="yes" defaultChecked={entryLevel} className="h-4 w-4 rounded border-neutral-300" />
-          Mostrar somente vagas sem experiência, estágio, jovem aprendiz ou primeiro emprego
-        </label>
-      </form>
-
-      {jobs.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 p-8 text-center">
-          <Briefcase className="h-8 w-8 mx-auto text-neutral-400" />
-          <p className="mt-3 font-semibold">Nenhuma vaga encontrada para estes filtros.</p>
-          <p className="mt-1 text-sm text-neutral-500">Tente remover algum filtro ou voltar mais tarde.</p>
+          </div>
         </div>
-      ) : (
-        <div className="mt-6 grid gap-3">
-          {jobs.map((job) => (
-            <article key={job.id} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 p-5">
-              <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                <div className="min-w-0">
-                  <a href={job.url} target="_blank" rel="noopener noreferrer" className="font-semibold hover:underline">
-                    {job.jobTitle}
-                  </a>
-                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-neutral-500">
-                    <span>via {job.source}</span>
-                    {job.location && (
-                      <span className="inline-flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        {job.location}
+
+        {/* Filters Form */}
+        <form className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 p-5 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <span className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Search className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              Filtrar vagas de hoje
+            </span>
+            {(q || area || seniority || workModel || contractType || source || entryLevel) && (
+              <Link
+                href="/vagas-de-hoje"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+              >
+                Limpar filtros
+              </Link>
+            )}
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <label className="relative min-w-0 sm:col-span-2 lg:col-span-3">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <input
+                name="q"
+                defaultValue={q}
+                placeholder="Digite cargo, tecnologia, palavra-chave ou cidade..."
+                className="w-full rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 pl-10 pr-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-900 dark:text-white placeholder:text-slate-400 transition-all"
+              />
+            </label>
+
+            <select
+              name="area"
+              defaultValue={area}
+              className="w-full min-w-0 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 text-slate-900 dark:text-white transition-all"
+            >
+              <option value="">Todas as áreas</option>
+              {areaOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="seniority"
+              defaultValue={seniority}
+              className="w-full min-w-0 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 text-slate-900 dark:text-white transition-all"
+            >
+              <option value="">Todos os níveis</option>
+              {seniorityOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="workModel"
+              defaultValue={workModel}
+              className="w-full min-w-0 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 text-slate-900 dark:text-white transition-all"
+            >
+              <option value="">Todos os modelos</option>
+              {workModelOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="contractType"
+              defaultValue={contractType}
+              className="w-full min-w-0 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 text-slate-900 dark:text-white transition-all"
+            >
+              <option value="">Todos os regimes</option>
+              {contractTypeOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <select
+              name="source"
+              defaultValue={source}
+              className="w-full min-w-0 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 text-slate-900 dark:text-white transition-all"
+            >
+              <option value="">Todas as fontes</option>
+              {sourceOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+
+            <button
+              type="submit"
+              className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 text-sm transition-colors shadow-md shadow-blue-500/20 inline-flex items-center justify-center gap-2"
+            >
+              <Filter className="w-4 h-4" />
+              <span>Aplicar Filtros</span>
+            </button>
+          </div>
+
+          <div className="pt-2 border-t border-slate-200 dark:border-slate-800/80">
+            <label className="inline-flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                name="entryLevel"
+                value="yes"
+                defaultChecked={entryLevel}
+                className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+              />
+              <span>Mostrar apenas vagas sem experiência, estágio ou jovem aprendiz</span>
+            </label>
+          </div>
+        </form>
+
+        {/* Jobs List */}
+        {jobs.length === 0 ? (
+          <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-10 text-center shadow-sm space-y-3">
+            <Briefcase className="h-10 w-10 mx-auto text-slate-400" />
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              Nenhuma vaga encontrada para estes filtros
+            </h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
+              Tente remover ou redefinir os filtros de busca para visualizar mais oportunidades.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/vagas-de-hoje"
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 text-sm transition-colors"
+              >
+                Ver todas as vagas de hoje
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {jobs.map((job) => (
+              <article
+                key={job.id}
+                className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:border-blue-500/60 dark:hover:border-blue-500/60 hover:shadow-lg transition-all duration-200 space-y-3"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2 text-xs">
+                      <span className="rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 font-semibold">
+                        via {job.source}
                       </span>
-                    )}
-                    <span>{formatDateTime(job.createdAt)}</span>
-                    {job.area && <span>{job.area}</span>}
-                    {job.seniority && <span>{job.seniority}</span>}
-                    {job.workModel && <span>{job.workModel}</span>}
-                    {job.contractType && <span>{job.contractType}</span>}
-                    {job.entryLevel && <span>Entrada</span>}
+                      {job.location && (
+                        <span className="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                          <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          <span>{job.location}</span>
+                        </span>
+                      )}
+                      <span className="inline-flex items-center gap-1 text-slate-400">
+                        <Clock className="h-3.5 w-3.5 shrink-0" />
+                        <span>{formatDateTime(job.createdAt)}</span>
+                      </span>
+                    </div>
+
+                    <a
+                      href={job.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug"
+                    >
+                      {job.jobTitle}
+                    </a>
                   </div>
+
+                  <a
+                    href={job.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 dark:hover:bg-blue-600 dark:hover:text-white transition-all shrink-0 self-start shadow-2xs"
+                  >
+                    <span>Ver vaga</span>
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
                 </div>
-                <a href={job.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-1 rounded-xl border border-neutral-200 dark:border-neutral-800 px-4 py-2 text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-900 shrink-0">
-                  Ver vaga
-                  <ExternalLink className="h-4 w-4" />
-                </a>
-              </div>
-              <p className="mt-3 text-sm text-neutral-600 dark:text-neutral-400">{cleanJobSnippet(job.jobText)}...</p>
-            </article>
-          ))}
-        </div>
-      )}
 
-      {totalPages > 1 && (
-        <nav className="mt-6 flex items-center justify-between gap-3">
-          <Link href={pageHref(Math.max(1, page - 1))} aria-disabled={page <= 1} className="rounded-xl border border-neutral-200 dark:border-neutral-800 px-4 py-2 text-sm font-semibold aria-disabled:pointer-events-none aria-disabled:opacity-40">
-            Anterior
-          </Link>
-          <span className="text-sm text-neutral-500">Página {page} de {totalPages}</span>
-          <Link href={pageHref(Math.min(totalPages, page + 1))} aria-disabled={page >= totalPages} className="rounded-xl border border-neutral-200 dark:border-neutral-800 px-4 py-2 text-sm font-semibold aria-disabled:pointer-events-none aria-disabled:opacity-40">
-            Próxima
-          </Link>
-        </nav>
-      )}
+                <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                  {cleanJobSnippet(job.jobText)}...
+                </p>
 
-      <div className="mt-8 rounded-2xl bg-blue-600 p-5 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <p className="font-semibold">Encontrou uma vaga interessante?</p>
-          <p className="text-sm text-blue-100 mt-1">Compare com seu currículo antes de aplicar e veja os ajustes prioritários.</p>
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  {job.area && (
+                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
+                      {job.area}
+                    </span>
+                  )}
+                  {job.seniority && (
+                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
+                      {job.seniority}
+                    </span>
+                  )}
+                  {job.workModel && (
+                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
+                      {job.workModel}
+                    </span>
+                  )}
+                  {job.contractType && (
+                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
+                      {job.contractType}
+                    </span>
+                  )}
+                  {job.entryLevel && (
+                    <span className="rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-xs font-semibold border border-emerald-500/20">
+                      Primeiro emprego / Entrada
+                    </span>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <nav className="flex items-center justify-between gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
+            <Link
+              href={pageHref(Math.max(1, page - 1))}
+              aria-disabled={page <= 1}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-40 transition-colors shadow-2xs"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              <span>Anterior</span>
+            </Link>
+
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              Página <strong className="text-slate-900 dark:text-white">{page}</strong> de{" "}
+              <strong className="text-slate-900 dark:text-white">{totalPages}</strong>
+            </span>
+
+            <Link
+              href={pageHref(Math.min(totalPages, page + 1))}
+              aria-disabled={page >= totalPages}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 aria-disabled:pointer-events-none aria-disabled:opacity-40 transition-colors shadow-2xs"
+            >
+              <span>Próxima</span>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
+          </nav>
+        )}
+
+        {/* Bottom Feature Callout Banner */}
+        <div className="rounded-3xl bg-gradient-to-r from-blue-600 to-indigo-700 p-6 sm:p-8 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-6 shadow-xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+          <div className="relative z-10 space-y-1.5 max-w-xl">
+            <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider bg-white/15 px-3 py-1 rounded-full text-blue-100">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Diagnóstico de Aderência com IA</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-bold tracking-tight">
+              Encontrou uma vaga interessante?
+            </h3>
+            <p className="text-sm text-blue-100 leading-relaxed">
+              Compare seu currículo com os requisitos da vaga antes de se candidatar e receba um diagnóstico de compatibilidade completo em segundos.
+            </p>
+          </div>
+          <Link
+            href="/analise"
+            className="relative z-10 shrink-0 rounded-xl bg-white hover:bg-blue-50 text-blue-700 font-extrabold px-6 py-3 text-sm text-center shadow-lg transition-all transform hover:-translate-y-0.5"
+          >
+            Analisar currículo e vaga
+          </Link>
         </div>
-        <Link href="/analise" className="rounded-xl bg-white text-blue-700 px-4 py-2 text-sm font-semibold text-center">
-          Analisar currículo e vaga
-        </Link>
       </div>
     </ContentPage>
   );
