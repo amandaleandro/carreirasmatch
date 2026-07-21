@@ -1,0 +1,158 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Deploys & Incidentes",
+  "uid": "carreiras-deploys-incidentes",
+  "tags": ["carreiras-match", "infra", "deploy", "incidentes"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "30s",
+  "templating": { "list": [] },
+  "panels": [
+    { "type": "row", "title": "Deploys", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "App no ar há", "gridPos": { "h": 5, "w": 6, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 1 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "time() - process_start_time_seconds{job=\"carreiras-app\"}", "legendFormat": "uptime do processo" }],
+      "description": "Zera a cada deploy (o hook post-receive dá --force-recreate no container app, reiniciando o processo Node)."
+    },
+    {
+      "type": "stat", "title": "Reinícios do app (24h)", "gridPos": { "h": 5, "w": 6, "x": 6, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 2 }, { "color": "red", "value": 5 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "resets(process_start_time_seconds{job=\"carreiras-app\"}[24h])", "legendFormat": "reinícios" }],
+      "description": "Proxy de deploy/crash: cada reinício do processo (deploy com --force-recreate ou crash) incrementa."
+    },
+    {
+      "type": "stat", "title": "Reinícios do app (7d)", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "resets(process_start_time_seconds{job=\"carreiras-app\"}[7d])", "legendFormat": "reinícios" }]
+    },
+    {
+      "type": "stat", "title": "Migração Prisma na última subida", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "FALHOU", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_snapshot_success", "legendFormat": "coleta de negócio" }],
+      "description": "Não existe métrica direta de 'migrate deploy' — usar como sinal indireto de que o app subiu saudável. Para confirmar migration em si: docker logs carreiras-match-app | head (ver [[deploy-vps-caddy-bindmount]])."
+    },
+    {
+      "type": "timeseries", "title": "Linha do tempo de reinícios (marca cada deploy/crash)", "gridPos": { "h": 7, "w": 24, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "dtdurations", "custom": { "drawStyle": "points", "pointSize": 8 } } },
+      "targets": [{ "refId": "A", "expr": "time() - process_start_time_seconds{job=\"carreiras-app\"}", "legendFormat": "idade do processo" }],
+      "description": "Cada vez que a linha cai a zero e volta a subir é um reinício do container app (deploy ou crash)."
+    },
+
+    { "type": "row", "title": "Indisponibilidade", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Uptime App (24h)", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "avg_over_time(up{job=\"carreiras-app\"}[24h]) * 100" }]
+    },
+    {
+      "type": "stat", "title": "Uptime App (7d)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "avg_over_time(up{job=\"carreiras-app\"}[7d]) * 100" }]
+    },
+    {
+      "type": "stat", "title": "Uptime Caddy (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "avg_over_time(up{job=\"caddy\"}[24h]) * 100" }]
+    },
+    {
+      "type": "stat", "title": "Minutos indisponível (24h, estimado)", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "m", "decimals": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 10 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "(1 - avg_over_time(up{job=\"carreiras-app\"}[24h])) * 24 * 60" }],
+      "description": "Estimativa baseada na fração de scrapes com up=0 nas últimas 24h. Precisão limitada pelo intervalo de scrape do Prometheus."
+    },
+    {
+      "type": "timeseries", "title": "Disponibilidade ao longo do tempo (app x caddy)", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "min": 0, "max": 1, "custom": { "drawStyle": "bars", "fillOpacity": 60 } } },
+      "targets": [
+        { "refId": "A", "expr": "up{job=\"carreiras-app\"}", "legendFormat": "app" },
+        { "refId": "B", "expr": "up{job=\"caddy\"}", "legendFormat": "caddy" }
+      ]
+    },
+
+    { "type": "row", "title": "Erros", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 19 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Taxa de erro 5xx agora", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(caddy_http_request_duration_seconds_count{code=~\"5..\"}[5m])) / clamp_min(sum(rate(caddy_http_request_duration_seconds_count[5m])), 0.000001)" }]
+    },
+    {
+      "type": "stat", "title": "Erros 5xx (24h, total)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 20 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(caddy_http_request_duration_seconds_count{code=~\"5..\"}[24h]))" }]
+    },
+    {
+      "type": "stat", "title": "Falhas de IA (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 20 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"error\"}[24h]))" }]
+    },
+    {
+      "type": "stat", "title": "Análises com erro (24h)", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 10 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_analysis_total{outcome!=\"success\"}[24h]))" }]
+    },
+    {
+      "type": "stat", "title": "Coleta de negócio falhou?", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "FALHOU", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_snapshot_success" }]
+    },
+    {
+      "type": "stat", "title": "Loki tem logs agora?", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 20 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "SEM INGESTÃO", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "up{job=\"loki\"}" }],
+      "description": "Só confirma o processo Loki de pé, não a ingestão do promtail. Ver [[observabilidade-stack]] — promtail está com 'context deadline exceeded' desde 16/07/2026."
+    },
+    {
+      "type": "timeseries", "title": "Requests por segundo e status HTTP", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
+      "targets": [{ "refId": "A", "expr": "sum by (code) (rate(caddy_http_request_duration_seconds_count[5m]))", "legendFormat": "{{code}}" }]
+    },
+    {
+      "type": "timeseries", "title": "Chamadas de IA por resultado", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
+      "targets": [{ "refId": "A", "expr": "sum by (outcome) (rate(carreiras_ai_provider_calls_total[15m]))", "legendFormat": "{{outcome}}" }]
+    },
+    {
+      "type": "logs", "title": "Erros e warnings recentes (Loki)", "gridPos": { "h": 10, "w": 24, "x": 0, "y": 33 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "options": { "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending", "enableLogDetails": true },
+      "targets": [{ "refId": "A", "expr": "{container=~\"carreiras-match-.*\"} |~ \"(?i)(error|erro|fatal|panic|warn)\"", "queryType": "range" }]
+    }
+  ]
+}

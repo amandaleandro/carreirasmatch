@@ -1,0 +1,151 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Farol das Jornadas",
+  "uid": "carreiras-farol-jornadas",
+  "tags": ["carreiras-match", "farol", "status"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "1m",
+  "templating": { "list": [] },
+  "panels": [
+    { "type": "row", "title": "Infra e coleta", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "App", "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "up{job=\"carreiras-app\"}" }]
+    },
+    {
+      "type": "stat", "title": "Borda (Caddy)", "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DOWN", "color": "red" }, "1": { "text": "UP", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "up{job=\"caddy\"}" }]
+    },
+    {
+      "type": "stat", "title": "Banco (Postgres)", "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 50 }, { "color": "red", "value": 90 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_postgres_stat{metric=\"connections\"}", "legendFormat": "conexões" }]
+    },
+    {
+      "type": "stat", "title": "Coleta de métricas de negócio", "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "FALHOU", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_snapshot_success" }]
+    },
+    {
+      "type": "stat", "title": "Logs (Loki)", "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "SEM INGESTÃO", "color": "red" }, "1": { "text": "PROCESSO UP*", "color": "yellow" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "up{job=\"loki\"}" }],
+      "description": "*Só indica o processo Loki de pé; a ingestão do promtail está quebrada desde 16/07 — ver [[observabilidade-stack]]."
+    },
+    {
+      "type": "stat", "title": "App no ar há", "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "time() - process_start_time_seconds{job=\"carreiras-app\"}" }]
+    },
+
+    { "type": "row", "title": "Jornada do candidato", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Análise de currículo (IA) — sucesso 1h", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.9 }, { "color": "green", "value": 0.98 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(carreiras_analysis_total{outcome=\"success\"}[1h])) / clamp_min(sum(rate(carreiras_analysis_total[1h])), 0.000001)" }]
+    },
+    {
+      "type": "stat", "title": "Provedores de IA — sucesso 24h", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.9 }, { "color": "green", "value": 0.98 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"success\"}[24h])) / clamp_min(sum(increase(carreiras_ai_provider_calls_total[24h])), 0.000001)" }]
+    },
+    {
+      "type": "stat", "title": "Candidaturas (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"applications\",period=\"24h\"}" }]
+    },
+    {
+      "type": "stat", "title": "Pagamento candidato — aprovação 24h", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "green", "value": 0.8 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_flow{metric=\"payments_paid\",channel=\"candidate\",period=\"24h\"} / clamp_min(carreiras_business_flow{metric=\"payment_attempts\",channel=\"candidate\",period=\"24h\"}, 1)" }]
+    },
+    {
+      "type": "stat", "title": "Assinaturas ativas", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"}" }]
+    },
+    {
+      "type": "stat", "title": "Novos usuários (24h)", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"24h\"}" }]
+    },
+
+    { "type": "row", "title": "Jornada da empresa", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Pagamento empresa — aprovação 24h", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "green", "value": 0.8 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_flow{metric=\"payments_paid\",channel=\"company\",period=\"24h\"} / clamp_min(carreiras_business_flow{metric=\"payment_attempts\",channel=\"company\",period=\"24h\"}, 1)" }]
+    },
+    {
+      "type": "stat", "title": "Empresas cadastradas (24h)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "area" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_created{entity=\"companies\",period=\"24h\"}" }]
+    },
+    {
+      "type": "stat", "title": "Vagas/triagens abertas (total)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"company_screenings\"}" }],
+      "description": "Total acumulado (sem quebra por período) — ver [[observabilidade-stack]] para instrumentar janela móvel se precisar de tendência."
+    },
+    {
+      "type": "stat", "title": "Pedidos de contato com talentos (total)", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"talent_contacts\"}" }]
+    },
+    {
+      "type": "stat", "title": "Status das candidaturas", "gridPos": { "h": 5, "w": 8, "x": 16, "y": 12 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none", "orientation": "horizontal" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"application_status\"}", "legendFormat": "{{value}}" }]
+    },
+
+    { "type": "row", "title": "Fora do radar de métricas (checar manualmente)", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 17 }, "collapsed": false, "panels": [] },
+    {
+      "type": "text", "title": "Jornadas sem telemetria própria", "gridPos": { "h": 6, "w": 24, "x": 0, "y": 18 },
+      "options": {
+        "mode": "markdown",
+        "content": "Estas jornadas existem e funcionam, mas **não têm métrica Prometheus dedicada** hoje — não aparecem no farol acima porque não há sinal de saúde automatizado, não porque estejam OK:\n\n- **Alertas de vaga (e-mail + push)** — `email-scheduler.ts` (`sendJobAlerts`) e `lib/push.ts`. Checar via `EmailLog` no banco ou logs do container.\n- **Blog/SEO scheduler** — `blog-scheduler.ts`. Checar via tabela `Post` (novos posts recentes).\n- **Radares de concurso/vestibular** — RSS agendado (08h/14h/20h). Checar se rodou nos horários esperados.\n- **Marketplace freelancer** (`FreelanceProject`/`FreelanceProposal`/`FreelanceContract`) — feature nova (2026-07-20), zero instrumentação Prometheus ainda.\n\nSe quiser esses no farol de verdade (com cor vermelha/verde automática), o próximo passo é expor contadores desses fluxos em `src/lib/metrics.ts` como foi feito para análise de CV e pagamentos."
+      }
+    }
+  ]
+}
