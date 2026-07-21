@@ -27,7 +27,7 @@ const STORAGE_KEY = "upcoming-features-modal:v5:seen";
 const SHIPPED = [
   {
     title: "Desafio do Match",
-    description: "Indique amigos com seu link e desbloqueie créditos de diagnóstico completo a cada 3 indicações confirmadas.",
+    description: "Indique amigos com seu link e desbloqueie créditos de Kit Candidatura a cada 3 indicações confirmadas.",
     href: "/desafio",
     icon: Trophy,
   },

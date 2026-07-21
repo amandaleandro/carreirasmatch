@@ -335,9 +335,9 @@ export async function sendPaymentConfirmationEmail(
   opts: { kind: string; amountCents: number }
 ) {
   const isDiagnostic = opts.kind === "diagnostic";
-  const what = isDiagnostic ? "o diagnóstico completo da sua análise" : "sua análise completa";
+  const what = isDiagnostic ? "o Kit Candidatura da sua análise" : "sua análise completa";
   const cta = isDiagnostic
-    ? { href: `${APP_URL}/report`, label: "Ver meu diagnóstico" }
+    ? { href: `${APP_URL}/report`, label: "Ver meu Kit Candidatura" }
     : { href: `${APP_URL}/analise`, label: "Ir para minha análise" };
 
   await send(

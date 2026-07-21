@@ -453,19 +453,19 @@ const FIT_CONFIG: Record<
   fit: {
     emoji: "✅",
     label: "Você tem aderência com essa vaga",
-    message: "Seu perfil combina bem com o que a vaga pede. Veja o diagnóstico completo para saber exatamente como se destacar.",
+    message: "Seu perfil combina bem com o que a vaga pede. Veja o Kit Candidatura completo para saber exatamente como se destacar.",
     className: "border-emerald-300 bg-emerald-50 dark:border-emerald-900 dark:bg-emerald-950/40",
   },
   partial: {
     emoji: "🟡",
     label: "Você tem aderência parcial com essa vaga",
-    message: "Seu perfil tem pontos fortes, mas também gaps importantes. O diagnóstico completo mostra o que ajustar antes de aplicar.",
+    message: "Seu perfil tem pontos fortes, mas também gaps importantes. O Kit Candidatura mostra o que ajustar antes de aplicar.",
     className: "border-amber-300 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40",
   },
   no_fit: {
     emoji: "🔴",
     label: "Você ainda não tem aderência com essa vaga",
-    message: "Existem gaps relevantes entre seu currículo e essa vaga. O diagnóstico completo mostra um plano para chegar lá.",
+    message: "Existem gaps relevantes entre seu currículo e essa vaga. O Kit Candidatura mostra um plano para chegar lá.",
     className: "border-red-300 bg-red-50 dark:border-red-900 dark:bg-red-950/40",
   },
 };
@@ -523,7 +523,7 @@ export function SimpleFitTeaser({
             ))}
             {hiddenKeywords > 0 && (
               <span className="text-xs rounded-full px-3 py-1 bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400">
-                +{hiddenKeywords} no diagnóstico completo
+                +{hiddenKeywords} no Kit Candidatura
               </span>
             )}
           </div>
@@ -539,15 +539,15 @@ export function SimpleFitTeaser({
           <div className="mt-3 flex items-center gap-2 rounded-lg border border-dashed border-blue-300 dark:border-blue-800 bg-blue-50/60 dark:bg-blue-950/20 px-3 py-2.5">
             <span aria-hidden>🔒</span>
             <p className="text-sm text-blue-700 dark:text-blue-300">
-              O plano passo a passo para corrigir este e os demais pontos está no diagnóstico
-              completo.
+              O plano passo a passo para corrigir este e os demais pontos está no Kit
+              Candidatura.
             </p>
           </div>
         </div>
       )}
 
       <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 shadow-sm shadow-slate-900/5">
-        <h3 className="font-semibold mb-3">No diagnóstico completo você ainda recebe:</h3>
+        <h3 className="font-semibold mb-3">No Kit Candidatura você ainda recebe:</h3>
         <ul className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
           {[
             "Currículo reescrito e otimizado para esta vaga",

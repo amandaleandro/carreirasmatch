@@ -131,6 +131,12 @@ export default async function ReportPage({
             >
               Otimizar currículo para esta vaga →
             </Link>
+            <Link
+              href="/tools/cover-letter"
+              className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              Gerar carta de apresentação para esta vaga →
+            </Link>
           </div>
         )}
       </header>
@@ -165,10 +171,10 @@ export default async function ReportPage({
               <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
                 Próximo passo recomendado
               </p>
-              <h3 className="font-semibold text-lg">Veja exatamente o que ajustar antes de aplicar</h3>
+              <h3 className="font-semibold text-lg">Libere o Kit Candidatura para esta vaga</h3>
               <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Libere o diagnóstico desta vaga com palavras-chave, ajustes de currículo,
-                plano de evolução, perguntas de entrevista e mensagem para o recrutador.
+                Currículo pronto em PDF, palavras-chave da vaga, mensagem para o recrutador,
+                perguntas de entrevista e um plano de evolução — tudo em um só lugar.
               </p>
               <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
                 {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (

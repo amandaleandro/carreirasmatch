@@ -32,8 +32,8 @@ const steps = [
   },
   {
     number: "03",
-    title: "Saia com um plano",
-    description: "Veja aderência, lacunas, ajustes e preparação para entrevista.",
+    title: "Saia com a candidatura pronta",
+    description: "Kit Candidatura: currículo pronto em PDF, palavras-chave certas e preparação para entrevista.",
   },
 ];
 
@@ -138,7 +138,7 @@ const deliverables = [
   "Score de aderência e leitura ATS",
   "Pontos fortes e lacunas prioritárias",
   "Palavras-chave encontradas e ausentes",
-  "Sugestões para currículo e resumo",
+  "Currículo otimizado, pronto em PDF para enviar",
   "Perguntas prováveis de entrevista",
   "Plano de evolução e próximos passos",
 ];
@@ -203,9 +203,8 @@ export async function MarketingHome() {
               Descubra por que você não é chamado — antes de aplicar de novo.
             </h1>
             <p className="animate-rise mt-6 max-w-2xl text-base leading-relaxed text-white/70 md:text-xl" style={{ animationDelay: "160ms" }}>
-              Cole o link da vaga, envie seu currículo e veja em segundos o que está
-              pesando contra você, o que já joga a seu favor e o que ajustar para
-              virar o jogo.
+              Cole o link da vaga, envie seu currículo e saia com o currículo ajustado,
+              as palavras-chave certas e o passo a passo da candidatura — não só uma nota.
             </p>
             <div className="animate-rise mt-8 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "240ms" }}>
               <Link
@@ -224,7 +223,7 @@ export async function MarketingHome() {
             </div>
             <div className="animate-rise mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/55" style={{ animationDelay: "320ms" }}>
               <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Resultado inicial gratuito</span>
-              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Diagnóstico completo a partir de R$9,90</span>
+              <span className="inline-flex items-center gap-1.5"><Check className="h-3.5 w-3.5 text-emerald-400" /> Kit Candidatura completo a partir de R$9,90</span>
               <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> Sem promessa de contratação</span>
             </div>
             {openJobs > 0 && (
