@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Upload, FileText, Sparkles, AlertCircle, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Upload, FileText, Sparkles, AlertCircle, ArrowRight, CheckCircle2, Link2 } from "lucide-react";
 import { CAREER_TRACK_OPTIONS, CareerTrack } from "@/components/analysis-display";
 
 interface DesafioFormProps {
@@ -20,6 +20,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
   const [file, setFile] = useState<File | null>(null);
   const [jobTitle, setJobTitle] = useState("");
   const [jobText, setJobText] = useState("");
+  const [jobLink, setJobLink] = useState("");
   const [careerTrack, setCareerTrack] = useState<CareerTrack>("growth");
 
   const [name, setName] = useState("");
@@ -60,8 +61,8 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
       setError("Informe o nome do cargo desejado.");
       return;
     }
-    if (!jobText.trim()) {
-      setError("Cole a descrição da vaga desejada.");
+    if (!jobText.trim() && !jobLink.trim()) {
+      setError("Cole a descrição da vaga ou informe o link da vaga.");
       return;
     }
 
@@ -90,10 +91,16 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
         }
       }
 
+      const finalJobText = jobLink.trim()
+        ? `[Link da vaga]\n${jobLink.trim()}\n\n[Descrição da vaga]\n${
+            jobText.trim() || "Não informada; candidato forneceu apenas o link acima."
+          }`
+        : jobText;
+
       const formData = new FormData();
       formData.append("resume", file);
       formData.append("jobTitle", jobTitle);
-      formData.append("jobText", jobText);
+      formData.append("jobText", finalJobText);
       formData.append("careerTrack", careerTrack);
 
       const res = await fetch("/api/analyze", {
@@ -219,7 +226,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
       {/* Texto da Vaga */}
       <div className="space-y-2">
         <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
-          3. Descrição / Requisitos da Vaga
+          3. Descrição / Requisitos da Vaga {jobLink.trim() && <span className="text-slate-500 normal-case font-normal">(opcional com link)</span>}
         </label>
         <textarea
           rows={4}
@@ -227,7 +234,22 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
           onChange={(e) => setJobText(e.target.value)}
           placeholder="Cole aqui o texto da vaga ou requisitos anunciados..."
           className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500 resize-none"
-          required
+          required={!jobLink.trim()}
+        />
+      </div>
+
+      {/* Link da Vaga (alternativa à descrição) */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-1.5 text-xs font-bold text-sky-400 uppercase tracking-wider">
+          <Link2 className="w-3.5 h-3.5" />
+          Ou informe o link da vaga (LinkedIn, Gupy, etc.)
+        </label>
+        <input
+          type="url"
+          value={jobLink}
+          onChange={(e) => setJobLink(e.target.value)}
+          placeholder="https://..."
+          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-sky-500"
         />
       </div>
 
