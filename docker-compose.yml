@@ -139,7 +139,10 @@ services:
     profiles: ["whatsapp"]
     environment:
       - POSTGRES_USER=evolution
-      - POSTGRES_PASSWORD=${EVOLUTION_POSTGRES_PASSWORD:?defina EVOLUTION_POSTGRES_PASSWORD no .env}
+      # ":?" quebraria o parse do compose para TODOS os serviços (mesmo fora
+      # do profile ativo) se a env faltasse — soft default aqui, quem sobe de
+      # verdade é o `--profile whatsapp up`, que falha em runtime sem senha.
+      - POSTGRES_PASSWORD=${EVOLUTION_POSTGRES_PASSWORD:-}
       - POSTGRES_DB=evolution
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U evolution -d evolution"]
@@ -167,7 +170,7 @@ services:
     restart: unless-stopped
     profiles: ["whatsapp"]
     environment:
-      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY:?defina EVOLUTION_API_KEY no .env}
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY:-}
       - DATABASE_ENABLED=true
       - DATABASE_PROVIDER=postgresql
       - DATABASE_CONNECTION_URI=postgresql://evolution:${EVOLUTION_POSTGRES_PASSWORD}@evolution-postgres:5432/evolution
