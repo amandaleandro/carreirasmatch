@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const company = await loadCompany(slug);
   if (!company) return { title: "Empresa não encontrada" };
   return {
-    title: `${company.name} — vagas e perfil`,
+    title: `${company.name} | vagas e perfil`,
     description: company.description.slice(0, 160) || `Vagas abertas e perfil de ${company.name}.`,
     alternates: { canonical: `/empresas/${slug}` },
   };

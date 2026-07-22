@@ -102,17 +102,17 @@ export default async function ApplicationsPage() {
   const journeyStats = [
     {
       label: "Dias em busca",
-      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "—",
+      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "Sem dados",
       tone: "text-neutral-900 dark:text-neutral-100",
     },
     {
       label: "Taxa de resposta",
-      value: journey.responseRate !== null ? `${journey.responseRate}%` : "—",
+      value: journey.responseRate !== null ? `${journey.responseRate}%` : "Sem dados",
       tone: "text-emerald-600 dark:text-emerald-400",
     },
     {
       label: "Taxa de rejeição",
-      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—",
+      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "Sem dados",
       tone: "text-neutral-500 dark:text-neutral-400",
     },
     {

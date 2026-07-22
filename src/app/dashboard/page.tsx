@@ -470,19 +470,19 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-3xl font-black text-[#2563EB]">
-              {journey.daysSearching !== null ? journey.daysSearching : "—"}
+              {journey.daysSearching !== null ? journey.daysSearching : "Sem dados"}
             </p>
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Dias em busca</p>
           </div>
           <div>
             <p className="text-3xl font-black text-[#2563EB]">
-              {journey.responseRate !== null ? `${journey.responseRate}%` : "—"}
+              {journey.responseRate !== null ? `${journey.responseRate}%` : "Sem dados"}
             </p>
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Taxa de resposta</p>
           </div>
           <div>
             <p className="text-3xl font-black text-[#2563EB]">
-              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "—"}
+              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "Sem dados"}
             </p>
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Taxa de rejeição</p>
           </div>

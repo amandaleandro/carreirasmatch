@@ -146,7 +146,7 @@ export function MarketingHome() {
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Veja o produto funcionando</p>
             <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">A nota é só o começo da análise.</h2>
-            <p className="mt-4 text-neutral-600 dark:text-neutral-400">O CarreirasMatch mostra por que existe uma lacuna e transforma o diagnóstico em uma alteração concreta — sempre para você revisar antes de usar.</p>
+            <p className="mt-4 text-neutral-600 dark:text-neutral-400">O CarreirasMatch mostra por que existe uma lacuna e transforma o diagnóstico em uma alteração concreta, sempre para você revisar antes de usar.</p>
           </div>
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             <article className="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-950"><p className="text-xs font-bold uppercase text-emerald-600">Encontrado na vaga</p><h3 className="mt-3 text-lg font-bold">Planejamento de conteúdo</h3><p className="mt-2 text-sm text-neutral-500">Seu currículo já apresenta uma evidência relacionada. O relatório explica onde ela aparece.</p></article>
@@ -179,7 +179,7 @@ export function MarketingHome() {
         </section>
 
         <section id="para-voce" className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-          <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Para diferentes momentos</p><h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">A mesma pergunta, com contextos diferentes.</h2><p className="mt-4 text-neutral-600 dark:text-neutral-400">O que do seu histórico ajuda nesta vaga — e o que precisa ficar mais claro?</p></div>
+          <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Para diferentes momentos</p><h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">A mesma pergunta, com contextos diferentes.</h2><p className="mt-4 text-neutral-600 dark:text-neutral-400">O que do seu histórico ajuda nesta vaga e o que precisa ficar mais claro?</p></div>
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">{journeys.map(([href, title, description, Icon]) => <Link key={href} href={href} className="group rounded-2xl border border-neutral-200 bg-white p-6 transition hover:-translate-y-1 hover:border-blue-300 dark:border-neutral-800 dark:bg-neutral-950"><Icon className="h-5 w-5 text-blue-600" /><h3 className="mt-4 text-lg font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-neutral-500">{description}</p><span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-600">Ver orientação <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></Link>)}</div>
         </section>
 

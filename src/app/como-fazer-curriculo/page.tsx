@@ -40,7 +40,7 @@ export default function ComoFazerCurriculoPage() {
     <ContentPage
       eyebrow="Guia de carreira"
       title="Como fazer um currículo do zero"
-      description="Um passo a passo direto para montar seu primeiro currículo — mesmo que você nunca tenha feito um."
+      description="Um passo a passo direto para montar seu primeiro currículo, mesmo que você nunca tenha feito um."
       backHref="/curriculo-gratis"
       backLabel="Montar currículo grátis"
     >
@@ -80,7 +80,7 @@ export default function ComoFazerCurriculoPage() {
 
       <ContentSection title="3. Escreva um objetivo específico">
         <p>
-          Em uma frase, diga o cargo ou a área que você busca — e adapte para cada vaga. &ldquo;Busco
+          Em uma frase, diga o cargo ou a área que você busca e adapte para cada vaga. &ldquo;Busco
           vaga de auxiliar administrativo para aplicar minha organização e atenção a detalhes&rdquo;
           diz muito mais do que &ldquo;busco uma oportunidade para crescer&rdquo;.
         </p>
@@ -95,7 +95,7 @@ export default function ComoFazerCurriculoPage() {
 
       <ContentSection title="5. Descreva suas experiências com resultados">
         <p>
-          Para cada experiência, não liste só tarefas — mostre o efeito do seu trabalho sempre que
+          Para cada experiência, não liste só tarefas. Mostre o efeito do seu trabalho sempre que
           possível: &ldquo;organizei o estoque e reduzi faltas de produto&rdquo; é melhor que
           &ldquo;responsável pelo estoque&rdquo;. Sem experiência formal, use projetos, estágios,
           voluntariado e trabalhos acadêmicos.
@@ -105,7 +105,7 @@ export default function ComoFazerCurriculoPage() {
       <ContentSection title="6. Destaque cursos e habilidades">
         <p>
           Inclua idiomas, ferramentas e competências que a vaga pede. Priorize o que é relevante para
-          o cargo — uma lista enorme e genérica pesa menos que poucas habilidades certeiras.
+          o cargo. Uma lista enorme e genérica pesa menos que poucas habilidades certeiras.
         </p>
       </ContentSection>
 

@@ -8,7 +8,7 @@ export const proxy = auth;
 // ads.txt/manifest.webmanifest ficam fora do matcher junto com robots.txt/sitemap.xml:
 // são arquivos lidos sem sessão (crawler ou o navegador checando instalabilidade do
 // PWA). Passando pelo proxy, responderiam um redirect para /login em vez do
-// conteúdo esperado — o Google trataria o ads.txt como ausente, e o navegador
+// conteúdo esperado. O Google trataria o ads.txt como ausente, e o navegador
 // recebia HTML no lugar do JSON do manifest.
 export const config = {
   matcher: [

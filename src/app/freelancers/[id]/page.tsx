@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!profile) return { title: "Freelancer não encontrado" };
   const name = profile.user.name ?? "Freelancer";
   return {
-    title: `${name} — ${profile.headline || "Freelancer"}`,
+    title: `${name} | ${profile.headline || "Freelancer"}`,
     description: profile.headline || `Perfil freelancer de ${name}`,
   };
 }

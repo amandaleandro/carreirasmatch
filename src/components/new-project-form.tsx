@@ -129,7 +129,7 @@ export function NewProjectForm() {
       </div>
 
       <div>
-        <label className={labelClass}>Prazo desejado — opcional</label>
+        <label className={labelClass}>Prazo desejado, opcional</label>
         <input type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className={inputClass} />
       </div>
 

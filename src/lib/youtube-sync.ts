@@ -4,7 +4,7 @@ import { recordSync } from "@/lib/external-source-sync";
 /**
  * Coleta automática de vídeos gratuitos do YouTube (mentorias e cursos de carreira)
  * via YouTube Data API v3. Mesmo em modo automático, as buscas são "curadas" por
- * um conjunto fixo de termos por nicho para manter a relevância — evitando clickbait
+ * um conjunto fixo de termos por nicho para manter a relevância, evitando clickbait
  * e conteúdo fora do tema. Os vídeos são apenas EMBUTIDOS (player oficial); nada é
  * baixado ou rehospedado, em conformidade com os termos do YouTube.
  */

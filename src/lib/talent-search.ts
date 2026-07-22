@@ -28,7 +28,7 @@ function firstNameOf(name: string | null): string {
 /**
  * Busca candidatos que deram opt-in (discoverable) e ranqueia pela aderência à
  * vaga informada. Pré-filtra por área/UF quando informados e limita o pool.
- * Nunca expõe contato aqui — só nome, área e cidade; o contato só volta quando
+ * Nunca expõe contato aqui, só nome, área e cidade; o contato só volta quando
  * já existe um pedido aceito pelo candidato.
  */
 export async function searchTalent(

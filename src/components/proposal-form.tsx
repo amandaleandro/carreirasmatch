@@ -52,7 +52,7 @@ export function ProposalForm({ projectId }: { projectId: string }) {
           <input type="number" min={0} step={50} value={bid} onChange={(e) => setBid(e.target.value)} className={inputClass} placeholder="Ex: 1500" />
         </div>
         <div>
-          <label className={labelClass}>Prazo (dias) — opcional</label>
+          <label className={labelClass}>Prazo (dias), opcional</label>
           <input type="number" min={1} step={1} value={estimatedDays} onChange={(e) => setEstimatedDays(e.target.value)} className={inputClass} placeholder="Ex: 7" />
         </div>
       </div>

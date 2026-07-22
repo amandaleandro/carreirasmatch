@@ -138,7 +138,7 @@ export default async function ProjectDetailPage({ params }: Props) {
           status={contract.status}
           viewerRole={viewerId === contract.clientUserId ? "client" : "freelancer"}
           agreedLabel={`Valor acordado: ${formatCents(contract.agreedCents)}`}
-          counterpartName={(viewerId === contract.clientUserId ? contract.freelancer.name : contract.client.name) ?? "—"}
+          counterpartName={(viewerId === contract.clientUserId ? contract.freelancer.name : contract.client.name) ?? "Não informado"}
           alreadyReviewed={alreadyReviewed}
         />
       )}
@@ -198,7 +198,7 @@ export default async function ProjectDetailPage({ params }: Props) {
               <p className="text-sm text-neutral-500">
                 Valor: <span className="font-semibold text-neutral-800 dark:text-neutral-200">{formatCents(myProposal.bidCents)}</span>
                 {myProposal.estimatedDays ? ` · ${myProposal.estimatedDays} dia(s)` : ""} ·{" "}
-                {myProposal.status === "pending" ? "Aguardando resposta" : myProposal.status === "accepted" ? "✓ Aceita — você foi contratado!" : myProposal.status === "rejected" ? "Recusada" : "Retirada"}
+                {myProposal.status === "pending" ? "Aguardando resposta" : myProposal.status === "accepted" ? "✓ Aceita. Você foi contratado!" : myProposal.status === "rejected" ? "Recusada" : "Retirada"}
               </p>
               <p className="text-sm text-neutral-700 dark:text-neutral-300 mt-3 whitespace-pre-wrap">{myProposal.coverLetter}</p>
             </div>

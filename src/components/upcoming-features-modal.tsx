@@ -154,7 +154,7 @@ export function UpcomingFeaturesModal() {
                     O que acabou de chegar no CarreirasMatch
                   </h2>
                   <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                    Agora você acompanha vagas, concursos e vestibulares e ainda estuda de graça — tudo num lugar só.
+                    Agora você acompanha vagas, concursos e vestibulares e ainda estuda de graça, tudo num lugar só.
                   </p>
                 </div>
                 <button

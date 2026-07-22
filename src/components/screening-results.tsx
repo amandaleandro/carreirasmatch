@@ -314,11 +314,11 @@ export function ScreeningResults({
                   <h4 className="font-semibold break-words">{c.candidateName || c.fileName}</h4>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 mb-1">Aderência</p>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{c.reason || "—"}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{c.reason || "Não informado"}</p>
                   </div>
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400 mb-1">Anotação</p>
-                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed whitespace-pre-line">{c.note || "—"}</p>
+                    <p className="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed whitespace-pre-line">{c.note || "Não informado"}</p>
                   </div>
                 </div>
               ))}

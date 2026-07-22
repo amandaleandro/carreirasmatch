@@ -21,6 +21,10 @@ import {
  *   OPENAI_API_KEY, GROQ_API_KEY, CEREBRAS_API_KEY, GEMINI_API_KEY, TOGETHER_API_KEY,
  *   DEEPINFRA_API_KEY, OPENROUTER_API_KEY
  *
+ * Groq aceita múltiplas contas: GROQ_API_KEY_2, GROQ_API_KEY_3, ... entram na
+ * fila como endpoints extras (ids "groq2", "groq3", ...), cada um com cota/
+ * cooldown independentes, para somar as cotas gratuitas de várias contas.
+ *
  * Controle proativo de cota (opcional): antes de chamar, provedores que já
  * estouraram o orçamento diário de tokens (AI_DAILY_TOKEN_BUDGET ou
  * AI_DAILY_TOKEN_BUDGET_<ID>, 0 = ilimitado) ou que estão em cooldown por um
@@ -36,15 +40,31 @@ export type AiEndpoint = {
   model: string;
 };
 
+/**
+ * Lê GROQ_API_KEY, GROQ_API_KEY_2, GROQ_API_KEY_3, ... (contas Groq diferentes,
+ * cada uma com sua própria cota gratuita). Para no primeiro índice ausente.
+ */
+function groqApiKeys(): string[] {
+  const keys: string[] = [];
+  if (process.env.GROQ_API_KEY?.trim()) keys.push(process.env.GROQ_API_KEY.trim());
+  for (let i = 2; ; i++) {
+    const key = process.env[`GROQ_API_KEY_${i}`];
+    if (!key || !key.trim()) break;
+    keys.push(key.trim());
+  }
+  return keys;
+}
+
 function buildRegistry(groqModel: string): AiEndpoint[] {
+  const groqEndpoints: AiEndpoint[] = groqApiKeys().map((apiKey, i) => ({
+    id: i === 0 ? "groq" : `groq${i + 1}`,
+    label: i === 0 ? "Groq" : `Groq ${i + 1}`,
+    baseURL: "https://api.groq.com/openai/v1",
+    apiKey,
+    model: groqModel,
+  }));
   return [
-    {
-      id: "groq",
-      label: "Groq",
-      baseURL: "https://api.groq.com/openai/v1",
-      apiKey: process.env.GROQ_API_KEY,
-      model: groqModel,
-    },
+    ...groqEndpoints,
     {
       id: "cerebras",
       label: "Cerebras",
@@ -96,8 +116,12 @@ export function getConfiguredEndpoints(groqModel: string): AiEndpoint[] {
 }
 
 let rotationCursor = 0;
-const FREE_FIRST_PROVIDER_IDS = new Set(["groq", "cerebras", "gemini"]);
+const FREE_FIRST_PROVIDER_PREFIXES = ["groq", "cerebras", "gemini"];
 const PAID_RESERVE_PROVIDER_IDS = new Set(["openai"]);
+
+function isFreeFirstProvider(id: string): boolean {
+  return FREE_FIRST_PROVIDER_PREFIXES.some((prefix) => id.startsWith(prefix));
+}
 
 /** Rotaciona sem remover nenhum endpoint; a ordem restante serve como fallback. */
 export function rotateEndpoints(endpoints: AiEndpoint[], startIndex: number): AiEndpoint[] {
@@ -114,10 +138,10 @@ export function orderEndpointsForRouting(
   if (mode === "priority" || endpoints.length <= 1) return [...endpoints];
   if (mode === "round_robin") return rotateEndpoints(endpoints, startIndex);
 
-  const free = endpoints.filter((endpoint) => FREE_FIRST_PROVIDER_IDS.has(endpoint.id));
+  const free = endpoints.filter((endpoint) => isFreeFirstProvider(endpoint.id));
   const secondary = endpoints.filter(
     (endpoint) =>
-      !FREE_FIRST_PROVIDER_IDS.has(endpoint.id) &&
+      !isFreeFirstProvider(endpoint.id) &&
       !PAID_RESERVE_PROVIDER_IDS.has(endpoint.id)
   );
   const paidReserve = endpoints.filter((endpoint) => PAID_RESERVE_PROVIDER_IDS.has(endpoint.id));

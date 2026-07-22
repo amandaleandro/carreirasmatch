@@ -5,7 +5,7 @@ import { SITE_NAME } from "@/lib/seo";
 // service worker de push. O manifest é servido em /manifest.webmanifest.
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: `${SITE_NAME} — vagas e preparação para entrevista`,
+    name: `${SITE_NAME} | vagas e preparação para entrevista`,
     short_name: SITE_NAME,
     description:
       "Compare seu currículo com a vaga, receba alertas de vagas novas e prepare-se para a entrevista.",

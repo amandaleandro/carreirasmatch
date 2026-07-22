@@ -57,7 +57,7 @@ export default function CurriculoGratisPage() {
             Como fazer um currículo grátis do jeito certo
           </h2>
           <p className="mt-3">
-            Um bom currículo não precisa ser bonito — precisa ser claro. Em poucos segundos, o
+            Um bom currículo não precisa ser bonito, precisa ser claro. Em poucos segundos, o
             recrutador (ou o sistema de triagem que lê o arquivo antes dele) tem que entender quem
             você é, o que você sabe fazer e por que serve para a vaga. O construtor acima monta esse
             currículo grátis para você; abaixo explicamos o que colocar em cada parte para ele
@@ -83,7 +83,7 @@ export default function CurriculoGratisPage() {
               está começando pode incluir o ensino médio.
             </li>
             <li>
-              <strong>Experiência:</strong> empresa, cargo, período e o que você fez — de preferência
+              <strong>Experiência:</strong> empresa, cargo, período e o que você fez, de preferência
               com resultados. Sem experiência formal? Use projetos, estágios, voluntariado e trabalhos
               acadêmicos.
             </li>
@@ -117,13 +117,13 @@ export default function CurriculoGratisPage() {
               <Link href="/como-fazer-curriculo" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                 Como fazer um currículo do zero
               </Link>{" "}
-              — passo a passo completo para quem nunca montou um.
+              , um passo a passo completo para quem nunca montou um.
             </li>
             <li>
               <Link href="/curriculo-sem-experiencia" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                 Currículo sem experiência
               </Link>{" "}
-              — o que colocar quando você ainda não teve um emprego formal.
+              , o que colocar quando você ainda não teve um emprego formal.
             </li>
             <li>
               <Link href="/primeiro-emprego" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">

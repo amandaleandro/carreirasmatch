@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 // Imagem Open Graph padrão do site (usada quando uma rota não define a sua).
 // 1200x630 é o tamanho recomendado para cards de redes sociais.
-export const alt = "CarreirasMatch — compare seu currículo com a vaga";
+export const alt = "CarreirasMatch | compare seu currículo com a vaga";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

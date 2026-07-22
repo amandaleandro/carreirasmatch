@@ -51,7 +51,7 @@ export default async function AdminSupportPage({
   const counts = Object.fromEntries(SUPPORT_STATUSES.map((status) => [status, groupedCounts.find((item) => item.status === status)?._count._all ?? 0])) as Record<(typeof SUPPORT_STATUSES)[number], number>;
   const responded = metricTickets.filter((ticket) => ticket.firstResponseAt);
   const resolved = metricTickets.filter((ticket) => ticket.resolvedAt);
-  const averageHours = (items: typeof metricTickets, end: "firstResponseAt" | "resolvedAt") => items.length ? (items.reduce((sum, item) => sum + ((item[end]?.getTime() ?? item.createdAt.getTime()) - item.createdAt.getTime()), 0) / items.length / 3_600_000).toFixed(1) : "—";
+  const averageHours = (items: typeof metricTickets, end: "firstResponseAt" | "resolvedAt") => items.length ? (items.reduce((sum, item) => sum + ((item[end]?.getTime() ?? item.createdAt.getTime()) - item.createdAt.getTime()), 0) / items.length / 3_600_000).toFixed(1) : "Sem dados";
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const makeHref = (changes: Record<string, string | number>) => {
     const next = new URLSearchParams({ status: activeFilter, q: query, order });

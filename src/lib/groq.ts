@@ -282,7 +282,7 @@ const TRACK_EXTRA_FIELDS: Record<CareerTrack, TrackExtraField[]> = {
 
 const SYSTEM_PROMPT = `Recrutador sênior, cético e direto, para vagas de QUALQUER área (não assuma TI sem a vaga dizer). Notas REALISTAS, sem inflar. Frases curtas, sem repetição.
 
-TOM (escreva como gente, não como IA): você está falando com ESTA pessoa sobre ESTA vaga, não escrevendo um relatório-modelo. Cada frase de texto (strengths, weaknesses, fixes, applicationStatusReason, suggestedSummary, recruiterMessage) tem que se apoiar em algo concreto e único deste currículo (uma experiência, empresa, ferramenta, número, curso reais) ou desta vaga (o cargo, requisito ou empresa reais). Teste cada frase: se ela serviria igual para outro candidato ou outra vaga, ela está genérica — reescreva com o detalhe específico ou corte.
+TOM (escreva como gente, não como IA): você está falando com ESTA pessoa sobre ESTA vaga, não escrevendo um relatório-modelo. Cada frase de texto (strengths, weaknesses, fixes, applicationStatusReason, suggestedSummary, recruiterMessage) tem que se apoiar em algo concreto e único deste currículo (uma experiência, empresa, ferramenta, número, curso reais) ou desta vaga (o cargo, requisito ou empresa reais). Teste cada frase: se ela serviria igual para outro candidato ou outra vaga, ela está genérica. Reescreva com o detalhe específico ou corte.
 - PROIBIDO clichê de IA/RH: "é importante ressaltar/destacar", "no cenário competitivo atual", "de forma eficaz/eficiente", "aprimorar/aperfeiçoar suas habilidades", "melhore seu currículo", "candidato(a) promissor(a)", "buscar novas oportunidades", "sólido conhecimento", "robusto", "alavancar", "agregar valor", "se destacar no mercado".
 - Não comece todas as frases igual (nem tudo no imperativo, nem tudo com "Você"). Varie a abertura e o tamanho.
 - Fale direto, com naturalidade de conversa real ("Sua experiência na [empresa] mostra X, mas a vaga pede Y e isso não aparece"), não em tópicos formais e intercambiáveis.
@@ -466,8 +466,11 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
 
   const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
+  // Groq como provedor preferido: análise de currículo × vaga é o uso principal
+  // do produto, então fica com a cota reservada só pra ela. Só cai pros demais
+  // provedores se o Groq falhar ou estourar cota.
   return runJsonPrompt<ResumeAnalysis>(
-    systemPrompt, userMessage, 0, 6000, undefined, resumeAnalysisSchema, "resume_analysis"
+    systemPrompt, userMessage, 0, 6000, undefined, resumeAnalysisSchema, "resume_analysis", "groq"
   );
 }
 
@@ -492,7 +495,8 @@ export async function extractStructuredResume(resumeText: string): Promise<Struc
     6000,
     EXTRACTION_MODEL,
     structuredResumeSchema,
-    "resume_extraction"
+    "resume_extraction",
+    "groq"
   );
 }
 
@@ -618,6 +622,8 @@ export async function generateProfileSuggestions(input: {
   const varietyBlock = `\n\nID_DESTA_SOLICITACAO: ${randomUUID()} (varie a seleção em relação a gerações anteriores; não repita exatamente as mesmas sugestões).`;
   const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${guidanceBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}${varietyBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
+  // Cerebras como provedor preferido: sugestão de perfil é uma ferramenta mais
+  // simples que a análise principal, mesma categoria das ferramentas de tools.ts.
   return runJsonPrompt<ProfileSuggestionsResult>(
     PROFILE_SUGGESTIONS_SYSTEM_PROMPT,
     userMessage,
@@ -625,6 +631,7 @@ export async function generateProfileSuggestions(input: {
     undefined,
     undefined,
     profileSuggestionsSchema,
-    "profile_suggestions"
+    "profile_suggestions",
+    "cerebras"
   );
 }

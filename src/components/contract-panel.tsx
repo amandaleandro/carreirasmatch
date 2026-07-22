@@ -43,7 +43,7 @@ export function ContractPanel({ contractId, status, viewerRole, agreedLabel, cou
 
   const statusLabel: Record<string, string> = {
     active: "Em andamento",
-    delivered: "Entregue — aguardando confirmação",
+    delivered: "Entregue, aguardando confirmação",
     completed: "Concluído",
     cancelled: "Cancelado",
   };

@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 //  - o contratante (dono do projeto) aceita ("accept") ou rejeita ("reject");
 //  - o freelancer autor retira ("withdraw").
 // Aceitar cria o contrato, coloca o projeto em andamento, rejeita as demais
-// propostas e abre a thread de conversa — tudo numa transação.
+// propostas e abre a thread de conversa, tudo numa transação.
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { session, response } = await requireAuth();
   if (!session) return response;

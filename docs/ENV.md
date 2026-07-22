@@ -31,6 +31,7 @@ Todos são compatíveis com a API OpenAI (`chat.completions`).
 | Variável | Provedor | Observação |
 | --- | --- | --- |
 | `GROQ_API_KEY` / `GROQ_MODEL` | Groq | default sugerido `llama-3.3-70b-versatile`; modelo configurável também em runtime via `/admin` (`AppSetting`) |
+| `GROQ_API_KEY_2`, `GROQ_API_KEY_3`, ... | Groq (contas extras) | opcional: cada chave de uma conta Groq diferente entra na fila como endpoint próprio (`groq2`, `groq3`, ...), com cooldown/cota de 429 independentes, para somar as cotas gratuitas; para no primeiro índice ausente |
 | `OPENAI_API_KEY` / `OPENAI_MODEL` | OpenAI | default `gpt-4.1-nano`; funciona como reserva paga, nunca é removida da fila por cota/cooldown |
 | `CEREBRAS_API_KEY` / `CEREBRAS_MODEL` | Cerebras | default `gpt-oss-120b` |
 | `GEMINI_API_KEY` / `GEMINI_MODEL` | Google Gemini | default `gemini-3.1-flash-lite` |

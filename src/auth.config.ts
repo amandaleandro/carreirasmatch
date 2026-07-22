@@ -56,7 +56,7 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     // jwt/session precisam viver aqui (e não só em auth.ts): o proxy.ts cria
     // uma instância separada do NextAuth só com este config, e sem eles o
-    // middleware não enxerga o accountType — toda sessão de empresa era
+    // middleware não enxerga o accountType; toda sessão de empresa era
     // devolvida para /empresa/login.
     async jwt({ token, user }) {
       if (user) {

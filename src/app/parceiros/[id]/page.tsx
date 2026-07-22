@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const partner = await getPartnerData(id);
   if (!partner) return { title: "Parceiro Não Encontrado" };
   return {
-    title: `${partner.name} — Cursos e Treinamentos`,
+    title: `${partner.name} | Cursos e Treinamentos`,
     description: partner.description || `Veja todos os cursos e qualificações oferecidas por ${partner.name} no CarreirasMatch.`,
   };
 }

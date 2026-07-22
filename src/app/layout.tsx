@@ -24,7 +24,7 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "CarreirasMatch — compare seu currículo com a vaga",
+    default: "CarreirasMatch | compare seu currículo com a vaga",
     template: `%s | ${SITE_NAME}`,
   },
   description: "Descubra sua aderência real a uma vaga e como se preparar para a entrevista.",

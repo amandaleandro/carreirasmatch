@@ -63,7 +63,7 @@ export default async function CompanyReportsPage() {
   const cards = [
     { label: "Triagens Realizadas", value: jobCount, icon: FileSearch, color: "blue" },
     { label: "Currículos Analisados", value: candidateCount, icon: FileText, color: "indigo" },
-    { label: "Aderência Média", value: candidateCount > 0 ? `${avgFit}%` : "—", icon: Target, color: "emerald" },
+    { label: "Aderência Média", value: candidateCount > 0 ? `${avgFit}%` : "Sem dados", icon: Target, color: "emerald" },
     { label: "Vagas Abertas", value: openVagas, icon: Briefcase, color: "purple" },
     { label: "Vagas Fechadas", value: closedVagas, icon: Briefcase, color: "amber" },
     { label: "Pedidos de Contato", value: contactTotal, icon: Users, color: "rose" },
@@ -71,7 +71,7 @@ export default async function CompanyReportsPage() {
 
   const bands = [
     { label: "Alta Compatibilidade (70%+)", value: high, color: "bg-emerald-500" },
-    { label: "Média Compatibilidade (40–69%)", value: mid, color: "bg-amber-500" },
+    { label: "Média Compatibilidade (40 a 69%)", value: mid, color: "bg-amber-500" },
     { label: "Baixa Compatibilidade (<40%)", value: low, color: "bg-rose-500" },
   ];
 

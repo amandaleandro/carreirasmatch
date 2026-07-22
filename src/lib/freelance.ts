@@ -130,7 +130,7 @@ export function formatBudget(
 ): string {
   const suffix = budgetType === "hourly" ? "/h" : "";
   if (min != null && max != null && min !== max) {
-    return `${formatCents(min)} – ${formatCents(max)}${suffix}`;
+    return `${formatCents(min)} a ${formatCents(max)}${suffix}`;
   }
   const single = min ?? max;
   if (single != null) return `${formatCents(single)}${suffix}`;

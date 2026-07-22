@@ -537,7 +537,7 @@ const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: st
   },
   "primeiro-emprego": {
     headline: "Encontrou sua primeira vaga? Mostre o que você já sabe fazer.",
-    subheadline: "Compare seu currículo com a oportunidade e transforme cursos, projetos e atividades em evidências reais — sem inventar experiência profissional.",
+    subheadline: "Compare seu currículo com a oportunidade e transforme cursos, projetos e atividades em evidências reais, sem inventar experiência profissional.",
   },
   "transicao-de-carreira": {
     headline: "Encontrou uma vaga na nova área? Conecte sua experiência à mudança.",
@@ -901,7 +901,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             </div>
           </section>}
 
-          {/* Hero — remonta ao trocar de nicho para reproduzir a entrada escalonada */}
+          {/* Hero remonta ao trocar de nicho para reproduzir a entrada escalonada */}
           <section key={activeSlug} className="py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 items-center">
             <div>
               <span className={`animate-rise inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 ${theme.badge}`}>

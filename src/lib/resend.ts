@@ -160,7 +160,7 @@ export async function notifyAdminNewSignup(opts: {
   segment?: string | null;
 }) {
   const rows: Array<[string, string]> = [
-    ["Nome", opts.name?.trim() || "—"],
+    ["Nome", opts.name?.trim() || "Não informado"],
     ["E-mail", opts.email],
   ];
   if (opts.phone?.trim()) rows.push(["Telefone", opts.phone.trim()]);
@@ -177,7 +177,7 @@ export async function notifyAdminPurchase(opts: {
   await sendAdmin("Nova venda 💰", [
     ["Produto", opts.product],
     ["Valor", formatCentsToBRL(opts.amountCents)],
-    ["Cliente", opts.email?.trim() || "—"],
+    ["Cliente", opts.email?.trim() || "Não informado"],
   ]);
 }
 

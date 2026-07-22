@@ -162,7 +162,7 @@ export function FreelancerProfileForm({ initial }: { initial: FreelancerProfileI
       </div>
 
       <div>
-        <label className={labelClass}>Valor por hora (R$) — opcional</label>
+        <label className={labelClass}>Valor por hora (R$), opcional</label>
         <input
           type="number"
           min={0}

@@ -27,7 +27,7 @@ export type PushPayload = {
 
 /**
  * Envia um push para todas as inscrições de um usuário. Inscrições mortas
- * (404/410 — o browser desinscreveu ou expirou) são removidas do banco.
+ * (404/410, quando o browser desinscreveu ou expirou) são removidas do banco.
  * Retorna quantos envios tiveram sucesso.
  */
 export async function sendPushToUser(userId: string, payload: PushPayload): Promise<number> {

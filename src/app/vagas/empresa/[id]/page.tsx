@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const vaga = await loadVaga(id);
   if (!vaga) return { title: "Vaga não encontrada" };
   return {
-    title: `${vaga.title} — ${vaga.company.name}`,
+    title: `${vaga.title} | ${vaga.company.name}`,
     description: vaga.description.slice(0, 160),
     alternates: { canonical: `/vagas/empresa/${vaga.id}` },
   };

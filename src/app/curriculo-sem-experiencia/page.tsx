@@ -16,7 +16,7 @@ const FAQ = [
   {
     question: "O que colocar em um currículo sem nenhuma experiência?",
     answer:
-      "Coloque formação, cursos livres, projetos pessoais ou acadêmicos, trabalhos voluntários e habilidades. Tudo que mostre iniciativa, responsabilidade e o que você já sabe fazer conta — não precisa ter sido um emprego com carteira assinada.",
+      "Coloque formação, cursos livres, projetos pessoais ou acadêmicos, trabalhos voluntários e habilidades. Tudo que mostre iniciativa, responsabilidade e o que você já sabe fazer conta. Não precisa ter sido um emprego com carteira assinada.",
   },
   {
     question: "Como preencher a seção de experiência se nunca trabalhei?",
@@ -53,7 +53,7 @@ export default function CurriculoSemExperienciaPage() {
       />
 
       <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-        Todo mundo começa sem experiência — e dá para montar um ótimo currículo mesmo assim. O
+        Todo mundo começa sem experiência, e dá para montar um ótimo currículo mesmo assim. O
         segredo é parar de pensar só em &ldquo;empregos anteriores&rdquo; e mostrar tudo que
         comprova o que você é capaz de fazer. Abaixo, o que incluir e como organizar. Para montar na
         prática,{" "}
@@ -75,7 +75,7 @@ export default function CurriculoSemExperienciaPage() {
           <li>Cursos com projeto prático, monitorias e atividades extracurriculares.</li>
         </ul>
         <p>
-          Para cada item, descreva o que você fez e o que aprendeu — de preferência com algum
+          Para cada item, descreva o que você fez e o que aprendeu, de preferência com algum
           resultado.
         </p>
       </ContentSection>
@@ -99,7 +99,7 @@ export default function CurriculoSemExperienciaPage() {
       <ContentSection title="Escreva um objetivo claro e adaptado">
         <p>
           Diga em uma frase a vaga ou área que busca, ligada ao que você tem a oferecer. Ajuste esse
-          objetivo para cada candidatura — genérico não funciona.
+          objetivo para cada candidatura. Texto genérico não funciona.
         </p>
       </ContentSection>
 

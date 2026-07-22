@@ -148,7 +148,7 @@ async function sendLeadFollowUps(now: Date): Promise<void> {
 /**
  * Empurrão de conversão para o lead mais quente: fez o cadastro, já rodou ao
  * menos uma análise (provou o produto) entre 4 e 7 dias atrás, mas não comprou
- * nada nem tem assinatura ativa. É o estado que nenhum outro e-mail cobre — o
+ * nada nem tem assinatura ativa. É o estado que nenhum outro e-mail cobre; o
  * onboarding_nudge só fala com quem NÃO analisou. Uma vez por usuário.
  *
  * Piso de data: só consideramos análises a partir de CONVERT_EMAIL_START para

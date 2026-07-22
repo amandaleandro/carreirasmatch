@@ -15,7 +15,7 @@ export const dynamic = "force-dynamic";
 // Ferramentas realmente públicas (as demais /tools/* exigem assinatura por
 // design, não entram no sitemap para não apontar a crawler para páginas que
 // redirecionam ao login/upgrade). vocation-test é liberado em auth.config.ts;
-// os guias abertos vêm da flag `free` do catálogo (FREE_TOOL_PATHS) — antes
+// os guias abertos vêm da flag `free` do catálogo (FREE_TOOL_PATHS); antes
 // ficavam de fora do sitemap e o Google não os descobria.
 const PUBLIC_TOOL_PATHS = Array.from(
   new Set([

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { searchTalent, type TalentMatch } from "@/lib/talent-search";
 
 /**
- * Match guardado no snapshot da vaga (matchesJson). Nunca inclui contato — só
+ * Match guardado no snapshot da vaga (matchesJson). Nunca inclui contato, só
  * dados neutros usados para exibir a lista. O contato e o status do pedido são
  * resolvidos ao vivo em `hydrateMatches`.
  */
