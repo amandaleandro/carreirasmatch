@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/auth.config";
 import { normalizeEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { claimLeadResumesForUser } from "@/lib/leads";
 
 const LOGIN_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
@@ -43,6 +44,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
+
+        void claimLeadResumesForUser(email, user.id);
 
         return { id: user.id, name: user.name, email: user.email };
       },
@@ -119,5 +122,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
+    async signIn({ user, account }) {
+      if (account?.provider === "google" && user.email && user.id) {
+        void claimLeadResumesForUser(normalizeEmail(user.email)!, user.id);
+      }
+      return true;
+    },
   },
 });

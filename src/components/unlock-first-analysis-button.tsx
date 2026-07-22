@@ -9,7 +9,7 @@ export function UnlockFirstAnalysisButton({ price }: { price?: string }) {
   const [showBrick, setShowBrick] = useState(false);
   const [couponCode, setCouponCode] = useState("");
 
-  const amount = parseBRLToCents(price ?? "R$4,90") / 100;
+  const amount = parseBRLToCents(price ?? "R$9,90") / 100;
 
   if (showBrick) {
     return (

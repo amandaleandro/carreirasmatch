@@ -7,6 +7,7 @@ import { sendWelcomeEmail, notifyAdminNewSignup } from "@/lib/resend";
 import { normalizePersonName, isValidFullName, normalizeBrazilPhone, isValidBrazilPhone } from "@/lib/contact-validation";
 import { normalizeEmail, isValidEmail } from "@/lib/email";
 import { normalizeCouponCode } from "@/lib/coupons";
+import { claimLeadResumesForUser } from "@/lib/leads";
 
 const REGISTER_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
           ...(normalizedPhone ? { phone: normalizedPhone } : {}),
         },
       });
+      void claimLeadResumesForUser(normalizedEmail, existing.id);
       return NextResponse.json({ ok: true });
     }
 
@@ -92,7 +94,8 @@ export async function POST(req: NextRequest) {
       ...(signupCouponId ? { signupCouponId } : {}),
     };
 
-    await prisma.user.create({ data: { ...data, email: normalizedEmail } });
+    const createdUser = await prisma.user.create({ data: { ...data, email: normalizedEmail } });
+    void claimLeadResumesForUser(normalizedEmail, createdUser.id);
 
     // Envio de e-mails e registro de lead sem bloquear a resposta principal
     void sendWelcomeEmail(normalizedEmail, data.name);

@@ -3,8 +3,10 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 const { prismaMock, hasFullAccessUserIdMock, isInfluencerUserMock } = vi.hoisted(() => ({
   prismaMock: {
     subscription: { findUnique: vi.fn(), upsert: vi.fn() },
-    payment: { findFirst: vi.fn(), update: vi.fn(), count: vi.fn() },
-    analysis: { count: vi.fn() },
+    payment: { findFirst: vi.fn(), update: vi.fn(), count: vi.fn(), create: vi.fn() },
+    analysis: { count: vi.fn(), findFirst: vi.fn(), findMany: vi.fn() },
+    user: { updateMany: vi.fn() },
+    $transaction: vi.fn(),
   },
   hasFullAccessUserIdMock: vi.fn(),
   isInfluencerUserMock: vi.fn(),
@@ -26,7 +28,14 @@ function resetMocks() {
   prismaMock.payment.findFirst.mockReset();
   prismaMock.payment.update.mockReset();
   prismaMock.payment.count.mockReset();
+  prismaMock.payment.create.mockReset();
   prismaMock.analysis.count.mockReset();
+  prismaMock.analysis.findFirst.mockReset().mockResolvedValue(null);
+  prismaMock.analysis.findMany.mockReset().mockResolvedValue([]);
+  prismaMock.user.updateMany.mockReset().mockResolvedValue({ count: 0 });
+  prismaMock.$transaction.mockReset().mockImplementation(
+    (callback: (tx: typeof prismaMock) => unknown) => callback(prismaMock),
+  );
   hasFullAccessUserIdMock.mockReset().mockResolvedValue(false);
   isInfluencerUserMock.mockReset().mockResolvedValue(false);
 }
@@ -110,5 +119,36 @@ describe("canViewFullDiagnostic", () => {
     prismaMock.subscription.findUnique.mockResolvedValue(null);
     prismaMock.payment.findFirst.mockResolvedValue(null);
     expect(await canViewFullDiagnostic("user-4", "analysis-4")).toBe(false);
+  });
+
+  it("unlocks the user's first analysis for free", async () => {
+    prismaMock.subscription.findUnique.mockResolvedValue(null);
+    prismaMock.payment.findFirst.mockResolvedValue(null);
+    prismaMock.analysis.findFirst.mockResolvedValue({ id: "analysis-first" });
+
+    expect(await canViewFullDiagnostic("user-5", "analysis-first")).toBe(true);
+    expect(prismaMock.user.updateMany).not.toHaveBeenCalled();
+  });
+
+  it("consumes one referral credit and persists the analysis unlock", async () => {
+    prismaMock.subscription.findUnique.mockResolvedValue(null);
+    prismaMock.payment.findFirst.mockResolvedValue(null);
+    prismaMock.user.updateMany.mockResolvedValue({ count: 1 });
+
+    expect(await canViewFullDiagnostic("user-6", "analysis-6")).toBe(true);
+    expect(prismaMock.user.updateMany).toHaveBeenCalledWith({
+      where: { id: "user-6", unlockedFullDiagnosticCredits: { gt: 0 } },
+      data: { unlockedFullDiagnosticCredits: { decrement: 1 } },
+    });
+    expect(prismaMock.payment.create).toHaveBeenCalledWith({
+      data: expect.objectContaining({
+        userId: "user-6",
+        kind: "diagnostic",
+        amount: 0,
+        status: "paid",
+        analysisId: "analysis-6",
+        source: "referral",
+      }),
+    });
   });
 });

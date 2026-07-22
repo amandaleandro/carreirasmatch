@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
+const SUBMISSION_LIMIT = { limit: 5, windowMs: 60 * 60 * 1000 };
 
 const schema = z.object({
   organization: z.string().trim().min(2).max(160),
@@ -16,7 +19,16 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const parsed = schema.safeParse(await request.json());
+  const rateLimit = checkRateLimit(`partner-submission:${getClientIp(request)}`, SUBMISSION_LIMIT);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Muitas solicitações. Tente novamente mais tarde." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+    );
+  }
+
+  const body = await request.json().catch(() => null);
+  const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "Revise os dados enviados." }, { status: 400 });
   await prisma.partnerSubmission.create({ data: parsed.data });
   return NextResponse.json({ ok: true }, { status: 201 });

@@ -530,6 +530,40 @@ const FIRST_JOB_PATH_OPTIONS: { key: FirstJobPath; label: string }[] = [
 ];
 
 const NICHE_ORDER = Object.keys(NICHES) as NicheSlug[];
+const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: string }> = {
+  estagiarios: {
+    headline: "Encontrou um estágio? Veja como aproximar seu currículo dessa vaga.",
+    subheadline: "Compare a oportunidade com seus projetos, cursos e atividades e descubra o que já conta a seu favor e o que precisa ficar mais claro antes de se candidatar.",
+  },
+  "primeiro-emprego": {
+    headline: "Encontrou sua primeira vaga? Mostre o que você já sabe fazer.",
+    subheadline: "Compare seu currículo com a oportunidade e transforme cursos, projetos e atividades em evidências reais — sem inventar experiência profissional.",
+  },
+  "transicao-de-carreira": {
+    headline: "Encontrou uma vaga na nova área? Conecte sua experiência à mudança.",
+    subheadline: "Descubra quais habilidades são transferíveis, o que a vaga ainda exige e como explicar sua transição com clareza antes de se candidatar.",
+  },
+  recolocacao: {
+    headline: "Encontrou a vaga para voltar ao mercado? Ajuste sua apresentação primeiro.",
+    subheadline: "Compare a oportunidade com sua trajetória, destaque resultados atuais e prepare uma explicação segura para pausas ou mudanças no currículo.",
+  },
+  "menor-aprendiz": {
+    headline: "Encontrou uma vaga de Jovem Aprendiz? Prepare seu currículo para ela.",
+    subheadline: "Mostre escola, cursos, atividades e responsabilidade de um jeito profissional, mesmo que esta seja sua primeira oportunidade.",
+  },
+  estudante: {
+    headline: "Faculdade, técnico ou outro caminho? Compare antes de decidir.",
+    subheadline: "Organize interesses, rotina e objetivos para entender quais formações combinam com o futuro profissional que você quer construir.",
+  },
+  concurseiro: {
+    headline: "Escolheu um concurso? Transforme o edital em prioridades de estudo.",
+    subheadline: "Organize matérias, pesos, simulados e revisões para saber o que estudar primeiro e acompanhar sua evolução até a prova.",
+  },
+  oab: {
+    headline: "Vai fazer a OAB? Prepare cada fase pelo padrão da FGV.",
+    subheadline: "Pratique questões, peças e discursivas com um plano organizado para a fase do exame em que você está.",
+  },
+};
 const RESOURCE_TABS = [
   { key: "curiosities", label: "Curiosidades" },
   { key: "freeCourses", label: "Cursos gratis" },
@@ -767,6 +801,8 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
   }, []);
 
   const niche: Niche = NICHES[activeSlug];
+  const isDedicatedLanding = initialNiche !== undefined;
+  const dedicatedCopy = DEDICATED_HERO_COPY[activeSlug];
   const theme = THEME_PALETTE[niche.themeAccent];
   const offer = CAREER_OFFER_BY_SEGMENT[niche.segment];
   const firstAnalysisHref = `/analise?track=${niche.track}`;
@@ -780,12 +816,12 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
   const painPoints = isFirstJob ? FIRST_JOB_PAIN_POINTS[firstJobPath] : niche.painPoints;
   // A CTA não cita preço: o valor da primeira análise aparece só no checkout,
   // então mudar `firstAnalysisPrice` não exige revisar o texto do hero.
-  const heroSecondaryCtaLabel = niche.heroSecondaryCtaLabel ?? "Analisar meu currículo";
+  const heroSecondaryCtaLabel = niche.heroSecondaryCtaLabel ?? "Criar currículo do zero";
   // Nichos de estudo (concurso/OAB) não usam o fluxo de currículo: a ação primária
   // leva ao hub de estudo e a copy troca de "currículo" para "plano de estudo".
   const isStudyNiche = Boolean(niche.heroPrimaryCtaHref);
-  const primaryActionHref = niche.heroPrimaryCtaHref ?? freeResumeHref;
-  const primaryActionLabel = niche.heroPrimaryCtaLabel ?? "Criar currículo grátis";
+  const primaryActionHref = niche.heroPrimaryCtaHref ?? firstAnalysisHref;
+  const primaryActionLabel = niche.heroPrimaryCtaLabel ?? "Analisar meu currículo grátis";
   const attentionCards = [
     {
       label: isStudyNiche ? "Onde você está" : "Antes de aplicar",
@@ -839,7 +875,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
 
         <div className="relative max-w-7xl mx-auto px-4 md:px-8">
           {/* Niche selector */}
-          <section className="pt-2 md:pt-4">
+          {!isDedicatedLanding && <section className="pt-2 md:pt-4">
             <p className="text-center text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-3">
               Qual é o seu momento agora?
             </p>
@@ -863,7 +899,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
                 );
               })}
             </div>
-          </section>
+          </section>}
 
           {/* Hero — remonta ao trocar de nicho para reproduzir a entrada escalonada */}
           <section key={activeSlug} className="py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 items-center">
@@ -872,10 +908,10 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
                 {niche.eyebrow}
               </span>
               <h1 className="animate-rise text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight" style={{ animationDelay: "80ms" }}>
-                {niche.headline}
+                {isDedicatedLanding ? dedicatedCopy.headline : niche.headline}
               </h1>
               <p className="animate-rise text-white/70 mt-5 max-w-xl text-base md:text-lg" style={{ animationDelay: "160ms" }}>
-                {niche.subheadline}
+                {isDedicatedLanding ? dedicatedCopy.subheadline : niche.subheadline}
               </p>
               <div className="animate-rise mt-8 flex flex-col sm:flex-row items-start sm:items-center gap-3" style={{ animationDelay: "240ms" }}>
                 <Link
@@ -885,7 +921,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
                   {primaryActionLabel}
                 </Link>
                 <Link
-                  href={isStudyNiche ? completeTierHref : firstAnalysisHref}
+                  href={isStudyNiche ? completeTierHref : freeResumeHref}
                   className={`inline-flex items-center justify-center rounded-xl font-semibold px-6 py-3.5 text-sm transition-all ${theme.btnGhost}`}
                 >
                   {heroSecondaryCtaLabel}
@@ -1063,12 +1099,12 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
         {/* Sample preview */}
         <section className="reveal pb-12">
           <div className="text-center max-w-2xl mx-auto">
-            <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>Exemplo real</p>
+            <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>Exemplo demonstrativo</p>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">
               Veja o que a análise te devolve
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
-              Um exemplo de diagnóstico gerado pelo sistema para o seu momento, o seu vai usar o seu currículo e a vaga real.
+              Uma demonstração do formato da entrega. O seu resultado será calculado com os dados que você informar.
             </p>
           </div>
 
@@ -1179,7 +1215,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           <p className="text-neutral-600 dark:text-neutral-400 mt-2 max-w-md mx-auto text-sm">
             {isStudyNiche
               ? "Monte seu plano de estudo grátis e dê o primeiro passo rumo à aprovação."
-              : "Crie seu currículo grátis e dê o primeiro passo para o seu futuro."}
+              : "Compare seu currículo com uma vaga real e veja os ajustes prioritários antes de se candidatar."}
           </p>
           <Link
             href={primaryActionHref}
@@ -1205,11 +1241,11 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           <div className="text-center max-w-2xl mx-auto">
             <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>O que você ganha</p>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">
-              {niche.funnelHeadline ?? "Do grátis à assinatura: veja o que cada etapa libera"}
+              {niche.funnelHeadline ?? (isStudyNiche ? "Do plano inicial à preparação completa" : "Comece grátis e libere o Kit Candidatura se fizer sentido")}
             </h2>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+          <div className={`mt-8 grid grid-cols-1 gap-6 items-stretch ${isStudyNiche ? "lg:grid-cols-3" : "lg:grid-cols-2 max-w-4xl mx-auto"}`}>
             {/* Tier 1: grátis */}
             <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 flex flex-col">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Para começar</p>
@@ -1229,7 +1265,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             {/* Tier 2: pagamento único */}
             <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 flex flex-col">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Pagamento único</p>
-              <p className="text-lg font-bold mt-1">{niche.completeTierLabel ?? "Análise Completa"}</p>
+              <p className="text-lg font-bold mt-1">{niche.completeTierLabel ?? "Kit Candidatura"}</p>
               <p className={`mt-2 text-3xl font-extrabold ${theme.accentText}`}>{offer.diagnosticPrice}</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                 {niche.completeTierDescription ?? "Tudo que você precisa para aplicar com confiança nesta vaga."}
@@ -1253,7 +1289,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             </div>
 
             {/* Tier 3: assinatura mensal, valor por nicho */}
-            <div className={`animate-soft-glow relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
+            {isStudyNiche && <div className={`animate-soft-glow relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
               <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full text-white text-[10px] font-bold uppercase tracking-wide px-3 py-1 shadow-sm whitespace-nowrap ${theme.numberBg}`}>
                 Melhor custo-benefício
               </span>
@@ -1282,7 +1318,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               >
                 Assinar {offer.monthlyName}
               </Link>
-            </div>
+            </div>}
           </div>
 
           <p className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
@@ -1294,7 +1330,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
         </section>
 
         {/* Learning resources */}
-        <section id="recursos" className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
+        {(!isDedicatedLanding || isStudyNiche) && <section id="recursos" className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900 scroll-mt-24">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5">
             <div>
               <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>
@@ -1341,7 +1377,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               </div>
             ))}
           </div>
-        </section>
+        </section>}
 
         {/* Benefits */}
         <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
@@ -1362,7 +1398,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
         </section>
 
         {/* First job tips teaser */}
-        {isFirstJob && (
+        {isFirstJob && !isDedicatedLanding && (
           <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-center">
               Dicas para {FIRST_JOB_PATH_OPTIONS.find((p) => p.key === firstJobPath)!.label.toLowerCase()}
@@ -1397,12 +1433,12 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
         {/* Final CTA */}
         <section className="reveal py-14 pb-24 sm:pb-14 border-t border-neutral-100 dark:border-neutral-900 text-center">
           <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
-            {isStudyNiche ? "Pronto para começar a estudar certo?" : "Pronto para montar seu currículo?"}
+            {isStudyNiche ? "Pronto para começar a estudar com prioridade?" : "Pronto para ajustar seu currículo para uma vaga real?"}
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 mt-2 max-w-md mx-auto text-sm">
             {isStudyNiche
               ? "Comece pelo fluxo grátis e, quando quiser, destrave o plano completo e os simulados."
-              : "Comece pelo fluxo grátis e, depois, use a análise completa quando quiser comparar com uma vaga real."}
+              : "Comece pelo resultado gratuito e libere o Kit Candidatura somente se a análise fizer sentido para você."}
           </p>
           <Link
             href={primaryActionHref}

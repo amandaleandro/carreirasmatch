@@ -1,11 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+
+const CLICK_LIMIT = { limit: 60, windowMs: 60 * 60 * 1000 };
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+
+  const rateLimit = checkRateLimit(`course-click:${getClientIp(req)}`, CLICK_LIMIT);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Muitas solicitações. Tente novamente mais tarde." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } },
+    );
+  }
 
   try {
     const course = await prisma.externalCourse.findUnique({

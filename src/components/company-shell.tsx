@@ -71,19 +71,19 @@ export function CompanyShell({
           key={item.href}
           href={item.href}
           onClick={onNavigate}
-          className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${
+          className={`group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all ${
             active
-              ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md shadow-blue-950/40"
-              : "text-slate-300 hover:bg-white/[0.06] hover:text-white hover:translate-x-0.5"
+              ? "bg-[#18263e] text-white font-bold border border-blue-500/30 shadow-sm"
+              : "text-slate-300 hover:bg-white/[0.06] hover:text-white hover:translate-x-0.5 font-medium"
           }`}
         >
           <Icon
-            strokeWidth={1.75}
-            className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-white" : "text-slate-400 group-hover:text-amber-400"}`}
+            strokeWidth={2}
+            className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-blue-400" : "text-slate-400 group-hover:text-blue-400"}`}
           />
-          <span className="flex-1">{item.label}</span>
+          <span className="flex-1 truncate">{item.label}</span>
           {item.badge ? (
-            <span className="shrink-0 rounded-full bg-amber-400 text-blue-950 text-[10px] font-bold px-1.5 py-0.5 min-w-[1.25rem] text-center">
+            <span className="shrink-0 rounded-full bg-blue-600 text-white text-[10px] font-bold px-1.5 py-0.5 min-w-[1.25rem] text-center">
               {item.badge}
             </span>
           ) : null}

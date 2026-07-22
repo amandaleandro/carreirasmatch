@@ -12,11 +12,14 @@ export const dynamic = "force-dynamic";
 // se METRICS_TOKEN estiver setado, exige-se "Authorization: Bearer <token>".
 export async function GET(req: NextRequest) {
   const token = process.env.METRICS_TOKEN;
-  if (token) {
-    const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${token}`) {
-      return new NextResponse("Unauthorized", { status: 401 });
-    }
+  // Sem token, só aceita o scrape direto da rede Docker. Requisições públicas
+  // passam pelo Caddy, que sempre acrescenta x-forwarded-for.
+  if (!token && process.env.NODE_ENV === "production" && req.headers.has("x-forwarded-for")) {
+    return new NextResponse("Metrics unavailable", { status: 503 });
+  }
+
+  if (token && req.headers.get("authorization") !== `Bearer ${token}`) {
+    return new NextResponse("Unauthorized", { status: 401 });
   }
 
   await refreshBusinessMetrics();

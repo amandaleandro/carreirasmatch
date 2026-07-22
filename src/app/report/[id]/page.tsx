@@ -50,7 +50,7 @@ export default async function ReportPage({
     hasActiveSubscriptionAccess(session.user.id),
   ]);
   const segment = normalizeCareerSegment(user?.careerSegment);
-  const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$14,90";
+  const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$9,90";
 
   const teaser = {
     overallScore: record.overallScore,

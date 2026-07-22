@@ -3,6 +3,7 @@ import { hasFullAccessUserId } from "@/lib/full-access-users";
 import { isInfluencerUser } from "@/lib/influencer";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { randomUUID } from "node:crypto";
 
 // Must match SUBSCRIPTION_PERIOD_DAYS in src/app/api/billing/webhook/route.ts, which sets
 // currentPeriodEnd 30 days out on each renewal.
@@ -74,13 +75,29 @@ export async function canViewFullDiagnostic(userId: string, analysisId: string):
   }
 
   // Verifica se o usuário possui créditos de diagnóstico obtidos indicando 3 amigos
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { unlockedFullDiagnosticCredits: true },
-  });
-  if (user && user.unlockedFullDiagnosticCredits > 0) {
+  const referralUnlock = await prisma.$transaction(async (tx) => {
+    const consumed = await tx.user.updateMany({
+      where: { id: userId, unlockedFullDiagnosticCredits: { gt: 0 } },
+      data: { unlockedFullDiagnosticCredits: { decrement: 1 } },
+    });
+    if (consumed.count === 0) return false;
+
+    await tx.payment.create({
+      data: {
+        userId,
+        kind: "diagnostic",
+        segment: "referral_reward",
+        amount: 0,
+        status: "paid",
+        mpPaymentId: `referral:${analysisId}:${randomUUID()}`,
+        analysisId,
+        paidAt: new Date(),
+        source: "referral",
+      },
+    });
     return true;
-  }
+  });
+  if (referralUnlock) return true;
 
   return false;
 }

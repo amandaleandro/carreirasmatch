@@ -140,7 +140,7 @@ abertos); áreas logadas e páginas de pagamento não têm anúncio.
 
 | Variável | Uso |
 | --- | --- |
-| `METRICS_TOKEN` | Protege opcionalmente `/api/metrics` com `Authorization: Bearer <token>` (defesa em profundidade; o Caddy já bloqueia o caminho vindo da internet) |
+| `METRICS_TOKEN` | Protege `/api/metrics` com `Authorization: Bearer <token>`. Sem ele, produção aceita apenas o scrape direto da rede Docker; acessos encaminhados pelo proxy público respondem `503` (e o Caddy também bloqueia o caminho). |
 
 Stack completa (Prometheus, Loki, Promtail, Grafana) sobe por
 `docker-compose.observability.yml`, com variáveis próprias documentadas em

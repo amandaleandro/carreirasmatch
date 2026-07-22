@@ -290,7 +290,7 @@ export async function POST(req: NextRequest) {
 
     const unlocked = userId ? await canViewFullDiagnostic(userId, saved.id) : false;
     const segment = normalizeCareerSegment(candidate?.careerSegment);
-    const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$4,90";
+    const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$9,90";
 
     return NextResponse.json({
       id: saved.id,
