@@ -9,6 +9,7 @@ import { toolsForSegment } from "@/lib/tools-catalog";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { computeJourneyMetrics } from "@/lib/applications";
 import { formatBrazilDate, formatBrazilDateTime } from "@/lib/brazil";
+import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { Trophy } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -48,7 +49,11 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  const isTopPlayer = topMonthlyScores.some((s) => s.userId === session.user.id);
+  // O selo/recomendação premium do Top 10 é reservado a quem assina: o ranking em si
+  // é aberto a todos, mas a recompensa (vagas exclusivas) é benefício pago.
+  const isTopPlayer =
+    topMonthlyScores.some((s) => s.userId === session.user.id) &&
+    (await hasActiveSubscriptionAccess(session.user.id));
 
   let topVagas: any[] = [];
   if (isTopPlayer) {

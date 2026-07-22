@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { ListOrdered, Trophy, RotateCcw, ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 // Cada processo tem os passos na ORDEM CORRETA. O jogo embaralha e o jogador reordena.
 const PROCESSES: Record<string, { title: string; steps: string[] }[]> = {
@@ -136,6 +137,8 @@ export default function OrdenarPage() {
               <RotateCcw className="h-4 w-4" />
               Jogar de novo
             </button>
+
+            <ShareGameCard gameLabel="Ordene o Processo" score={total} scoreSuffix="pts" accentColor="#14B8A6" />
           </div>
         ) : (
           <div className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 space-y-4 shadow-sm">

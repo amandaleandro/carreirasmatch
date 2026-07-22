@@ -70,7 +70,7 @@ export function PublicSubscriptionCheckout({
           Por que assinar por R$ 24,90/mês é a sua melhor decisão?
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
-          Disparar o mesmo currículo genérico garante apenas rejeições automáticas. Por menos de R$ 0,83 ao dia (o preço de um café), você destrava o poder da IA para adaptar seu perfil a cada vaga e conquistar sua contratação.
+          Disparar o mesmo currículo genérico garante apenas rejeições automáticas. Por menos de R$ 0,83 ao dia (o preço de um café), você otimiza seu perfil para cada vaga e conquista sua contratação.
         </p>
       </header>
 
@@ -79,17 +79,17 @@ export function PublicSubscriptionCheckout({
         {[
           [
             RefreshCw,
-            "Análises com IA Ilimitadas",
+            "Análises de Vaga Ilimitadas",
             "Ajuste seu currículo palavra por palavra para quantas vagas quiser sem custo adicional por análise.",
           ],
           [
             Target,
-            "Passe pelos Filtros dos Robôs (ATS)",
+            "Filtros de Triagem Técnica (ATS)",
             "Descubra as palavras-chave faltantes que o software de triagem do RH exige antes que um humano leia seu currículo.",
           ],
           [
             TrendingUp,
-            "Simulador de Entrevistas com IA",
+            "Simulador de Entrevistas Interativo",
             "Treine perguntas reais da vaga e receba feedbacks imediatos antes de encarar o recrutador ao vivo.",
           ],
         ].map(([Icon, title, description]) => {

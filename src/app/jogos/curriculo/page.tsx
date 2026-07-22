@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FileText, Trophy, RotateCcw, ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 // Cada perfil tem as seções na ORDEM IDEAL. O jogo embaralha e o jogador reordena.
 const PROFILES: Record<string, { title: string; steps: string[] }[]> = {
@@ -153,6 +154,8 @@ export default function CurriculoPage() {
               <RotateCcw className="h-4 w-4" />
               Jogar de novo
             </button>
+
+            <ShareGameCard gameLabel="Monte o Currículo" score={total} scoreSuffix="pts" accentColor="#06B6D4" />
           </div>
         ) : (
           <div className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 space-y-4 shadow-sm">

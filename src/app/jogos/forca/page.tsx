@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Skull, Trophy, RotateCcw, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 // Termos (sem acento) + dica, por área. Espaços são revelados automaticamente.
 const TERMS: Record<string, { word: string; hint: string }[]> = {
@@ -134,6 +135,8 @@ export default function ForcaPage() {
               <RotateCcw className="h-4 w-4" />
               Jogar de novo
             </button>
+
+            <ShareGameCard gameLabel="Forca Profissional" score={total} scoreSuffix="pts" accentColor="#F43F5E" />
           </div>
         ) : (
           <div className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 space-y-5 shadow-sm">

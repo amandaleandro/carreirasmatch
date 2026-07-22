@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Sparkles, Trophy, RotateCcw, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 type Question = {
   q: string;
@@ -295,6 +296,13 @@ export default function QuizPage() {
               <RotateCcw className="h-4 w-4" />
               Jogar Novamente
             </button>
+
+            <ShareGameCard
+              gameLabel="Show do Match"
+              score={Math.round((score / questions.length) * 1000)}
+              scoreSuffix="pts"
+              accentColor="#F59E0B"
+            />
           </div>
         )}
       </main>

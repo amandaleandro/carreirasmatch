@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Type, Trophy, RotateCcw, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 // Palavras de 5 letras, sem acento (o teclado do jogo é A-Z). Por área.
 const WORDS: Record<string, string[]> = {
@@ -211,6 +212,13 @@ export default function TermoPage() {
               <RotateCcw className="h-4 w-4" />
               Nova Palavra
             </button>
+
+            <ShareGameCard
+              gameLabel="Termo"
+              score={won ? (MAX_TRIES - guesses.length + 1) * 200 : 0}
+              scoreSuffix="pts"
+              accentColor="#10B981"
+            />
           </div>
         ) : (
           /* Teclado */

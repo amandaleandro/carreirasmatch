@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Keyboard, RotateCcw, AlertTriangle, Flame, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 const SNIPPETS: Record<string, { label: string; text: string }[]> = {
   tecnologia: [
@@ -274,6 +275,10 @@ export default function SpeedTyperPage() {
               </div>
             )}
           </div>
+
+          {finished && (
+            <ShareGameCard gameLabel="Speed Typer" score={wpm} scoreSuffix="WPM" accentColor="#2563EB" />
+          )}
         </section>
 
         {/* Dicas de Digitação */}

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { rankCandidates, type CandidateInput } from "@/lib/tools";
+import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 
 /** Teto de candidatos por busca, para manter a chamada de IA limitada. */
 export const TALENT_SEARCH_POOL_LIMIT = 25;
@@ -71,7 +72,13 @@ export async function searchTalent(
     }),
   ]);
 
-  const top10UserIds = new Set(topMonthlyScores.map((s) => s.userId));
+  // O selo de Top Match Gamificado é benefício pago: ranking é aberto a todos,
+  // mas só quem assina exibe o selo pras empresas.
+  const top10Ids = topMonthlyScores.map((s) => s.userId);
+  const top10SubscribedFlags = await Promise.all(
+    top10Ids.map((id) => hasActiveSubscriptionAccess(id))
+  );
+  const top10UserIds = new Set(top10Ids.filter((_, i) => top10SubscribedFlags[i]));
 
   const withResume = pool.filter((u) => u.resumes[0]?.rawText?.trim());
   if (withResume.length === 0) return [];

@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Search, Trophy, RotateCcw, ArrowLeft, Timer } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 const WORDS: Record<string, string[]> = {
   tecnologia: ["REACT", "PYTHON", "DOCKER", "GITHUB", "SERVIDOR", "DEBUG", "NUVEM", "CODIGO"],
@@ -292,6 +293,8 @@ export default function CacaPalavrasPage() {
               <RotateCcw className="h-4 w-4" />
               Jogar de novo
             </button>
+
+            <ShareGameCard gameLabel="Caça-Palavras" score={score} scoreSuffix="pts" accentColor="#F97316" />
           </div>
         )}
       </main>

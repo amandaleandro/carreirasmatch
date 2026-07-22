@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Sparkles, Trophy, RotateCcw, ArrowLeft, Timer, Brain } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 type Card = {
   id: number;
@@ -306,6 +307,8 @@ export default function MemoryGamePage() {
               <RotateCcw className="h-4 w-4" />
               Jogar Novamente
             </button>
+
+            <ShareGameCard gameLabel="Termos Pareados" score={score} scoreSuffix="pts" accentColor="#3B82F6" />
           </div>
         )}
       </main>

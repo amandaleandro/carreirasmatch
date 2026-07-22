@@ -34,9 +34,9 @@ export function SubscriptionUpsell({
       {/* Checklist de Vantagens */}
       <div className="grid sm:grid-cols-2 gap-3 pt-1">
         {[
-          "Análises de vaga & match ilimitados por IA",
+          "Análises de vaga & match ilimitados",
           "Simulador interativo de perguntas de entrevista",
-          "Ajustes de palavras-chave para passar nos robôs (ATS)",
+          "Ajustes de palavras-chave para triagem automática (ATS)",
           "Cartas de apresentação e mensagens para recrutadores",
           "Geração de currículos otimizados em PDF",
           "Sem fidelidade: cancele a qualquer momento com 1 clique",

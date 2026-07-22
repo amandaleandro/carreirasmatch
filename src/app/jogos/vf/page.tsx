@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Scale, Trophy, RotateCcw, ArrowLeft, Check, X, Timer } from "lucide-react";
 import Link from "next/link";
+import { ShareGameCard } from "@/components/share-game-card";
 
 type Fact = { s: string; t: boolean; e: string };
 
@@ -187,6 +188,8 @@ export default function VfPage() {
               <RotateCcw className="h-4 w-4" />
               Jogar de novo
             </button>
+
+            <ShareGameCard gameLabel="Verdadeiro ou Falso" score={score} scoreSuffix="pts" accentColor="#6366F1" />
           </div>
         )}
       </main>
