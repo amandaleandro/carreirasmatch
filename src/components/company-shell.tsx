@@ -73,13 +73,13 @@ export function CompanyShell({
           onClick={onNavigate}
           className={`group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all ${
             active
-              ? "bg-[#18263e] text-white font-bold border border-blue-500/30 shadow-sm"
-              : "text-slate-300 hover:bg-white/[0.06] hover:text-white hover:translate-x-0.5 font-medium"
+              ? "bg-[#0e2032] text-white font-bold border border-blue-500/30 shadow-xs"
+              : "text-[#94a3b8] hover:bg-white/[0.05] hover:text-white hover:translate-x-0.5 font-medium"
           }`}
         >
           <Icon
             strokeWidth={2}
-            className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-blue-400" : "text-slate-400 group-hover:text-blue-400"}`}
+            className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-blue-500" : "text-[#64748b] group-hover:text-blue-400"}`}
           />
           <span className="flex-1 truncate">{item.label}</span>
           {item.badge ? (
@@ -114,8 +114,8 @@ export function CompanyShell({
   return (
     <div className="flex min-h-screen">
       {/* Sidebar desktop */}
-      <aside className="hidden md:flex w-64 shrink-0 flex-col bg-gradient-to-b from-[#0d1830] via-[#0b1526] to-[#080e1c] text-white h-screen sticky top-0 border-r border-white/5">
-        <div className="px-5 py-6 border-b border-white/5">
+      <aside className="hidden md:flex w-64 shrink-0 flex-col bg-[#071827] text-white h-screen sticky top-0 border-r border-slate-800/80">
+        <div className="px-5 py-6 border-b border-slate-800/80">
           <Link href="/empresa" aria-label="CarreirasMatch">
             <BrandLogo heightClassName="h-12" onDark />
           </Link>
