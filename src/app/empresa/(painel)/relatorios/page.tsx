@@ -1,3 +1,15 @@
+import {
+  BarChart3,
+  TrendingUp,
+  FileSearch,
+  FileText,
+  Target,
+  Briefcase,
+  Users,
+  CheckCircle2,
+  XCircle,
+  Star,
+} from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 
@@ -49,108 +61,139 @@ export default async function CompanyReportsPage() {
   const acceptRate = pct(contactAccepted, contactAccepted + contactDeclined);
 
   const cards = [
-    { label: "Triagens realizadas", value: jobCount },
-    { label: "Currículos analisados", value: candidateCount },
-    { label: "Aderência média", value: candidateCount > 0 ? `${avgFit}` : "—" },
-    { label: "Vagas abertas", value: openVagas },
-    { label: "Vagas fechadas", value: closedVagas },
-    { label: "Pedidos de contato", value: contactTotal },
+    { label: "Triagens Realizadas", value: jobCount, icon: FileSearch, color: "blue" },
+    { label: "Currículos Analisados", value: candidateCount, icon: FileText, color: "indigo" },
+    { label: "Aderência Média", value: candidateCount > 0 ? `${avgFit}%` : "—", icon: Target, color: "emerald" },
+    { label: "Vagas Abertas", value: openVagas, icon: Briefcase, color: "purple" },
+    { label: "Vagas Fechadas", value: closedVagas, icon: Briefcase, color: "amber" },
+    { label: "Pedidos de Contato", value: contactTotal, icon: Users, color: "rose" },
   ];
 
   const bands = [
-    { label: "Alta (70+)", value: high, color: "bg-emerald-500" },
-    { label: "Média (40–69)", value: mid, color: "bg-amber-500" },
-    { label: "Baixa (<40)", value: low, color: "bg-red-500" },
+    { label: "Alta Compatibilidade (70%+)", value: high, color: "bg-emerald-500" },
+    { label: "Média Compatibilidade (40–69%)", value: mid, color: "bg-amber-500" },
+    { label: "Baixa Compatibilidade (<40%)", value: low, color: "bg-rose-500" },
   ];
 
   const actions = [
-    { label: "Favoritos", value: favorite, color: "text-amber-600 dark:text-amber-400" },
-    { label: "Aprovados", value: approved, color: "text-emerald-600 dark:text-emerald-400" },
-    { label: "Reprovados", value: rejected, color: "text-red-600 dark:text-red-400" },
+    { label: "Favoritos", value: favorite, color: "text-amber-600 dark:text-amber-400", icon: Star },
+    { label: "Aprovados", value: approved, color: "text-emerald-600 dark:text-emerald-400", icon: CheckCircle2 },
+    { label: "Reprovados", value: rejected, color: "text-rose-600 dark:text-rose-400", icon: XCircle },
   ];
 
   return (
-    <div>
-      <div className="max-w-4xl mx-auto px-4 md:px-8 py-10 space-y-8">
-        <header>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Relatórios</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Uma visão geral do que aconteceu nas suas triagens, vagas e contatos.
-          </p>
-        </header>
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
+      {/* Header Banner */}
+      <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+          <BarChart3 className="w-3.5 h-3.5" />
+          Relatórios & Métricas da Empresa
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          Visão Geral do Recrutamento
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm max-w-2xl">
+          Acompanhe os resultados das suas triagens, vagas cadastradas e interações com o banco de talentos.
+        </p>
+      </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {cards.map((c) => (
-            <div key={c.label} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-4">
-              <p className="text-2xl font-bold">{c.value}</p>
-              <p className="text-xs text-neutral-500 mt-0.5">{c.label}</p>
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+        {cards.map((c) => {
+          const Icon = c.icon;
+          return (
+            <div key={c.label} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                  {c.label}
+                </p>
+                <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20">
+                  <Icon className="w-4 h-4" />
+                </div>
+              </div>
+              <p className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{c.value}</p>
             </div>
-          ))}
+          );
+        })}
+      </div>
+
+      {/* Distribution Chart */}
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <div>
+          <h2 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            Distribuição de Aderência dos Currículos
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Classificação por faixa de pontuação calculada pela IA.
+          </p>
         </div>
 
-        <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 space-y-4">
-          <h2 className="font-semibold">Distribuição de aderência</h2>
-          {candidateCount === 0 ? (
-            <p className="text-sm text-neutral-500">Nenhum currículo analisado ainda.</p>
-          ) : (
-            <div className="space-y-3">
-              {bands.map((b) => (
-                <div key={b.label}>
-                  <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-neutral-600 dark:text-neutral-300">{b.label}</span>
-                    <span className="text-neutral-500">
-                      {b.value} ({pct(b.value, candidateCount)}%)
-                    </span>
-                  </div>
-                  <div className="h-2 rounded-full bg-neutral-100 dark:bg-neutral-900 overflow-hidden">
-                    <div className={`h-full ${b.color}`} style={{ width: `${pct(b.value, candidateCount)}%` }} />
-                  </div>
+        {candidateCount === 0 ? (
+          <p className="text-xs text-slate-500 py-4 text-center">Nenhum currículo analisado até o momento.</p>
+        ) : (
+          <div className="space-y-4 pt-1">
+            {bands.map((b) => (
+              <div key={b.label} className="space-y-1.5">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="text-slate-700 dark:text-slate-300">{b.label}</span>
+                  <span className="text-slate-500">
+                    {b.value} ({pct(b.value, candidateCount)}%)
+                  </span>
                 </div>
-              ))}
+                <div className="h-2.5 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                  <div className={`h-full ${b.color}`} style={{ width: `${pct(b.value, candidateCount)}%` }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Decisions & Talent Contact Grid */}
+      <div className="grid gap-5 sm:grid-cols-2">
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <h2 className="font-bold text-slate-900 dark:text-white text-base">Decisões nas Triagens</h2>
+          <div className="grid grid-cols-3 gap-3 text-center">
+            {actions.map((a) => {
+              const Icon = a.icon;
+              return (
+                <div key={a.label} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 space-y-1">
+                  <Icon className={`w-5 h-5 mx-auto ${a.color}`} />
+                  <p className={`text-2xl font-extrabold ${a.color}`}>{a.value}</p>
+                  <p className="text-xs font-semibold text-slate-500">{a.label}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <h2 className="font-bold text-slate-900 dark:text-white text-base">Banco de Talentos</h2>
+          {contactTotal === 0 ? (
+            <p className="text-xs text-slate-500 py-4 text-center">Nenhum pedido de contato realizado ainda.</p>
+          ) : (
+            <div className="space-y-2.5 text-xs font-semibold">
+              <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40">
+                <span className="text-slate-600 dark:text-slate-400">Contatos Liberados</span>
+                <span className="text-emerald-600 dark:text-emerald-400 font-bold text-sm">{contactAccepted}</span>
+              </div>
+              <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40">
+                <span className="text-slate-600 dark:text-slate-400">Aguardando Resposta</span>
+                <span className="text-amber-600 dark:text-amber-400 font-bold text-sm">{contactPending}</span>
+              </div>
+              <div className="flex justify-between items-center p-2 rounded-lg bg-slate-50 dark:bg-slate-800/40">
+                <span className="text-slate-600 dark:text-slate-400">Recusados</span>
+                <span className="text-slate-500 font-bold text-sm">{contactDeclined}</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-800">
+                <span className="text-slate-700 dark:text-slate-300">Taxa de Aceite de Contato</span>
+                <span className="font-extrabold text-slate-900 dark:text-white text-sm">{acceptRate}%</span>
+              </div>
             </div>
           )}
         </section>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6">
-            <h2 className="font-semibold mb-4">Decisões nas triagens</h2>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              {actions.map((a) => (
-                <div key={a.label}>
-                  <p className={`text-2xl font-bold ${a.color}`}>{a.value}</p>
-                  <p className="text-xs text-neutral-500 mt-0.5">{a.label}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6">
-            <h2 className="font-semibold mb-4">Contatos do banco de talentos</h2>
-            {contactTotal === 0 ? (
-              <p className="text-sm text-neutral-500">Nenhum pedido de contato ainda.</p>
-            ) : (
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-neutral-600 dark:text-neutral-300">Liberados</span>
-                  <span className="font-semibold text-emerald-600 dark:text-emerald-400">{contactAccepted}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-600 dark:text-neutral-300">Aguardando</span>
-                  <span className="font-semibold text-amber-600 dark:text-amber-400">{contactPending}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-neutral-600 dark:text-neutral-300">Recusados</span>
-                  <span className="font-semibold text-neutral-500">{contactDeclined}</span>
-                </div>
-                <div className="flex justify-between border-t border-neutral-100 dark:border-neutral-900 pt-2 mt-2">
-                  <span className="text-neutral-600 dark:text-neutral-300">Taxa de aceite</span>
-                  <span className="font-semibold">{acceptRate}%</span>
-                </div>
-              </div>
-            )}
-          </section>
-        </div>
       </div>
-    </div>
+    </main>
   );
 }

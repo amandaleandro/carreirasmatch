@@ -298,8 +298,8 @@ export function AuthShell({
       </div>
 
       {/* Lado Direito: Container do Formulário */}
-      <div className="flex-1 flex items-center justify-center px-4 py-8 lg:py-12 bg-[#F8FAFC] dark:bg-[#071827]">
-        <div className="w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="flex-1 flex flex-col justify-center items-center px-4 py-8 lg:py-12 bg-[#F8FAFC] dark:bg-[#071827] relative">
+        <div className="w-full max-w-md sm:max-w-lg my-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="lg:hidden mb-6 flex flex-col items-center text-center">
             <Link href="/" className="hover:opacity-90 transition-opacity">
               <BrandLogo heightClassName="h-8" />

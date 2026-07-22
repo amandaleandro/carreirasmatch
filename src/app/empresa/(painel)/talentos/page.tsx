@@ -1,3 +1,4 @@
+import { Users, Sparkles } from "lucide-react";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { TalentSearch } from "@/components/talent-search";
 
@@ -7,18 +8,22 @@ export default async function TalentPoolPage() {
   await requireCompanyPage();
 
   return (
-    <div>
-      <div className="max-w-3xl mx-auto px-4 md:px-8 py-10 space-y-6">
-        <header>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Banco de talentos</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Descreva a vaga e encontre candidatos que optaram por ser localizados. O contato só é
-            liberado quando o candidato aceita o seu pedido.
-          </p>
-        </header>
-
-        <TalentSearch />
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
+      {/* Header Banner */}
+      <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+          <Users className="w-3.5 h-3.5" />
+          Banco de Talentos CarreirasMatch
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          Busca de Profissionais Verificados
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm max-w-3xl">
+          Descreva a vaga ou requisitos técnicos para localizar candidatos que optaram por ser encontrados por empresas. O contato é liberado após o aceite do candidato.
+        </p>
       </div>
-    </div>
+
+      <TalentSearch />
+    </main>
   );
 }

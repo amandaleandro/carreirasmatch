@@ -1,3 +1,4 @@
+import { CreditCard, Sparkles, CheckCircle2 } from "lucide-react";
 import { requireCompanyPage, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
 import { SCREENING_PACKS } from "@/lib/company-billing";
 import { CompanyBillingCheckout } from "@/components/company-billing-checkout";
@@ -10,28 +11,49 @@ export default async function CompanyBillingPage() {
   const totalAvailable = freeRemaining + company.screeningCredits;
 
   return (
-    <div>
-      <div className="max-w-2xl mx-auto px-4 md:px-8 py-10 space-y-6">
-        <header>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Créditos de triagem</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-            Cada triagem consome 1 crédito. Compre um pacote para continuar ranqueando currículos.
-          </p>
-        </header>
+    <main className="max-w-4xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
+      {/* Header Banner */}
+      <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+          <CreditCard className="w-3.5 h-3.5" />
+          Faturamento & Pacotes
+        </span>
+        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          Créditos de Triagem
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm max-w-2xl">
+          Cada triagem com IA consome 1 crédito. Compre um pacote avulso para continuar ranqueando currículos recebidos sem mensalidade fixa.
+        </p>
+      </div>
 
-        <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-neutral-500">Saldo disponível</p>
-            <p className="text-2xl font-bold">{totalAvailable} {totalAvailable === 1 ? "triagem" : "triagens"}</p>
+      {/* Saldo Disponível Card */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shrink-0">
+            <CreditCard className="w-6 h-6" />
           </div>
-          <div className="text-right text-xs text-neutral-500">
-            {freeRemaining > 0 && <p>{freeRemaining} gratuita(s)</p>}
-            <p>{company.screeningCredits} compradas</p>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Saldo Atual de Triagens
+            </p>
+            <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-0.5">
+              {totalAvailable} <span className="text-lg font-semibold text-slate-500">{totalAvailable === 1 ? "triagem" : "triagens"}</span>
+            </p>
           </div>
         </div>
 
-        <CompanyBillingCheckout packs={SCREENING_PACKS} payerEmail={company.email} />
+        <div className="text-left sm:text-right text-xs text-slate-500 space-y-1 bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+          {freeRemaining > 0 && (
+            <p className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5" /> {freeRemaining} gratuita(s) restante(s)
+            </p>
+          )}
+          <p className="font-medium text-slate-600 dark:text-slate-300">{company.screeningCredits} créditos comprados</p>
+        </div>
       </div>
-    </div>
+
+      {/* Checkout Options */}
+      <CompanyBillingCheckout packs={SCREENING_PACKS} payerEmail={company.email} />
+    </main>
   );
 }
