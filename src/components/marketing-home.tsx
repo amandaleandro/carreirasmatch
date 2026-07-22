@@ -242,21 +242,56 @@ export function MarketingHome() {
               </p>
             </div>
 
-            {/* 3 CARDS ALINHADOS E ELEGANTES */}
-            <div className="grid lg:grid-cols-3 gap-8 items-stretch">
-              {/* Card 1: Análise Avulsa */}
-              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-sm space-y-6">
+            {/* 4 CARDS INDEPENDENTES E BEM ESPAÇADOS */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+              {/* Card 1: Grátis */}
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                    Degustação
+                  </span>
+                  <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">Grátis</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    1ª leitura inicial para testar seu perfil.
+                  </p>
+
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>Score inicial de aderência</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>Leitura preliminar de requisitos</span>
+                    </div>
+                    <div className="flex items-center gap-2.5">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span>Resumo dos principais pontos</span>
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  href="/analise"
+                  className="w-full rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 text-center text-xs transition-all shadow-md shadow-blue-600/20"
+                >
+                  Testar Grátis Agora →
+                </Link>
+              </div>
+
+              {/* Card 2: Análise Avulsa */}
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
+                <div className="space-y-4">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
                     Avulso · 1 Vaga
                   </span>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">Análise Completa</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">R$ 9,90</span>
-                    <span className="text-xs text-slate-500 font-semibold">/ pagamento único</span>
+                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 9,90</span>
+                    <span className="text-[11px] text-slate-500 font-semibold">/ único</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Diagnóstico detalhado de compatibilidade para uma candidatura pontual.
+                    Diagnóstico detalhado para 1 vaga pontual.
                   </p>
 
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -270,32 +305,32 @@ export function MarketingHome() {
                     </div>
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Justificativa técnica de pontos fracos</span>
+                      <span>Justificativa técnica detalhada</span>
                     </div>
                   </div>
                 </div>
 
                 <Link
                   href="/analise"
-                  className="w-full rounded-2xl border border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-extrabold py-3.5 text-center text-xs transition-all"
+                  className="w-full rounded-2xl border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold py-3.5 text-center text-xs transition-all"
                 >
-                  Fazer Análise Completa (R$ 9,90)
+                  Fazer Análise (R$ 9,90) →
                 </Link>
               </div>
 
-              {/* Card 2: Kit Candidatura */}
-              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 flex flex-col justify-between shadow-sm space-y-6">
+              {/* Card 3: Kit Candidatura */}
+              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                     Entrega Completa · 1 Vaga
                   </span>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">Kit Candidatura</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">R$ 12,90</span>
-                    <span className="text-xs text-slate-500 font-semibold">/ pagamento único</span>
+                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 12,90</span>
+                    <span className="text-[11px] text-slate-500 font-semibold">/ único</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Pacote com currículo em PDF ajustado + carta de apresentação + preparação de entrevista.
+                    Currículo PDF + carta + preparação entrevista.
                   </p>
 
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -311,66 +346,58 @@ export function MarketingHome() {
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span>Carta de Apresentação pronta</span>
                     </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Perguntas prováveis de entrevista</span>
-                    </div>
                   </div>
                 </div>
 
                 <Link
                   href="/analise"
-                  className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-extrabold py-3.5 text-center text-xs transition-all"
+                  className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold py-3.5 text-center text-xs transition-all"
                 >
-                  Gerar Kit Candidatura (R$ 12,90)
+                  Gerar Kit (R$ 12,90) →
                 </Link>
               </div>
 
-              {/* Card 3: Assinatura Mensal Profissional (O MAIS ESCOLHIDO) */}
-              <div className="rounded-3xl border-2 border-blue-500 bg-[#071827] text-white p-8 flex flex-col justify-between shadow-2xl relative space-y-6">
-                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 text-white px-4 py-1 text-[11px] font-extrabold uppercase tracking-wider shadow-md">
+              {/* Card 4: Assinatura Mensal Profissional (O MAIS ESCOLHIDO) */}
+              <div className="rounded-3xl border-2 border-blue-500 bg-[#071827] text-white p-6 flex flex-col justify-between shadow-2xl relative space-y-6 mt-4 sm:mt-0">
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 text-white px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-wider shadow-md whitespace-nowrap z-10">
                   ⭐ O Mais Escolhido
                 </span>
 
                 <div className="space-y-4 pt-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-300">
-                    Acesso Ilimitado · Cancele quando quiser
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 block">
+                    Acesso Ilimitado
                   </span>
-                  <h3 className="text-xl font-extrabold text-white">Plano Profissional</h3>
+                  <h3 className="text-xl font-extrabold text-white leading-tight">Plano Profissional</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-white">R$ 24,90</span>
-                    <span className="text-xs text-slate-300 font-semibold">/mês (menos de R$ 0,83/dia)</span>
+                    <span className="text-3xl font-extrabold text-white">R$ 24,90</span>
+                    <span className="text-[11px] text-slate-300 font-semibold">/mês</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Para quem deseja adaptar o currículo para todas as vagas e acompanhar a evolução.
+                    Adapte seu currículo para todas as vagas.
                   </p>
 
-                  <div className="pt-4 border-t border-white/10 space-y-3 text-xs font-semibold text-slate-200">
-                    <div className="flex items-center gap-2.5">
+                  <div className="pt-4 border-t border-white/10 space-y-2.5 text-xs font-semibold text-slate-200">
+                    <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                       <span>Análises de Vaga Ilimitadas</span>
                     </div>
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Kits de Candidatura em PDF Ilimitados</span>
+                      <span>Kits de Candidatura Ilimitados</span>
                     </div>
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Simulador de Entrevistas Interativo</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span>Quadro Kanban de Gestão de Candidaturas</span>
+                      <span>Simulador de Entrevistas</span>
                     </div>
                   </div>
                 </div>
 
                 <Link
                   href="/assinar?segment=career_pro"
-                  className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-4 text-center text-xs sm:text-sm shadow-lg shadow-blue-600/40 transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-2"
+                  className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3.5 text-center text-xs shadow-lg shadow-blue-600/40 transition-all hover:scale-[1.02] inline-flex items-center justify-center gap-1.5"
                 >
-                  <span>Assinar por R$ 24,90/mês</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <span>Assinar R$ 24,90/mês</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
