@@ -17,6 +17,7 @@ model User {
   name               String?
   email              String?   @unique
   phone              String?
+  whatsappMarketingOptIn Boolean @default(false)
   emailVerified      DateTime?
   image              String?
   passwordHash       String?
@@ -522,6 +523,19 @@ model EmailLog {
 
   @@unique([type, dedupeKey])
   @@index([email])
+}
+
+/// Mesma função do EmailLog (trava de idempotência), mas para a régua de WhatsApp:
+/// tabela separada porque a chave de contato é o telefone, não o e-mail.
+model WhatsappLog {
+  id        String   @id @default(cuid())
+  type      String // "convert_to_subscription" | "convert_second_nudge" | "urgency_coupon"
+  dedupeKey String
+  phone     String
+  createdAt DateTime @default(now())
+
+  @@unique([type, dedupeKey])
+  @@index([phone])
 }
 
 /// Configurações operacionais editáveis pela tela de admin (ex.: qual modelo da Groq usar).

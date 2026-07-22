@@ -9,6 +9,7 @@ import { CourseListForm } from "@/components/course-list-form";
 import { BillingSection } from "@/components/billing-section";
 import { JobAlertManager } from "@/components/job-alert-manager";
 import { DiscoverableToggle } from "@/components/discoverable-toggle";
+import { WhatsappOptInToggle } from "@/components/whatsapp-optin-toggle";
 import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
@@ -38,6 +39,8 @@ export default async function SettingsPage({
         hasFormalEducation: true,
         interestedRoles: true,
         discoverable: true,
+        phone: true,
+        whatsappMarketingOptIn: true,
       },
     }),
     prisma.userCourse.findMany({
@@ -146,6 +149,13 @@ export default async function SettingsPage({
 
       <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
         <DiscoverableToggle initialValue={user?.discoverable ?? false} />
+      </section>
+
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <WhatsappOptInToggle
+          initialValue={user?.whatsappMarketingOptIn ?? false}
+          initialPhone={user?.phone ?? null}
+        />
       </section>
 
       {(user?.discoverable || contactRequests.length > 0) && (

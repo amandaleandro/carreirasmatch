@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { isCareerSegment } from "@/lib/career-segments";
+import { normalizeBrazilPhone, isValidBrazilPhone } from "@/lib/contact-validation";
 
 export async function PATCH(req: NextRequest) {
   const { session, response } = await requireAuth();
@@ -19,6 +20,8 @@ export async function PATCH(req: NextRequest) {
     city?: string | null;
     state?: string | null;
     discoverable?: boolean;
+    phone?: string | null;
+    whatsappMarketingOptIn?: boolean;
   } = {};
 
   if ("name" in body) {
@@ -102,6 +105,34 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Valor inválido." }, { status: 400 });
     }
     data.discoverable = discoverable;
+  }
+
+  if ("phone" in body) {
+    const normalized = normalizeBrazilPhone(body.phone);
+    if (normalized && !isValidBrazilPhone(normalized)) {
+      return NextResponse.json({ error: "Telefone inválido." }, { status: 400 });
+    }
+    data.phone = normalized || null;
+  }
+
+  if ("whatsappMarketingOptIn" in body) {
+    const { whatsappMarketingOptIn } = body;
+    if (typeof whatsappMarketingOptIn !== "boolean") {
+      return NextResponse.json({ error: "Valor inválido." }, { status: 400 });
+    }
+    if (whatsappMarketingOptIn) {
+      const effectivePhone =
+        "phone" in data
+          ? data.phone
+          : (await prisma.user.findUnique({ where: { id: session.user.id }, select: { phone: true } }))?.phone;
+      if (!effectivePhone) {
+        return NextResponse.json(
+          { error: "Informe um telefone válido para ativar as mensagens por WhatsApp." },
+          { status: 400 }
+        );
+      }
+    }
+    data.whatsappMarketingOptIn = whatsappMarketingOptIn;
   }
 
   if ("themePreference" in body) {

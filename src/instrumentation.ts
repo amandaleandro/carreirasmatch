@@ -27,6 +27,11 @@ export async function register() {
     startEmailScheduler();
   }
 
+  if (process.env.LIFECYCLE_WHATSAPP_ENABLED !== "false") {
+    const { startWhatsappScheduler } = await import("@/lib/whatsapp-scheduler");
+    startWhatsappScheduler();
+  }
+
   // One-time backfill for jobs ingested before the job-tags migration.
   // Self-disabling: once every active job is tagged this becomes a no-op.
   try {

@@ -100,6 +100,11 @@ services:
       - AI_MAX_RETRIES=${AI_MAX_RETRIES:-2}
       - AI_REQUEST_TIMEOUT_MS=${AI_REQUEST_TIMEOUT_MS:-45000}
       - LIFECYCLE_EMAILS_ENABLED=${LIFECYCLE_EMAILS_ENABLED:-true}
+      - LIFECYCLE_WHATSAPP_ENABLED=${LIFECYCLE_WHATSAPP_ENABLED:-false}
+      - EVOLUTION_API_URL=${EVOLUTION_API_URL:-http://evolution-api:8080}
+      - EVOLUTION_API_KEY=${EVOLUTION_API_KEY:-}
+      - EVOLUTION_INSTANCE=${EVOLUTION_INSTANCE:-}
+      - EVOLUTION_WEBHOOK_SECRET=${EVOLUTION_WEBHOOK_SECRET:-}
     depends_on:
       postgres:
         condition: service_healthy
@@ -119,6 +124,68 @@ services:
     networks:
       - default
       - edge_net
+
+  # Evolution API (gateway self-hosted de WhatsApp) para a régua de conversão
+  # via WhatsApp. Banco e cache próprios, isolados do Postgres principal, pra
+  # não misturar dado de produto com estado de sessão do WhatsApp. Desligado
+  # por padrão (perfil "whatsapp"): só sobe com
+  # `docker compose --profile whatsapp up -d`, depois que EVOLUTION_* estiver
+  # no .env. Pareamento inicial exige escanear o QR code com o celular da
+  # linha dedicada (passo manual, feito uma vez via túnel SSH).
+  evolution-postgres:
+    image: postgres:17-alpine
+    container_name: carreiras-match-evolution-postgres
+    restart: unless-stopped
+    profiles: ["whatsapp"]
+    environment:
+      - POSTGRES_USER=evolution
+      - POSTGRES_PASSWORD=${EVOLUTION_POSTGRES_PASSWORD:?defina EVOLUTION_POSTGRES_PASSWORD no .env}
+      - POSTGRES_DB=evolution
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evolution -d evolution"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - evolution-postgres-data:/var/lib/postgresql/data
+    networks:
+      - default
+
+  evolution-redis:
+    image: redis:7-alpine
+    container_name: carreiras-match-evolution-redis
+    restart: unless-stopped
+    profiles: ["whatsapp"]
+    volumes:
+      - evolution-redis-data:/data
+    networks:
+      - default
+
+  evolution-api:
+    image: atendai/evolution-api:v2.2.3
+    container_name: carreiras-match-evolution-api
+    restart: unless-stopped
+    profiles: ["whatsapp"]
+    environment:
+      - AUTHENTICATION_API_KEY=${EVOLUTION_API_KEY:?defina EVOLUTION_API_KEY no .env}
+      - DATABASE_ENABLED=true
+      - DATABASE_PROVIDER=postgresql
+      - DATABASE_CONNECTION_URI=postgresql://evolution:${EVOLUTION_POSTGRES_PASSWORD}@evolution-postgres:5432/evolution
+      - CACHE_REDIS_ENABLED=true
+      - CACHE_REDIS_URI=redis://evolution-redis:6379
+      - WEBHOOK_GLOBAL_URL=${APP_URL:-https://carreirasmatch.com.br}/api/whatsapp/webhook?token=${EVOLUTION_WEBHOOK_SECRET}
+      - WEBHOOK_GLOBAL_ENABLED=true
+      - WEBHOOK_EVENTS_MESSAGES_UPSERT=true
+    volumes:
+      - evolution-instances:/evolution/instances
+    depends_on:
+      evolution-postgres:
+        condition: service_healthy
+    networks:
+      - default
+    # Não exposto via Caddy/internet de propósito: só o container `app` fala
+    # com ele (rede interna). Pareamento inicial do QR e administração são
+    # feitos via túnel SSH.
 
   postgres-backup:
     image: postgres:17-alpine
@@ -147,6 +214,9 @@ volumes:
     name: carreiras-match_caddy-data
   caddy-config:
     name: carreiras-match_caddy-config
+  evolution-postgres-data:
+  evolution-redis-data:
+  evolution-instances:
 
 networks:
   default:
