@@ -12,10 +12,15 @@ export const dynamic = "force-dynamic";
 // se METRICS_TOKEN estiver setado, exige-se "Authorization: Bearer <token>".
 export async function GET(req: NextRequest) {
   const token = process.env.METRICS_TOKEN;
-  // Sem token, só aceita o scrape direto da rede Docker. Requisições públicas
-  // passam pelo Caddy, que sempre acrescenta x-forwarded-for.
-  if (!token && process.env.NODE_ENV === "production" && req.headers.has("x-forwarded-for")) {
-    return new NextResponse("Metrics unavailable", { status: 503 });
+  // Sem token, só aceita hosts usados pelo scrape direto da rede Docker. O
+  // Next acrescenta x-forwarded-for inclusive em chamadas internas, então o
+  // header Host é o sinal confiável nesta topologia conhecida.
+  if (!token && process.env.NODE_ENV === "production") {
+    const host = req.headers.get("host")?.split(":")[0] ?? "";
+    const internalHosts = new Set(["carreiras-match-app", "127.0.0.1", "localhost"]);
+    if (!internalHosts.has(host)) {
+      return new NextResponse("Metrics unavailable", { status: 503 });
+    }
   }
 
   if (token && req.headers.get("authorization") !== `Bearer ${token}`) {
