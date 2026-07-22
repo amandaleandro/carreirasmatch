@@ -476,21 +476,36 @@ export function ResumeOptimizer({
       y -= 16;
     }
 
+    // Uma skill "bate" com a vaga se aparecer (por igualdade ou inclusão parcial,
+    // já que "React" e "React.js" contam) em keywordsFound retornado pela análise.
+    function skillMatchesJob(skill: string): boolean {
+      const s = skill.trim().toLowerCase();
+      if (!s) return false;
+      return keywordsFound.some((k) => {
+        const kw = k.trim().toLowerCase();
+        return kw.length > 0 && (kw === s || kw.includes(s) || s.includes(kw));
+      });
+    }
+
     // Wraps a row of pill-shaped tags, moving to the next line/page as needed.
-    function drawChips(items: string[], size = 9.5) {
+    // `highlight`, quando informado, destaca no accent da vaga as skills que batem com o texto analisado.
+    function drawChips(items: string[], size = 9.5, highlight?: (item: string) => boolean) {
       const padX = 8;
       const chipH = size + 10;
       let x = margin;
       ensureSpace(chipH + 4);
       items.forEach((item) => {
+        const isMatch = highlight?.(item) ?? false;
+        const bg = isMatch ? accentLight : chipBg;
+        const textColor = isMatch ? accent : chipText;
         const w = font.widthOfTextAtSize(item, size) + padX * 2;
         if (x + w > margin + maxWidth) {
           x = margin;
           y -= chipH + 6;
           ensureSpace(chipH + 4);
         }
-        page.drawRectangle({ x, y: y - chipH + 4, width: w, height: chipH, color: chipBg });
-        page.drawText(item, { x: x + padX, y: y - chipH + 4 + (chipH - size) / 2 + 1, size, font, color: chipText });
+        page.drawRectangle({ x, y: y - chipH + 4, width: w, height: chipH, color: bg });
+        page.drawText(item, { x: x + padX, y: y - chipH + 4 + (chipH - size) / 2 + 1, size, font, color: textColor });
         x += w + 6;
       });
       y -= chipH + 14;
@@ -543,7 +558,7 @@ export function ResumeOptimizer({
 
     if (skills.length > 0) {
       drawSectionTitle("Habilidades");
-      drawChips(skills);
+      drawChips(skills, 9.5, hasBaseline ? skillMatchesJob : undefined);
     }
 
     if (languages.length > 0) {
@@ -946,6 +961,9 @@ export function ResumeOptimizer({
                   PDF final incluem contato, resumo, experiências, formação,
                   habilidades, idiomas e certificações, nada do currículo
                   original é perdido.
+                  {hasBaseline && (
+                    <> No PDF, as habilidades que batem com a vaga analisada saem destacadas na cor de destaque.</>
+                  )}
                 </p>
                 <div className="flex flex-wrap gap-3 mt-4">
                   <button

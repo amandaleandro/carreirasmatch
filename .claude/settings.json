@@ -55,7 +55,13 @@
       "Bash(curl -s \"https://jobicy.com/api/v2/remote-jobs?count=2\")",
       "Bash(curl -s \"https://boards-api.greenhouse.io/v1/boards/stripe/jobs?content=true\")",
       "Bash(curl -s \"https://api.lever.co/v0/postings/netflix?mode=json\")",
-      "Bash(curl -s \"https://api.lever.co/v0/postings/leverdemo?mode=json\")"
+      "Bash(curl -s \"https://api.lever.co/v0/postings/leverdemo?mode=json\")",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=8 root@177.153.62.190 \"docker exec carreiras-match-postgres psql -U \\\\$\\(docker exec carreiras-match-postgres env | grep POSTGRES_USER | cut -d= -f2\\) -d \\\\$\\(docker exec carreiras-match-postgres env | grep POSTGRES_DB | cut -d= -f2\\) -t -c \\\\\"select count\\(*\\) from \\\\\\\\\\\\\"User\\\\\\\\\\\\\";\\\\\"\")",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=8 root@177.153.62.190 \"docker exec carreiras-match-postgres env | grep POSTGRES_\")",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=8 root@177.153.62.190 'docker exec carreiras-match-postgres psql -U carreiras -d carreiras_match -c \" *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -c \"import json; json.load\\(open\\('observability/grafana/dashboards/carreiras-growth-funnel.json', encoding='utf-8'\\)\\); print\\('valid json'\\)\")",
+      "Bash(ssh -o BatchMode=yes -o ConnectTimeout=8 root@177.153.62.190 \"df -h / && echo --- && docker system df\")"
     ]
   }
 }

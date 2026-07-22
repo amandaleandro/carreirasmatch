@@ -2,12 +2,14 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
+import { freeToolTrial } from "@/lib/metrics";
 
 export async function authorizeFreeAiTool(tool: string, consume: boolean) {
   const { session, response } = await requireAuth();
   if (!session) return { session: null, response, subscriber: false };
 
   if (await hasActiveSubscriptionAccess(session.user.id)) {
+    freeToolTrial.inc({ tool, outcome: "subscriber" });
     return { session, response: null, subscriber: true };
   }
 
@@ -25,6 +27,7 @@ export async function authorizeFreeAiTool(tool: string, consume: boolean) {
   }
 
   if (usage) {
+    freeToolTrial.inc({ tool, outcome: "already_used" });
     return {
       session: null,
       subscriber: false,
@@ -36,6 +39,7 @@ export async function authorizeFreeAiTool(tool: string, consume: boolean) {
   }
 
   await prisma.freeToolUsage.create({ data: { userId: session.user.id, tool } });
+  freeToolTrial.inc({ tool, outcome: "granted" });
   return { session, response: null, subscriber: false };
 }
 

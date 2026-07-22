@@ -808,7 +808,7 @@ Formato de resposta:
 {
   "titleEn": string (o cargo mais adequado, em inglês, curto e comum em portais de vaga internacionais, ex: "Backend Developer", "Registered Nurse", "Legal Assistant"),
   "titlePt": string (o mesmo cargo, em português, como apareceria em portais de vaga brasileiros, ex: "Desenvolvedor Backend", "Enfermeiro", "Assistente Jurídico"),
-  "keywords": string[] (3 a 6 skills/competências centrais do currículo na língua em que costumam aparecer em vagas dessa área — em inglês para termos técnicos internacionais de TI, em português para as demais áreas, ex: ["Python", "SQL", "AWS"] para TI, ["Direito Trabalhista", "Rotinas Cartorárias"] para Direito)
+  "keywords": string[] (3 a 6 skills/competências centrais do currículo na língua em que costumam aparecer em vagas dessa área, em inglês para termos técnicos internacionais de TI, em português para as demais áreas, ex: ["Python", "SQL", "AWS"] para TI, ["Direito Trabalhista", "Rotinas Cartorárias"] para Direito)
 }`;
 
   const userMessage = `CURRÍCULO:\n${truncate(resumeText, MAX_RESUME_CHARS)}`;
@@ -840,7 +840,7 @@ export async function getInterviewFeedbackBatch(
   qas: { question: string; answer: string }[],
   jobTitle: string
 ): Promise<InterviewFeedbackResult[]> {
-  const systemPrompt = `Você é um treinador de entrevistas de emprego direto e construtivo, que atende candidatos de qualquer área profissional (tecnologia, saúde, direito, educação, administração, design etc.). Você vai avaliar várias respostas de uma mesma simulação de entrevista de uma vez só, calibrando os critérios ao que a VAGA realmente exige — nem toda vaga é técnica no sentido de programação.
+  const systemPrompt = `Você é um treinador de entrevistas de emprego direto e construtivo, que atende candidatos de qualquer área profissional (tecnologia, saúde, direito, educação, administração, design etc.). Você vai avaliar várias respostas de uma mesma simulação de entrevista de uma vez só, calibrando os critérios ao que a VAGA realmente exige, pois nem toda vaga é técnica no sentido de programação.
 ${BASE_RULES}
 Formato de resposta:
 {
@@ -850,7 +850,7 @@ Formato de resposta:
       "strongPoints": string[] (0-3 pontos fortes da resposta, array vazio se não houver nenhum),
       "improvementTips": string[] (2-4 dicas concretas de como melhorar essa resposta especificamente),
       "clarity": number (0-100, quão clara e bem estruturada foi a resposta),
-      "technicalDepth": number (0-100, quão profunda e específica foi a resposta em relação ao conhecimento técnico/prático real da profissão daquela vaga — não assuma programação; avalie o domínio da área de atuação em questão),
+      "technicalDepth": number (0-100, quão profunda e específica foi a resposta em relação ao conhecimento técnico/prático real da profissão daquela vaga; não assuma programação e avalie o domínio da área de atuação em questão),
       "confidence": number (0-100, quão segura e assertiva a resposta parece, com base na forma como foi escrita)
     }
   ]
@@ -902,7 +902,7 @@ export async function generateInterviewQuestions(
 ): Promise<string[]> {
   const focuses = pickRandomFocuses(3);
 
-  const systemPrompt = `Você é um entrevistador sênior experiente que cria perguntas de entrevista de emprego para vagas de QUALQUER área profissional (tecnologia, saúde, direito, educação, administração, design etc.) — a partir do cargo e da descrição da vaga, identifique de que área/profissão se trata e gere perguntas específicas e realistas dela, não um template genérico de TI.
+  const systemPrompt = `Você é um entrevistador sênior experiente que cria perguntas de entrevista de emprego para vagas de QUALQUER área profissional (tecnologia, saúde, direito, educação, administração, design etc.). A partir do cargo e da descrição da vaga, identifique de que área/profissão se trata e gere perguntas específicas e realistas dela, não um template genérico de TI.
 ${BASE_RULES}
 Antes de gerar as perguntas, identifique o nível de senioridade pedido pela vaga (estágio, júnior, pleno, sênior, especialista/staff etc.) a partir do cargo e da descrição. Calibre a profundidade das perguntas de acordo:
 - Estágio/júnior: fundamentos da área, potencial de aprendizado, projetos acadêmicos/pessoais, situações simples do dia a dia.

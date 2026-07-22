@@ -414,6 +414,12 @@ function extractJson(raw: string): string {
   return s;
 }
 
+/** Restringe a fila a endpoints cujo id comece por um dos prefixos informados (ex.: ["groq", "openai"]). */
+function filterEndpointsByAllowList(endpoints: AiEndpoint[], allowList?: string[]): AiEndpoint[] {
+  if (!allowList || allowList.length === 0) return endpoints;
+  return endpoints.filter((endpoint) => allowList.some((prefix) => endpoint.id.startsWith(prefix)));
+}
+
 /**
  * Executa um prompt JSON tentando os provedores configurados por prioridade
  * (ordem do registro); cai para o próximo em qualquer falha. Retorna o conteúdo
@@ -427,9 +433,10 @@ export async function runJsonAcrossProviders(
   groqModel: string,
   validate?: (value: unknown) => void,
   operation = "other",
-  preferredProviderId?: string
+  preferredProviderId?: string,
+  providerAllowList?: string[]
 ): Promise<string> {
-  const endpoints = getConfiguredEndpoints(groqModel);
+  const endpoints = filterEndpointsByAllowList(getConfiguredEndpoints(groqModel), providerAllowList);
   if (endpoints.length === 0) {
     throw new Error(
       "Nenhum provedor de IA configurado (defina OPENAI_API_KEY, GROQ_API_KEY ou outra chave suportada)."

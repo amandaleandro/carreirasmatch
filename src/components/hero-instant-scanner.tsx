@@ -1,0 +1,143 @@
+"use client";
+
+import { useState, FormEvent } from "react";
+import Link from "next/link";
+import { Search, Sparkles, CheckCircle2, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+
+export function HeroInstantScanner() {
+  const [roleQuery, setRoleQuery] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const [result, setResult] = useState<{
+    role: string;
+    score: number;
+    skills: string[];
+    gaps: string[];
+  } | null>(null);
+
+  function handleScan(e: FormEvent) {
+    e.preventDefault();
+    if (!roleQuery.trim()) return;
+
+    setScanning(true);
+    setResult(null);
+
+    setTimeout(() => {
+      // Generate realistic preview metrics based on role
+      const query = roleQuery.trim().toLowerCase();
+      let score = 76;
+      let skills = ["Comunicação Clara", "Trabalho em Equipe", "Resolução de Problemas"];
+      let gaps = ["Palavras-chave específicas do ATS", "Métricas quantitativas no histórico"];
+
+      if (query.includes("dev") || query.includes("front") || query.includes("react") || query.includes("software")) {
+        score = 82;
+        skills = ["React.js", "TypeScript", "TailwindCSS", "Git & GitHub"];
+        gaps = ["Testes Unitários (Jest)", "Métricas de Performance Web"];
+      } else if (query.includes("vendas") || query.includes("comercial") || query.includes("atendimento")) {
+        score = 79;
+        skills = ["Negociação", "Prospecção de Leads", "CRM", "Foco em Metas"];
+        gaps = ["Indicadores de Conversão", "Follow-up Estruturado"];
+      } else if (query.includes("admin") || query.includes("gest") || query.includes("gerente")) {
+        score = 84;
+        skills = ["Gestão de Processos", "Pacote Office / Excel", "Organização", "Liderança"];
+        gaps = ["Certificações da Área", "Metodologia Ágil"];
+      }
+
+      setResult({
+        role: roleQuery.trim(),
+        score,
+        skills,
+        gaps,
+      });
+      setScanning(false);
+    }, 1200);
+  }
+
+  return (
+    <div className="rounded-3xl border border-white/15 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-2xl space-y-6 font-sans">
+      <div className="flex items-center justify-between">
+        <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30">
+          <Sparkles className="w-3.5 h-3.5" />
+          Simulador de Match ao Vivo
+        </span>
+        <span className="text-[11px] text-white/60 font-semibold">Sem cadastrar cartão</span>
+      </div>
+
+      <div className="space-y-1.5">
+        <h3 className="text-xl font-bold text-white">Teste a aderência da sua vaga agora</h3>
+        <p className="text-xs text-white/70">
+          Digite o cargo da vaga que você deseja para ver uma demonstração imediata de pontuação por IA.
+        </p>
+      </div>
+
+      <form onSubmit={handleScan} className="space-y-3">
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <input
+            type="text"
+            required
+            value={roleQuery}
+            onChange={(e) => setRoleQuery(e.target.value)}
+            placeholder="Ex: Desenvolvedor Front-end, Vendedor..."
+            className="w-full rounded-2xl border border-white/20 bg-black/30 pl-10 pr-4 py-3 text-sm text-white placeholder-white/40 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 transition-all"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={scanning}
+          className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3.5 text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+        >
+          {scanning ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              Analisando vaga com IA...
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-300" />
+              <span>Simular Aderência Gratuitamente</span>
+            </span>
+          )}
+        </button>
+      </form>
+
+      {/* Simulated Live Result */}
+      {result && (
+        <div className="rounded-2xl border border-white/20 bg-slate-900/90 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-300">
+          <div className="flex items-center justify-between pb-3 border-b border-white/10">
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-white/50 font-bold">Cargo Simulado</p>
+              <h4 className="font-extrabold text-sm text-white truncate max-w-[12rem] sm:max-w-xs">{result.role}</h4>
+            </div>
+            <div className="text-right">
+              <span className="text-2xl font-extrabold text-blue-400">{result.score}%</span>
+              <span className="block text-[10px] font-bold text-emerald-400">Boa Aderência</span>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-[11px] font-bold uppercase tracking-wider text-white/60">Habilidades identificadas:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {result.skills.map((s) => (
+                <span key={s} className="rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold inline-flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <Link
+              href={`/analise?role=${encodeURIComponent(result.role)}`}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-extrabold py-2.5 text-xs shadow-md transition-all"
+            >
+              <span>Ver relatório completo com seu currículo</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

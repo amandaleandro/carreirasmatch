@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { HeroInstantScanner } from "@/components/hero-instant-scanner";
 import {
   ArrowRight,
   BookOpenCheck,
@@ -23,6 +24,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CAREER_OFFERS } from "@/lib/career-offers";
 
 const kitPrice = CAREER_OFFERS[0].diagnosticPrice;
+const careerSubscription = CAREER_OFFERS.find((offer) => offer.segment === "career_pro") ?? CAREER_OFFERS[0];
 
 const steps = [
   ["01", "Envie seu currículo", "Use seu PDF atual. A análise parte apenas das informações que você já tem."],
@@ -143,28 +145,7 @@ export function MarketingHome() {
           </div>
 
           <div className="animate-rise" style={{ animationDelay: "300ms" }}>
-            <div className="rounded-3xl border border-white/15 bg-white/[0.08] p-4 shadow-2xl backdrop-blur-md md:p-6">
-              <div className="rounded-2xl bg-white p-5 text-slate-950 shadow-xl md:p-6">
-                <div className="flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3">
-                    <div className="relative h-10 w-10 overflow-hidden rounded-full border border-slate-200">
-                      <Image src="/niche-hero/primeiro-emprego.png" alt="" fill sizes="40px" className="object-cover object-top" />
-                    </div>
-                    <div><p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">Exemplo demonstrativo</p><p className="mt-1 font-bold">Analista de Marketing</p></div>
-                  </div>
-                  <div className="text-right"><p className="text-2xl font-extrabold text-blue-600">78%</p><p className="text-[10px] font-bold uppercase text-slate-400">aderência</p></div>
-                </div>
-                <div className="mt-5 space-y-3">
-                  <div className="rounded-xl bg-emerald-50 p-4"><p className="text-[10px] font-bold uppercase text-emerald-700">Requisito encontrado</p><p className="mt-1 text-sm font-semibold">Produção de conteúdo e planejamento editorial.</p></div>
-                  <div className="rounded-xl bg-amber-50 p-4"><p className="text-[10px] font-bold uppercase text-amber-700">Falta comprovar</p><p className="mt-1 text-sm font-semibold">Uso de métricas para melhorar campanhas.</p></div>
-                  <div className="rounded-xl border border-slate-200 p-4">
-                    <p className="text-[10px] font-bold uppercase text-slate-400">Antes</p><p className="mt-1 text-sm text-slate-500 line-through">Responsável pelas redes sociais.</p>
-                    <p className="mt-3 text-[10px] font-bold uppercase text-blue-600">Depois</p><p className="mt-1 text-sm font-semibold text-slate-800">Planejei o calendário editorial e acompanhei alcance e engajamento das publicações.</p>
-                  </div>
-                </div>
-                <a href="#exemplo" className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-600">Entender este exemplo <ArrowRight className="h-4 w-4" /></a>
-              </div>
-            </div>
+            <HeroInstantScanner />
           </div>
         </div>
       </section>
@@ -240,12 +221,100 @@ export function MarketingHome() {
           <div className="mx-auto max-w-7xl px-4 py-20 md:px-8"><div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Confiança e segurança</p><h2 className="mt-3 text-3xl font-bold">Seu currículo merece cuidado, não promessas vazias.</h2></div><div className="mt-10 grid gap-5 md:grid-cols-3"><article className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950"><LockKeyhole className="h-6 w-6 text-blue-600" /><h3 className="mt-4 font-bold">Privacidade em primeiro lugar</h3><p className="mt-2 text-sm text-neutral-500">Seus dados são usados para gerar a análise e ficam protegidos pelos controles da sua conta.</p></article><article className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950"><ShieldCheck className="h-6 w-6 text-blue-600" /><h3 className="mt-4 font-bold">Sem inventar qualificações</h3><p className="mt-2 text-sm text-neutral-500">A ferramenta melhora a forma de apresentar fatos verdadeiros; você sempre revisa o resultado.</p></article><article className="rounded-2xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-950"><FileCheck2 className="h-6 w-6 text-blue-600" /><h3 className="mt-4 font-bold">Falha técnica não é entrega</h3><p className="mt-2 text-sm text-neutral-500">Se algo der errado na geração, tente novamente ou acione o suporte para verificarmos o caso.</p></article></div></div>
         </section>
 
-        <section id="preco" className="mx-auto max-w-5xl px-4 py-20 md:px-8">
-          <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Preço claro</p><h2 className="mt-3 text-3xl font-bold">Comece grátis. Libere o kit se fizer sentido.</h2></div>
-          <div className="mt-10 grid overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-950 md:grid-cols-2">
-            <div className="p-7 md:p-9"><p className="text-sm font-bold text-neutral-500">Resultado inicial</p><p className="mt-3 text-4xl font-extrabold">Grátis</p><ul className="mt-6 space-y-3 text-sm"><li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500" /> Score inicial de aderência</li><li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500" /> Primeira leitura dos pontos fortes</li><li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500" /> Indicação dos principais gaps</li></ul></div>
-            <div className="bg-slate-950 p-7 text-white md:p-9"><p className="text-sm font-bold text-blue-300">Kit Candidatura</p><p className="mt-3 text-4xl font-extrabold">{kitPrice}</p><p className="mt-1 text-sm text-white/50">pagamento único por análise</p><ul className="mt-6 space-y-3 text-sm text-white/85">{deliverables.slice(2).map((item) => <li key={item} className="flex gap-2"><Check className="h-4 w-4 shrink-0 text-emerald-400" />{item}</li>)}</ul><div className="mt-7"><PrimaryCta label="Fazer análise gratuita primeiro" /></div></div>
+        <section id="preco" className="mx-auto max-w-6xl px-4 py-20 md:px-8 font-sans">
+          <div className="text-center space-y-2">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Preços Transparentes</p>
+            <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white">Escolha o formato ideal para o seu momento</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+              Seja para uma vaga específica ou para acompanhamento ilimitado em toda a sua busca profissional.
+            </p>
           </div>
+
+          <div className="mt-10 grid overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm sm:grid-cols-2 lg:grid-cols-4">
+            {/* Grátis */}
+            <div className="p-6 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 space-y-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Degustação</p>
+                <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">Grátis</p>
+                <p className="text-xs text-slate-500 mt-1">1ª leitura inicial</p>
+                <ul className="mt-6 space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Score inicial de aderência</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Leitura preliminar de requisitos</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Resumo dos principais gaps</li>
+                </ul>
+              </div>
+              <div className="pt-4">
+                <PrimaryCta label="Testar Grátis Agora" />
+              </div>
+            </div>
+
+            {/* Análise Completa 9,90 */}
+            <div className="p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-800 space-y-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Análise Completa</p>
+                <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">R$ 9,90</p>
+                <p className="text-xs text-slate-500 mt-1">Avulso para 1 vaga</p>
+                <ul className="mt-6 space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Score detalhado de 0 a 100%</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Diagnóstico completo por IA</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Palavras-chave exigidas pelos robôs (ATS)</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Justificativa técnica do resultado</li>
+                </ul>
+              </div>
+              <div className="pt-4">
+                <PrimaryCta label="Fazer Análise (R$ 9,90)" />
+              </div>
+            </div>
+
+            {/* Kit Candidatura 12,90 */}
+            <div className="p-6 flex flex-col justify-between border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 space-y-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Kit Candidatura</p>
+                <p className="mt-2 text-3xl font-extrabold text-slate-900 dark:text-white">R$ 12,90</p>
+                <p className="text-xs text-slate-500 mt-1">Entrega completa para 1 vaga</p>
+                <ul className="mt-6 space-y-2.5 text-xs text-slate-700 dark:text-slate-300">
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Tudo da Análise Completa</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Currículo Otimizado em PDF</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Carta de Apresentação pronta</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-500 shrink-0" /> Perguntas de Entrevista da vaga</li>
+                </ul>
+              </div>
+              <div className="pt-4">
+                <PrimaryCta label="Gerar Kit (R$ 12,90)" />
+              </div>
+            </div>
+
+            {/* Assinatura Mensal R$ 24,90/mês */}
+            <div className="p-6 bg-slate-950 text-white flex flex-col justify-between space-y-4 relative">
+              <span className="absolute right-4 top-4 rounded-full bg-blue-600 text-white px-2.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider">
+                Recomendado
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-400">Assinatura Profissional</p>
+                <p className="mt-2 text-3xl font-extrabold text-white">R$ 24,90<span className="text-xs text-slate-400 font-semibold">/mês</span></p>
+                <p className="text-xs text-slate-400 mt-1">Acesso ilimitado, cancele a qualquer momento</p>
+                <ul className="mt-6 space-y-2.5 text-xs text-slate-200">
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> <strong>Análises com IA ilimitadas</strong></li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> <strong>Kits de Candidatura ilimitados</strong></li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Simulador de Entrevistas com IA</li>
+                  <li className="flex gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Acompanhamento de evolução</li>
+                </ul>
+              </div>
+              <div className="pt-4">
+                <Link
+                  href="/assinar?segment=career_pro"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold px-4 py-3 text-xs shadow-md transition-all"
+                >
+                  Assinar por R$ 24,90/mês
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          <p className="mt-5 text-center text-xs text-slate-500">
+            <strong className="text-slate-800 dark:text-slate-200">Menos de R$ 0,83 por dia.</strong> A assinatura acompanha você em todas as vagas até conquistar sua contratação.
+          </p>
         </section>
 
         <section className="border-t border-neutral-200 dark:border-neutral-800"><div className="mx-auto max-w-3xl px-4 py-20 md:px-8"><div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Dúvidas frequentes</p><h2 className="mt-3 text-3xl font-bold">Antes de enviar seu currículo.</h2></div><div className="mt-10 divide-y divide-neutral-200 border-y border-neutral-200 dark:divide-neutral-800 dark:border-neutral-800">{faqs.map(([question, answer]) => <details key={question} className="group py-5"><summary className="cursor-pointer list-none pr-8 font-bold marker:content-none">{question}</summary><p className="mt-3 text-sm leading-relaxed text-neutral-500">{answer}</p></details>)}</div></div></section>

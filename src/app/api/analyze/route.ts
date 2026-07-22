@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { analyzeResumeAgainstJob, extractStructuredResume, CareerTrack, StructuredResume } from "@/lib/groq";
+import { analyzeResumeAgainstJob, extractStructuredResume, CareerTrack, StructuredResume, ResumeAnalysis } from "@/lib/groq";
 import { canViewFullDiagnostic, hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { toAnalysisTeaser } from "@/lib/analysis-teaser";
 import { normalizeCareerSegment, tracksForSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { analysisTotal, analysisDuration } from "@/lib/metrics";
+import { analysisTotal, analysisDuration, freeAnalysisLimitHit } from "@/lib/metrics";
 import {
   FREE_ANALYSIS_DAILY_LIMIT,
   FREE_ANALYSIS_MONTHLY_LIMIT,
@@ -26,6 +26,79 @@ const VALID_TRACKS: CareerTrack[] = [
   "growth",
   "apprentice",
 ];
+
+/** Reidrata uma linha de Analysis já persistida de volta no formato retornado pela IA, para reaproveitar sem gastar tokens numa repetição exata (mesmo currículo salvo + mesma vaga + mesmo momento profissional). */
+function analysisRecordToResumeAnalysis(record: {
+  overallScore: number;
+  technicalScore: number;
+  experienceScore: number;
+  seniorityScore: number;
+  atsScore: number;
+  applicationStatus: string;
+  applicationStatusReason: string;
+  keywordsFound: string;
+  keywordsMissing: string;
+  suggestedSummary: string;
+  currentSummary: string;
+  strengths: string;
+  weaknesses: string;
+  fixes: string;
+  interviewQuestions: string;
+  studyPlan: string;
+  recruiterMessage: string;
+  alternativeRoles: string;
+  experienceSuggestions: string;
+  atsChecklist: string;
+  talkAboutYourselfAnswer: string | null;
+  transferableSkills: string | null;
+  transitionNarrative: string | null;
+  whyCareerChangeAnswer: string | null;
+  bridgeRoles: string | null;
+  recruiterObjections: string | null;
+  applicationStrategy: string | null;
+  weeklyApplicationPlan: string | null;
+  feedbackAnalysis: string | null;
+  grammarErrors: string | null;
+  structureRating: string | null;
+  structureFeedback: string | null;
+  missingBasicInfo: string | null;
+}): ResumeAnalysis {
+  return {
+    overallScore: record.overallScore,
+    technicalScore: record.technicalScore,
+    experienceScore: record.experienceScore,
+    seniorityScore: record.seniorityScore,
+    atsScore: record.atsScore,
+    applicationStatus: record.applicationStatus as ResumeAnalysis["applicationStatus"],
+    applicationStatusReason: record.applicationStatusReason,
+    keywordsFound: JSON.parse(record.keywordsFound),
+    keywordsMissing: JSON.parse(record.keywordsMissing),
+    suggestedSummary: record.suggestedSummary,
+    currentSummary: record.currentSummary,
+    strengths: JSON.parse(record.strengths),
+    weaknesses: JSON.parse(record.weaknesses),
+    fixes: JSON.parse(record.fixes),
+    interviewQuestions: JSON.parse(record.interviewQuestions),
+    studyPlan: JSON.parse(record.studyPlan),
+    recruiterMessage: record.recruiterMessage,
+    alternativeRoles: JSON.parse(record.alternativeRoles),
+    experienceSuggestions: JSON.parse(record.experienceSuggestions || "[]"),
+    atsChecklist: JSON.parse(record.atsChecklist || "[]"),
+    talkAboutYourselfAnswer: record.talkAboutYourselfAnswer ?? undefined,
+    transferableSkills: record.transferableSkills ? JSON.parse(record.transferableSkills) : undefined,
+    transitionNarrative: record.transitionNarrative ?? undefined,
+    whyCareerChangeAnswer: record.whyCareerChangeAnswer ?? undefined,
+    bridgeRoles: record.bridgeRoles ? JSON.parse(record.bridgeRoles) : undefined,
+    recruiterObjections: record.recruiterObjections ? JSON.parse(record.recruiterObjections) : undefined,
+    applicationStrategy: record.applicationStrategy ?? undefined,
+    weeklyApplicationPlan: record.weeklyApplicationPlan ? JSON.parse(record.weeklyApplicationPlan) : undefined,
+    feedbackAnalysis: record.feedbackAnalysis ?? undefined,
+    ...(record.grammarErrors ? { grammarErrors: JSON.parse(record.grammarErrors) } : {}),
+    ...(record.structureRating ? { structureRating: record.structureRating } : {}),
+    ...(record.structureFeedback ? { structureFeedback: record.structureFeedback } : {}),
+    ...(record.missingBasicInfo ? { missingBasicInfo: JSON.parse(record.missingBasicInfo) } : {}),
+  } as ResumeAnalysis;
+}
 
 export async function POST(req: NextRequest) {
   // Cronômetro do histograma; as labels são definidas ao observar (no fim).
@@ -57,6 +130,7 @@ export async function POST(req: NextRequest) {
 
       const allowance = await getFreeAnalysisAllowance(userId);
       if (!allowance.allowed) {
+        freeAnalysisLimitHit.inc({ reason: allowance.reason ?? "unknown" });
         const error =
           allowance.reason === "monthly"
             ? `Você já usou as ${FREE_ANALYSIS_MONTHLY_LIMIT} análises gratuitas deste mês. Assine para continuar analisando sem esse limite.`
@@ -189,22 +263,67 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const [analysis, freshResumeStructured] = await Promise.all([
-      analyzeResumeAgainstJob(
-        resumeText,
-        jobTitle,
-        jobText,
-        effectiveCareerTrack,
-        pastFeedback,
-        {
-          professionalArea: candidate?.professionalArea ?? null,
-          hasFormalEducation: candidate?.hasFormalEducation ?? null,
-          courses: userCourses.map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title)),
+    const pastFeedbackKey = pastFeedback.trim() || null;
+
+    // Repetição exata (mesmo currículo salvo + mesma vaga + mesmo momento profissional +
+    // mesmo feedback colado): reaproveita a análise já persistida em vez de chamar a IA de
+    // novo. Não conta na cota gratuita nem cria uma nova linha no histórico do usuário.
+    const duplicateAnalysis = existingResume
+      ? await prisma.analysis.findFirst({
+          where: {
+            resumeId: existingResume.id,
+            careerTrack: effectiveCareerTrack,
+            jobText,
+            pastFeedback: pastFeedbackKey,
+          },
+          orderBy: { createdAt: "desc" },
+        })
+      : null;
+
+    let analysis: ResumeAnalysis;
+    let freshResumeStructured: StructuredResume | null = null;
+
+    if (duplicateAnalysis) {
+      analysis = analysisRecordToResumeAnalysis(duplicateAnalysis);
+    } else {
+      [analysis, freshResumeStructured] = await Promise.all([
+        analyzeResumeAgainstJob(
+          resumeText,
+          jobTitle,
+          jobText,
+          effectiveCareerTrack,
+          pastFeedback,
+          {
+            professionalArea: candidate?.professionalArea ?? null,
+            hasFormalEducation: candidate?.hasFormalEducation ?? null,
+            courses: userCourses.map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title)),
+          },
+          carriedResumeStructured
+        ),
+        // Skip the extraction call entirely when we already have a carried-forward structured resume to reuse.
+        carriedResumeStructured ? Promise.resolve(null) : extractStructuredResume(resumeText),
+      ]);
+
+      // Substitui o palpite da IA para dados básicos por uma checagem determinística em cima
+      // do currículo já extraído: mais confiável que pedir pro modelo "adivinhar" isso no meio
+      // da análise, e não custa tokens extra (o currículo estruturado já foi extraído acima).
+      const structuredForChecks = carriedResumeStructured ?? freshResumeStructured;
+      if (structuredForChecks) {
+        const missing: string[] = [];
+        const contact = structuredForChecks.contact;
+        if (!contact.email?.trim()) missing.push("E-mail");
+        if (!contact.phone?.trim()) missing.push("Telefone");
+        if (!contact.linkedin?.trim()) missing.push("LinkedIn");
+        if (!contact.location?.trim()) missing.push("Localidade");
+        if (
+          !analysis.currentSummary?.trim() ||
+          analysis.currentSummary === "Nenhum resumo profissional encontrado no currículo."
+        ) {
+          missing.push("Resumo profissional");
         }
-      ),
-      // Skip the extraction call entirely when we already have a carried-forward structured resume to reuse.
-      carriedResumeStructured ? Promise.resolve(null) : extractStructuredResume(resumeText),
-    ]);
+        (analysis as unknown as { missingBasicInfo: string[] }).missingBasicInfo = missing;
+      }
+    }
 
     const resume =
       existingResume ??
@@ -217,7 +336,7 @@ export async function POST(req: NextRequest) {
         },
       }));
 
-    const saved = await prisma.analysis.create({
+    const saved = duplicateAnalysis ?? await prisma.analysis.create({
       data: {
         resumeId: resume.id,
         careerTrack: effectiveCareerTrack,
@@ -281,11 +400,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    stopTimer({ career_track: effectiveCareerTrack, outcome: "success" });
+    const outcome = duplicateAnalysis ? "success_reused" : "success";
+    stopTimer({ career_track: effectiveCareerTrack, outcome });
     analysisTotal.inc({
       career_track: effectiveCareerTrack,
       logged_in: String(Boolean(userId)),
-      outcome: "success",
+      outcome,
     });
 
     const unlocked = userId ? await canViewFullDiagnostic(userId, saved.id) : false;

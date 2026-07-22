@@ -49,7 +49,8 @@ export async function runJsonPrompt<T>(
   model?: string,
   schema?: ZodType<T>,
   operation = "other",
-  preferredProviderId?: string
+  preferredProviderId?: string,
+  providerAllowList?: string[]
 ): Promise<T> {
   // `model` (quando passado, ex.: extração) define o modelo do endpoint Groq;
   // os demais provedores usam seus próprios modelos. A camada multi-provedor
@@ -63,7 +64,8 @@ export async function runJsonPrompt<T>(
     groqModel,
     schema ? (value) => { schema.parse(value); } : undefined,
     operation,
-    preferredProviderId
+    preferredProviderId,
+    providerAllowList
   );
   // A resposta em JSON-mode é fechada em JSON sintaticamente válido mesmo quando
   // cortada por max_tokens, então um corte é logado na camada de provedores.
@@ -354,6 +356,24 @@ export type CandidateContext = {
   courses?: string[];
 };
 
+/** Reduz o currículo estruturado a um bloco compacto de sinais objetivos (skills, certificações, idiomas), sem repetir as experiências (já cobertas pelo texto cru do currículo). */
+function structuredResumeSignalsBlock(resumeStructured: StructuredResume): string {
+  const parts: string[] = [];
+  if (resumeStructured.skills.length > 0) {
+    parts.push(`Skills/ferramentas listadas: ${resumeStructured.skills.join(", ")}`);
+  }
+  if (resumeStructured.certifications.length > 0) {
+    parts.push(`Certificações: ${resumeStructured.certifications.join(", ")}`);
+  }
+  if (resumeStructured.languages.length > 0) {
+    parts.push(
+      `Idiomas: ${resumeStructured.languages.map((l) => (l.level ? `${l.language} (${l.level})` : l.language)).join(", ")}`
+    );
+  }
+  if (parts.length === 0) return "";
+  return `\n\nSINAIS_ESTRUTURADOS_DO_CURRÍCULO (extraídos previamente, use para conferir keywordsFound/Missing com mais precisão, não substitui o texto do currículo acima):\n- ${parts.join("\n- ")}`;
+}
+
 const MAX_RESUME_CHARS = 14000;
 const MAX_JOB_TEXT_CHARS = 3000;
 
@@ -398,7 +418,8 @@ export async function analyzeResumeAgainstJob(
   jobText: string,
   careerTrack: CareerTrack,
   pastFeedback?: string,
-  candidateContext?: CandidateContext
+  candidateContext?: CandidateContext,
+  resumeStructured?: StructuredResume | null
 ): Promise<ResumeAnalysis> {
   resumeText = normalizeForPrompt(resumeText, MAX_RESUME_CHARS);
   jobText = normalizeForPrompt(jobText, MAX_JOB_TEXT_CHARS);
@@ -464,13 +485,15 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
       ? `\n\nCURSOS_DO_CANDIDATO (cadastrados no perfil, comprovados mesmo que não apareçam no currículo colado):\n- ${candidateContext.courses.join("\n- ")}`
       : "";
 
-  const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
+  const structuredBlock = resumeStructured ? structuredResumeSignalsBlock(resumeStructured) : "";
 
-  // Groq como provedor preferido: análise de currículo × vaga é o uso principal
-  // do produto, então fica com a cota reservada só pra ela. Só cai pros demais
-  // provedores se o Groq falhar ou estourar cota.
+  const userMessage = `CARGO DESEJADO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO DO CANDIDATO:\n${resumeText}${structuredBlock}${areaBlock}${coursesBlock}${feedbackBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
+
+  // Análise de currículo × vaga é o uso principal do produto: só Groq (todas as
+  // contas cadastradas) e, se todas estourarem cota/falharem, OpenAI como reserva
+  // paga. Nenhum outro provedor entra na fila para esta chamada.
   return runJsonPrompt<ResumeAnalysis>(
-    systemPrompt, userMessage, 0, 6000, undefined, resumeAnalysisSchema, "resume_analysis", "groq"
+    systemPrompt, userMessage, 0, 6000, undefined, resumeAnalysisSchema, "resume_analysis", "groq", ["groq", "openai"]
   );
 }
 

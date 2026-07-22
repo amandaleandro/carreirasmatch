@@ -6,31 +6,57 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
-export default async function GamesHubPage() {
+const GAMES = [
+  { id: "typer", label: "Speed Typer" },
+  { id: "quiz", label: "Show do Match" },
+  { id: "memory", label: "Termos Pareados" },
+  { id: "termo", label: "Termo" },
+  { id: "forca", label: "Forca Profissional" },
+  { id: "vf", label: "Verdadeiro ou Falso" },
+  { id: "ordenar", label: "Ordene o Processo" },
+  { id: "cacapalavras", label: "Caça-Palavras" },
+  { id: "curriculo", label: "Monte o Currículo" },
+] as const;
+
+export default async function GamesHubPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ game?: string }>;
+}) {
+  const { game: gameParam } = await searchParams;
+  const selectedGame = GAMES.some((g) => g.id === gameParam) ? gameParam! : GAMES[0].id;
+
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfYear = new Date(now.getFullYear(), 0, 1);
 
+  async function topScoresByUser(since: Date) {
+    const grouped = await prisma.gameScore.groupBy({
+      by: ["userId"],
+      where: { createdAt: { gte: since }, game: selectedGame },
+      _max: { score: true },
+      orderBy: { _max: { score: "desc" } },
+      take: 10,
+    });
+
+    const users = await prisma.user.findMany({
+      where: { id: { in: grouped.map((g) => g.userId) } },
+      select: { id: true, name: true },
+    });
+    const nameById = new Map(users.map((u) => [u.id, u.name]));
+
+    return grouped.map((g) => ({
+      id: g.userId,
+      score: g._max.score ?? 0,
+      user: { name: nameById.get(g.userId) ?? null },
+    }));
+  }
+
   const [dailyRank, monthlyRank, yearlyRank] = await Promise.all([
-    prisma.gameScore.findMany({
-      where: { createdAt: { gte: startOfDay } },
-      orderBy: { score: "desc" },
-      take: 10,
-      include: { user: { select: { name: true } } },
-    }),
-    prisma.gameScore.findMany({
-      where: { createdAt: { gte: startOfMonth } },
-      orderBy: { score: "desc" },
-      take: 10,
-      include: { user: { select: { name: true } } },
-    }),
-    prisma.gameScore.findMany({
-      where: { createdAt: { gte: startOfYear } },
-      orderBy: { score: "desc" },
-      take: 10,
-      include: { user: { select: { name: true } } },
-    }),
+    topScoresByUser(startOfDay),
+    topScoresByUser(startOfMonth),
+    topScoresByUser(startOfYear),
   ]);
 
   return (
@@ -226,7 +252,23 @@ export default async function GamesHubPage() {
             </p>
           </header>
 
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="flex flex-wrap justify-center gap-2">
+            {GAMES.map((g) => (
+              <Link
+                key={g.id}
+                href={`/jogos?game=${g.id}#rankings`}
+                className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold border transition-all ${
+                  selectedGame === g.id
+                    ? "bg-[#2563EB] border-[#2563EB] text-white"
+                    : "bg-white dark:bg-neutral-900/40 border-[#E2E8F0] dark:border-neutral-800 text-[#64748B] hover:border-[#2563EB]/50"
+                }`}
+              >
+                {g.label}
+              </Link>
+            ))}
+          </div>
+
+          <div id="rankings" className="grid gap-4 md:grid-cols-3">
             {/* Diário */}
             <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
               <h3 className="font-bold text-xs text-[#071827] dark:text-white flex items-center gap-2 border-b border-neutral-100 dark:border-neutral-850 pb-2.5 uppercase tracking-wider">

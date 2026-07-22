@@ -317,7 +317,7 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Nenhuma experiência prática ainda",
     ],
     careerNotes:
-      "Não há conselho regulador. Portfólio é o principal ativo de carreira — mais decisivo na contratação do que o diploma.",
+      "Não há conselho regulador. Portfólio é o principal ativo de carreira e mais decisivo na contratação do que o diploma.",
   },
   {
     slug: "administracao",
@@ -1052,7 +1052,7 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Nenhuma experiência prática ainda",
     ],
     careerNotes:
-      "Ingresso é majoritariamente via concurso público, com prova objetiva, teste físico, avaliação psicológica e formação em academia — diferente do processo seletivo de mercado privado das demais áreas.",
+      "Ingresso é majoritariamente via concurso público, com prova objetiva, teste físico, avaliação psicológica e formação em academia, diferente do processo seletivo de mercado privado das demais áreas.",
   },
 ];
 

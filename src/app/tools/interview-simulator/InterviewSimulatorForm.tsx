@@ -309,15 +309,23 @@ export function InterviewSimulatorForm() {
                 <button
                   type="button"
                   onClick={startSpeechRecognition}
-                  className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all cursor-pointer shadow-xs ${
                     isRecording
-                      ? "bg-red-500 text-white animate-pulse"
-                      : "bg-[#2563EB]/10 text-[#2563EB] hover:bg-[#2563EB]/15 border border-[#2563EB]/15"
+                      ? "bg-rose-600 text-white animate-pulse border border-rose-400 shadow-rose-500/30"
+                      : "bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/20"
                   }`}
                 >
-                  🎙️ {isRecording ? "Gravando..." : "Responder por voz"}
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  <span>{isRecording ? "🔴 Gravando voz (fale em voz alta)..." : "🎙️ Responder por voz com IA"}</span>
                 </button>
               </div>
+
+              {isRecording && (
+                <div className="rounded-xl border border-rose-300 dark:border-rose-900 bg-rose-50 dark:bg-rose-950/40 p-3 text-xs text-rose-700 dark:text-rose-300 font-semibold flex items-center gap-2 animate-pulse">
+                  <span className="shrink-0 text-base">🎤</span>
+                  <span>Ouvindo sua resposta em português... O texto aparecerá na caixa abaixo em tempo real.</span>
+                </div>
+              )}
               <textarea
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}

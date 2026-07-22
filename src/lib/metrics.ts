@@ -115,6 +115,28 @@ export const aiProviderDuration = getOrCreate(
     })
 );
 
+export const freeAnalysisLimitHit = getOrCreate(
+  "carreiras_free_analysis_limit_hit_total",
+  () =>
+    new Counter({
+      name: "carreiras_free_analysis_limit_hit_total",
+      help: "Vezes que um usuário sem assinatura bateu no limite de análises grátis (diário ou mensal)",
+      labelNames: ["reason"] as const,
+      registers: [registry],
+    })
+);
+
+export const freeToolTrial = getOrCreate(
+  "carreiras_free_tool_trial_total",
+  () =>
+    new Counter({
+      name: "carreiras_free_tool_trial_total",
+      help: "Resultado de tentativas de uso das ferramentas accountFree (1 uso grátis por ferramenta)",
+      labelNames: ["tool", "outcome"] as const,
+      registers: [registry],
+    })
+);
+
 export const paymentEvents = getOrCreate(
   "carreiras_payment_events_total",
   () =>
@@ -293,6 +315,7 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     applicationGroups,
     paymentGroups,
     companyPaymentGroups,
+    freeToolUsageGroups,
     databaseRows,
     periodSnapshots,
     topPaths,
@@ -327,6 +350,7 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
       _count: { _all: true },
       _sum: { amount: true },
     }),
+    prisma.freeToolUsage.groupBy({ by: ["tool"], _count: { _all: true } }),
     prisma.$queryRaw<DatabaseStatsRow[]>`
       SELECT
         pg_database_size(current_database())::bigint AS database_bytes,
@@ -536,6 +560,12 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
   for (const group of companyPaymentGroups) {
     businessBreakdown.set(
       { metric: "company_payment_status", value: group.status },
+      group._count._all
+    );
+  }
+  for (const group of freeToolUsageGroups) {
+    businessBreakdown.set(
+      { metric: "free_tool_usage", value: group.tool },
       group._count._all
     );
   }

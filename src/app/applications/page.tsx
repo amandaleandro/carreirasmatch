@@ -14,6 +14,8 @@ import {
 } from "./actions";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
 
+import { ApplicationsKanban } from "@/components/applications-kanban";
+
 export const dynamic = "force-dynamic";
 
 function percent(done: number, target: number) {
@@ -72,8 +74,6 @@ export default async function ApplicationsPage() {
     ["interview", "technical_test", "offer"].includes(item.status)
   ).length;
 
-  // Dynamic deadline countdown intentionally uses the current clock on each request.
-  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const upcomingDeadlines = applications
     .filter((item) => item.deadline && item.deadline.getTime() >= now)
@@ -123,24 +123,30 @@ export default async function ApplicationsPage() {
   ];
 
   return (
-    <main className="px-4 md:px-8 py-6 max-w-5xl mx-auto w-full space-y-5 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-4">
+    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8 font-sans">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/15">
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
             Pipeline de Vagas
           </span>
-          <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white mt-1">Candidaturas</h1>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Acompanhe suas vagas salvas, processos seletivos e entrevistas em um só lugar.
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Candidaturas</h1>
+          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+            Gerencie visualmente suas candidaturas por etapa do processo seletivo.
           </p>
         </div>
         <Link
           href="/feed"
-          className="inline-flex items-center justify-center rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-[#2563EB]/25 transition-all text-center shrink-0"
+          className="inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all shrink-0"
         >
           Buscar vagas no feed
         </Link>
       </div>
+
+      {/* Kanban Board Visual */}
+      <section className="space-y-4">
+        <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Quadro Kanban de Processos</h2>
+        <ApplicationsKanban items={applications} />
+      </section>
 
       {/* Jornada de Busca */}
       <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">

@@ -63,7 +63,7 @@ export const COURSE_CATALOG: CourseCatalogEntry[] = [
   { title: "Marketing Digital", provider: "Google Ateliê Digital", free: true, areas: ["marketing digital", "vendedor", "tecnologia", "social media"] },
   { title: "Comunicação, Cidadania e Tecnologia Básica", provider: "Escola Virtual Gov", free: true, areas: ["tecnologia", "administrativo"] },
 
-  // Áreas de nível superior (ensino/vestibular vocacional) — complementa as trilhas
+  // Áreas de nível superior (ensino/vestibular vocacional), complementa as trilhas
   // acima, que eram focadas em ofícios e Jovem Aprendiz.
   { title: "Programação para Iniciantes", provider: "Coursera", free: true, areas: ["ti", "tecnologia da informacao"] },
   { title: "Fundamentos de Cloud Computing", provider: "Microsoft Learn", free: true, areas: ["ti", "tecnologia da informacao"] },

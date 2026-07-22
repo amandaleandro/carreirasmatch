@@ -116,7 +116,7 @@ export function Topbar({
       {mobileNavOpen && (
         <div className="md:hidden fixed inset-0 z-30 bg-neutral-950/40 backdrop-blur-sm" onClick={() => setMobileNavOpen(false)}>
           <nav 
-            className="w-64 h-full bg-[#0b1526] text-white p-5 flex flex-col justify-between border-r border-white/5"
+            className="w-64 h-full bg-[#071827] text-white p-5 flex flex-col justify-between border-r border-slate-800/80"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-6">
