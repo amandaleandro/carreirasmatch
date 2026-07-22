@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Handshake, Building2, Globe, Mail, Lock, FileText, ArrowRight, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
 
 export default function PartnerRegisterPage() {
@@ -44,11 +45,6 @@ export default function PartnerRegisterPage() {
     }
   }
 
-  const inputClass =
-    "w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-white/10 dark:bg-white/[0.03]";
-  const labelClass =
-    "block text-xs font-semibold text-neutral-500 dark:text-slate-400 uppercase tracking-wider";
-
   return (
     <AuthShell
       eyebrow="Para parceiros"
@@ -56,52 +52,141 @@ export default function PartnerRegisterPage() {
       description="Anuncie no nosso portal e alcance milhares de profissionais buscando qualificação para o mercado."
       highlights={["Destaque seus cursos no feed", "Painel exclusivo de cliques", "Checkout fácil via Mercado Pago"]}
     >
-      <header className="mb-8 text-center lg:text-left">
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">Cadastrar como parceiro</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2 text-sm">Crie seu perfil e divulgue seus produtos hoje mesmo.</p>
-      </header>
+      <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xl shadow-slate-900/5 p-6 sm:p-8 space-y-6">
+        {/* Card Header inside the card */}
+        <div className="flex items-center gap-3.5 pb-5 border-b border-slate-100 dark:border-slate-800">
+          <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/20 shadow-inner shrink-0">
+            <Handshake className="w-6 h-6" />
+          </div>
+          <div>
+            <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2 py-0.5 rounded border border-blue-200/50 dark:border-blue-900/50 mb-1">
+              <ShieldCheck className="w-3 h-3" />
+              Portal do Parceiro
+            </span>
+            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white leading-tight">
+              Cadastrar como parceiro
+            </h1>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Divulgue seus produtos hoje mesmo.</p>
+          </div>
+        </div>
 
-      <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 shadow-lg shadow-slate-900/5 p-6 md:p-8">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className={labelClass}>Nome da Organização / Escola</label>
-            <input type="text" required minLength={2} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
-          </div>
-          <div className="space-y-1.5">
-            <label className={labelClass}>CNPJ (opcional)</label>
-            <input type="text" value={cnpj} onChange={(e) => setCnpj(e.target.value)} className={inputClass} />
-          </div>
-          <div className="space-y-1.5">
-            <label className={labelClass}>Website Oficial (opcional)</label>
-            <input type="url" placeholder="https://" value={website} onChange={(e) => setWebsite(e.target.value)} className={inputClass} />
-          </div>
-          <div className="space-y-1.5">
-            <label className={labelClass}>E-mail de Contato</label>
-            <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} />
-          </div>
-          <div className="space-y-1.5">
-            <label className={labelClass}>Senha</label>
-            <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} />
-            <p className="text-xs text-neutral-500">Mínimo de 8 caracteres.</p>
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Nome da Organização / Escola
+            </label>
+            <div className="relative">
+              <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                required
+                minLength={2}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ex: Escola EduCarreiras"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 pl-10 pr-3.5 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              />
+            </div>
           </div>
 
-          {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              CNPJ (opcional)
+            </label>
+            <div className="relative">
+              <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="text"
+                value={cnpj}
+                onChange={(e) => setCnpj(e.target.value)}
+                placeholder="00.000.000/0000-00"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 pl-10 pr-3.5 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Website Oficial (opcional)
+            </label>
+            <div className="relative">
+              <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="url"
+                placeholder="https://suaescola.com.br"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 pl-10 pr-3.5 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              E-mail de Contato
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="contato@suaescola.com.br"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 pl-10 pr-3.5 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Senha de Acesso
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mínimo 8 caracteres"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50 pl-10 pr-3.5 py-3 text-sm text-slate-900 dark:text-white outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-blue-500/10 transition-all"
+              />
+            </div>
+          </div>
+
+          {error && (
+            <div className="rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50 dark:bg-rose-950/30 p-3 text-xs font-semibold text-rose-600 dark:text-rose-400">
+              {error}
+            </div>
+          )}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 disabled:opacity-50"
+            className="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-6 py-3.5 text-sm font-bold shadow-md shadow-blue-500/20 transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2"
           >
-            {loading ? "Criando conta..." : "Criar conta de parceiro"}
+            <span>{loading ? "Criando conta..." : "Criar conta de parceiro"}</span>
+            <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        <p className="text-sm text-center text-neutral-600 dark:text-neutral-400 mt-5">
-          Já tem conta de parceiro?{" "}
-          <Link href="/parceiro/login" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-            Entrar
-          </Link>
-        </p>
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center space-y-2">
+          <p className="text-xs text-slate-600 dark:text-slate-400">
+            Já tem conta de parceiro?{" "}
+            <Link href="/parceiro/login" className="font-bold text-blue-600 dark:text-blue-400 hover:underline">
+              Entrar
+            </Link>
+          </p>
+
+          <p className="text-[11px] text-slate-400">
+            É um candidato?{" "}
+            <Link href="/register" className="font-semibold text-slate-600 dark:text-slate-300 hover:underline">
+              Criar conta de candidato
+            </Link>
+          </p>
+        </div>
       </div>
     </AuthShell>
   );
