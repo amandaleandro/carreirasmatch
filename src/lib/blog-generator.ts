@@ -46,7 +46,8 @@ const SYSTEM_PROMPT = `Você é um redator de conteúdo de carreira brasileiro, 
 
 REGRAS:
 1. Escolha UM tema específico e prático dentro da área informada, focado num problema/dúvida concreto de quem está entrando ou crescendo nela. Nunca escreva um artigo genérico "sobre a área".
-2. VARIE o ângulo do artigo. Não use sempre o mesmo formato: alterne entre, por exemplo, como se preparar para entrevista, erros comuns e como evitá-los, o dia a dia real da função, como decidir entre subáreas, tendências e habilidades em alta, transição de outra área, primeiros 90 dias no cargo, como negociar salário/proposta, o que estudar e por onde começar, mitos da profissão. NÃO escreva mais um artigo de "como montar portfólio/currículo" a menos que o tema realmente peça. Esse formato já está saturado no blog.
+2. VARIE o ângulo do artigo. Não use sempre o mesmo formato: alterne entre, por exemplo, como se preparar para entrevista/prova, erros comuns e como evitá-los, o dia a dia real da função, como decidir entre subáreas, tendências e habilidades em alta, transição de outra área, primeiros 90 dias no cargo, como negociar salário/proposta, o que estudar e por onde começar, mitos da profissão. NÃO escreva mais um artigo de "como montar portfólio/currículo" a menos que o tema realmente peça. Esse formato já está saturado no blog.
+2b. RESPEITE A MECÂNICA REAL DA PROFISSÃO (ver NOTAS_DE_CARREIRA abaixo): se a área exige conselho profissional, exame de ordem, concurso público ou residência, ancore os conselhos nisso em vez de receitas genéricas de mercado de tecnologia/startup. Vocabulário como "portfólio no GitHub", "stack", "sprint" ou "montar portfólio" só cabe em áreas onde isso é como o mercado realmente contrata (ex: TI, Design, Marketing, Audiovisual, Artes, Moda) — não em profissões regulamentadas por conselho/concurso/residência (ex: Medicina, Direito, Engenharia, Enfermagem), onde o caminho real é outro.
 3. Não repita nenhum dos temas nem o formato dos títulos listados em TEMAS_JA_PUBLICADOS. Se todos os títulos recentes começam com o mesmo padrão ("Como montar...", "Descubra..."), use uma abertura diferente.
 4. Profundidade real: cada seção deve trazer informação concreta, exemplos práticos e passos acionáveis, sem frases genéricas. Evite abertura formulaica; comece pelo problema real do leitor, não por "No mundo de hoje..." ou "O mercado está em constante mudança".
 5. Tom direto, encorajador e sem enrolação. Sem clichês vazios.
@@ -64,7 +65,9 @@ export async function generateBlogPost(
       ? `\n\nTEMAS_JA_PUBLICADOS (não repetir nenhum destes):\n- ${recentTitles.join("\n- ")}`
       : "";
 
-  const userMessage = `ÁREA: ${area.label}\nDESCRIÇÃO DA ÁREA: ${area.description}\nSUBÁREAS: ${area.subareas.join(", ")}${recentBlock}
+  const careerNotesBlock = area.careerNotes ? `\nNOTAS_DE_CARREIRA: ${area.careerNotes}` : "";
+
+  const userMessage = `ÁREA: ${area.label}\nDESCRIÇÃO DA ÁREA: ${area.description}\nSUBÁREAS: ${area.subareas.join(", ")}${careerNotesBlock}${recentBlock}
 
 Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo exatamente este formato:
 {

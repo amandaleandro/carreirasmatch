@@ -6,7 +6,8 @@ import Link from "next/link";
 type Result = {
   suggestedHeadline: string;
   suggestedAbout: string;
-  suggestedGithubBio: string;
+  suggestedPortfolioBio: string;
+  portfolioPlatform: string;
   projectHighlights: string[];
   nextSteps: string[];
 };
@@ -63,8 +64,8 @@ export function ProfileFromScratchForm() {
           Monte seu perfil do zero
         </h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Ainda não tem LinkedIn ou GitHub? Conte sua formação, projetos e habilidades e receba
-          um rascunho pronto para criar os dois perfis.
+          Ainda não tem LinkedIn ou portfólio online? Conte sua formação, projetos e habilidades e
+          receba um rascunho pronto para criar os dois perfis.
         </p>
       </header>
 
@@ -141,13 +142,13 @@ export function ProfileFromScratchForm() {
             </p>
           </div>
           <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-            <h3 className="font-semibold mb-3">Bio sugerida (GitHub)</h3>
+            <h3 className="font-semibold mb-3">Bio sugerida ({result.portfolioPlatform})</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300">
-              {result.suggestedGithubBio}
+              {result.suggestedPortfolioBio}
             </p>
           </div>
           <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-            <h3 className="font-semibold mb-3">Como destacar seus projetos no GitHub</h3>
+            <h3 className="font-semibold mb-3">Como destacar seus projetos no {result.portfolioPlatform}</h3>
             <ul className="space-y-2 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
               {result.projectHighlights.map((p, i) => (
                 <li key={i}>{p}</li>

@@ -90,7 +90,7 @@ const TRACK_LABELS: Record<CareerTrack, string> = {
 
 const TRACK_GUIDANCE: Record<CareerTrack, string> = {
   internship: `ESTÁGIO/PRIMEIRO EMPREGO:
-  - Não penalize falta de experiência formal; TCC, cursos, projetos pessoais e GitHub contam.
+  - Não penalize falta de experiência formal; TCC, cursos, projetos pessoais e voluntariado contam (GitHub só se a vaga for de TI/dados).
   - experienceScore: potencial e base de aprendizado, não anos de empresa. Só penalize se não houver prática nenhuma.
   - seniorityScore: só avalie compatibilidade com estágio/júnior; vaga sênior = vaga errada (sinalize em applicationStatusReason), sem penalizar falta de liderança.
   - Se cursando: matérias, trabalhos em grupo, iniciação científica e monitoria contam como evidência técnica.
@@ -514,6 +514,8 @@ export type ProfileSuggestionItem = {
   gapAddressed?: string;
   /** Só para "course": "online" | "presencial" | "híbrido". */
   modality?: string;
+  /** Só para course presencial: cidade onde ele acontece. */
+  city?: string;
 };
 
 export type ProfileSuggestionsResult = {
@@ -532,13 +534,16 @@ REGRAS:
 7. "impactReason": 1 frase curta e específica citando a lacuna/objetivo que o item resolve. Nunca genérico como "melhora seu currículo".
 8. "gapAddressed": nome curto da lacuna ou objetivo concreto que o item resolve (ex: "Excel avançado", "Inglês técnico", "Base em contabilidade"). Use, quando possível, um termo de LACUNAS_PRIORITARIAS.
 9. "modality" (apenas para "course"): "online", "presencial" ou "híbrido". Respeite a modalidade indicada em OPCOES_CURADAS quando usar uma delas; para os demais, use "online" se não tiver certeza.
-10. Ordene "suggestions" por impactScore decrescente.
-11. Responda apenas em português do Brasil.`;
+10. Cursos presenciais só fazem sentido se acontecerem na cidade/estado do candidato (REGIAO_DO_CANDIDATO). Priorize as opções presenciais de OPCOES_CURADAS que estejam nessa região; se não houver nenhuma opção presencial confiável ali, prefira sugerir "online" em vez de presencial em outra cidade. Quando sugerir presencial, preencha "city" com a cidade.
+11. Ordene "suggestions" por impactScore decrescente.
+12. Responda apenas em português do Brasil.`;
 
 export async function generateProfileSuggestions(input: {
   professionalArea?: string | null;
   careerSegment?: string | null;
   hasFormalEducation?: boolean | null;
+  city?: string | null;
+  state?: string | null;
   topSkillGaps: string[];
   knownSkills: string[];
   completedCourses: string[];
@@ -563,6 +568,7 @@ export async function generateProfileSuggestions(input: {
       "impactReason": string (1 frase curta e específica),
       "gapAddressed": string (lacuna/objetivo curto que o item resolve),
       "modality": string (só para course: "online" | "presencial" | "híbrido"),
+      "city": string (só para course presencial: cidade onde acontece),
       "url": string (Se você escolher um curso das OPCOES_CURADAS que tem Link, você DEVE retornar exatamente a mesma URL correspondente. Caso contrário, omita o campo)
     }
   ]
@@ -577,6 +583,8 @@ export async function generateProfileSuggestions(input: {
   const areaBlock = input.professionalArea
     ? `\n\nÁREA DE ATUAÇÃO DO CANDIDATO: ${input.professionalArea}`
     : "";
+  const regionLabel = [input.city, input.state].filter(Boolean).join(" - ");
+  const regionBlock = regionLabel ? `\n\nREGIAO_DO_CANDIDATO: ${regionLabel}` : "";
   const segmentBlock = segmentLabel
     ? `\n\nMOMENTO_PROFISSIONAL: ${segmentLabel}`
     : "";
@@ -620,7 +628,7 @@ export async function generateProfileSuggestions(input: {
   // fazendo parecer que o botão não pesquisa. O nonce muda a chave de cache (garante
   // resposta nova) e ainda instrui o modelo a variar a seleção.
   const varietyBlock = `\n\nID_DESTA_SOLICITACAO: ${randomUUID()} (varie a seleção em relação a gerações anteriores; não repita exatamente as mesmas sugestões).`;
-  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${segmentBlock}${guidanceBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}${varietyBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
+  const userMessage = `Gere sugestões de melhoria de perfil para este candidato.${areaBlock}${regionBlock}${segmentBlock}${guidanceBlock}${educationBlock}${gapsBlock}${knownBlock}${completedBlock}${curatedBlock}${varietyBlock}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
 
   // Cerebras como provedor preferido: sugestão de perfil é uma ferramenta mais
   // simples que a análise principal, mesma categoria das ferramentas de tools.ts.

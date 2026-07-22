@@ -6,6 +6,7 @@ import { CircularScore } from "@/components/circular-score";
 import { TRACK_LABELS, CareerTrack } from "@/components/analysis-display";
 import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segments";
 import { toolsForSegment } from "@/lib/tools-catalog";
+import { matchAreaSlug } from "@/lib/vocation-areas";
 import { computeJourneyMetrics } from "@/lib/applications";
 import { formatBrazilDate, formatBrazilDateTime } from "@/lib/brazil";
 import { Trophy } from "lucide-react";
@@ -31,7 +32,10 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "desc" },
       include: { resume: true },
     }),
-    prisma.user.findUnique({ where: { id: session.user.id }, select: { careerSegment: true } }),
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { careerSegment: true, professionalArea: true },
+    }),
     prisma.softSkillTestResult.findFirst({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
@@ -76,7 +80,8 @@ export default async function DashboardPage() {
   });
   const journey = computeJourneyMetrics(allApplicationsForMetrics);
   const segment = normalizeCareerSegment(user?.careerSegment);
-  const { recommended: recommendedTools } = toolsForSegment(segment);
+  const userAreaSlug = matchAreaSlug(user?.professionalArea);
+  const { recommended: recommendedTools } = toolsForSegment(segment, userAreaSlug);
   const topRecommendedTool = recommendedTools[0];
 
   const firstName = (session.user.name ?? session.user.email ?? "").split(" ")[0];

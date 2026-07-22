@@ -910,7 +910,7 @@ export function ResumeOptimizer({
               label="Certificações"
               items={certifications}
               onChange={setCertifications}
-              placeholder="Ex: AWS Cloud Practitioner..."
+              placeholder="Ex: certificação profissional, curso de extensão..."
             />
 
             <div className="flex justify-end">

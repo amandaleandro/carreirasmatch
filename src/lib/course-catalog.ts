@@ -62,6 +62,87 @@ export const COURSE_CATALOG: CourseCatalogEntry[] = [
   { title: "Fundamentos de Tecnologia e Produtividade", provider: "Microsoft Learn", free: true, areas: ["tecnologia", "ti", "programador", "programadora"] },
   { title: "Marketing Digital", provider: "Google Ateliê Digital", free: true, areas: ["marketing digital", "vendedor", "tecnologia", "social media"] },
   { title: "Comunicação, Cidadania e Tecnologia Básica", provider: "Escola Virtual Gov", free: true, areas: ["tecnologia", "administrativo"] },
+
+  // Áreas de nível superior (ensino/vestibular vocacional) — complementa as trilhas
+  // acima, que eram focadas em ofícios e Jovem Aprendiz.
+  { title: "Programação para Iniciantes", provider: "Coursera", free: true, areas: ["ti", "tecnologia da informacao"] },
+  { title: "Fundamentos de Cloud Computing", provider: "Microsoft Learn", free: true, areas: ["ti", "tecnologia da informacao"] },
+
+  { title: "Suporte Básico de Vida (BLS)", provider: "Cruz Vermelha Brasileira", free: false, areas: ["medicina"] },
+  { title: "Preparatório para Residência Médica", provider: "Sanar Medicina", free: false, areas: ["medicina"] },
+
+  { title: "Preparatório para o Exame da OAB", provider: "Estratégia OAB", free: false, areas: ["direito"] },
+  { title: "Introdução ao Direito Digital", provider: "FGV Online", free: true, areas: ["direito"] },
+
+  { title: "Introdução à Engenharia de Produção", provider: "Coursera", free: true, areas: ["engenharia"] },
+  { title: "AutoCAD Básico", provider: "SENAI", free: false, areas: ["engenharia", "arquitetura"] },
+
+  { title: "Metodologias Ativas em Sala de Aula", provider: "Nova Escola", free: true, areas: ["educacao"] },
+  { title: "Gestão Escolar na Prática", provider: "Fundação Bradesco", free: true, areas: ["educacao"] },
+
+  { title: "Marketing Digital para Negócios", provider: "Google Ateliê Digital", free: true, areas: ["marketing"] },
+  { title: "Fundamentos de Growth e Performance", provider: "Coursera", free: true, areas: ["marketing"] },
+
+  { title: "Introdução ao UX/UI Design", provider: "Coursera", free: true, areas: ["design"] },
+  { title: "Figma na Prática", provider: "Alura", free: false, areas: ["design"] },
+
+  { title: "Fundamentos de Administração", provider: "Fundação Bradesco", free: true, areas: ["administracao"] },
+  { title: "Gestão de Projetos na Prática", provider: "FGV Online", free: true, areas: ["administracao"] },
+
+  { title: "Excel Avançado para Finanças", provider: "Fundação Bradesco", free: true, areas: ["financas"] },
+  { title: "Preparatório para o Exame de Suficiência (CFC)", provider: "Gran Cursos Online", free: false, areas: ["financas"] },
+
+  { title: "Redação Jornalística na Prática", provider: "Coursera", free: true, areas: ["comunicacao"] },
+  { title: "Produção de Conteúdo Digital", provider: "Google Ateliê Digital", free: true, areas: ["comunicacao"] },
+
+  { title: "Técnico em Enfermagem", provider: "SENAC", free: false, areas: ["enfermagem"] },
+  { title: "Atualização em Procedimentos de Enfermagem", provider: "Sanar Enfermagem", free: false, areas: ["enfermagem"] },
+
+  { title: "Atualização em Odontologia Estética", provider: "Sanar Odontologia", free: false, areas: ["odontologia"] },
+
+  { title: "Farmácia Clínica na Prática", provider: "Sanar Farmácia", free: false, areas: ["farmacia"] },
+
+  { title: "Fisioterapia Baseada em Evidências", provider: "Sanar Fisioterapia", free: false, areas: ["fisioterapia"] },
+
+  { title: "Nutrição Esportiva na Prática", provider: "Sanar Nutrição", free: false, areas: ["nutricao"] },
+
+  { title: "Introdução à Terapia Cognitivo-Comportamental", provider: "Coursera", free: true, areas: ["psicologia"] },
+  { title: "Psicologia Organizacional na Prática", provider: "FGV Online", free: true, areas: ["psicologia"] },
+
+  { title: "Manejo Clínico de Pequenos Animais", provider: "Sanar Veterinária", free: false, areas: ["veterinaria"] },
+
+  { title: "Prescrição de Treino e Avaliação Física", provider: "SENAC", free: false, areas: ["educacao fisica"] },
+
+  { title: "Revit para Arquitetura", provider: "SENAI", free: false, areas: ["arquitetura"] },
+  { title: "Introdução ao Urbanismo", provider: "Coursera", free: true, areas: ["arquitetura"] },
+
+  { title: "Introdução à Bioinformática", provider: "Coursera", free: true, areas: ["biologicas", "ciencias biologicas"] },
+
+  { title: "Boas Práticas Agrícolas", provider: "SENAR", free: false, areas: ["agronomia"] },
+
+  { title: "Estatística Aplicada com Excel", provider: "Fundação Bradesco", free: true, areas: ["exatas"] },
+  { title: "Preparatório para Concursos de Exatas", provider: "Gran Cursos Online", free: false, areas: ["exatas"] },
+
+  { title: "Tradução e Versão de Textos", provider: "Coursera", free: true, areas: ["letras"] },
+  { title: "Revisão de Texto na Prática", provider: "Alura", free: false, areas: ["letras"] },
+
+  { title: "Geoprocessamento e Cartografia Básica", provider: "Coursera", free: true, areas: ["humanas"] },
+  { title: "Preparatório para Concursos de Humanas", provider: "Gran Cursos Online", free: false, areas: ["humanas"] },
+
+  { title: "Políticas Públicas Sociais", provider: "FGV Online", free: true, areas: ["servico social", "relacoes internacionais"] },
+  { title: "Preparatório para o Instituto Rio Branco", provider: "Estratégia Diplomacia", free: false, areas: ["relacoes internacionais"] },
+
+  { title: "Produção Cultural na Prática", provider: "Coursera", free: true, areas: ["artes"] },
+
+  { title: "Modelagem e Costura para Estilismo", provider: "SENAI", free: false, areas: ["moda"] },
+
+  { title: "Gestão de Restaurantes e Bares", provider: "SENAC", free: false, areas: ["gastronomia", "turismo", "hotelaria"] },
+  { title: "Guia de Turismo: Cadastur na Prática", provider: "Sebrae", free: true, areas: ["turismo"] },
+
+  { title: "Edição de Vídeo na Prática", provider: "Alura", free: false, areas: ["audiovisual"] },
+  { title: "Roteiro para Audiovisual", provider: "Coursera", free: true, areas: ["audiovisual"] },
+
+  { title: "Preparatório para Concursos de Segurança Pública", provider: "Gran Cursos Online", free: false, areas: ["seguranca publica"] },
 ];
 
 export function getCoursesForArea(area: string | null | undefined): CourseCatalogEntry[] {

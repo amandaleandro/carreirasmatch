@@ -19,6 +19,13 @@ export type ToolCatalogEntry = {
   icon: ToolIcon;
   color: ToolColor;
   /**
+   * Restringe a ferramenta a slugs de VOCATION_AREAS específicos (ex: ["ti", "exatas"]
+   * para a Análise de GitHub). Omitido = relevante para qualquer área. Só filtra o
+   * usuário para fora quando a área dele é conhecida e não bate com nenhum item da
+   * lista; sem sinal de área, a ferramenta continua aparecendo (evita esconder por engano).
+   */
+  areas?: string[];
+  /**
    * Ferramenta aberta: sem login e sem assinatura, indexável pelo Google e com
    * anúncio. Inclui guias e utilidades locais que não custam chamada de IA.
    *
@@ -150,6 +157,7 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     segments: ["first_job", "internship", "student", "career_change"],
     icon: "github",
     color: "indigo",
+    areas: ["ti", "exatas"],
   },
   {
     href: "/tools/compare-jobs",
@@ -334,11 +342,17 @@ export function isFreeTool(href: string): boolean {
   return TOOLS_CATALOG.some((t) => t.href === href && t.free);
 }
 
-export function toolsForSegment(segment: string | CareerSegment | null | undefined) {
+export function toolsForSegment(
+  segment: string | CareerSegment | null | undefined,
+  userAreaSlug?: string | null
+) {
+  const areaFiltered = TOOLS_CATALOG.filter(
+    (t) => !t.areas || !userAreaSlug || t.areas.includes(userAreaSlug)
+  );
   const normalizedSegment = normalizeCareerSegment(segment);
-  if (!normalizedSegment) return { recommended: [] as ToolCatalogEntry[], others: TOOLS_CATALOG };
+  if (!normalizedSegment) return { recommended: [] as ToolCatalogEntry[], others: areaFiltered };
   return {
-    recommended: TOOLS_CATALOG.filter((t) => t.segments.includes(normalizedSegment)),
-    others: TOOLS_CATALOG.filter((t) => !t.segments.includes(normalizedSegment)),
+    recommended: areaFiltered.filter((t) => t.segments.includes(normalizedSegment)),
+    others: areaFiltered.filter((t) => !t.segments.includes(normalizedSegment)),
   };
 }

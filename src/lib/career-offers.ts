@@ -134,14 +134,14 @@ export const CAREER_OFFERS: CareerOffer[] = [
       "Plano de estudo",
       "Simulado de entrevista",
       "Sugestão de portfólio",
-      "Perguntas técnicas básicas",
+      "Perguntas básicas da área",
       "Acompanhamento de candidaturas",
     ],
     monthlyFeatures: [
       "Até 80 análises de vaga",
       "Currículo por vaga",
       "Plano de estudos por requisito",
-      "Simulado de entrevista técnica básica",
+      "Simulado de entrevista básico da área",
     ],
     retentionFeatures: [
       "Transformador de matérias e projetos em experiência",

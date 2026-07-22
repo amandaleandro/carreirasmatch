@@ -38,13 +38,6 @@ function ChatIcon({ className }: { className?: string }) {
     </svg>
   );
 }
-function CodeIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="m9 8-4 4 4 4M15 8l4 4-4 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 function ShieldIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
@@ -309,7 +302,7 @@ export function InterviewPrep({
             {latestFeedback ? (
               <div className="space-y-4">
                 <ScoreRow icon={ChatIcon} label="Clareza" value={latestFeedback.clarity} />
-                <ScoreRow icon={CodeIcon} label="Profundidade técnica" value={latestFeedback.technicalDepth} />
+                <ScoreRow icon={BulbIcon} label="Domínio da área" value={latestFeedback.technicalDepth} />
                 <ScoreRow icon={ShieldIcon} label="Confiança" value={latestFeedback.confidence} />
               </div>
             ) : (

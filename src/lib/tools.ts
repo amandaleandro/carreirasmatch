@@ -639,7 +639,8 @@ export type ProfileFromScratchInput = {
 export type ProfileFromScratchResult = {
   suggestedHeadline: string;
   suggestedAbout: string;
-  suggestedGithubBio: string;
+  suggestedPortfolioBio: string;
+  portfolioPlatform: string;
   projectHighlights: string[];
   nextSteps: string[];
 };
@@ -647,14 +648,16 @@ export type ProfileFromScratchResult = {
 export async function generateProfileFromScratch(
   input: ProfileFromScratchInput
 ): Promise<ProfileFromScratchResult> {
-  const systemPrompt = `Você é um especialista em carreira ajudando alguém que ainda NÃO tem perfil no LinkedIn nem no GitHub a criar os dois do zero, a partir de formação, projetos e habilidades informados.
+  const systemPrompt = `Você é um especialista em carreira ajudando alguém que ainda NÃO tem um perfil profissional online, de qualquer área (tecnologia, saúde, direito, educação, design, marketing etc.), a montá-lo do zero a partir de formação, projetos e habilidades informados.
 ${BASE_RULES}
+IMPORTANTE: primeiro identifique, pelo CARGO-ALVO e pelas HABILIDADES informadas, se a pessoa é de uma área de tecnologia/dados (aí a plataforma de portfólio certa é GitHub) ou de outra área (aí a plataforma certa é outra: Behance/site pessoal para Design, ResearchGate/Lattes para pesquisa acadêmica, site pessoal/blog para a maioria das demais áreas, ou simplesmente reforçar o próprio LinkedIn quando não há uma plataforma de portfólio padrão). NÃO assuma GitHub por padrão.
 Formato de resposta:
 {
   "suggestedHeadline": string (headline de LinkedIn pronta para usar, curta e objetiva),
   "suggestedAbout": string (texto para a seção "sobre" do LinkedIn, 3-5 frases),
-  "suggestedGithubBio": string (bio curta de perfil do GitHub, 1-2 frases),
-  "projectHighlights": string[] (2-5 sugestões de como nomear/descrever os projetos informados como repositórios do GitHub, um item por projeto),
+  "portfolioPlatform": string (nome curto da plataforma de portfólio mais adequada à área da pessoa, ex: "GitHub", "Behance", "site pessoal", "Lattes/ResearchGate"),
+  "suggestedPortfolioBio": string (bio curta para essa plataforma, 1-2 frases, coerente com "portfolioPlatform"),
+  "projectHighlights": string[] (2-5 sugestões de como nomear/descrever os projetos/trabalhos informados como itens de portfólio na plataforma escolhida, um item por projeto),
   "nextSteps": string[] (3-5 passos práticos para criar as contas e publicar o conteúdo, ex: "crie a conta em linkedin.com e cole a headline sugerida")
 }`;
 
@@ -799,13 +802,13 @@ export type JobSearchKeywords = {
 };
 
 export async function extractJobSearchKeywords(resumeText: string): Promise<JobSearchKeywords> {
-  const systemPrompt = `Você é um especialista em recrutamento técnico. A partir de um currículo, identifique o cargo mais adequado para essa pessoa buscar agora e as principais palavras-chave técnicas, para usar como termos de busca em APIs de vagas.
+  const systemPrompt = `Você é um especialista em recrutamento generalista, que atende candidatos de qualquer área profissional (tecnologia, saúde, direito, educação, administração, design etc.). A partir de um currículo, identifique o cargo mais adequado para essa pessoa buscar agora e as principais palavras-chave/skills centrais da área dela, para usar como termos de busca em APIs de vagas.
 ${BASE_RULES}
 Formato de resposta:
 {
-  "titleEn": string (o cargo mais adequado, em inglês, curto e comum em portais de vaga internacionais, ex: "Backend Developer", "Data Analyst"),
-  "titlePt": string (o mesmo cargo, em português, como apareceria em portais de vaga brasileiros, ex: "Desenvolvedor Backend", "Analista de Dados"),
-  "keywords": string[] (3 a 6 tecnologias/skills técnicas centrais do currículo, em inglês, como aparecem em vagas, ex: ["Python", "SQL", "AWS"])
+  "titleEn": string (o cargo mais adequado, em inglês, curto e comum em portais de vaga internacionais, ex: "Backend Developer", "Registered Nurse", "Legal Assistant"),
+  "titlePt": string (o mesmo cargo, em português, como apareceria em portais de vaga brasileiros, ex: "Desenvolvedor Backend", "Enfermeiro", "Assistente Jurídico"),
+  "keywords": string[] (3 a 6 skills/competências centrais do currículo na língua em que costumam aparecer em vagas dessa área — em inglês para termos técnicos internacionais de TI, em português para as demais áreas, ex: ["Python", "SQL", "AWS"] para TI, ["Direito Trabalhista", "Rotinas Cartorárias"] para Direito)
 }`;
 
   const userMessage = `CURRÍCULO:\n${truncate(resumeText, MAX_RESUME_CHARS)}`;
@@ -837,7 +840,7 @@ export async function getInterviewFeedbackBatch(
   qas: { question: string; answer: string }[],
   jobTitle: string
 ): Promise<InterviewFeedbackResult[]> {
-  const systemPrompt = `Você é um treinador de entrevistas de emprego para vagas de tecnologia, direto e construtivo. Você vai avaliar várias respostas de uma mesma simulação de entrevista de uma vez só.
+  const systemPrompt = `Você é um treinador de entrevistas de emprego direto e construtivo, que atende candidatos de qualquer área profissional (tecnologia, saúde, direito, educação, administração, design etc.). Você vai avaliar várias respostas de uma mesma simulação de entrevista de uma vez só, calibrando os critérios ao que a VAGA realmente exige — nem toda vaga é técnica no sentido de programação.
 ${BASE_RULES}
 Formato de resposta:
 {
@@ -847,7 +850,7 @@ Formato de resposta:
       "strongPoints": string[] (0-3 pontos fortes da resposta, array vazio se não houver nenhum),
       "improvementTips": string[] (2-4 dicas concretas de como melhorar essa resposta especificamente),
       "clarity": number (0-100, quão clara e bem estruturada foi a resposta),
-      "technicalDepth": number (0-100, quão profunda e específica foi a resposta tecnicamente; se a pergunta não for técnica, avalie a profundidade do raciocínio/exemplo),
+      "technicalDepth": number (0-100, quão profunda e específica foi a resposta em relação ao conhecimento técnico/prático real da profissão daquela vaga — não assuma programação; avalie o domínio da área de atuação em questão),
       "confidence": number (0-100, quão segura e assertiva a resposta parece, com base na forma como foi escrita)
     }
   ]
@@ -876,16 +879,16 @@ RESPOSTA DO CANDIDATO: ${qa.answer || "(não respondida)"}`
 // --- Geração de novas perguntas de entrevista (aleatórias, por vaga + senioridade) ---
 
 const INTERVIEW_FOCUS_POOL = [
-  "arquitetura e decisões técnicas",
-  "debugging e resolução de problemas",
+  "decisões técnicas ou processuais complexas da área",
+  "resolução de problemas no dia a dia da função",
   "trabalho em equipe e colaboração",
-  "comunicação com stakeholders não técnicos",
+  "comunicação com clientes, pacientes ou públicos leigos",
   "priorização e gestão de tempo",
-  "aprendizado contínuo e atualização técnica",
+  "aprendizado contínuo e atualização profissional",
   "lidar com falhas ou erros no trabalho",
-  "tomada de decisão sob incerteza",
-  "boas práticas de código e qualidade",
-  "performance e escalabilidade",
+  "tomada de decisão sob incerteza ou pressão",
+  "boas práticas e qualidade no trabalho",
+  "lidar com alta demanda ou prazos apertados",
 ];
 
 function pickRandomFocuses(count: number): string[] {
@@ -899,16 +902,16 @@ export async function generateInterviewQuestions(
 ): Promise<string[]> {
   const focuses = pickRandomFocuses(3);
 
-  const systemPrompt = `Você é um entrevistador técnico sênior que cria perguntas de entrevista de emprego para vagas de tecnologia.
+  const systemPrompt = `Você é um entrevistador sênior experiente que cria perguntas de entrevista de emprego para vagas de QUALQUER área profissional (tecnologia, saúde, direito, educação, administração, design etc.) — a partir do cargo e da descrição da vaga, identifique de que área/profissão se trata e gere perguntas específicas e realistas dela, não um template genérico de TI.
 ${BASE_RULES}
 Antes de gerar as perguntas, identifique o nível de senioridade pedido pela vaga (estágio, júnior, pleno, sênior, especialista/staff etc.) a partir do cargo e da descrição. Calibre a profundidade das perguntas de acordo:
-- Estágio/júnior: fundamentos, potencial de aprendizado, projetos acadêmicos/pessoais, situações simples do dia a dia.
-- Pleno: experiência aplicada, decisões técnicas reais, trade-offs em projetos que já executou.
-- Sênior/especialista: arquitetura, liderança técnica, mentoria, decisões de alto impacto, trade-offs complexos.
-Gere um conjunto DIFERENTE de perguntas a cada chamada, mesmo para a mesma vaga, varie o enunciado, os tópicos e o ângulo (nunca repita literalmente um banco fixo de perguntas). Dê ênfase especial, em pelo menos 2 das perguntas, aos seguintes temas: ${focuses.join(", ")}.
+- Estágio/júnior: fundamentos da área, potencial de aprendizado, projetos acadêmicos/pessoais, situações simples do dia a dia.
+- Pleno: experiência aplicada, decisões reais da profissão, trade-offs em casos/projetos que já executou.
+- Sênior/especialista: liderança, mentoria, decisões de alto impacto, trade-offs complexos da área.
+Gere um conjunto DIFERENTE de perguntas a cada chamada, mesmo para a mesma vaga, varie o enunciado, os tópicos e o ângulo (nunca repita literalmente um banco fixo de perguntas). Dê ênfase especial, em pelo menos 2 das perguntas, aos seguintes temas (adapte-os ao contexto real da profissão da vaga): ${focuses.join(", ")}.
 Formato de resposta:
 {
-  "questions": string[] (5 a 8 perguntas prováveis, misturando técnicas e comportamentais, baseadas nos requisitos e na senioridade da vaga)
+  "questions": string[] (5 a 8 perguntas prováveis, misturando técnicas/específicas da profissão e comportamentais, baseadas nos requisitos e na senioridade da vaga)
 }`;
 
   const userMessage = `CARGO: ${jobTitle}\n\nDESCRIÇÃO DA VAGA:\n${jobText || "não informada"}`;

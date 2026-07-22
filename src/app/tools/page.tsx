@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segments";
 import { toolsForSegment, type ToolCatalogEntry, type ToolIcon, type ToolColor } from "@/lib/tools-catalog";
+import { matchAreaSlug } from "@/lib/vocation-areas";
 import {
   Sparkles,
   Lock,
@@ -30,10 +31,14 @@ export const metadata = {
 export default async function ToolsPage() {
   const session = await auth();
   const user = session?.user?.id
-    ? await prisma.user.findUnique({ where: { id: session.user.id }, select: { careerSegment: true } })
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { careerSegment: true, professionalArea: true },
+      })
     : null;
   const segment = normalizeCareerSegment(user?.careerSegment);
-  const { recommended, others } = toolsForSegment(segment);
+  const userAreaSlug = matchAreaSlug(user?.professionalArea);
+  const { recommended, others } = toolsForSegment(segment, userAreaSlug);
 
   return (
     <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 w-full space-y-10">

@@ -1,3 +1,5 @@
+import { parseBrazilLocation } from "@/lib/brazil-locations";
+
 export type FeedTier = "excellent" | "good" | "medium" | "low";
 
 export function tierFromScore(score: number): FeedTier {
@@ -77,7 +79,15 @@ const AREA_PATTERNS: [RegExp, string][] = [
   [/sa[uú]de|enfermagem|hospital|farm[aá]cia/i, "Saude"],
   [/jur[ií]dico|advogado|contratos/i, "Juridico"],
   [/design/i, "Design"],
+  [/jornalis|comunica[cç][aã]o social|assessoria de imprensa|redator publicit[aá]rio|rela[cç][oõ]es p[uú]blicas/i, "Comunicacao"],
+  [/arquitet[oôu]|urbanismo/i, "Arquitetura"],
+  [/agronomi|agroneg[oó]cio|zootecni|engenheiro agr[oô]nomo/i, "Agronomia"],
+  [/veterin[aá]ri/i, "Veterinaria"],
+  [/audiovisual|artes c[eê]nicas|artes visuais|cinema\b|produ[cç][aã]o cultural|curador/i, "Artes"],
+  [/turismo|hotelaria|gastronomia|chef de cozinha/i, "Turismo"],
+  [/pol[ií]cia militar|pol[ií]cia civil|bombeiro|seguran[cç]a p[uú]blica|for[cç]as armadas|per[ií]cia criminal/i, "Seguranca Publica"],
   [/desenvolvedor|engenheiro de software|programador|sistemas|\bti\b|tecnologia/i, "Tecnologia"],
+  [/engenheir|engenharia/i, "Engenharia"],
 ];
 
 function matchFirst(text: string, patterns: [RegExp, string][]): string | undefined {
@@ -187,8 +197,11 @@ export function classifyJobForStorage(job: {
   contractType: string;
   entryLevel: boolean;
   salaryMin?: number;
+  city: string;
+  state: string;
 } {
   const tags = deriveJobTags(job);
+  const { city, state } = parseBrazilLocation(job.location);
 
   return {
     company: tags.company,
@@ -198,6 +211,8 @@ export function classifyJobForStorage(job: {
     contractType: tags.contractType ?? "",
     entryLevel: isEntryLevelJob(job),
     salaryMin: tags.salaryValue ? Math.round(tags.salaryValue) : undefined,
+    city,
+    state,
   };
 }
 

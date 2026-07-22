@@ -22,7 +22,7 @@ const COURSE_CATALOG: Record<string, { title: string; provider: string; duration
   sql: { title: "SQL do Zero ao Avançado", provider: "Mode Analytics", duration: "5h" },
   "power bi": { title: "Power BI Essentials", provider: "Microsoft Learn", duration: "5h" },
   "power bi.": { title: "Power BI Essentials", provider: "Microsoft Learn", duration: "5h" },
-  inglês: { title: "Inglês Técnico para TI", provider: "Estudo dirigido", duration: "contínuo" },
+  inglês: { title: "Inglês para uso profissional", provider: "Estudo dirigido", duration: "contínuo" },
   monitoramento: { title: "Observabilidade e Monitoramento", provider: "Grafana Labs", duration: "4h" },
 };
 

@@ -5,6 +5,13 @@ export type VocationAreaConfig = {
   subareas: string[];
   enjoysOptions: string[];
   priorExperienceOptions: string[];
+  /**
+   * Mecânica real de carreira no Brasil (conselho profissional, exame de
+   * ordem, concurso, residência etc.). Usado para ancorar o blog em fatos
+   * concretos da profissão em vez de conselhos genéricos "estilo tech"
+   * (portfólio, stack, sprint) que não se aplicam fora de TI/design/marketing.
+   */
+  careerNotes?: string;
 };
 
 export const VOCATION_PEOPLE_OR_PROCESS_OPTIONS = [
@@ -101,6 +108,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho em outra área (não-TI)",
       "Nenhuma experiência ainda",
     ],
+    careerNotes:
+      "Não há conselho profissional obrigatório. Portfólio (GitHub, projetos próprios), certificações técnicas e desafios práticos costumam pesar mais que o diploma na contratação.",
   },
   {
     slug: "medicina",
@@ -135,6 +144,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Vivência pessoal/familiar com a área da saúde",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRM após a graduação (Revalida para formados no exterior). A especialização padrão é via residência médica, com prova concorrida por vaga; sem residência formal, o médico pode atuar como generalista mas fica de fora de títulos de especialista.",
   },
   {
     slug: "direito",
@@ -169,6 +180,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho anterior em área administrativa/atendimento",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige aprovação no Exame da OAB para atuar como advogado(a). Carreiras públicas (magistratura, MP, procuradorias, delegacia) são um caminho concorrido e separado da advocacia privada, com concurso próprio em vez do exame da Ordem.",
   },
   {
     slug: "engenharia",
@@ -202,6 +215,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho manual/técnico em outra área",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CREA (Conselho Regional de Engenharia e Agronomia) e ART (Anotação de Responsabilidade Técnica) para assinar projetos. Engenharia de Software/Computação é a exceção: mercado trata como cargo de TI, sem exigir CREA na prática.",
   },
   {
     slug: "educacao",
@@ -233,6 +248,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Experiência em coordenação/gestão de grupos",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Docência exige licenciatura na disciplina. Concursos públicos estaduais/municipais são a porta de entrada mais estável e concorrida; escolas privadas contratam via processo seletivo próprio, geralmente menos formal.",
   },
   {
     slug: "marketing",
@@ -266,6 +283,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Empreendedorismo/negócio próprio",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Não há conselho regulador. Portfólio de campanhas/cases, certificações de plataforma (Google, Meta, RD Station etc.) e resultados mensuráveis pesam mais que o diploma.",
   },
   {
     slug: "design",
@@ -297,6 +316,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Produção de conteúdo visual nas redes",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Não há conselho regulador. Portfólio é o principal ativo de carreira — mais decisivo na contratação do que o diploma.",
   },
   {
     slug: "administracao",
@@ -329,6 +350,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Cursos de gestão/Excel/Office",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Registro no CRA (Conselho Regional de Administração) é opcional/recomendado, não exigido para a maioria dos cargos. Concursos públicos em áreas de gestão (analista administrativo) também são caminho comum.",
   },
   {
     slug: "financas",
@@ -360,6 +383,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho anterior em área administrativa",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Contador exige registro no CRC e aprovação no Exame de Suficiência do CFC. Áreas de investimentos/mercado de capitais valorizam certificações como CPA-10/20 e CFP mais do que o registro contábil.",
   },
   {
     slug: "comunicacao",
@@ -391,6 +416,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Produção de conteúdo nas redes sociais",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Jornalismo não exige mais diploma obrigatório desde decisão do STF em 2009, mas o mercado ainda valoriza formação e, principalmente, clipping/portfólio de matérias publicadas.",
   },
   {
     slug: "enfermagem",
@@ -422,6 +449,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Socorrista/brigadista",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no COREN (Conselho Regional de Enfermagem). Especializações costumam vir de pós-graduação lato sensu ou residência multiprofissional, não de um exame de ordem único.",
   },
   {
     slug: "odontologia",
@@ -453,6 +482,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho de atendimento ao público",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRO (Conselho Regional de Odontologia). Especialidades exigem título de especialista via curso reconhecido pelo CFO ou residência.",
   },
   {
     slug: "farmacia",
@@ -483,6 +514,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho de atendimento ao público",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRF (Conselho Regional de Farmácia). Indústria farmacêutica e análises clínicas costumam valorizar pós-graduação/especialização além do registro básico.",
   },
   {
     slug: "fisioterapia",
@@ -513,6 +546,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho como cuidador",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CREFITO (Conselho Regional de Fisioterapia e Terapia Ocupacional). Especialidades como esportiva costumam pedir vivência prática/estágio em clubes além do registro.",
   },
   {
     slug: "nutricao",
@@ -543,6 +578,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Curso livre de nutrição/gastronomia",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRN (Conselho Regional de Nutricionistas). Nutrição esportiva e estética costumam exigir especialização além da graduação.",
   },
   {
     slug: "psicologia",
@@ -573,6 +610,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Experiência com educação infantil",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRP (Conselho Regional de Psicologia). Clínica exige título de psicoterapeuta reconhecido; psicologia organizacional costuma dialogar diretamente com RH.",
   },
   {
     slug: "veterinaria",
@@ -603,6 +642,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho com pets (pet shop, adestramento)",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRMV (Conselho Regional de Medicina Veterinária). Grandes animais/agropecuária costuma dialogar com engenharia agronômica e zootecnia no dia a dia de campo.",
   },
   {
     slug: "educacao-fisica",
@@ -633,6 +674,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Voluntariado em projetos esportivos sociais",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CREF (Conselho Regional de Educação Física). Personal trainer autônomo e docência escolar têm caminhos de contratação bem diferentes, mas ambos passam pelo registro.",
   },
   {
     slug: "arquitetura",
@@ -663,6 +706,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Portfólio pessoal de projetos",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CAU (Conselho de Arquitetura e Urbanismo) e ART/RRT para assinar projetos. Portfólio de projetos é decisivo na contratação, mesmo com o registro obrigatório.",
   },
   {
     slug: "biologicas",
@@ -693,6 +738,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Interesse pessoal por natureza/animais",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CRBio (Conselho Regional de Biologia) para atuar como biólogo(a). Pesquisa/academia costuma exigir mestrado/doutorado além do registro.",
   },
   {
     slug: "agronomia",
@@ -723,6 +770,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho manual/técnico em outra área",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Exige registro no CREA como as demais engenharias. Agronegócio/gestão rural é a exceção que costuma valorizar mais resultado prático de campo do que o registro em si.",
   },
   {
     slug: "exatas",
@@ -752,6 +801,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Aulas particulares dadas",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador geral. Docência exige licenciatura; carreiras quantitativas (atuária) valorizam certificação própria do IBA (Instituto Brasileiro de Atuária) além da graduação.",
   },
   {
     slug: "letras",
@@ -781,6 +832,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Certificações de proficiência",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador. Docência exige licenciatura; tradução juramentada exige aprovação em concurso público da Junta Comercial do estado, diferente da tradução livre.",
   },
   {
     slug: "humanas",
@@ -810,6 +863,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Estágio em museu/instituição cultural",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador. Docência exige licenciatura; pesquisa/museus/órgãos públicos costumam contratar via concurso público ou processo seletivo específico.",
   },
   {
     slug: "servico-social",
@@ -840,6 +895,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Monitoria/iniciação científica",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Serviço Social exige registro no CRESS (Conselho Regional de Serviço Social). Diplomacia/carreira pública em Relações Internacionais passa pelo concurso do Instituto Rio Branco, um dos mais concorridos do país.",
   },
   {
     slug: "artes",
@@ -870,6 +927,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Portfólio de trabalhos artísticos",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador geral. Portfólio, editais culturais (leis de incentivo) e participação em grupos/coletivos costumam pesar mais do que diploma formal.",
   },
   {
     slug: "moda",
@@ -899,6 +958,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Freelances de styling/consultoria",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador. Portfólio de peças/coleções é o principal ativo de carreira, tanto para marcas quanto para trabalho autônomo/freelance.",
   },
   {
     slug: "gastronomia-turismo",
@@ -928,6 +989,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Trabalho em eventos",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador amplo. Guias de turismo dependem de cadastro no Cadastur; chefs e gestores de restaurante/hotel são contratados principalmente por experiência prática, não por diploma.",
   },
   {
     slug: "audiovisual",
@@ -957,6 +1020,8 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Participação em produções acadêmicas",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Sem conselho regulador. Reel/portfólio de projetos é o principal critério de contratação, tanto em produtora quanto como freelancer.",
   },
   {
     slug: "seguranca-publica",
@@ -986,9 +1051,41 @@ export const VOCATION_AREAS: VocationAreaConfig[] = [
       "Voluntariado em segurança comunitária",
       "Nenhuma experiência prática ainda",
     ],
+    careerNotes:
+      "Ingresso é majoritariamente via concurso público, com prova objetiva, teste físico, avaliação psicológica e formação em academia — diferente do processo seletivo de mercado privado das demais áreas.",
   },
 ];
 
 export function getVocationArea(slug: string): VocationAreaConfig | undefined {
   return VOCATION_AREAS.find((a) => a.slug === slug);
+}
+
+/**
+ * Tenta identificar a área vocacional a partir de um texto livre (ex: o campo
+ * `professionalArea` do usuário, que não é um enum). Usa sobreposição de
+ * tokens contra o slug/label/subáreas de cada área; retorna undefined quando
+ * não há sinal confiável, em vez de arriscar um match errado.
+ */
+export function matchAreaSlug(text: string | null | undefined): string | undefined {
+  if (!text) return undefined;
+
+  const tokenize = (value: string) =>
+    value
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((token) => token.length >= 3);
+
+  const inputTokens = new Set(tokenize(text));
+  if (inputTokens.size === 0) return undefined;
+
+  let best: { slug: string; score: number } | undefined;
+  for (const area of VOCATION_AREAS) {
+    const areaTokens = tokenize(`${area.slug} ${area.label} ${area.subareas.join(" ")}`);
+    const score = areaTokens.filter((token) => inputTokens.has(token)).length;
+    if (score > 0 && (!best || score > best.score)) best = { slug: area.slug, score };
+  }
+
+  return best?.slug;
 }
