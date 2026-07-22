@@ -165,7 +165,7 @@ services:
       - default
 
   evolution-api:
-    image: atendai/evolution-api:v2.2.0
+    image: evoapicloud/evolution-api:v2.3.0
     container_name: carreiras-match-evolution-api
     restart: unless-stopped
     profiles: ["whatsapp"]
