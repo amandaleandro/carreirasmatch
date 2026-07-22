@@ -199,6 +199,8 @@ model Job {
   jobTitle      String
   jobText       String
   location      String?
+  city          String     @default("")
+  state         String     @default("")
   source        String     @default("scrape")
   company       String     @default("")
   area          String     @default("")
@@ -221,6 +223,8 @@ model Job {
   @@index([active, seniority, createdAt])
   @@index([active, workModel, createdAt])
   @@index([active, contractType, createdAt])
+  @@index([state, city])
+  @@index([active, state, createdAt])
 }
 
 model JobMatch {
@@ -385,8 +389,10 @@ model ProfileSuggestion {
   gapAddressed String   @default("") // lacuna/objetivo que o item resolve (explica o porquê)
   modality     String   @default("") // só para course: "online" | "presencial" | "híbrido"
   city         String   @default("") // cidade quando presencial
+  status       String   @default("pending") // "pending" | "in_progress" | "done"
   createdAt    DateTime @default(now())
 
+  @@unique([userId, title, provider])
   @@index([userId])
 }
 
