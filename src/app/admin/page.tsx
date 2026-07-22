@@ -7,6 +7,7 @@ import { AdminGroqModel } from "@/components/admin-groq-model";
 import { AdminCouponManager } from "@/components/admin-coupon-manager";
 import { AdminExternalSources } from "@/components/admin-external-sources";
 import { AdminOpportunityReports } from "@/components/admin-opportunity-reports";
+import { AdminWhatsappConnection } from "@/components/admin-whatsapp-connection";
 import {
   SUPPORT_CATEGORY_LABELS,
   SUPPORT_STATUS_ADMIN_LABELS,
@@ -736,6 +737,15 @@ export default async function AdminPage() {
           <h2 className="font-semibold">Denúncias de oportunidades</h2>
           <p className="mt-1 text-sm text-neutral-500">Revise avisos de vaga encerrada, informação incorreta ou link suspeito.</p>
           <div className="mt-5"><AdminOpportunityReports /></div>
+        </div>
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+          <h2 className="font-semibold">WhatsApp de conversão</h2>
+          <p className="mt-1 text-sm text-neutral-500">
+            Canal de marketing via WhatsApp (régua de conversão pós-análise). Pareie o número dedicado aqui.
+          </p>
+          <div className="mt-5">
+            <AdminWhatsappConnection />
+          </div>
         </div>
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
           <h2 className="font-semibold">Cupons de influenciadores</h2>

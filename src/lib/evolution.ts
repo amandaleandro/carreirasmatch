@@ -39,6 +39,59 @@ async function sendText(phone: string, text: string): Promise<void> {
   }
 }
 
+/** Chamada autenticada genérica à Evolution API, usada pelo painel de admin. */
+async function evolutionFetch(path: string, init?: RequestInit): Promise<Response> {
+  if (!SERVER_URL || !API_KEY || !INSTANCE) {
+    throw new Error(
+      "Evolution API não configurada (defina EVOLUTION_API_URL, EVOLUTION_API_KEY e EVOLUTION_INSTANCE)."
+    );
+  }
+  return fetch(`${SERVER_URL}${path}`, {
+    ...init,
+    headers: { "Content-Type": "application/json", apikey: API_KEY, ...(init?.headers ?? {}) },
+  });
+}
+
+export type EvolutionConnectionState = "open" | "connecting" | "close" | "unknown";
+
+/** Estado da sessão pareada: "open" = conectado, "connecting" = aguardando QR, "close" = desconectado. */
+export async function getEvolutionConnectionState(): Promise<EvolutionConnectionState> {
+  const res = await evolutionFetch(`/instance/connectionState/${INSTANCE}`);
+  if (!res.ok) return "unknown";
+  const data = await res.json().catch(() => null);
+  const state = data?.instance?.state;
+  return state === "open" || state === "connecting" || state === "close" ? state : "unknown";
+}
+
+/**
+ * Gera um QR code novo para parear o número dedicado. Tenta criar a instância
+ * (primeira vez); se ela já existir, cai para `/instance/connect`, que também
+ * devolve um QR fresco para repareamento.
+ */
+export async function requestEvolutionQrCode(): Promise<{ base64: string | null; pairingCode: string | null }> {
+  const createRes = await evolutionFetch(`/instance/create`, {
+    method: "POST",
+    body: JSON.stringify({ instanceName: INSTANCE, qrcode: true, integration: "WHATSAPP-BAILEYS" }),
+  });
+  if (createRes.ok) {
+    const data = await createRes.json();
+    return { base64: data?.qrcode?.base64 ?? null, pairingCode: data?.qrcode?.pairingCode ?? null };
+  }
+
+  const connectRes = await evolutionFetch(`/instance/connect/${INSTANCE}`);
+  if (!connectRes.ok) {
+    throw new Error(`Evolution API recusou a conexão: ${connectRes.status} ${await connectRes.text()}`);
+  }
+  const data = await connectRes.json();
+  return { base64: data?.base64 ?? null, pairingCode: data?.pairingCode ?? null };
+}
+
+/** Desconecta a sessão pareada (mantém a instância, permitindo reparear depois). */
+export async function logoutEvolutionInstance(): Promise<void> {
+  const res = await evolutionFetch(`/instance/logout/${INSTANCE}`, { method: "DELETE" });
+  if (!res.ok) throw new Error(`Evolution API recusou o logout: ${res.status} ${await res.text()}`);
+}
+
 /**
  * Garante que uma mensagem de um dado `type`/`dedupeKey` seja enviada uma
  * única vez. Espelha `sendOnce` de lib/resend.ts, mas usa WhatsappLog (chave
