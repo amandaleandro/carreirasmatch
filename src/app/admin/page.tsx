@@ -8,6 +8,7 @@ import { AdminCouponManager } from "@/components/admin-coupon-manager";
 import { AdminExternalSources } from "@/components/admin-external-sources";
 import { AdminOpportunityReports } from "@/components/admin-opportunity-reports";
 import { AdminWhatsappConnection } from "@/components/admin-whatsapp-connection";
+import { AdminWhatsappMarketingCampaign } from "@/components/admin-whatsapp-marketing-campaign";
 import {
   SUPPORT_CATEGORY_LABELS,
   SUPPORT_STATUS_ADMIN_LABELS,
@@ -745,6 +746,17 @@ export default async function AdminPage() {
           </p>
           <div className="mt-5">
             <AdminWhatsappConnection />
+          </div>
+        </div>
+        <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">
+          <h2 className="font-semibold">Campanha de marketing por WhatsApp</h2>
+          <p className="mt-1 text-sm text-neutral-500">
+            Manda o próximo convite (do banco de mensagens do Desafio do Match) pra leads com telefone que ainda
+            não viraram conta e pra quem já se cadastrou mas não assinou. Cada telefone recebe cada mensagem só
+            uma vez; clicar de novo avança pro próximo toque de quem ainda não esgotou a lista.
+          </p>
+          <div className="mt-5">
+            <AdminWhatsappMarketingCampaign />
           </div>
         </div>
         <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-5 bg-white dark:bg-neutral-950">

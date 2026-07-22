@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { formatCentsToBRL } from "@/lib/pricing";
 
 const SERVER_URL = (process.env.EVOLUTION_API_URL ?? "").replace(/\/$/, "");
 const API_KEY = process.env.EVOLUTION_API_KEY ?? "";
@@ -14,6 +15,16 @@ function toWhatsappNumber(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   return digits.startsWith("55") ? digits : `55${digits}`;
 }
+
+/**
+ * Destinatários das notificações internas por WhatsApp (novos cadastros e
+ * vendas). Mesmo padrão do ADMIN_EMAILS em lib/resend.ts: sem a env, nada é
+ * enviado (só loga).
+ */
+const ADMIN_RECIPIENTS = (process.env.ADMIN_WHATSAPP_NUMBERS ?? "")
+  .split(",")
+  .map((n) => n.trim())
+  .filter(Boolean);
 
 /**
  * Envia uma mensagem de texto via Evolution API (self-hosted).
@@ -37,6 +48,73 @@ async function sendText(phone: string, text: string): Promise<void> {
   } catch (err) {
     console.error(`Falha ao enviar WhatsApp para ${phone}:`, err);
   }
+}
+
+/**
+ * WhatsApp interno para o(s) admin(s): mesmo texto para cada número da lista.
+ * Fire-and-forget, nunca lança para o chamador, igual ao `sendAdmin` de e-mail.
+ */
+async function sendAdmin(text: string): Promise<void> {
+  if (!evolutionEnabled) {
+    console.error(`Evolution API não configurada, notificação admin por WhatsApp não enviada: "${text}".`);
+    return;
+  }
+  if (ADMIN_RECIPIENTS.length === 0) {
+    console.warn(`ADMIN_WHATSAPP_NUMBERS não configurada, notificação admin por WhatsApp não enviada.`);
+    return;
+  }
+  for (const number of ADMIN_RECIPIENTS) {
+    await sendText(number, text);
+  }
+}
+
+/** Avisa o admin de um novo cadastro por WhatsApp. Chame com fire-and-forget (void). */
+export async function notifyAdminNewSignupWhatsapp(opts: {
+  name?: string | null;
+  email: string;
+  phone?: string | null;
+  segment?: string | null;
+}): Promise<void> {
+  const lines = [
+    "🎉 Novo cadastro",
+    `Nome: ${opts.name?.trim() || "Não informado"}`,
+    `E-mail: ${opts.email}`,
+  ];
+  if (opts.phone?.trim()) lines.push(`Telefone: ${opts.phone.trim()}`);
+  if (opts.segment?.trim()) lines.push(`Momento de carreira: ${opts.segment.trim()}`);
+  await sendAdmin(lines.join("\n"));
+}
+
+/** Avisa o admin de uma venda confirmada por WhatsApp. Chame com fire-and-forget (void). */
+export async function notifyAdminPurchaseWhatsapp(opts: {
+  product: string;
+  amountCents: number;
+  email?: string | null;
+}): Promise<void> {
+  await sendAdmin(
+    [
+      "💰 Nova venda",
+      `Produto: ${opts.product}`,
+      `Valor: ${formatCentsToBRL(opts.amountCents)}`,
+      `Cliente: ${opts.email?.trim() || "Não informado"}`,
+    ].join("\n")
+  );
+}
+
+/** Avisa o admin de um novo chamado de suporte por WhatsApp. Chame com fire-and-forget (void). */
+export async function notifyAdminSupportTicketWhatsapp(opts: {
+  ticketId: string;
+  subject: string;
+  email: string;
+}): Promise<void> {
+  await sendAdmin(
+    [
+      "💬 Novo chamado de suporte",
+      `Assunto: ${opts.subject}`,
+      `Usuário: ${opts.email}`,
+      `Atendimento: ${APP_URL}/admin/suporte/${opts.ticketId}`,
+    ].join("\n")
+  );
 }
 
 /** Chamada autenticada genérica à Evolution API, usada pelo painel de admin. */
@@ -158,4 +236,69 @@ export async function sendUrgencyCouponWhatsapp(
     phone,
     `Última mensagem sobre isso, prometo 🤝\n\nSepararei um cupom de 20% só seu, válido por ${hours}h: *${opts.code}*\n\n${href}\n\nDepois disso o cupom expira e eu paro de te encher o saco. Responda *PARAR* se quiser sair antes disso.`
   );
+}
+
+/**
+ * Banco de convites de marketing pro Desafio do Match (`/desafio`): gera um
+ * Match % com card pra Stories, então o convite mira gente que quer testar E
+ * compartilhar o resultado. Tom divertido e com emoji, gíria leve tá liberada,
+ * mas sem perder o profissionalismo (nada de deboche ou informalidade
+ * exagerada). Sempre com o nome. Cada função é um "toque" diferente;
+ * `sendNextMarketingInviteWhatsapp` manda o próximo ainda não enviado pra
+ * aquele telefone, então ninguém recebe o mesmo texto duas vezes.
+ */
+const MARKETING_INVITE_MESSAGES: Array<(firstName: string, href: string) => string> = [
+  (name, href) =>
+    `Oi, ${name}! 👋 Bora descobrir seu Match % com a vaga dos seus sonhos? Em 2 minutinhos a IA te dá o placar, os pontos fortes do currículo e um card show de bola pra postar no Story:\n${href}`,
+  (name, href) =>
+    `${name}, seu currículo já topou o Desafio do Match? 🎯 A gente calcula seu percentual de aderência com uma vaga real e ainda gera um card bonito pra você compartilhar:\n${href}`,
+  (name, href) =>
+    `Oi, ${name} 😊 Bateu aquela curiosidade: qual seria seu Match % com a próxima vaga que você quer? Descobre de graça e sai com o card na mão:\n${href}`,
+  (name, href) =>
+    `${name}, dica rápida pra você 💡 Compara seu currículo com uma vaga de verdade, recebe o diagnóstico com pontos fortes e o que ajustar, e ainda sobra um card pra Stories:\n${href}`,
+  (name, href) =>
+    `Oi, ${name}! ✨ Que tal transformar aquela ansiedade da busca de emprego em um número? O Desafio do Match calcula seu percentual e gera um card pra você mandar pra galera:\n${href}`,
+  (name, href) =>
+    `${name}, isso aqui vale menos que uma pausa pro café ☕ Testa seu Match % com uma vaga real, vê o que destaca seu perfil e compartilha o resultado com quem quiser:\n${href}`,
+  (name, href) =>
+    `Oi, ${name}! 🚀 Quer saber o quanto seu currículo conversa com a vaga certa? Faz o Desafio do Match, pega seu score e um card pronto pra postar:\n${href}`,
+  (name, href) =>
+    `${name}, sabe aquele número que ninguém te dá numa entrevista? 📊 O Desafio do Match calcula seu percentual de aderência com uma vaga real, na hora:\n${href}`,
+  (name, href) =>
+    `Oi, ${name}! 🔍 Antes de mandar currículo pra próxima vaga, descobre seu Match %. É rápido, é grátis e ainda sai com um card pra Stories:\n${href}`,
+  (name, href) =>
+    `${name}, dois minutos e um card show de bola 📸 O Desafio do Match mostra seu percentual de aderência e o que destacar no currículo:\n${href}`,
+  (name, href) =>
+    `Oi, ${name}! 🎲 Bora arriscar? Testa seu currículo contra uma vaga real, vê seu Match % e ainda ganha um card pra compartilhar:\n${href}`,
+  (name, href) =>
+    `${name}, currículo bom é currículo que converte 📈 Mede seu Match % com uma vaga de verdade e leva um diagnóstico + card pra Stories:\n${href}`,
+  (name, href) =>
+    `Oi, ${name}! 🧩 Falta uma peça pra saber se seu currículo encaixa na vaga certa: o Match %. Descobre o seu agora:\n${href}`,
+  (name, href) =>
+    `${name}, sem enrolação 🙌 Roda o Desafio do Match, recebe seu percentual de aderência e um card pronto pra postar em 2 minutos:\n${href}`,
+];
+
+/**
+ * Manda o próximo convite de marketing (dentre `MARKETING_INVITE_MESSAGES`)
+ * que aquele telefone ainda não recebeu. Usa o mesmo WhatsappLog como trava de
+ * dedupe (`type: marketing_invite_<i>`), então cada envio some da lista assim
+ * que sai — sem repetir e sem duplicar em reexecuções do scheduler.
+ * Retorna `true` se mandou algo, `false` se o telefone já recebeu tudo.
+ */
+export async function sendNextMarketingInviteWhatsapp(
+  phone: string,
+  name?: string | null
+): Promise<boolean> {
+  const firstName = name?.trim()?.split(" ")[0] || "tudo bem";
+  const href = `${APP_URL}/desafio`;
+  for (let i = 0; i < MARKETING_INVITE_MESSAGES.length; i++) {
+    try {
+      await prisma.whatsappLog.create({ data: { type: `marketing_invite_${i}`, dedupeKey: phone, phone } });
+    } catch {
+      continue; // esse toque já foi enviado pra esse telefone, tenta o próximo
+    }
+    await sendText(phone, MARKETING_INVITE_MESSAGES[i](firstName, href));
+    return true;
+  }
+  return false;
 }

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { isCareerSegment } from "@/lib/career-segments";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendWelcomeEmail, notifyAdminNewSignup } from "@/lib/resend";
+import { notifyAdminNewSignupWhatsapp } from "@/lib/evolution";
 import { normalizePersonName, isValidFullName, normalizeBrazilPhone, isValidBrazilPhone } from "@/lib/contact-validation";
 import { normalizeEmail, isValidEmail } from "@/lib/email";
 import { normalizeCouponCode } from "@/lib/coupons";
@@ -100,6 +101,12 @@ export async function POST(req: NextRequest) {
     // Envio de e-mails e registro de lead sem bloquear a resposta principal
     void sendWelcomeEmail(normalizedEmail, data.name);
     void notifyAdminNewSignup({
+      name: normalizedName,
+      email: normalizedEmail,
+      phone: normalizedPhone,
+      segment: effectiveCareerSegment,
+    });
+    void notifyAdminNewSignupWhatsapp({
       name: normalizedName,
       email: normalizedEmail,
       phone: normalizedPhone,

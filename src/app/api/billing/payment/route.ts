@@ -14,6 +14,7 @@ import {
   sendOnce,
   notifyAdminPurchase,
 } from "@/lib/resend";
+import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import {
   isPeriodPlanKind,
   periodPlanAmountCents,
@@ -230,6 +231,7 @@ export async function POST(req: NextRequest) {
       void sendPaymentConfirmationEmail(email, { kind, amountCents });
     }
     void notifyAdminPurchase({ product: productName, amountCents, email });
+    void notifyAdminPurchaseWhatsapp({ product: productName, amountCents, email });
     await prisma.funnelEvent.create({
       data: {
         name: isPeriodPlan ? "subscription_confirmed" : "payment_confirmed",

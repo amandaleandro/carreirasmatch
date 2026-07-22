@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { createPayment } from "@/lib/mercadopago";
 import { findAdPack, grantPartnerCredits } from "@/lib/partner-billing";
 import { notifyAdminPurchase } from "@/lib/resend";
+import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 const BUY_LIMIT = { limit: 10, windowMs: 10 * 60 * 1000 };
@@ -76,6 +77,11 @@ export async function POST(req: NextRequest) {
     balance = await grantPartnerCredits(payment.id);
     if (balance !== null) {
       void notifyAdminPurchase({
+        product: `${pack.credits} destaques de curso (parceiro)`,
+        amountCents: pack.priceCents,
+        email: partner.email,
+      });
+      void notifyAdminPurchaseWhatsapp({
         product: `${pack.credits} destaques de curso (parceiro)`,
         amountCents: pack.priceCents,
         email: partner.email,

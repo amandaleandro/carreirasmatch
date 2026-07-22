@@ -13,6 +13,7 @@ import {
   validateSupportAttachment,
 } from "@/lib/support";
 import { notifyAdminSupportTicket } from "@/lib/resend";
+import { notifyAdminSupportTicketWhatsapp } from "@/lib/evolution";
 
 // Suporte é aberto a qualquer pessoa logada, inclusive quem não assina - quem
 // tem problema de pagamento normalmente é exatamente quem ainda não conseguiu
@@ -77,6 +78,7 @@ export async function createSupportTicket(
 
   if (ticket.user.email) {
     void notifyAdminSupportTicket({ ticketId: ticket.id, subject: ticket.subject, email: ticket.user.email });
+    void notifyAdminSupportTicketWhatsapp({ ticketId: ticket.id, subject: ticket.subject, email: ticket.user.email });
   }
   revalidatePath("/suporte");
   redirect(`/suporte/${ticket.id}`);

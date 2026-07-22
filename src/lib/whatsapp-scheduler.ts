@@ -4,6 +4,7 @@ import {
   sendConvertToSubscriptionWhatsapp,
   sendConvertSecondNudgeWhatsapp,
   sendUrgencyCouponWhatsapp,
+  sendNextMarketingInviteWhatsapp,
 } from "@/lib/evolution";
 import { createUrgencyCoupon } from "@/lib/coupons";
 
@@ -54,6 +55,34 @@ async function findCandidates(from: Date, to: Date): Promise<Candidate[]> {
     candidates.push({ userId, overallScore: analysis.overallScore });
   }
   return candidates;
+}
+
+/**
+ * Convite de marketing pra quem cadastrou e tem opt-in de WhatsApp mas ainda
+ * não fez nenhuma análise, entre 2 e 4 dias atrás. Espelha o
+ * `sendOnboardingNudges` de email-scheduler.ts, mas manda o próximo dos
+ * MARKETING_INVITE_MESSAGES (rotaciona a cada execução até esgotar).
+ */
+async function sendOnboardingNudgeWhatsapps(now: Date): Promise<void> {
+  const from = new Date(now.getTime() - 4 * DAY_MS);
+  const to = new Date(now.getTime() - 2 * DAY_MS);
+
+  const users = await prisma.user.findMany({
+    where: {
+      createdAt: { gte: from, lte: to },
+      whatsappMarketingOptIn: true,
+      phone: { not: null },
+    },
+    select: { id: true, name: true, phone: true },
+  });
+
+  for (const user of users) {
+    if (!user.phone) continue;
+    const analyses = await prisma.analysis.count({ where: { resume: { userId: user.id } } });
+    if (analyses > 0) continue;
+
+    await sendNextMarketingInviteWhatsapp(user.phone, user.name);
+  }
 }
 
 async function sendConvertToSubscriptionWhatsapps(now: Date): Promise<void> {
@@ -137,6 +166,7 @@ async function sendUrgencyCouponWhatsapps(now: Date): Promise<void> {
 export async function runWhatsappTick(): Promise<void> {
   const now = new Date();
   const steps: Array<[string, () => Promise<void>]> = [
+    ["onboarding_nudge", () => sendOnboardingNudgeWhatsapps(now)],
     ["convert_to_subscription", () => sendConvertToSubscriptionWhatsapps(now)],
     ["convert_second_nudge", () => sendConvertSecondNudgeWhatsapps(now)],
     ["urgency_coupon", () => sendUrgencyCouponWhatsapps(now)],

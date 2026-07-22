@@ -15,6 +15,7 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
 import { FunnelImpression, TEASER_VIEWED_EVENT } from "@/components/funnel-impression";
 import { SubscriptionUpsell } from "@/components/subscription-upsell";
+import { SubscriptionNudgeAutoOpen } from "@/components/subscription-nudge";
 import { ShareMatchCard } from "@/components/share-match-card";
 import { ReferralRewardBox } from "@/components/referral-reward-box";
 import { getUserReferralStats } from "@/lib/referrals";
@@ -157,7 +158,12 @@ export default async function ReportPage({
             jobTitle={record.jobTitle}
             behavioralResult={behavioralResult}
           />
-          {!subscribed && segment !== "student" && <SubscriptionUpsell segment={segment ?? "career_pro"} />}
+          {!subscribed && segment !== "student" && (
+            <>
+              <SubscriptionUpsell segment={segment ?? "career_pro"} />
+              <SubscriptionNudgeAutoOpen reason="limit" />
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-6">

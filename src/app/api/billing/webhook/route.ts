@@ -11,6 +11,7 @@ import {
   sendOnce,
   notifyAdminPurchase,
 } from "@/lib/resend";
+import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod, periodPlanProductName } from "@/lib/billing-plans";
 import { grantScreeningCredits } from "@/lib/company-billing";
@@ -56,6 +57,11 @@ export async function POST(req: NextRequest) {
               amountCents: companyPayment.amount,
               email: null,
             });
+            void notifyAdminPurchaseWhatsapp({
+              product: `${companyPayment.credits} triagens (empresa)`,
+              amountCents: companyPayment.amount,
+              email: null,
+            });
           }
         } else if (
           (mpPayment.status === "rejected" || mpPayment.status === "cancelled") &&
@@ -75,6 +81,11 @@ export async function POST(req: NextRequest) {
           const balance = await grantPartnerCredits(partnerPayment.id);
           if (balance !== null) {
             void notifyAdminPurchase({
+              product: `${partnerPayment.credits} destaques de curso (parceiro)`,
+              amountCents: partnerPayment.amount,
+              email: null,
+            });
+            void notifyAdminPurchaseWhatsapp({
               product: `${partnerPayment.credits} destaques de curso (parceiro)`,
               amountCents: partnerPayment.amount,
               email: null,
@@ -130,6 +141,7 @@ export async function POST(req: NextRequest) {
         );
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
         void notifyAdminPurchase({ product: periodPlanProductName(payment.kind), amountCents: payment.amount, email });
+        void notifyAdminPurchaseWhatsapp({ product: periodPlanProductName(payment.kind), amountCents: payment.amount, email });
         await prisma.funnelEvent.create({
           data: {
             name: "subscription_confirmed",
@@ -147,6 +159,11 @@ export async function POST(req: NextRequest) {
       } else {
         if (email) void sendPaymentConfirmationEmail(email, { kind: payment.kind, amountCents: payment.amount });
         void notifyAdminPurchase({
+          product: payment.kind === "diagnostic" ? "Kit Candidatura" : "Primeira análise",
+          amountCents: payment.amount,
+          email,
+        });
+        void notifyAdminPurchaseWhatsapp({
           product: payment.kind === "diagnostic" ? "Kit Candidatura" : "Primeira análise",
           amountCents: payment.amount,
           email,
@@ -230,6 +247,7 @@ export async function POST(req: NextRequest) {
         const email = await userEmail(payment.userId);
         if (email) void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
         void notifyAdminPurchase({ product: "Assinatura mensal", amountCents: payment.amount, email });
+        void notifyAdminPurchaseWhatsapp({ product: "Assinatura mensal", amountCents: payment.amount, email });
         await prisma.funnelEvent.create({
           data: {
             name: "subscription_confirmed",

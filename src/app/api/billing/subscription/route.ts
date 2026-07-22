@@ -5,6 +5,7 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { isCareerSegment, normalizeCareerSegment } from "@/lib/career-segments";
 import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { sendSubscriptionConfirmationEmail, notifyAdminPurchase } from "@/lib/resend";
+import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import { createPreapproval } from "@/lib/mercadopago";
 import { parseBRLToCents } from "@/lib/pricing";
 import { NextRequest, NextResponse } from "next/server";
@@ -142,6 +143,7 @@ export async function POST(req: NextRequest) {
     // assíncrono o e-mail sai no webhook, com guard para não duplicar.
     void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
     void notifyAdminPurchase({ product: offer.monthlyName, amountCents, email });
+    void notifyAdminPurchaseWhatsapp({ product: offer.monthlyName, amountCents, email });
     await prisma.funnelEvent.create({
       data: {
         name: "subscription_confirmed",
