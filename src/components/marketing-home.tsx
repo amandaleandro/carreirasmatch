@@ -2,13 +2,16 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpenCheck,
   BriefcaseBusiness,
   Check,
   FileCheck2,
   FileSearch,
   GraduationCap,
   LockKeyhole,
+  Landmark,
   RefreshCw,
+  Scale,
   ShieldCheck,
   Sparkles,
   Target,
@@ -41,6 +44,30 @@ const journeys = [
   ["/primeiro-emprego", "Primeiro emprego", "Apresente potencial sem precisar inventar experiência profissional.", UserRoundSearch],
   ["/recolocacao", "Recolocação", "Traduza sua experiência para a linguagem da vaga atual.", BriefcaseBusiness],
   ["/transicao", "Transição de carreira", "Destaque habilidades transferíveis e construa uma narrativa coerente.", RefreshCw],
+] as const;
+
+const studyJourneys = [
+  {
+    href: "/faculdade-ou-tecnico",
+    title: "Vestibular e escolha de curso",
+    description: "Compare áreas, cursos e caminhos de formação antes de decidir seu próximo passo.",
+    linkLabel: "Explorar orientação",
+    Icon: BookOpenCheck,
+  },
+  {
+    href: "/concurso",
+    title: "Concursos públicos",
+    description: "Transforme o edital em prioridades, plano de estudo e preparação para a prova.",
+    linkLabel: "Preparar para concurso",
+    Icon: Landmark,
+  },
+  {
+    href: "/oab",
+    title: "Exame da OAB",
+    description: "Organize a preparação para a 1ª e a 2ª fase com foco no padrão da FGV.",
+    linkLabel: "Preparar para a OAB",
+    Icon: Scale,
+  },
 ] as const;
 
 const faqs = [
@@ -80,6 +107,7 @@ export function MarketingHome() {
             <a href="#exemplo" className="hover:text-white">Ver exemplo</a>
             <a href="#como-funciona" className="hover:text-white">Como funciona</a>
             <a href="#kit" className="hover:text-white">O que você recebe</a>
+            <a href="#estudos" className="hover:text-white">Estudos</a>
             <a href="#preco" className="hover:text-white">Preço</a>
           </nav>
           <div className="flex items-center gap-2">
@@ -181,6 +209,31 @@ export function MarketingHome() {
         <section id="para-voce" className="mx-auto max-w-7xl px-4 py-20 md:px-8">
           <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600">Para diferentes momentos</p><h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">A mesma pergunta, com contextos diferentes.</h2><p className="mt-4 text-neutral-600 dark:text-neutral-400">O que do seu histórico ajuda nesta vaga e o que precisa ficar mais claro?</p></div>
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">{journeys.map(([href, title, description, Icon]) => <Link key={href} href={href} className="group rounded-2xl border border-neutral-200 bg-white p-6 transition hover:-translate-y-1 hover:border-blue-300 dark:border-neutral-800 dark:bg-neutral-950"><Icon className="h-5 w-5 text-blue-600" /><h3 className="mt-4 text-lg font-bold">{title}</h3><p className="mt-2 text-sm leading-relaxed text-neutral-500">{description}</p><span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-blue-600">Ver orientação <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span></Link>)}</div>
+        </section>
+
+        <section id="estudos" className="scroll-mt-8 border-y border-neutral-200 bg-white/70 dark:border-neutral-800 dark:bg-neutral-950/50">
+          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+            <div className="mx-auto max-w-3xl text-center">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-violet-600">Estudos e formação</p>
+              <h2 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">Seu objetivo ainda não é uma candidatura?</h2>
+              <p className="mt-4 text-neutral-600 dark:text-neutral-400">Acesse a jornada específica para escolher uma formação, estudar para concurso ou se preparar para a OAB.</p>
+            </div>
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {studyJourneys.map(({ href, title, description, linkLabel, Icon }) => (
+                <Link key={href} href={href} className="group rounded-2xl border border-neutral-200 bg-white p-6 transition hover:-translate-y-1 hover:border-violet-300 dark:border-neutral-800 dark:bg-neutral-950">
+                  <span className="inline-flex rounded-xl bg-violet-50 p-3 text-violet-600 dark:bg-violet-950/30"><Icon className="h-5 w-5" /></span>
+                  <h3 className="mt-4 text-lg font-bold">{title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-neutral-500">{description}</p>
+                  <span className="mt-5 inline-flex items-center gap-2 text-sm font-bold text-violet-600">{linkLabel} <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" /></span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-neutral-500">
+              <span>Quer acompanhar inscrições e editais?</span>
+              <Link href="/vestibulares" className="font-bold text-violet-600 hover:underline">Radar de vestibulares</Link>
+              <Link href="/concursos" className="font-bold text-violet-600 hover:underline">Radar de concursos</Link>
+            </div>
+          </div>
         </section>
 
         <section className="border-y border-neutral-200 bg-white/70 dark:border-neutral-800 dark:bg-neutral-950/50">

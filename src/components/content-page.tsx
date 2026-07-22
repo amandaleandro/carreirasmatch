@@ -11,7 +11,7 @@ export function ContentPage({
   maxWidthClass,
   backHref,
   backLabel,
-  hideNav = true,
+  hideNav = false,
   children,
 }: {
   eyebrow: string;
@@ -37,6 +37,14 @@ export function ContentPage({
             <BrandLogo heightClassName="h-9 sm:h-12 md:h-14" onDark />
           </Link>
           <div className="flex items-center gap-2">
+            {!hideNav && (
+              <nav aria-label="Navegação institucional" className="mr-2 hidden items-center gap-4 text-sm font-semibold text-white/70 lg:flex">
+                <Link href="/sobre" className="transition-colors hover:text-white">Sobre</Link>
+                <Link href="/contato" className="transition-colors hover:text-white">Contato</Link>
+                <Link href="/privacidade" className="transition-colors hover:text-white">Privacidade</Link>
+                <Link href="/termos" className="transition-colors hover:text-white">Termos</Link>
+              </nav>
+            )}
             <Link
               href={backHref ?? "/login"}
               className="rounded-lg border border-white/20 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-white/10 transition-colors whitespace-nowrap"
@@ -80,9 +88,9 @@ export function ContentPage({
   );
 }
 
-export function ContentSection({ title, children }: { title: string; children: ReactNode }) {
+export function ContentSection({ id, title, children }: { id?: string; title: string; children: ReactNode }) {
   return (
-    <section className="[&:not(:first-child)]:mt-8 [&:not(:first-child)]:pt-8 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-neutral-100 dark:[&:not(:first-child)]:border-neutral-900">
+    <section id={id} className="scroll-mt-8 [&:not(:first-child)]:mt-8 [&:not(:first-child)]:pt-8 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-neutral-100 dark:[&:not(:first-child)]:border-neutral-900">
       <h2 className="text-base font-bold text-neutral-900 dark:text-white mb-3">{title}</h2>
       <div className="space-y-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
         {children}

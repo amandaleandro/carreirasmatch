@@ -1,14 +1,32 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { Bot, CreditCard, FileCheck2, UserRoundCheck } from "lucide-react";
 import { ContentPage, ContentSection } from "@/components/content-page";
 
 export const metadata: Metadata = {
   title: "Termos de Uso",
   description: "Termos de uso da plataforma CarreirasMatch.",
+  alternates: { canonical: "/termos" },
 };
 
 export default function TermosPage() {
   return (
-    <ContentPage eyebrow="Última atualização: 09/07/2026" title="Termos de Uso">
+    <ContentPage eyebrow="Última atualização: 22/07/2026" title="Termos de Uso" description="Estas são as regras para usar os serviços, ferramentas e conteúdos do CarreirasMatch." wide>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {[
+          [UserRoundCheck, "Sua conta", "Você é responsável pelas informações enviadas e pela segurança do acesso."],
+          [Bot, "Conteúdo por IA", "As sugestões são orientações automáticas e precisam da sua revisão."],
+          [CreditCard, "Compras", "Valores e condições aplicáveis aparecem antes da confirmação do pagamento."],
+        ].map(([Icon, title, text]) => {
+          const TopicIcon = Icon as typeof Bot;
+          return <article key={String(title)} className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-5 dark:border-neutral-800 dark:bg-neutral-900/40"><TopicIcon className="h-5 w-5 text-blue-600" /><h2 className="mt-3 font-bold">{String(title)}</h2><p className="mt-1 text-xs leading-relaxed text-neutral-500">{String(text)}</p></article>;
+        })}
+      </div>
+
+      <div className="mt-6 rounded-2xl border border-blue-200 bg-blue-50 p-5 text-sm leading-relaxed text-neutral-700 dark:border-blue-900 dark:bg-blue-950/20 dark:text-neutral-300">
+        <strong className="text-neutral-950 dark:text-white">Resumo importante:</strong> o CarreirasMatch oferece apoio à tomada de decisão, mas não garante contratação, aprovação em prova ou resultado profissional específico. Leia os termos completos abaixo.
+      </div>
+
       <ContentSection title="1. Sobre o CarreirasMatch">
         <p>
           O CarreirasMatch é uma plataforma que analisa currículos com auxílio de
@@ -70,9 +88,14 @@ export default function TermosPage() {
         <p>
           Podemos atualizar estes Termos periodicamente; alterações relevantes serão
           comunicadas na plataforma. Para dúvidas, entre em contato pelo e-mail
-          informado na página de suporte/contato do site.
+          contato@carreirasmatch.com.br ou pela página de contato do site.
         </p>
       </ContentSection>
+
+      <section className="mt-8 flex flex-col gap-4 rounded-2xl bg-slate-950 p-6 text-white sm:flex-row sm:items-center sm:justify-between">
+        <div><p className="flex items-center gap-2 font-bold"><FileCheck2 className="h-5 w-5 text-blue-300" /> Ficou com alguma dúvida sobre estes termos?</p><p className="mt-1 text-sm text-white/60">Consulte também a Política de Privacidade ou fale diretamente com a equipe.</p></div>
+        <div className="flex shrink-0 flex-wrap gap-2"><Link href="/privacidade" className="rounded-xl border border-white/20 px-4 py-2.5 text-sm font-bold hover:bg-white/10">Ver privacidade</Link><Link href="/contato" className="rounded-xl bg-white px-4 py-2.5 text-sm font-bold text-slate-950 hover:bg-blue-50">Entrar em contato</Link></div>
+      </section>
     </ContentPage>
   );
 }

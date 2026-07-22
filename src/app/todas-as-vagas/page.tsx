@@ -89,13 +89,21 @@ export default async function AllJobsPage({
     andFilters.push({ contractType: { contains: contractType, mode: "insensitive" } });
   }
   if (city) {
+    // Coluna estruturada `city` (mais precisa, já normalizada) OR o texto livre
+    // de `location` (cobre vagas que ainda não passaram pelo backfill/parser).
     andFilters.push({
-      OR: locationSearchVariants(city).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+      OR: [
+        ...locationSearchVariants(city).map((variant) => ({ city: { contains: variant, mode: "insensitive" } })),
+        ...locationSearchVariants(city).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+      ],
     });
   }
   if (state) {
     andFilters.push({
-      OR: stateSearchVariants(state).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+      OR: [
+        { state: state.trim().toUpperCase() },
+        ...stateSearchVariants(state).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+      ],
     });
   }
 

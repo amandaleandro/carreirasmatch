@@ -1,80 +1,77 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ArrowRight, Eye, ShieldCheck, Sparkles, Target, UsersRound } from "lucide-react";
 import { ContentPage } from "@/components/content-page";
 
 export const metadata: Metadata = {
-  title: "Sobre nós",
-  description: "Conheça a missão do CarreirasMatch: ajudar você a se posicionar com confiança em cada etapa da carreira.",
+  title: "Sobre o CarreirasMatch",
+  description: "Conheça a missão, os princípios e a forma de trabalho do CarreirasMatch.",
+  alternates: { canonical: "/sobre" },
 };
 
-const VALUES = [
+const PRINCIPLES = [
   {
-    icon: "🎯",
-    title: "Clareza em vez de jargão",
-    description:
-      "Nada de termo difícil ou relatório genérico. Cada análise devolve o que está bom, o que falta e o próximo passo, em linguagem direta.",
+    Icon: Eye,
+    title: "Clareza antes de complexidade",
+    description: "Cada resultado deve explicar o que foi identificado, por que isso importa e qual é o próximo passo.",
   },
   {
-    icon: "🧭",
-    title: "Feito para cada momento",
-    description:
-      "Estagiário, primeiro emprego, transição de carreira, recolocação ou jovem aprendiz: a experiência muda porque o desafio de cada fase é diferente.",
+    Icon: ShieldCheck,
+    title: "Sem inventar experiências",
+    description: "A tecnologia ajuda a apresentar melhor fatos verdadeiros. A decisão e a revisão final continuam sendo suas.",
   },
   {
-    icon: "🤝",
-    title: "Sem julgamento",
-    description:
-      "Gap no currículo, pouca experiência, mudança de área, a gente lê sua história como ela é e ajuda a contar isso a seu favor.",
+    Icon: UsersRound,
+    title: "Contexto importa",
+    description: "Estágio, primeiro emprego, recolocação e transição exigem orientações diferentes, não uma resposta genérica.",
   },
-];
+] as const;
 
 export default function SobrePage() {
   return (
     <ContentPage
-      eyebrow="Sobre nós"
-      title="Ajudamos você a se posicionar com confiança em cada momento da carreira."
-      description="Não somos só um analisador de currículo, somos um copiloto para as decisões que mais pesam na sua trajetória profissional."
+      eyebrow="Sobre o CarreirasMatch"
+      title="Mais clareza entre a vaga que você encontrou e a candidatura que vai enviar."
+      description="Transformamos uma comparação difícil em ajustes práticos para você decidir e agir com mais confiança."
+      wide
     >
-      <div className="space-y-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-        <p>
-          O CarreirasMatch nasceu de uma constatação simples: a maioria das pessoas não perde
-          uma vaga por falta de capacidade, e sim por não saber como se apresentar para ela.
-          Currículo genérico, insegurança na hora da entrevista e falta de um plano claro
-          custam oportunidades todos os dias.
-        </p>
-        <p>
-          Por isso, criamos uma plataforma que usa inteligência artificial para analisar seu
-          currículo em relação a uma vaga real, mostrar exatamente onde estão as lacunas e
-          te dar um caminho concreto, score de aderência, palavras-chave, perguntas prováveis
-          de entrevista e plano de ação, em vez de conselhos vagos.
-        </p>
+      <div className="grid gap-8 lg:grid-cols-[1.1fr_.9fr] lg:items-start">
+        <div className="space-y-4 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+          <h2 className="text-xl font-bold text-neutral-950 dark:text-white">Por que existimos</h2>
+          <p>Muita gente tem capacidade para uma oportunidade, mas não consegue tornar essa capacidade visível no currículo ou na entrevista. Uma descrição genérica, a ausência das palavras certas e a falta de preparação podem esconder experiências relevantes.</p>
+          <p>O CarreirasMatch compara o currículo com uma vaga real e transforma o diagnóstico em ações: requisitos encontrados, lacunas que ainda precisam ser comprovadas, palavras-chave, sugestões de texto e preparação para entrevista.</p>
+          <p>Não prometemos contratação. Entregamos contexto para você melhorar sua apresentação sem distorcer sua história.</p>
+        </div>
+        <aside className="rounded-2xl bg-slate-950 p-6 text-white shadow-lg">
+          <span className="inline-flex rounded-xl bg-blue-500/15 p-3 text-blue-300"><Target className="h-6 w-6" /></span>
+          <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-blue-300">Nossa missão</p>
+          <p className="mt-3 text-xl font-bold leading-snug">Ajudar cada pessoa a apresentar melhor o que realmente sabe fazer.</p>
+          <p className="mt-3 text-sm leading-relaxed text-white/60">Da primeira oportunidade a uma mudança de carreira, com orientação específica para o momento vivido.</p>
+        </aside>
       </div>
 
-      <div className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-900">
-        <h2 className="text-base font-bold text-neutral-900 dark:text-white mb-4">O que guia o nosso trabalho</h2>
-        <div className="grid gap-3 sm:grid-cols-3">
-          {VALUES.map((value) => (
-            <div
-              key={value.title}
-              className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-700 transition-all"
-            >
-              <span className="text-xl">{value.icon}</span>
-              <p className="font-bold text-sm mt-2">{value.title}</p>
-              <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-1.5 leading-relaxed">{value.description}</p>
-            </div>
+      <section className="mt-10 border-t border-neutral-100 pt-10 dark:border-neutral-900">
+        <p className="text-xs font-bold uppercase tracking-[0.18em] text-blue-600">Como trabalhamos</p>
+        <h2 className="mt-2 text-xl font-bold">Princípios que aparecem no produto</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {PRINCIPLES.map(({ Icon, title, description }) => (
+            <article key={title} className="rounded-2xl border border-neutral-200 bg-neutral-50/60 p-5 dark:border-neutral-800 dark:bg-neutral-900/40">
+              <Icon className="h-5 w-5 text-blue-600" />
+              <h3 className="mt-4 font-bold">{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-neutral-500">{description}</p>
+            </article>
           ))}
         </div>
-      </div>
+      </section>
 
-      <p className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-900 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-        Ainda estamos no começo dessa jornada e construímos o produto ouvindo quem usa, 
-        estudantes, estagiários, quem busca o primeiro emprego, quem está mudando de área e
-        quem está se recolocando no mercado. Se você tem feedback, adoramos ouvir pela{" "}
-        <Link href="/contato" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-          página de contato
-        </Link>
-        .
-      </p>
+      <section className="mt-10 grid gap-5 rounded-2xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-900 dark:bg-blue-950/20 sm:grid-cols-[1fr_auto] sm:items-center">
+        <div>
+          <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-blue-700 dark:text-blue-300"><Sparkles className="h-4 w-4" /> Produto em evolução</span>
+          <h2 className="mt-2 text-lg font-bold">Sua experiência ajuda a melhorar o CarreirasMatch.</h2>
+          <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-300">Conte o que funcionou, o que ficou confuso ou o que ainda está faltando.</p>
+        </div>
+        <Link href="/contato" className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700">Falar com a gente <ArrowRight className="h-4 w-4" /></Link>
+      </section>
     </ContentPage>
   );
 }
