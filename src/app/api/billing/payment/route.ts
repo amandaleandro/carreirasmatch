@@ -106,6 +106,30 @@ export async function POST(req: NextRequest) {
     userId = user.id;
   }
 
+  // Duplo clique / retry de rede reenviam o mesmo form: sem essa trava, cada
+  // POST cobra de novo no Mercado Pago e cria outro Payment igual (foi o que
+  // gerou os pagamentos duplicados vistos no admin). Diagnóstico também trava
+  // por analysisId, já que a mesma análise não pode ser paga duas vezes.
+  const duplicateWindow = new Date(Date.now() - 2 * 60 * 1000);
+  const recentDuplicate = await prisma.payment.findFirst({
+    where: {
+      userId,
+      kind,
+      status: { in: ["paid", "pending"] },
+      createdAt: { gte: duplicateWindow },
+      ...(kind === "diagnostic" ? { analysisId } : {}),
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  if (recentDuplicate) {
+    return NextResponse.json({
+      status: recentDuplicate.status === "paid" ? "approved" : "pending",
+      statusDetail: recentDuplicate.status,
+      pix: null,
+      ...(isLoggedIn ? {} : { registerUrl: `/register?email=${encodeURIComponent(email)}` }),
+    });
+  }
+
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
   let baseAmountCents: number;
   let productName: string;
