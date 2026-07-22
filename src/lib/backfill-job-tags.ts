@@ -53,9 +53,10 @@ export async function backfillContractTypeIfNeeded(): Promise<{ scanned: number;
 
 /**
  * One-time backfill: derives area/seniority/workModel/entryLevel/company/salaryMin
- * (and fills a null expiresAt) for jobs ingested before the job-tags migration,
- * which have empty tag columns. Idempotent - only rows whose derived values still
- * differ from what is stored are written, so it is safe to run repeatedly.
+ * /city/state (and fills a null expiresAt) for jobs ingested before the job-tags
+ * migration, which have empty tag columns. Idempotent - only rows whose derived
+ * values still differ from what is stored are written, so it is safe to run
+ * repeatedly.
  */
 export async function backfillJobTags(): Promise<{ scanned: number; updated: number }> {
   const jobs = await prisma.job.findMany({
@@ -73,6 +74,8 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
       contractType: true,
       entryLevel: true,
       salaryMin: true,
+      city: true,
+      state: true,
       expiresAt: true,
       createdAt: true,
     },
@@ -94,6 +97,8 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
       tags.contractType !== job.contractType ||
       tags.entryLevel !== job.entryLevel ||
       (tags.salaryMin ?? null) !== job.salaryMin ||
+      tags.city !== job.city ||
+      tags.state !== job.state ||
       job.expiresAt === null;
 
     if (!changed) continue;
@@ -108,11 +113,42 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
         contractType: tags.contractType,
         entryLevel: tags.entryLevel,
         salaryMin: tags.salaryMin ?? null,
+        city: tags.city,
+        state: tags.state,
         expiresAt: nextExpiresAt,
       },
     });
     updated += 1;
   }
 
+  return { scanned: jobs.length, updated };
+}
+
+const CITY_STATE_BACKFILL_KEY = "job-tags:city-state-backfilled-v1";
+
+/**
+ * One-time pass (tracked via app-settings, not column contents) to derive
+ * `city`/`state` for jobs ingested before those columns existed. Separate from
+ * `backfillJobTags` because those jobs already have `company` set, so they
+ * would never be picked up by `countJobsNeedingTags`'s guard.
+ */
+export async function backfillCityStateIfNeeded(): Promise<{ scanned: number; updated: number } | null> {
+  const { getSetting, setSetting } = await import("@/lib/app-settings");
+  if (await getSetting(CITY_STATE_BACKFILL_KEY)) return null;
+
+  const jobs = await prisma.job.findMany({
+    where: { active: true, city: "", state: "", location: { not: null } },
+    select: { id: true, jobTitle: true, jobText: true, url: true, location: true },
+  });
+
+  let updated = 0;
+  for (const job of jobs) {
+    const { city, state } = classifyJobForStorage(job);
+    if (!city && !state) continue;
+    await prisma.job.update({ where: { id: job.id }, data: { city, state } });
+    updated += 1;
+  }
+
+  await setSetting(CITY_STATE_BACKFILL_KEY, "true");
   return { scanned: jobs.length, updated };
 }

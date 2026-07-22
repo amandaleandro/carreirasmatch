@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { getOrCreateFeedMatches, FEED_PAGE_SIZE } from "@/lib/job-feed";
 import { CareerTrack } from "@/components/analysis-display";
 import { deriveJobTags, tierFromScore, bypassesLocationFilter, isEntryLevelJob } from "@/lib/feed-tags";
+import { BRAZIL_STATE_NAMES } from "@/lib/brazil-locations";
 import { FeedList } from "./FeedList";
 import { AllJobsList } from "./AllJobsList";
 import { AddJobForm } from "./AddJobForm";
@@ -40,7 +41,8 @@ export default async function FeedPage({
     workModel?: string;
     area?: string;
     seniority?: string;
-    location?: string;
+    state?: string;
+    city?: string;
     entryLevel?: string;
     contractType?: string;
     sort?: string;
@@ -125,8 +127,20 @@ export default async function FeedPage({
   const workModels = Array.from(new Set(enriched.map((e) => e.tags.workModel).filter(Boolean))) as string[];
   const areas = Array.from(new Set(enriched.map((e) => e.tags.area).filter(Boolean))) as string[];
   const seniorities = Array.from(new Set(enriched.map((e) => e.tags.seniority).filter(Boolean))) as string[];
-  const locations = Array.from(new Set(enriched.map((e) => e.tags.location).filter(Boolean))) as string[];
   const contractTypes = Array.from(new Set(enriched.map((e) => e.tags.contractType).filter(Boolean))) as string[];
+
+  const states = Array.from(new Set(enriched.map((e) => e.match.job.state).filter(Boolean))).map((code) => ({
+    code,
+    label: BRAZIL_STATE_NAMES[code] ?? code,
+  }));
+  const citiesByState = enriched.reduce<Record<string, string[]>>((map, e) => {
+    const { state, city } = e.match.job;
+    if (!state || !city) return map;
+    const set = new Set(map[state] ?? []);
+    set.add(city);
+    map[state] = [...set];
+    return map;
+  }, {});
 
   const effectiveTier = params.tier || "aligned";
   let filtered = enriched;
@@ -141,9 +155,14 @@ export default async function FeedPage({
   if (params.seniority) filtered = filtered.filter((e) => e.tags.seniority === params.seniority);
   if (params.contractType) filtered = filtered.filter((e) => e.tags.contractType === params.contractType);
   if (params.entryLevel === "yes") filtered = filtered.filter((e) => isEntryLevelJob(e.match.job));
-  if (params.location) {
+  if (params.state) {
     filtered = filtered.filter(
-      (e) => bypassesLocationFilter(e.tags.workModel) || e.tags.location === params.location
+      (e) => bypassesLocationFilter(e.tags.workModel) || e.match.job.state === params.state
+    );
+  }
+  if (params.city) {
+    filtered = filtered.filter(
+      (e) => bypassesLocationFilter(e.tags.workModel) || e.match.job.city === params.city
     );
   }
 
@@ -264,14 +283,16 @@ export default async function FeedPage({
         workModels={workModels}
         areas={areas}
         seniorities={seniorities}
-        locations={locations}
+        states={states}
+        citiesByState={citiesByState}
         contractTypes={contractTypes}
         current={{
           tier: params.tier,
           workModel: params.workModel,
           area: params.area,
           seniority: params.seniority,
-          location: params.location,
+          state: params.state,
+          city: params.city,
           entryLevel: params.entryLevel,
           contractType: params.contractType,
           sort: params.sort,

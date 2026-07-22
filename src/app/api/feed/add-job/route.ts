@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { fetchJobFromUrl } from "@/lib/scrape-job";
+import { classifyJobForStorage } from "@/lib/feed-tags";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -28,7 +29,14 @@ export async function POST(req: NextRequest) {
         url: url.trim(),
         jobTitle: scraped.jobTitle,
         jobText: scraped.jobText,
+        location: scraped.location,
         addedByUserId: session.user.id,
+        ...classifyJobForStorage({
+          jobTitle: scraped.jobTitle,
+          jobText: scraped.jobText,
+          url: url.trim(),
+          location: scraped.location,
+        }),
       },
     });
 

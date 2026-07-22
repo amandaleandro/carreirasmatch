@@ -13,9 +13,14 @@ import {
   CheckCircle2,
   TrendingUp,
   RefreshCw,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
+const PAGE_SIZE = 6;
+
 export type ProfileSuggestionType = "course" | "certification" | "book";
+export type ProfileSuggestionStatus = "pending" | "in_progress" | "done";
 
 type ProfileSuggestion = {
   id: string;
@@ -29,6 +34,22 @@ type ProfileSuggestion = {
   gapAddressed: string;
   modality: string;
   city: string;
+  status: ProfileSuggestionStatus;
+};
+
+const STATUS_OPTIONS: Record<ProfileSuggestionType, { value: ProfileSuggestionStatus; label: string }[]> = {
+  course: [
+    { value: "in_progress", label: "Fazendo" },
+    { value: "done", label: "Já fiz" },
+  ],
+  certification: [
+    { value: "in_progress", label: "Fazendo" },
+    { value: "done", label: "Já fiz" },
+  ],
+  book: [
+    { value: "in_progress", label: "Vou ler" },
+    { value: "done", label: "Já li" },
+  ],
 };
 
 const TYPE_CONFIG: Record<ProfileSuggestionType, { label: string; icon: React.ReactNode; chip: string }> = {
@@ -62,6 +83,8 @@ export function ProfileSuggestions({
   const [typeFilter, setTypeFilter] = useState<"all" | ProfileSuggestionType>("all");
   const [modalityFilter, setModalityFilter] = useState<"all" | "online" | "presencial">("all");
   const [freeOnly, setFreeOnly] = useState(false);
+  const [page, setPage] = useState(1);
+  const [externalPage, setExternalPage] = useState(1);
 
   const isFree = (s: ProfileSuggestion) => /gratuito|grátis|gratis|r\$\s*0/i.test(s.priceLabel);
 
@@ -75,6 +98,41 @@ export function ProfileSuggestions({
     if (freeOnly && !isFree(s)) return false;
     return true;
   });
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  const externalTotalPages = Math.max(1, Math.ceil(externalCourses.length / PAGE_SIZE));
+  const currentExternalPage = Math.min(externalPage, externalTotalPages);
+  const paginatedExternal = externalCourses.slice(
+    (currentExternalPage - 1) * PAGE_SIZE,
+    currentExternalPage * PAGE_SIZE,
+  );
+
+  function updateFilter<T>(setter: (v: T) => void, value: T) {
+    setter(value);
+    setPage(1);
+  }
+
+  async function setStatus(id: string, status: ProfileSuggestionStatus) {
+    const current = suggestions.find((s) => s.id === id);
+    if (!current) return;
+    const previousStatus = current.status;
+    const nextStatus = previousStatus === status ? "pending" : status;
+
+    setSuggestions((prev) => prev.map((s) => (s.id === id ? { ...s, status: nextStatus } : s)));
+
+    try {
+      await fetch(`/api/profile-suggestions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+    } catch {
+      setSuggestions((prev) => prev.map((s) => (s.id === id ? { ...s, status: previousStatus } : s)));
+    }
+  }
 
   async function generate() {
     setLoading(true);
@@ -162,7 +220,7 @@ export function ProfileSuggestions({
             <div className="flex flex-wrap items-center gap-2">
               <FilterGroup
                 value={typeFilter}
-                onChange={setTypeFilter}
+                onChange={(v) => updateFilter(setTypeFilter, v)}
                 options={[
                   { value: "all", label: "Todos" },
                   { value: "course", label: "Cursos" },
@@ -172,7 +230,7 @@ export function ProfileSuggestions({
               />
               <FilterGroup
                 value={modalityFilter}
-                onChange={setModalityFilter}
+                onChange={(v) => updateFilter(setModalityFilter, v)}
                 options={[
                   { value: "all", label: "Toda modalidade" },
                   { value: "online", label: "Online" },
@@ -181,7 +239,7 @@ export function ProfileSuggestions({
               />
               <button
                 type="button"
-                onClick={() => setFreeOnly((v) => !v)}
+                onClick={() => updateFilter(setFreeOnly, !freeOnly)}
                 className={`rounded-full border px-3.5 py-1.5 text-xs font-semibold transition-all ${
                   freeOnly
                     ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
@@ -203,7 +261,7 @@ export function ProfileSuggestions({
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {filtered.map((s) => {
+              {paginated.map((s) => {
                 const config = TYPE_CONFIG[s.type];
                 return (
                   <div
@@ -275,6 +333,24 @@ export function ProfileSuggestions({
                         </a>
                       )}
 
+                      <div className="flex flex-wrap gap-1.5">
+                        {STATUS_OPTIONS[s.type].map((opt) => (
+                          <button
+                            key={opt.value}
+                            type="button"
+                            onClick={() => setStatus(s.id, opt.value)}
+                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                              s.status === opt.value
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                                : "border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 hover:border-slate-300"
+                            }`}
+                          >
+                            {s.status === opt.value && <CheckCircle2 className="w-3 h-3" />}
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+
                       <div>
                         <div className="flex justify-between text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                           <span className="flex items-center gap-1">
@@ -296,6 +372,14 @@ export function ProfileSuggestions({
               })}
             </div>
           )}
+
+          {filtered.length > PAGE_SIZE && (
+            <PaginationControls
+              page={currentPage}
+              totalPages={totalPages}
+              onChange={setPage}
+            />
+          )}
         </div>
       )}
 
@@ -313,7 +397,7 @@ export function ProfileSuggestions({
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {externalCourses.map((course) => (
+            {paginatedExternal.map((course) => (
               <a
                 key={course.id}
                 href={course.url}
@@ -348,8 +432,52 @@ export function ProfileSuggestions({
               </a>
             ))}
           </div>
+
+          {externalCourses.length > PAGE_SIZE && (
+            <PaginationControls
+              page={currentExternalPage}
+              totalPages={externalTotalPages}
+              onChange={setExternalPage}
+            />
+          )}
         </section>
       )}
+    </div>
+  );
+}
+
+function PaginationControls({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number;
+  totalPages: number;
+  onChange: (page: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-center gap-3 pt-2">
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(1, page - 1))}
+        disabled={page <= 1}
+        className="inline-flex items-center gap-1 rounded-full border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold px-3 py-1.5 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+      >
+        <ChevronLeft className="w-3.5 h-3.5" />
+        Anterior
+      </button>
+      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+        Página {page} de {totalPages}
+      </span>
+      <button
+        type="button"
+        onClick={() => onChange(Math.min(totalPages, page + 1))}
+        disabled={page >= totalPages}
+        className="inline-flex items-center gap-1 rounded-full border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs font-semibold px-3 py-1.5 hover:border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+      >
+        Próxima
+        <ChevronRight className="w-3.5 h-3.5" />
+      </button>
     </div>
   );
 }

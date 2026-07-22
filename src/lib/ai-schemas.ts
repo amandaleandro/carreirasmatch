@@ -51,5 +51,7 @@ export const profileSuggestionsSchema = z.object({
     gapAddressed: z.string().optional(),
     // Só faz sentido para "course": "online" | "presencial" | "híbrido". Livre para a IA omitir.
     modality: z.string().optional(),
+    // Só para course presencial: cidade onde ele acontece.
+    city: z.string().optional(),
   })).min(1),
 });

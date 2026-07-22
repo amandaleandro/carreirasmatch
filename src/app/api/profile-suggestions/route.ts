@@ -46,7 +46,7 @@ async function generateSuggestions(userId: string) {
   const [user, analyses, courses, externalCourses] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
-      select: { professionalArea: true, careerSegment: true, hasFormalEducation: true },
+      select: { professionalArea: true, careerSegment: true, hasFormalEducation: true, city: true, state: true },
     }),
     prisma.analysis.findMany({
       where: { resume: { userId } },
@@ -81,9 +81,12 @@ async function generateSuggestions(userId: string) {
 
   // Relevância por sobreposição de tokens contra área + lacunas (substitui o `includes`),
   // priorizando cursos que atacam as lacunas mais frequentes das análises do candidato.
+  // Presenciais na cidade/estado do candidato ganham bônus de região (ver course-match.ts).
   const liveOptions = rankCourses(externalCourses, {
     area: user?.professionalArea,
     skillGaps: topSkillGaps,
+    city: user?.city,
+    state: user?.state,
   })
     .slice(0, 30)
     .map((course) => ({
@@ -106,30 +109,50 @@ async function generateSuggestions(userId: string) {
     professionalArea: user?.professionalArea,
     careerSegment: user?.careerSegment,
     hasFormalEducation: user?.hasFormalEducation,
+    city: user?.city,
+    state: user?.state,
     topSkillGaps,
     knownSkills,
     completedCourses,
     curatedOptions,
   });
 
-  const [, suggestions] = await prisma.$transaction([
-    prisma.profileSuggestion.deleteMany({ where: { userId } }),
-    prisma.profileSuggestion.createManyAndReturn({
-      data: result.suggestions.map((s) => ({
-        userId,
-        type: s.type,
-        title: s.title,
-        provider: s.provider,
-        url: s.url ?? "",
-        priceLabel: s.priceLabel,
-        impactScore: s.impactScore,
-        impactReason: s.impactReason,
-        gapAddressed: s.gapAddressed ?? "",
-        modality: s.type === "course" ? (s.modality ?? "") : "",
-        city: "",
-      })),
-    }),
-  ]);
+  // Upsert em vez de apagar tudo: sugestões já marcadas como "fazendo"/"concluído"
+  // pelo usuário não podem sumir só porque ele gerou um novo plano.
+  await prisma.$transaction(
+    result.suggestions.map((s) =>
+      prisma.profileSuggestion.upsert({
+        where: {
+          userId_title_provider: { userId, title: s.title, provider: s.provider },
+        },
+        create: {
+          userId,
+          type: s.type,
+          title: s.title,
+          provider: s.provider,
+          url: s.url ?? "",
+          priceLabel: s.priceLabel,
+          impactScore: s.impactScore,
+          impactReason: s.impactReason,
+          gapAddressed: s.gapAddressed ?? "",
+          modality: s.type === "course" ? (s.modality ?? "") : "",
+          city: s.type === "course" ? (s.city ?? "") : "",
+        },
+        update: {
+          priceLabel: s.priceLabel,
+          impactScore: s.impactScore,
+          impactReason: s.impactReason,
+          gapAddressed: s.gapAddressed ?? "",
+          city: s.type === "course" ? (s.city ?? "") : "",
+        },
+      }),
+    ),
+  );
+
+  const suggestions = await prisma.profileSuggestion.findMany({
+    where: { userId },
+    orderBy: { impactScore: "desc" },
+  });
 
   return NextResponse.json({ suggestions });
 }

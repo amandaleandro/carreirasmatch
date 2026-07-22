@@ -57,3 +57,91 @@ export function stateSearchVariants(uf: string): string[] {
   }
   return [...variants];
 }
+
+const REMOTE_ONLY_PATTERN = /^(remoto|remote|home\s*-?\s*office|anywhere|worldwide|brasil|brazil)$/i;
+
+const LOCATION_SEPARATORS = /[,/|]|(?:\s-\s)/;
+
+const NOISE_SEGMENTS = /^(brasil|brazil|br)$/i;
+
+// UFs ordenadas por tamanho do nome (desc) para casar "Rio Grande do Sul" antes
+// de um eventual "Rio de Janeiro" via prefixo comum não é um risco aqui porque
+// cada state usa `\b...\b`, mas mantemos a ordem por clareza de leitura.
+const STATE_MATCHERS: { code: string; pattern: RegExp }[] = Object.keys(BRAZIL_STATE_NAMES).map((code) => {
+  const variants = stateSearchVariants(code)
+    .map((variant) => variant.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .sort((a, b) => b.length - a.length);
+  return { code, pattern: new RegExp(`\\b(${variants.join("|")})\\b`, "i") };
+});
+
+function titleCase(value: string): string {
+  return value
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((word) => (word.length <= 2 ? word : word[0].toUpperCase() + word.slice(1).toLowerCase()))
+    .join(" ");
+}
+
+// Sigla de UF (2 letras) isolada num segmento - sempre é o estado, nunca a cidade.
+function isStateCodeSegment(segment: string): boolean {
+  const upper = segment.trim().toUpperCase();
+  return upper.length === 2 && upper in BRAZIL_STATE_NAMES;
+}
+
+// Nome por extenso de UF (com/sem acento) num segmento - é o estado só quando é o
+// ÚNICO segmento do texto (ex.: raw = "Rio de Janeiro" sozinho). Quando aparece
+// ao lado de uma sigla (ex.: "São Paulo, SP"), é o padrão comum "Cidade, UF" e a
+// capital homônima do estado é a leitura correta - por isso essa checagem some
+// nesse caso (ver `hasExplicitCodeSegment` em `parseBrazilLocation`).
+const ALL_STATE_FULLNAME_VARIANTS_LOWER = new Set(
+  Object.values(BRAZIL_STATE_NAMES).flatMap((name) => locationSearchVariants(name).map((v) => v.toLowerCase())),
+);
+
+function isFullStateNameSegment(segment: string): boolean {
+  return ALL_STATE_FULLNAME_VARIANTS_LOWER.has(segment.toLowerCase());
+}
+
+/**
+ * Extrai {city, state} de um texto livre de localização vindo de qualquer fonte
+ * de vaga/curso ("São Paulo, SP", "Sao Paulo - SP", "SP", "Rio de Janeiro",
+ * "Remoto"...). Heurística determinística, sem chamada externa: identifica a UF
+ * comparando o texto contra as variantes canônicas de cada uma das 27 UFs, e
+ * usa o que sobra (sem o trecho do estado/ruído) como cidade. Retorna campos
+ * vazios quando não há UF reconhecível ou o texto é remoto/genérico.
+ *
+ * Quando o único segmento do texto é o nome do estado (ex.: "São Paulo", que
+ * também é o nome da capital, sem nenhuma sigla de UF ao lado), a cidade fica
+ * vazia de propósito, não dá pra distinguir estado de capital homônima sem
+ * mais contexto, e assumir errado é pior que não saber.
+ */
+export function parseBrazilLocation(raw: string | null | undefined): { city: string; state: string } {
+  const trimmed = (raw ?? "").trim();
+  if (!trimmed || REMOTE_ONLY_PATTERN.test(trimmed)) return { city: "", state: "" };
+
+  let state = "";
+  let stateMatchLength = 0;
+  for (const { code, pattern } of STATE_MATCHERS) {
+    const match = trimmed.match(pattern);
+    if (match && match[0].length > stateMatchLength) {
+      state = code;
+      stateMatchLength = match[0].length;
+    }
+  }
+
+  const segments = trimmed
+    .split(LOCATION_SEPARATORS)
+    .map((segment) => segment.trim())
+    .filter((segment) => segment.length > 0 && !NOISE_SEGMENTS.test(segment));
+
+  const hasExplicitCodeSegment = segments.some(isStateCodeSegment);
+
+  const cityCandidate = segments.find((segment) => {
+    if (isStateCodeSegment(segment)) return false;
+    if (REMOTE_ONLY_PATTERN.test(segment)) return false;
+    if (isFullStateNameSegment(segment) && !hasExplicitCodeSegment) return false;
+    return true;
+  });
+
+  const city = cityCandidate ? titleCase(cityCandidate) : "";
+  return { city, state };
+}

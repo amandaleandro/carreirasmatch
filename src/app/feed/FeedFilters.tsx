@@ -20,21 +20,24 @@ export function FeedFilters({
   workModels,
   areas,
   seniorities,
-  locations,
+  states,
+  citiesByState,
   contractTypes,
   current,
 }: {
   workModels: string[];
   areas: string[];
   seniorities: string[];
-  locations: string[];
+  states: { code: string; label: string }[];
+  citiesByState: Record<string, string[]>;
   contractTypes: string[];
   current: {
     tier?: string;
     workModel?: string;
     area?: string;
     seniority?: string;
-    location?: string;
+    state?: string;
+    city?: string;
     entryLevel?: string;
     contractType?: string;
     sort?: string;
@@ -46,7 +49,8 @@ export function FeedFilters({
   const workModel = current.workModel ?? "all";
   const area = current.area ?? "all";
   const seniority = current.seniority ?? "all";
-  const location = current.location ?? "all";
+  const state = current.state ?? "all";
+  const city = current.city ?? "all";
   const entryLevel = current.entryLevel ?? "all";
   const contractType = current.contractType ?? "all";
   const sort = current.sort ?? "fit";
@@ -56,13 +60,16 @@ export function FeedFilters({
     workModel !== "all" ||
     area !== "all" ||
     seniority !== "all" ||
-    location !== "all" ||
+    state !== "all" ||
+    city !== "all" ||
     entryLevel !== "all" ||
     contractType !== "all";
 
   function setParam(key: string, value: string) {
     const params = new URLSearchParams();
-    const next = { tier, workModel, area, seniority, location, entryLevel, contractType, sort, [key]: value };
+    const next = { tier, workModel, area, seniority, state, city, entryLevel, contractType, sort, [key]: value };
+    // Trocar o estado invalida a cidade selecionada anteriormente (pode não existir no novo estado).
+    if (key === "state") next.city = "all";
     for (const [paramKey, paramValue] of Object.entries(next)) {
       if (paramValue && paramValue !== "all" && paramValue !== "aligned") params.set(paramKey, paramValue);
     }
@@ -88,7 +95,8 @@ export function FeedFilters({
   const sortedAreas = [...areas].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const sortedSeniorities = [...seniorities].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const sortedContractTypes = [...contractTypes].sort((a, b) => a.localeCompare(b, "pt-BR"));
-  const sortedLocations = [...locations].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const sortedStates = [...states].sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+  const sortedCities = [...(citiesByState[state] ?? [])].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
   return (
     <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3.5 sm:p-4 shadow-sm shadow-slate-900/5 space-y-3">
@@ -202,18 +210,34 @@ export function FeedFilters({
         </select>
 
         <select
-          value={location}
-          onChange={(e) => setParam("location", e.target.value)}
+          value={state}
+          onChange={(e) => setParam("state", e.target.value)}
           className={selectClass}
           title="Vagas remotas e híbridas aparecem para qualquer localidade"
         >
-          <option value="all">Localidade</option>
-          {sortedLocations.map((option) => (
-            <option key={option} value={option}>
-              {option}
+          <option value="all">Estado</option>
+          {sortedStates.map((option) => (
+            <option key={option.code} value={option.code}>
+              {option.label}
             </option>
           ))}
         </select>
+
+        {state !== "all" && sortedCities.length > 0 && (
+          <select
+            value={city}
+            onChange={(e) => setParam("city", e.target.value)}
+            className={selectClass}
+            title="Vagas remotas e híbridas aparecem para qualquer localidade"
+          >
+            <option value="all">Cidade</option>
+            {sortedCities.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
     </div>
   );

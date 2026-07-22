@@ -34,19 +34,22 @@ export type MatchableCourse = {
   certificate?: boolean;
   modality?: string;
   featured?: boolean;
+  city?: string | null;
+  state?: string | null;
 };
 
 /**
  * Pontua um curso contra a área do candidato e suas lacunas. Maior = mais relevante.
  * - lacunas casadas valem mais que a área (é o que o candidato precisa aprender);
- * - gratuito e certificado dão um leve empurrão (mais acionável pra quem busca emprego).
+ * - gratuito e certificado dão um leve empurrão (mais acionável pra quem busca emprego);
+ * - curso presencial na cidade/estado do candidato ganha um empurrão extra, já que um
+ *   presencial longe da região dele é praticamente inacessível.
  */
 export function scoreCourse(
   course: MatchableCourse,
-  profile: { area?: string | null; skillGaps?: string[] },
+  profile: { area?: string | null; skillGaps?: string[]; city?: string | null; state?: string | null },
 ): number {
   const haystack = new Set([...tokenize(course.title), ...tokenize(course.area)]);
-  if (haystack.size === 0) return 0;
 
   let score = 0;
 
@@ -59,6 +62,16 @@ export function scoreCourse(
     const gapTokens = tokenize(gap);
     // conta a lacuna como casada se qualquer token dela aparecer no curso
     if (gapTokens.some((token) => haystack.has(token))) score += 3;
+  }
+
+  const isPresencial = (course.modality ?? "").toLowerCase() === "presencial";
+  if (isPresencial && (course.city || course.state)) {
+    const sameCity =
+      !!course.city && !!profile.city && normalizeText(course.city) === normalizeText(profile.city);
+    const sameState =
+      !!course.state && !!profile.state && normalizeText(course.state) === normalizeText(profile.state);
+    if (sameCity) score += 6;
+    else if (sameState) score += 3;
   }
 
   if (score === 0) {
@@ -78,7 +91,7 @@ export function scoreCourse(
  */
 export function rankCourses<T extends MatchableCourse>(
   courses: T[],
-  profile: { area?: string | null; skillGaps?: string[] },
+  profile: { area?: string | null; skillGaps?: string[]; city?: string | null; state?: string | null },
 ): T[] {
   return courses
     .map((course, index) => ({ course, index, score: scoreCourse(course, profile) }))

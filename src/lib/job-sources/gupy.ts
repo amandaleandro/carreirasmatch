@@ -118,6 +118,7 @@ export async function fetchGupyJobs(
       jobTitle: result.jobTitle,
       jobText: result.jobText,
       source: "gupy",
+      location: result.location,
     };
     return job;
   });
