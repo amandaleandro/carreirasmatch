@@ -63,7 +63,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   if (body.jobType !== undefined) data.jobType = String(body.jobType).trim();
 
   if (body.publishedToFeed !== undefined) {
-    data.publishedToFeed = Boolean(body.publishedToFeed);
+    const wantsToPublish = Boolean(body.publishedToFeed);
+    if (wantsToPublish && !company.logoUrl) {
+      return NextResponse.json(
+        { error: "Adicione o logo da empresa no seu perfil antes de publicar vagas no feed público." },
+        { status: 400 }
+      );
+    }
+    data.publishedToFeed = wantsToPublish;
   }
 
   if (Object.keys(data).length === 0) {

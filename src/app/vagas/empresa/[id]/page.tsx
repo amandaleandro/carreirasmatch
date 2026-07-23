@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, Sparkles } from "lucide-react";
 import { auth } from "@/auth";
@@ -14,7 +16,9 @@ export const dynamic = "force-dynamic";
 async function loadVaga(id: string) {
   return prisma.companyVaga.findFirst({
     where: { id, publishedToFeed: true, status: "open" },
-    include: { company: { select: { name: true, city: true, state: true } } },
+    include: {
+      company: { select: { name: true, city: true, state: true, logoUrl: true, slug: true, publicProfile: true } },
+    },
   });
 }
 
@@ -82,7 +86,28 @@ export default async function CompanyVagaPublicPage({ params }: { params: Promis
               Vaga de empresa
             </span>
             <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{vaga.title}</h1>
-            <p className="text-neutral-600 dark:text-neutral-300 font-medium">{vaga.company.name}</p>
+            <div className="flex items-center gap-2">
+              {vaga.company.logoUrl && (
+                <Image
+                  src={vaga.company.logoUrl}
+                  alt={vaga.company.name}
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 rounded-lg object-cover border border-neutral-200 dark:border-neutral-800"
+                  unoptimized
+                />
+              )}
+              {vaga.company.publicProfile && vaga.company.slug ? (
+                <Link
+                  href={`/empresas/${vaga.company.slug}`}
+                  className="text-neutral-600 dark:text-neutral-300 font-medium hover:underline"
+                >
+                  {vaga.company.name}
+                </Link>
+              ) : (
+                <p className="text-neutral-600 dark:text-neutral-300 font-medium">{vaga.company.name}</p>
+              )}
+            </div>
             {location && (
               <p className="flex items-center gap-1.5 text-sm text-neutral-500">
                 <MapPin className="h-4 w-4" strokeWidth={1.75} /> {location}

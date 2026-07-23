@@ -15,19 +15,24 @@ export function VagaActions({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const isOpen = status !== "closed";
 
   async function patch(payload: Record<string, unknown>) {
     setBusy(true);
+    setError(null);
     try {
       const res = await fetch(`/api/empresa/vagas/${vagaId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (!res.ok) throw new Error();
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Não foi possível atualizar a vaga.");
       router.refresh();
-    } catch {
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
       setBusy(false);
     }
   }
@@ -67,6 +72,7 @@ export function VagaActions({
   }
 
   return (
+    <div className="space-y-2">
     <div className="flex items-center gap-2 flex-wrap">
       <Link
         href={`/empresa/vagas/${vagaId}/editar`}
@@ -111,6 +117,8 @@ export function VagaActions({
       >
         Excluir
       </button>
+    </div>
+    {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
     </div>
   );
 }

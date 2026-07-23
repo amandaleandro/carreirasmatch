@@ -42,6 +42,13 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Preencha o cargo e a descrição da vaga." }, { status: 400 });
   }
 
+  if (publish && !company.logoUrl) {
+    return NextResponse.json(
+      { error: "Adicione o logo da empresa no seu perfil antes de publicar vagas no feed público." },
+      { status: 400 }
+    );
+  }
+
   // Deriva a subárea a partir do cargo+descrição (não pedimos isso na empresa
   // pra não mudar o formulário), reaproveitando a mesma taxonomia de cursos/vagas.
   const subarea = classifyArea(`${title} ${description}`, area).subarea;
