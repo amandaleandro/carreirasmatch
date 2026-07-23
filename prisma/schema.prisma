@@ -205,6 +205,7 @@ model Job {
   source        String     @default("scrape")
   company       String     @default("")
   area          String     @default("")
+  subarea       String     @default("")
   seniority     String     @default("")
   workModel     String     @default("")
   contractType  String     @default("")
@@ -648,6 +649,7 @@ model ExternalCourse {
   provider    String
   url         String   @unique
   area        String
+  subarea     String   @default("")
   city        String   @default("")
   state       String   @default("")
   modality    String   @default("online")
@@ -679,6 +681,7 @@ model CareerVideo {
   description String    @default("")
   thumbnail   String    @default("")
   area        String
+  subarea     String    @default("")
   durationSec Int       @default(0)
   publishedAt DateTime?
   active      Boolean   @default(true)
@@ -771,6 +774,7 @@ model PublicOpportunity {
   city           String   @default("")
   state          String   @default("")
   area           String   @default("")
+  subarea        String   @default("")
   education      String   @default("")
   experience     String   @default("")
   salary         String   @default("")
@@ -932,6 +936,7 @@ model CompanyVaga {
   title         String
   description   String
   area          String    @default("")
+  subarea       String    @default("")
   state         String    @default("")
   status        String    @default("open") // open | closed
   /// Campos opcionais que enriquecem o anúncio e o feed.

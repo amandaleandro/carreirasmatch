@@ -69,6 +69,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
       location: true,
       company: true,
       area: true,
+      subarea: true,
       seniority: true,
       workModel: true,
       contractType: true,
@@ -92,6 +93,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
     const changed =
       tags.company !== job.company ||
       tags.area !== job.area ||
+      tags.subarea !== job.subarea ||
       tags.seniority !== job.seniority ||
       tags.workModel !== job.workModel ||
       tags.contractType !== job.contractType ||
@@ -108,6 +110,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
       data: {
         company: tags.company,
         area: tags.area,
+        subarea: tags.subarea,
         seniority: tags.seniority,
         workModel: tags.workModel,
         contractType: tags.contractType,
@@ -121,6 +124,35 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
     updated += 1;
   }
 
+  return { scanned: jobs.length, updated };
+}
+
+const SUBAREA_BACKFILL_KEY = "job-tags:subarea-backfilled-v1";
+
+/**
+ * One-time pass (tracked via app-settings, not column contents) to derive
+ * `subarea` for jobs ingested before that column existed. Separate from
+ * `backfillJobTags` because those jobs already have `company` set, so they
+ * would never be picked up by `countJobsNeedingTags`'s guard.
+ */
+export async function backfillSubareaIfNeeded(): Promise<{ scanned: number; updated: number } | null> {
+  const { getSetting, setSetting } = await import("@/lib/app-settings");
+  if (await getSetting(SUBAREA_BACKFILL_KEY)) return null;
+
+  const jobs = await prisma.job.findMany({
+    where: { active: true, subarea: "" },
+    select: { id: true, jobTitle: true, jobText: true, url: true, location: true },
+  });
+
+  let updated = 0;
+  for (const job of jobs) {
+    const { subarea } = classifyJobForStorage(job);
+    if (!subarea) continue;
+    await prisma.job.update({ where: { id: job.id }, data: { subarea } });
+    updated += 1;
+  }
+
+  await setSetting(SUBAREA_BACKFILL_KEY, "true");
   return { scanned: jobs.length, updated };
 }
 

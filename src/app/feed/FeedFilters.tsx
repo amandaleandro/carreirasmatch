@@ -19,6 +19,7 @@ const SORT_OPTIONS = [
 export function FeedFilters({
   workModels,
   areas,
+  subareas,
   seniorities,
   states,
   citiesByState,
@@ -27,6 +28,7 @@ export function FeedFilters({
 }: {
   workModels: string[];
   areas: string[];
+  subareas: string[];
   seniorities: string[];
   states: { code: string; label: string }[];
   citiesByState: Record<string, string[]>;
@@ -35,6 +37,7 @@ export function FeedFilters({
     tier?: string;
     workModel?: string;
     area?: string;
+    subarea?: string;
     seniority?: string;
     state?: string;
     city?: string;
@@ -48,6 +51,7 @@ export function FeedFilters({
   const tier = current.tier ?? "aligned";
   const workModel = current.workModel ?? "all";
   const area = current.area ?? "all";
+  const subarea = current.subarea ?? "all";
   const seniority = current.seniority ?? "all";
   const state = current.state ?? "all";
   const city = current.city ?? "all";
@@ -59,6 +63,7 @@ export function FeedFilters({
     tier !== "aligned" ||
     workModel !== "all" ||
     area !== "all" ||
+    subarea !== "all" ||
     seniority !== "all" ||
     state !== "all" ||
     city !== "all" ||
@@ -67,7 +72,19 @@ export function FeedFilters({
 
   function setParam(key: string, value: string) {
     const params = new URLSearchParams();
-    const next = { tier, workModel, area, seniority, state, city, entryLevel, contractType, sort, [key]: value };
+    const next = {
+      tier,
+      workModel,
+      area,
+      subarea,
+      seniority,
+      state,
+      city,
+      entryLevel,
+      contractType,
+      sort,
+      [key]: value,
+    };
     // Trocar o estado invalida a cidade selecionada anteriormente (pode não existir no novo estado).
     if (key === "state") next.city = "all";
     for (const [paramKey, paramValue] of Object.entries(next)) {
@@ -93,6 +110,7 @@ export function FeedFilters({
 
   const sortedWorkModels = [...workModels].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const sortedAreas = [...areas].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const sortedSubareas = [...subareas].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const sortedSeniorities = [...seniorities].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const sortedContractTypes = [...contractTypes].sort((a, b) => a.localeCompare(b, "pt-BR"));
   const sortedStates = [...states].sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
@@ -164,7 +182,7 @@ export function FeedFilters({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2">
         <select value={tier} onChange={(e) => setParam("tier", e.target.value)} className={selectClass}>
           {TIER_OPTIONS.map((opt) => (
             <option key={opt.value} value={opt.value}>
@@ -185,6 +203,15 @@ export function FeedFilters({
         <select value={area} onChange={(e) => setParam("area", e.target.value)} className={selectClass}>
           <option value="all">Área profissional</option>
           {sortedAreas.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+
+        <select value={subarea} onChange={(e) => setParam("subarea", e.target.value)} className={selectClass}>
+          <option value="all">Subárea</option>
+          {sortedSubareas.map((option) => (
             <option key={option} value={option}>
               {option}
             </option>

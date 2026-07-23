@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { recordSync } from "@/lib/external-source-sync";
+import { classifyArea } from "@/lib/area-taxonomy";
 
 /**
  * Coleta automática de vídeos gratuitos do YouTube (mentorias e cursos de carreira)
@@ -65,6 +66,7 @@ export type CareerVideoRecord = {
   description: string;
   thumbnail: string;
   area: string;
+  subarea: string;
   durationSec: number;
   publishedAt: Date | null;
 };
@@ -108,13 +110,20 @@ export function mapSearchItem(area: string, item: YoutubeSearchItem, durationSec
   const snippet = item.snippet ?? {};
   const thumbnail =
     snippet.thumbnails?.high?.url ?? snippet.thumbnails?.medium?.url ?? snippet.thumbnails?.default?.url ?? "";
+  const contentArea = classifyVideoArea(area, snippet.title ?? "", snippet.description ?? "");
+  // As "áreas" de CONTENT_AREAS são tópicos de conteúdo (Currículo, LinkedIn,
+  // Concursos...), não profissões — a maioria não vai resolver subárea nenhuma
+  // em VOCATION_AREAS, e tudo bem: fica vazia. Só vídeos de temas realmente
+  // ligados a uma profissão (Tecnologia, Marketing, Educação...) ganham uma.
+  const subarea = classifyArea(snippet.title ?? "", contentArea).subarea;
   return {
     videoId,
     title: (snippet.title ?? "").slice(0, 240),
     channel: (snippet.channelTitle ?? "").slice(0, 120),
     description: (snippet.description ?? "").slice(0, 500),
     thumbnail,
-    area: classifyVideoArea(area, snippet.title ?? "", snippet.description ?? ""),
+    area: contentArea,
+    subarea,
     durationSec,
     publishedAt: snippet.publishedAt ? new Date(snippet.publishedAt) : null,
   };
@@ -180,6 +189,7 @@ export async function syncYoutubeCareerVideos() {
           channel: record.channel,
           thumbnail: record.thumbnail,
           area: record.area,
+          subarea: record.subarea,
           durationSec: record.durationSec,
           active: true,
           lastSeenAt: seenAt,

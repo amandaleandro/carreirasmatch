@@ -40,6 +40,7 @@ export default async function FeedPage({
     tier?: string;
     workModel?: string;
     area?: string;
+    subarea?: string;
     seniority?: string;
     state?: string;
     city?: string;
@@ -126,6 +127,7 @@ export default async function FeedPage({
 
   const workModels = Array.from(new Set(enriched.map((e) => e.tags.workModel).filter(Boolean))) as string[];
   const areas = Array.from(new Set(enriched.map((e) => e.tags.area).filter(Boolean))) as string[];
+  const subareas = Array.from(new Set(enriched.map((e) => e.tags.subarea).filter(Boolean))) as string[];
   const seniorities = Array.from(new Set(enriched.map((e) => e.tags.seniority).filter(Boolean))) as string[];
   const contractTypes = Array.from(new Set(enriched.map((e) => e.tags.contractType).filter(Boolean))) as string[];
 
@@ -152,6 +154,7 @@ export default async function FeedPage({
 
   if (params.workModel) filtered = filtered.filter((e) => e.tags.workModel === params.workModel);
   if (params.area) filtered = filtered.filter((e) => e.tags.area === params.area);
+  if (params.subarea) filtered = filtered.filter((e) => e.tags.subarea === params.subarea);
   if (params.seniority) filtered = filtered.filter((e) => e.tags.seniority === params.seniority);
   if (params.contractType) filtered = filtered.filter((e) => e.tags.contractType === params.contractType);
   if (params.entryLevel === "yes") filtered = filtered.filter((e) => isEntryLevelJob(e.match.job));
@@ -282,6 +285,7 @@ export default async function FeedPage({
       <FeedFilters
         workModels={workModels}
         areas={areas}
+        subareas={subareas}
         seniorities={seniorities}
         states={states}
         citiesByState={citiesByState}
@@ -290,6 +294,7 @@ export default async function FeedPage({
           tier: params.tier,
           workModel: params.workModel,
           area: params.area,
+          subarea: params.subarea,
           seniority: params.seniority,
           state: params.state,
           city: params.city,

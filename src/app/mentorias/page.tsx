@@ -164,6 +164,7 @@ export default async function MentoriasPage({
                   title={video.title}
                   channel={video.channel}
                   area={video.area}
+                  subarea={video.subarea}
                   thumbnail={video.thumbnail}
                   durationSec={video.durationSec}
                 />

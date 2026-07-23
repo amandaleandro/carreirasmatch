@@ -1,4 +1,5 @@
 import { parseBrazilLocation } from "@/lib/brazil-locations";
+import { classifyArea } from "@/lib/area-taxonomy";
 
 export type FeedTier = "excellent" | "good" | "medium" | "low";
 
@@ -115,6 +116,7 @@ export type JobTags = {
   seniority?: string;
   workModel?: string;
   area?: string;
+  subarea?: string;
   location?: string;
   company: string;
   salary?: string;
@@ -142,10 +144,17 @@ export function deriveJobTags(job: {
   const workModel = matchFirst(haystack, WORK_MODEL_PATTERNS);
   const salaryInfo = extractSalary(haystack);
 
+  // Subárea vem direto do texto da vaga via classifyArea (VOCATION_AREAS),
+  // independente de AREA_PATTERNS acima: os labels desse array são mais
+  // antigos/grosseiros e não batem 1:1 com os slugs de VOCATION_AREAS, mas
+  // servem bem como tag adicional de "área geral" já existente na UI/dados.
+  const { subarea } = classifyArea(haystack);
+
   return {
     seniority: matchFirst(haystack, SENIORITY_PATTERNS),
     workModel,
     area: matchFirst(haystack, AREA_PATTERNS),
+    subarea: subarea || undefined,
     location: job.location?.trim() || undefined,
     company,
     salary: salaryInfo?.label,
@@ -192,6 +201,7 @@ export function classifyJobForStorage(job: {
 }): {
   company: string;
   area: string;
+  subarea: string;
   seniority: string;
   workModel: string;
   contractType: string;
@@ -206,6 +216,7 @@ export function classifyJobForStorage(job: {
   return {
     company: tags.company,
     area: tags.area ?? "",
+    subarea: tags.subarea ?? "",
     seniority: tags.seniority ?? "",
     workModel: tags.workModel ?? "",
     contractType: tags.contractType ?? "",

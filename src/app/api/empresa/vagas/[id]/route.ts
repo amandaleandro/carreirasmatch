@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireCompanyApi } from "@/lib/company-auth";
 import { prisma } from "@/lib/prisma";
 import { publishVagaToFeed, unpublishVagaFromFeed } from "@/lib/company-vaga-feed";
+import { classifyArea } from "@/lib/area-taxonomy";
 
 // Edita a vaga (dados, status aberto/fechado e/ou publicação no feed).
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -48,6 +49,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     data.title = title;
     data.description = description;
     data.area = (body.area ?? "").trim();
+    data.subarea = classifyArea(`${title} ${description}`, data.area as string).subarea;
     data.state = (body.state ?? "").trim().toUpperCase().slice(0, 2);
   }
 

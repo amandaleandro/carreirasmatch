@@ -3,6 +3,7 @@ import { requireCompanyApi } from "@/lib/company-auth";
 import { prisma } from "@/lib/prisma";
 import { runVagaMatch } from "@/lib/company-vaga";
 import { publishVagaToFeed } from "@/lib/company-vaga-feed";
+import { classifyArea } from "@/lib/area-taxonomy";
 
 // Cadastra uma vaga e já roda o matching do banco de talentos.
 export async function POST(req: Request) {
@@ -41,8 +42,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Preencha o cargo e a descrição da vaga." }, { status: 400 });
   }
 
+  // Deriva a subárea a partir do cargo+descrição (não pedimos isso na empresa
+  // pra não mudar o formulário), reaproveitando a mesma taxonomia de cursos/vagas.
+  const subarea = classifyArea(`${title} ${description}`, area).subarea;
+
   const vaga = await prisma.companyVaga.create({
-    data: { companyId: company.id, title, description, area, state, salaryMin, workModel, seniority, jobType },
+    data: { companyId: company.id, title, description, area, subarea, state, salaryMin, workModel, seniority, jobType },
   });
 
   // Publica no feed já na criação, se marcado.

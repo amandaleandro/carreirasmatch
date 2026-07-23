@@ -7,10 +7,23 @@ import {
   normalizeCareerSegment,
   suggestionGuidanceForSegment,
 } from "@/lib/career-segments";
+import { resolveFreeText } from "@/lib/area-taxonomy";
 import { randomUUID } from "node:crypto";
 import type { ZodType } from "zod";
 
 const DEFAULT_GROQ_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+
+/**
+ * Monta o bloco "ÁREA DE ATUAÇÃO DO CANDIDATO" do prompt. Quando o texto
+ * livre resolve pra uma subárea conhecida (ver area-taxonomy.ts), acrescenta
+ * ela — sinal mais específico pra IA do que só a área/texto livre.
+ */
+function professionalAreaBlock(professionalArea: string | null | undefined): string {
+  if (!professionalArea) return "";
+  const resolved = resolveFreeText(professionalArea);
+  const subareaSuffix = resolved?.subarea ? ` (subárea: ${resolved.subarea})` : "";
+  return `\n\nÁREA DE ATUAÇÃO DO CANDIDATO: ${professionalArea}${subareaSuffix}`;
+}
 
 // Structured-resume extraction is literal transcription (no scoring/reasoning), so it doesn't
 // need the stronger model the admin picks for analysis, a cheaper model is just as accurate
@@ -476,9 +489,7 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
       ? `\n\nPAST_FEEDBACK (feedbacks recebidos em entrevistas anteriores):\n${pastFeedback}`
       : "";
 
-  const areaBlock = candidateContext?.professionalArea
-    ? `\n\nÁREA DE ATUAÇÃO DO CANDIDATO: ${candidateContext.professionalArea}`
-    : "";
+  const areaBlock = professionalAreaBlock(candidateContext?.professionalArea);
 
   const coursesBlock =
     candidateContext?.courses && candidateContext.courses.length > 0
@@ -603,9 +614,7 @@ export async function generateProfileSuggestions(input: {
     : null;
   const segmentGuidance = suggestionGuidanceForSegment(input.careerSegment);
 
-  const areaBlock = input.professionalArea
-    ? `\n\nÁREA DE ATUAÇÃO DO CANDIDATO: ${input.professionalArea}`
-    : "";
+  const areaBlock = professionalAreaBlock(input.professionalArea);
   const regionLabel = [input.city, input.state].filter(Boolean).join(" - ");
   const regionBlock = regionLabel ? `\n\nREGIAO_DO_CANDIDATO: ${regionLabel}` : "";
   const segmentBlock = segmentLabel

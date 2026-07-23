@@ -30,6 +30,7 @@ export function tokenize(value: string): string[] {
 export type MatchableCourse = {
   title: string;
   area: string;
+  subarea?: string;
   free?: boolean;
   certificate?: boolean;
   modality?: string;
@@ -41,6 +42,8 @@ export type MatchableCourse = {
 /**
  * Pontua um curso contra a área do candidato e suas lacunas. Maior = mais relevante.
  * - lacunas casadas valem mais que a área (é o que o candidato precisa aprender);
+ * - dentro de cada um desses dois critérios, casar contra a SUBárea (mais específica,
+ *   ex. "Desenvolvimento Back-end") vale mais que casar só contra área/título em geral;
  * - gratuito e certificado dão um leve empurrão (mais acionável pra quem busca emprego);
  * - curso presencial na cidade/estado do candidato ganha um empurrão extra, já que um
  *   presencial longe da região dele é praticamente inacessível.
@@ -49,19 +52,22 @@ export function scoreCourse(
   course: MatchableCourse,
   profile: { area?: string | null; skillGaps?: string[]; city?: string | null; state?: string | null },
 ): number {
-  const haystack = new Set([...tokenize(course.title), ...tokenize(course.area)]);
+  const subareaTokens = new Set(tokenize(course.subarea ?? ""));
+  const haystack = new Set([...tokenize(course.title), ...tokenize(course.area), ...subareaTokens]);
 
   let score = 0;
 
   const areaTokens = tokenize(profile.area ?? "");
   for (const token of areaTokens) {
-    if (haystack.has(token)) score += 2;
+    if (subareaTokens.has(token)) score += 3;
+    else if (haystack.has(token)) score += 2;
   }
 
   for (const gap of profile.skillGaps ?? []) {
     const gapTokens = tokenize(gap);
     // conta a lacuna como casada se qualquer token dela aparecer no curso
-    if (gapTokens.some((token) => haystack.has(token))) score += 3;
+    if (gapTokens.some((token) => subareaTokens.has(token))) score += 4;
+    else if (gapTokens.some((token) => haystack.has(token))) score += 3;
   }
 
   const isPresencial = (course.modality ?? "").toLowerCase() === "presencial";

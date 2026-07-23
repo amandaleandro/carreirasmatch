@@ -20,6 +20,7 @@ import { JobAlertForm } from "@/components/job-alert-form";
 import { PublicOpportunityActions } from "@/components/public-opportunity-actions";
 import { locationSlug } from "@/lib/location-slug";
 import { locationSearchVariants } from "@/lib/brazil-locations";
+import { resolveFreeText } from "@/lib/area-taxonomy";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -82,8 +83,19 @@ export default async function PublicJobsPage({
     take: 100,
   });
 
+  // Resolve o texto livre do perfil em área/subárea da mesma taxonomia usada
+  // pra classificar as oportunidades (ver external-source-sync.ts). Quando dá
+  // pra resolver, é uma comparação exata bem mais confiável que o
+  // `.includes()` abaixo; quando não dá (texto livre não reconhecido), o
+  // `.includes()` continua garantindo que ninguém perde recomendação.
+  const resolvedProfile = resolveFreeText(user?.professionalArea);
+
   const recommended = !query && user
     ? opportunities.filter((item) => {
+        if (resolvedProfile) {
+          if (resolvedProfile.subarea && resolvedProfile.subarea === item.subarea) return true;
+          if (resolvedProfile.areaLabel && resolvedProfile.areaLabel === item.area) return true;
+        }
         const text = `${item.title} ${item.area}`.toLowerCase();
         return [user.professionalArea, ...roleTerms].some((term) => term && text.includes(term.toLowerCase()));
       })

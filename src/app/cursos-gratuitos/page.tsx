@@ -17,20 +17,21 @@ export const metadata: Metadata = {
 export default async function FreeCoursesPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; area?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; area?: string; subarea?: string; page?: string }>;
 }) {
-  const { q = "", area = "", page: pageParam } = await searchParams;
+  const { q = "", area = "", subarea = "", page: pageParam } = await searchParams;
   const where = {
     active: true,
     free: true,
     ...(area ? { area: { contains: area } } : {}),
+    ...(subarea ? { subarea: { contains: subarea } } : {}),
     ...(q ? { OR: [{ title: { contains: q } }, { provider: { contains: q } }, { area: { contains: q } }] } : {}),
   };
 
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
-  
+
   // Separamos busca de destacados (featured) e comuns
-  const [featuredCourses, areas] = await Promise.all([
+  const [featuredCourses, areas, subareas] = await Promise.all([
     prisma.externalCourse.findMany({
       where: { ...where, featured: true },
       orderBy: [{ area: "asc" }, { title: "asc" }],
@@ -41,6 +42,12 @@ export default async function FreeCoursesPage({
       distinct: ["area"],
       select: { area: true },
       orderBy: { area: "asc" },
+    }),
+    prisma.externalCourse.findMany({
+      where: { active: true, free: true, subarea: { not: "" } },
+      distinct: ["subarea"],
+      select: { subarea: true },
+      orderBy: { subarea: "asc" },
     }),
   ]);
 
@@ -63,11 +70,15 @@ export default async function FreeCoursesPage({
 
   return (
     <ContentPage eyebrow="Qualificação" title="Cursos gratuitos verificados" description="Escolha uma área e encontre cursos gratuitos para fortalecer seu currículo." wide>
-      <form className="grid gap-3 rounded-2xl border border-neutral-200 p-4 dark:border-neutral-800 sm:grid-cols-[1fr_1fr_auto]">
+      <form className="grid gap-3 rounded-2xl border border-neutral-200 p-4 dark:border-neutral-800 sm:grid-cols-[1fr_1fr_1fr_auto]">
         <input name="q" defaultValue={q} placeholder="Curso, habilidade ou instituição" className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100" />
         <select name="area" defaultValue={area} className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
           <option value="" className="dark:bg-neutral-900">Todas as áreas</option>
           {areas.map((item) => <option key={item.area} value={item.area} className="dark:bg-neutral-900">{item.area}</option>)}
+        </select>
+        <select name="subarea" defaultValue={subarea} className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
+          <option value="" className="dark:bg-neutral-900">Todas as subáreas</option>
+          {subareas.map((item) => <option key={item.subarea} value={item.subarea} className="dark:bg-neutral-900">{item.subarea}</option>)}
         </select>
         <button className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white cursor-pointer">Buscar</button>
       </form>
@@ -143,7 +154,7 @@ export default async function FreeCoursesPage({
           page={page}
           totalPages={totalPages}
           basePath="/cursos-gratuitos"
-          searchParams={{ q, area }}
+          searchParams={{ q, area, subarea }}
         />
       </div>
     </ContentPage>

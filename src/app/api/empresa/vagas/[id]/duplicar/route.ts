@@ -11,7 +11,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const original = await prisma.companyVaga.findFirst({
     where: { id, companyId: company.id },
-    select: { title: true, description: true, area: true, state: true },
+    select: { title: true, description: true, area: true, subarea: true, state: true },
   });
   if (!original) return NextResponse.json({ error: "Vaga não encontrada." }, { status: 404 });
 
@@ -21,6 +21,7 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
       title: `${original.title} (cópia)`.slice(0, 140),
       description: original.description,
       area: original.area,
+      subarea: original.subarea,
       state: original.state,
     },
   });

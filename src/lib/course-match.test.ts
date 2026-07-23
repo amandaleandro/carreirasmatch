@@ -41,6 +41,18 @@ describe("scoreCourse", () => {
     );
     expect(boosted).toBeGreaterThan(base);
   });
+
+  it("match na subárea pontua mais que o mesmo match só na área geral", () => {
+    const generalOnly = scoreCourse(
+      { title: "Curso Genérico", area: "Desenvolvimento Back-end" },
+      { area: "Desenvolvimento Back-end" },
+    );
+    const withSubarea = scoreCourse(
+      { title: "Curso Genérico", area: "Tecnologia da Informação", subarea: "Desenvolvimento Back-end" },
+      { area: "Desenvolvimento Back-end" },
+    );
+    expect(withSubarea).toBeGreaterThan(generalOnly);
+  });
 });
 
 describe("rankCourses", () => {

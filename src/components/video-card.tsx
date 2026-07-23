@@ -8,6 +8,7 @@ type Props = {
   title: string;
   channel: string;
   area: string;
+  subarea?: string;
   thumbnail: string;
   durationSec: number;
 };
@@ -21,7 +22,7 @@ function formatDuration(seconds: number) {
   return h ? `${h}:${mm}:${String(s).padStart(2, "0")}` : `${mm}:${String(s).padStart(2, "0")}`;
 }
 
-export function VideoCard({ videoId, title, channel, area, thumbnail, durationSec }: Props) {
+export function VideoCard({ videoId, title, channel, area, subarea, thumbnail, durationSec }: Props) {
   const [playing, setPlaying] = useState(false);
   const duration = formatDuration(durationSec);
 
@@ -69,8 +70,15 @@ export function VideoCard({ videoId, title, channel, area, thumbnail, durationSe
         </div>
         <div className="p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-0.5 rounded-md border border-blue-200/50 dark:border-blue-900/50">
-              {area}
+            <span className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-2.5 py-0.5 rounded-md border border-blue-200/50 dark:border-blue-900/50">
+                {area}
+              </span>
+              {subarea && (
+                <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md">
+                  {subarea}
+                </span>
+              )}
             </span>
             <span className="inline-flex items-center gap-1 text-[11px] text-slate-400">
               <VideoIcon className="w-3.5 h-3.5 text-red-500" />

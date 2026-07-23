@@ -5,6 +5,7 @@ import { PDFParse } from "pdf-parse";
 import { assessOpportunityRisk } from "@/lib/opportunity-safety";
 import { syncYoutubeCareerVideos, classifyVideoArea } from "@/lib/youtube-sync";
 import { syncRadars } from "@/lib/radar-sync";
+import { classifyArea } from "@/lib/area-taxonomy";
 
 const USER_AGENT = "CarreirasMatch/1.0 (+https://carreirasmatch.com.br/contato)";
 const APRENDA_MAIS = "https://aprendamais.mec.gov.br/course/";
@@ -71,20 +72,22 @@ export async function syncAprendaMaisCourses() {
         if (url && title) courses.set(url.split("&")[0], title);
       });
       for (const [url, title] of courses) {
+        const classified = classifyArea(title, area);
         await prisma.externalCourse.upsert({
           where: { url },
           create: {
             title,
             provider: "Aprenda Mais MEC",
             url,
-            area,
+            area: classified.area,
+            subarea: classified.subarea,
             modality: "online",
             free: true,
             certificate: true,
             source: "aprenda-mais",
             lastSeenAt: seenAt,
           },
-          update: { title, area, active: true, lastSeenAt: seenAt },
+          update: { title, area: classified.area, subarea: classified.subarea, active: true, lastSeenAt: seenAt },
         });
         count += 1;
       }
@@ -128,20 +131,139 @@ export async function syncEscolaVirtualCourses() {
 
     let count = 0;
     for (const [url, { title, area }] of courses) {
+      const classified = classifyArea(title, area);
       await prisma.externalCourse.upsert({
         where: { url },
         create: {
           title,
           provider: "Fundação Bradesco - Escola Virtual",
           url,
-          area,
+          area: classified.area,
+          subarea: classified.subarea,
           modality: "online",
           free: true,
           certificate: true,
           source: "escola-virtual",
           lastSeenAt: seenAt,
         },
-        update: { title, area, active: true, lastSeenAt: seenAt },
+        update: { title, area: classified.area, subarea: classified.subarea, active: true, lastSeenAt: seenAt },
+      });
+      count += 1;
+    }
+    return count;
+  });
+}
+
+// Escola Virtual Gov (ENAP): plataforma federal de cursos livres, gratuitos e
+// com certificado, para servidores públicos e sociedade em geral. Cobre áreas
+// bem diferentes das demais fontes (Saúde, Educação, Gestão Pública, Direito,
+// Liderança...). Mesmo padrão de raspagem da Escola Virtual (Bradesco) acima:
+// cada tema tem uma página com os cursos já renderizados em HTML estático.
+const ESCOLA_VIRTUAL_GOV_BASE = "https://www.escolavirtual.gov.br";
+const ESCOLA_VIRTUAL_GOV_THEMES: { id: number; area: string }[] = [
+  { id: 69, area: "Transformação e Governo Digital" },
+  { id: 14, area: "Logística e Compras Públicas" },
+  { id: 67, area: "Políticas de Sustentabilidade e Clima" },
+  { id: 66, area: "Políticas de Segurança e Defesa" },
+  { id: 16, area: "Orçamento e Finanças" },
+  { id: 54, area: "Gestão de Políticas Públicas" },
+  { id: 2, area: "Análise e Ciência de Dados" },
+  { id: 9, area: "Gestão Pública" },
+  { id: 23, area: "Educação e Docência" },
+  { id: 57, area: "Inteligência Artificial" },
+  { id: 20, area: "Liderança" },
+  { id: 52, area: "Ética e Integridade" },
+  { id: 13, area: "Direito e Legislação" },
+];
+
+export async function syncEscolaVirtualGovCourses() {
+  return recordSync("escola-virtual-gov", "Escola Virtual Gov (ENAP)", "course", async () => {
+    const seenAt = new Date();
+    const courses = new Map<string, { title: string; area: string }>();
+
+    for (const { id, area } of ESCOLA_VIRTUAL_GOV_THEMES) {
+      const $ = cheerio.load(await fetchHtml(`${ESCOLA_VIRTUAL_GOV_BASE}/catalogo?id_tematica=${id}`));
+      $('a[href*="/curso/"]').each((_, element) => {
+        const href = $(element).attr("href");
+        const title = clean($(element).text());
+        if (!href || !title) return;
+        const url = absoluteUrl(href, ESCOLA_VIRTUAL_GOV_BASE);
+        if (url && !courses.has(url)) courses.set(url, { title, area });
+      });
+    }
+
+    let count = 0;
+    for (const [url, { title, area }] of courses) {
+      const classified = classifyArea(title, area);
+      await prisma.externalCourse.upsert({
+        where: { url },
+        create: {
+          title,
+          provider: "Escola Virtual Gov (ENAP)",
+          url,
+          area: classified.area,
+          subarea: classified.subarea,
+          modality: "online",
+          free: true,
+          certificate: true,
+          source: "escola-virtual-gov",
+          lastSeenAt: seenAt,
+        },
+        update: { title, area: classified.area, subarea: classified.subarea, active: true, lastSeenAt: seenAt },
+      });
+      count += 1;
+    }
+    return count;
+  });
+}
+
+// DIO: maior catálogo de cursos de tecnologia do Brasil, hoje 100% dentro da
+// assinatura DIO PRO (sem avulso gratuito) — por isso free:false. Em vez de
+// raspar cards de HTML (as páginas de curso são SPA-ish e mudam de layout com
+// frequência), usamos o sitemap dedicado de cursos, que lista todas as
+// ~1100+ URLs de curso de forma estável.
+const DIO_COURSES_SITEMAP = "https://www.dio.me/sitemap/courses.xml";
+
+function titleFromDioSlug(slug: string): string {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((word) => (word.length <= 2 ? word : word[0].toUpperCase() + word.slice(1)))
+    .join(" ");
+}
+
+export async function syncDioCourses() {
+  return recordSync("dio", "DIO", "course", async () => {
+    const xml = await fetchHtml(DIO_COURSES_SITEMAP);
+    const $ = cheerio.load(xml, { xmlMode: true });
+    const urls = new Set<string>();
+    $("url > loc").each((_, element) => {
+      const url = clean($(element).text());
+      if (url) urls.add(url);
+    });
+
+    const seenAt = new Date();
+    let count = 0;
+    for (const url of urls) {
+      const slug = url.split("/").filter(Boolean).pop() ?? "";
+      const title = titleFromDioSlug(slug);
+      if (title.length < 3) continue;
+      const classified = classifyArea(title, "Tecnologia da Informação");
+      await prisma.externalCourse.upsert({
+        where: { url },
+        create: {
+          title,
+          provider: "DIO",
+          url,
+          area: classified.area,
+          subarea: classified.subarea,
+          modality: "online",
+          free: false,
+          certificate: true,
+          source: "dio",
+          lastSeenAt: seenAt,
+        },
+        update: { title, area: classified.area, subarea: classified.subarea, active: true, lastSeenAt: seenAt },
       });
       count += 1;
     }
@@ -289,6 +411,7 @@ async function syncOpportunitySource(source: {
         url,
         official: source.official,
       });
+      const classified = classifyArea(title);
       await prisma.publicOpportunity.upsert({
         where: { sourceId_externalKey: { sourceId: source.id, externalKey: url } },
         create: {
@@ -298,6 +421,8 @@ async function syncOpportunitySource(source: {
           url,
           city: source.city,
           state: source.state,
+          area: classified.area,
+          subarea: classified.subarea,
           official: source.official,
           publishedAt: parsePublishedDate(title),
           lastSeenAt: seenAt,
@@ -312,6 +437,8 @@ async function syncOpportunitySource(source: {
           url,
           city: source.city,
           state: source.state,
+          area: classified.area,
+          subarea: classified.subarea,
           official: source.official,
           active: true,
           lastSeenAt: seenAt,
@@ -462,14 +589,15 @@ async function syncCourseSource(source: {
     let count = 0;
     for (const [url, title] of [...items].slice(0, 150)) {
       const free = FREE_TERMS.test(title);
-      const area = classifyVideoArea("", title, "");
+      const classified = classifyArea(title, classifyVideoArea("", title, ""));
       await prisma.externalCourse.upsert({
         where: { url },
         create: {
           title: title.slice(0, 240),
           provider: source.name,
           url,
-          area,
+          area: classified.area,
+          subarea: classified.subarea,
           city: source.city,
           state: source.state,
           modality,
@@ -481,7 +609,8 @@ async function syncCourseSource(source: {
         update: {
           title: title.slice(0, 240),
           provider: source.name,
-          area,
+          area: classified.area,
+          subarea: classified.subarea,
           city: source.city,
           state: source.state,
           modality,
@@ -543,6 +672,8 @@ export async function syncAllExternalSources() {
     syncYoutubeCareerVideos(),
     syncRadars(),
     syncEscolaVirtualCourses(),
+    syncDioCourses(),
+    syncEscolaVirtualGovCourses(),
   ]);
   const errors = results.flatMap((result) =>
     result.status === "rejected"
@@ -556,9 +687,15 @@ export async function syncAllExternalSources() {
       ? results[3].value.courses
       : 0;
   const escolaVirtualCourses = results[6].status === "fulfilled" ? results[6].value : 0;
+  const dioCourses = results[7].status === "fulfilled" ? results[7].value : 0;
+  const escolaVirtualGovCourses = results[8].status === "fulfilled" ? results[8].value : 0;
   return {
     courses:
-      (results[0].status === "fulfilled" ? results[0].value : 0) + registeredCourses + escolaVirtualCourses,
+      (results[0].status === "fulfilled" ? results[0].value : 0) +
+      registeredCourses +
+      escolaVirtualCourses +
+      dioCourses +
+      escolaVirtualGovCourses,
     bulletins: results[1].status === "fulfilled" ? results[1].value : 0,
     opportunities:
       results[2].status === "fulfilled" && typeof results[2].value === "object"
