@@ -170,23 +170,23 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId, bette
     }
     ctx.restore();
 
-    // Anel Central com Percentual de Match
+    // Anel Central com Percentual de Match (Expandido para maior respiro de texto)
     const ringCenterX = 540;
-    const ringCenterY = 780;
-    const ringRadius = 210;
+    const ringCenterY = 800;
+    const ringRadius = 245;
 
     // Anel de Fundo
     ctx.save();
     ctx.beginPath();
     ctx.arc(ringCenterX, ringCenterY, ringRadius, 0, Math.PI * 2);
     ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
-    ctx.lineWidth = 32;
+    ctx.lineWidth = 30;
     ctx.stroke();
 
-    // Preenchimento escuro interno do anel
-    ctx.fillStyle = "rgba(15, 23, 42, 0.5)";
+    // Preenchimento escuro interno do anel com leve sombra
+    ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
     ctx.beginPath();
-    ctx.arc(ringCenterX, ringCenterY, ringRadius - 16, 0, Math.PI * 2);
+    ctx.arc(ringCenterX, ringCenterY, ringRadius - 15, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
@@ -197,47 +197,47 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId, bette
 
     ctx.save();
     ctx.shadowColor = scoreHex;
-    ctx.shadowBlur = 40;
+    ctx.shadowBlur = 45;
     ctx.beginPath();
     ctx.arc(ringCenterX, ringCenterY, ringRadius, startAngle, endAngle);
     ctx.strokeStyle = scoreHex;
-    ctx.lineWidth = 32;
+    ctx.lineWidth = 30;
     ctx.lineCap = "round";
     ctx.stroke();
     ctx.restore();
 
-    // Texto do Score Dentro do Anel
+    // Texto do Score Dentro do Anel (Espaçamento amplo e legível)
     ctx.save();
-    ctx.shadowColor = "rgba(0,0,0,0.5)";
-    ctx.shadowBlur = 20;
+    ctx.shadowColor = "rgba(0,0,0,0.6)";
+    ctx.shadowBlur = 24;
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "900 135px Inter, sans-serif";
+    ctx.font = "900 145px Inter, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`${overallScore}%`, ringCenterX, ringCenterY + 42);
+    ctx.fillText(`${overallScore}%`, ringCenterX, ringCenterY + 30);
 
     ctx.fillStyle = "#94A3B8";
-    ctx.font = "bold 26px Inter, sans-serif";
-    ctx.fillText("ADERÊNCIA À VAGA", ringCenterX, ringCenterY + 105);
+    ctx.font = "bold 24px Inter, sans-serif";
+    ctx.fillText("ADERÊNCIA À VAGA", ringCenterX, ringCenterY + 98);
     ctx.restore();
 
     // Badge de Percentil ("🏆 À frente de X% dos candidatos")
-    let quoteBoxY = 1120;
+    let quoteBoxY = 1140;
     if (hasPercentile) {
       ctx.save();
       ctx.fillStyle = "rgba(251, 191, 36, 0.12)";
       ctx.beginPath();
-      ctx.roundRect(540 - 320, 1040, 640, 76, 38);
+      ctx.roundRect(540 - 330, 1070, 660, 76, 38);
       ctx.fill();
       ctx.strokeStyle = "rgba(251, 191, 36, 0.4)";
       ctx.lineWidth = 2;
       ctx.stroke();
 
       ctx.fillStyle = "#FBBF24";
-      ctx.font = `bold 32px ${emojiFontStack}`;
+      ctx.font = `bold 31px ${emojiFontStack}`;
       ctx.textAlign = "center";
-      ctx.fillText(`🏆 À frente de ${betterThanPercent}% dos candidatos`, 540, 1090);
+      ctx.fillText(`🏆 À frente de ${betterThanPercent}% dos candidatos`, 540, 1120);
       ctx.restore();
-      quoteBoxY = 1160;
+      quoteBoxY = 1180;
     }
 
     // Card Glassmorphic de Mensagem Social
@@ -410,9 +410,9 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId, bette
               <p className="text-xs font-bold text-white line-clamp-2 mt-0.5 leading-snug">{jobTitle}</p>
             </div>
 
-            <div className={`my-2 inline-flex flex-col items-center justify-center w-24 h-24 rounded-full border-4 ${ringColorClass} bg-slate-950/60 shadow-xl relative`}>
-              <span className="text-2xl font-black text-white leading-none">{overallScore}%</span>
-              <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter mt-0.5">Aderência</span>
+            <div className={`my-2 inline-flex flex-col items-center justify-center w-28 h-28 rounded-full border-4 ${ringColorClass} bg-slate-950/60 shadow-xl relative`}>
+              <span className="text-3xl font-black text-white leading-none">{overallScore}%</span>
+              <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Aderência</span>
             </div>
 
             {hasPercentile && (
