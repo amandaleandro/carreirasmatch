@@ -588,6 +588,35 @@ export async function sendConvertToSubscriptionEmail(
   );
 }
 
+/**
+ * Recuperação no mesmo dia: a pessoa acabou de rodar uma análise, viu o teaser
+ * bloqueado e fechou a aba. Chega horas depois, enquanto a vaga ainda está
+ * quente, apontando de volta para o relatório dela.
+ */
+export async function sendAnalysisRecoveryEmail(
+  to: string,
+  opts: { name?: string | null; score: number; jobTitle?: string | null; analysisId: string }
+) {
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}!` : "Olá!";
+  const forJob = opts.jobTitle?.trim() ? ` para <strong>${opts.jobTitle.trim()}</strong>` : "";
+  const gap = Math.max(70 - opts.score, 0);
+  const gapLine =
+    gap > 0
+      ? `<p>Faltam <strong>${gap} pontos</strong> para o seu perfil entrar na faixa de "recomendado aplicar" — e o caminho já está mapeado no seu relatório: currículo otimizado em PDF, palavras-chave do ATS e as perguntas prováveis da entrevista.</p>`
+      : `<p>Seu perfil já está na faixa de "recomendado aplicar" 🎉 O relatório completo tem o currículo otimizado em PDF e a preparação de entrevista para você aplicar com tudo.</p>`;
+  await send(
+    to,
+    `⏳ Sua análise de hoje ficou pronta (${opts.score}% de match). A vaga ainda está aberta?`,
+    `
+      <h2 style="font-size: 20px;">${greeting} 👋</h2>
+      <p>Sua análise${forJob} fechou em <strong>${opts.score}% de aderência</strong> hoje. O material completo já foi gerado para essa vaga e está esperando você.</p>
+      ${gapLine}
+      ${button(`${APP_URL}/report/${opts.analysisId}`, "Abrir meu relatório")}
+      <p>Vagas boas fecham rápido — quem ajusta o currículo antes de aplicar sai na frente de quem manda o genérico 🏃</p>
+    `
+  );
+}
+
 /** Segundo toque da régua de conversão, alguns dias após o primeiro, com um ângulo diferente. */
 export async function sendConvertSecondNudgeEmail(
   to: string,
@@ -717,6 +746,7 @@ export async function sendWeeklyDigestEmail(
     bestScore: number | null;
     scoreDelta: number | null;
     newMatchesCount: number;
+    applicationsCount?: number;
   }
 ) {
   const greeting = opts.name ? `Olá, ${opts.name.split(" ")[0]}!` : "Olá!";
@@ -731,6 +761,9 @@ export async function sendWeeklyDigestEmail(
   }
   if (opts.newMatchesCount > 0) {
     lines.push(`<li><strong>${opts.newMatchesCount}</strong> vaga${opts.newMatchesCount > 1 ? "s" : ""} nova${opts.newMatchesCount > 1 ? "s" : ""} compatível${opts.newMatchesCount > 1 ? "eis" : ""} com seu currículo. 🎯</li>`);
+  }
+  if (opts.applicationsCount && opts.applicationsCount > 0) {
+    lines.push(`<li><strong>${opts.applicationsCount}</strong> candidatura${opts.applicationsCount > 1 ? "s" : ""} no seu painel de acompanhamento. 📌</li>`);
   }
   await send(
     to,

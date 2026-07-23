@@ -8,6 +8,7 @@ import {
   sendJobAlertEmail,
   sendDiagnosticUpgradeEmail,
   sendCheckoutRecoveryEmail,
+  sendAnalysisRecoveryEmail,
   sendConvertToSubscriptionEmail,
   sendConvertSecondNudgeEmail,
   sendUrgencyCouponEmail,
@@ -159,6 +160,73 @@ async function sendLeadFollowUps(now: Date): Promise<void> {
  * produção. O funil pega os que entrarem no estado a partir daqui.
  */
 const CONVERT_EMAIL_START = new Date("2026-07-20T00:00:00Z");
+
+/** Piso de data do e-mail de recuperação same-day, mesmo motivo dos demais pisos. */
+const ANALYSIS_RECOVERY_START = new Date("2026-07-23T00:00:00Z");
+
+/**
+ * Recuperação no mesmo dia: análises criadas entre 2h e 26h atrás cujo dono não
+ * desbloqueou o diagnóstico daquela análise, não assinou e nunca pagou nada.
+ * A primeira análise de cada usuário fica de fora (ela já é liberada de graça).
+ * No máximo 1 e-mail por usuário por dia, sempre pela análise mais recente.
+ */
+async function sendAnalysisRecoveryEmails(now: Date): Promise<void> {
+  const windowStart = new Date(now.getTime() - 26 * 60 * 60 * 1000);
+  const from = windowStart > ANALYSIS_RECOVERY_START ? windowStart : ANALYSIS_RECOVERY_START;
+  const to = new Date(now.getTime() - 2 * 60 * 60 * 1000);
+  if (from > to) return;
+
+  const analyses = await prisma.analysis.findMany({
+    where: {
+      createdAt: { gte: from, lte: to },
+      resume: { user: { email: { not: null } } },
+    },
+    select: {
+      id: true,
+      overallScore: true,
+      jobTitle: true,
+      createdAt: true,
+      resume: { select: { userId: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  const seen = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || seen.has(userId)) continue;
+    seen.add(userId);
+
+    // A primeira análise do usuário já é completa e gratuita: nada a recuperar.
+    const firstAnalysis = await prisma.analysis.findFirst({
+      where: { resume: { userId } },
+      orderBy: { createdAt: "asc" },
+      select: { id: true },
+    });
+    if (firstAnalysis?.id === analysis.id) continue;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        email: true,
+        name: true,
+        subscription: { select: { status: true } },
+        _count: { select: { payments: { where: { status: "paid" } } } },
+      },
+    });
+    if (!user?.email || user.subscription?.status === "active" || user._count.payments > 0) continue;
+
+    const day = analysis.createdAt.toISOString().slice(0, 10);
+    await sendOnce("analysis_recovery", `${userId}:${day}`, user.email, () =>
+      sendAnalysisRecoveryEmail(user.email!, {
+        name: user.name,
+        score: analysis.overallScore,
+        jobTitle: analysis.jobTitle,
+        analysisId: analysis.id,
+      })
+    );
+  }
+}
 
 async function sendConvertToSubscriptionEmails(now: Date): Promise<void> {
   const windowStart = new Date(now.getTime() - 7 * DAY_MS);
@@ -558,9 +626,12 @@ async function sendWeeklyDigests(now: Date): Promise<void> {
   }
 
   for (const [userId, entry] of byUser) {
-    const [newMatchesCount, prevBest] = await Promise.all([
+    const [newMatchesCount, applicationsCount, prevBest] = await Promise.all([
       prisma.jobMatch.count({
         where: { createdAt: { gte: since }, resume: { userId } },
+      }),
+      prisma.application.count({
+        where: { userId, createdAt: { gte: since } },
       }),
       prisma.analysis.findFirst({
         where: { createdAt: { gte: prevWeekStart, lt: since }, resume: { userId } },
@@ -579,6 +650,7 @@ async function sendWeeklyDigests(now: Date): Promise<void> {
         bestScore,
         scoreDelta,
         newMatchesCount,
+        applicationsCount,
       })
     );
   }
@@ -629,6 +701,7 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["lead_followups", () => sendLeadFollowUps(now)],
     ["company_dormant_nudges", () => sendCompanyDormantNudges(now)],
     ["diagnostic_upgrades", () => sendDiagnosticUpgradeEmails(now)],
+    ["analysis_recovery", () => sendAnalysisRecoveryEmails(now)],
     ["convert_to_subscription", () => sendConvertToSubscriptionEmails(now)],
     ["convert_second_nudge", () => sendConvertSecondNudgeEmails(now)],
     ["urgency_coupon", () => sendUrgencyCouponEmails(now)],
