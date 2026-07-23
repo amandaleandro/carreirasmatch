@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getPayment, getPreapproval } from "@/lib/mercadopago";
 import { isValidMercadoPagoSignature } from "@/lib/webhook-secret";
 import { registerCouponUsage } from "@/lib/coupons";
+import { ensureApplicationForDiagnostic } from "@/lib/application-autotrack";
 import {
   sendPaymentConfirmationEmail,
   sendSubscriptionConfirmationEmail,
@@ -194,6 +195,12 @@ export async function POST(req: NextRequest) {
           });
           if (analysis && analysis.resume.userId == null) {
             await prisma.resume.update({ where: { id: analysis.resumeId }, data: { userId: payment.userId } });
+          }
+
+          // Kit liberado entra automaticamente no painel de candidaturas, para a
+          // busca inteira (análise → aplicação → entrevista) viver dentro do app.
+          if (payment.userId) {
+            await ensureApplicationForDiagnostic(payment.userId, payment.analysisId);
           }
         }
       }

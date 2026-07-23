@@ -7,6 +7,7 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { isCareerSegment, normalizeCareerSegment } from "@/lib/career-segments";
 import { isValidEmail, normalizeEmail } from "@/lib/email";
 import { applyCoupon, registerCouponUsage } from "@/lib/coupons";
+import { ensureApplicationForDiagnostic } from "@/lib/application-autotrack";
 import {
   sendPaymentConfirmationEmail,
   sendSubscriptionConfirmationEmail,
@@ -221,6 +222,10 @@ export async function POST(req: NextRequest) {
     // (pending), isso acontece no webhook quando o pagamento confirma.
     if (kind === "diagnostic" && analysisRecord && analysisRecord.resume.userId == null) {
       await prisma.resume.update({ where: { id: analysisRecord.resumeId }, data: { userId } });
+    }
+    // Kit liberado entra automaticamente no painel de candidaturas.
+    if (kind === "diagnostic" && analysisId) {
+      await ensureApplicationForDiagnostic(userId, analysisId);
     }
     // E-mail de confirmação no caminho síncrono (cartão). No PIX o Payment nasce
     // "pending" e o e-mail sai no webhook, o guard de lá evita envio duplicado.
