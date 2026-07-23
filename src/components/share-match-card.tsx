@@ -8,6 +8,8 @@ interface ShareMatchCardProps {
   overallScore: number;
   userName?: string | null;
   userId?: string;
+  /** Percentil do score na trilha ("fiquei à frente de X% dos candidatos") — o gancho social do card. */
+  betterThanPercent?: number | null;
 }
 
 function truncateToWidth(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
@@ -37,7 +39,8 @@ function copyTextFallback(value: string): boolean {
   return succeeded;
 }
 
-export function ShareMatchCard({ jobTitle, overallScore, userName, userId }: ShareMatchCardProps) {
+export function ShareMatchCard({ jobTitle, overallScore, userName, userId, betterThanPercent }: ShareMatchCardProps) {
+  const hasPercentile = typeof betterThanPercent === "number" && betterThanPercent >= 50;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -136,6 +139,13 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId }: Sha
     ctx.font = "bold 32px Inter, sans-serif";
     ctx.fillText("ADERÊNCIA DA VAGA", ringCenterX, ringCenterY + 110);
 
+    // Percentil: o número comparativo é o que dá motivo real para postar.
+    if (hasPercentile) {
+      ctx.fillStyle = "#FBBF24";
+      ctx.font = `bold 40px ${emojiFontStack}`;
+      ctx.fillText(`🏆 À frente de ${betterThanPercent}% dos candidatos`, 540, ringCenterY + 290);
+    }
+
     // Card de Mensagem Central
     ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
     ctx.beginPath();
@@ -189,7 +199,9 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId }: Sha
 
     const origin = typeof window !== "undefined" ? window.location.origin : "https://carreirasmatch.com.br";
     const shareUrl = userId ? `${origin}/desafio?ref=${userId}` : `${origin}/desafio`;
-    const text = `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch! Faça o seu teste também:`;
+    const text = hasPercentile
+      ? `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch — fiquei à frente de ${betterThanPercent}% dos candidatos! Faça o seu teste também:`
+      : `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch! Faça o seu teste também:`;
 
     if (navigator.share && dataUrl) {
       try {
@@ -282,6 +294,11 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId }: Sha
             <div className="bg-white/10 p-2 rounded-xl text-[11px] font-bold text-white leading-tight">
               "Meu Match com essa vaga foi de {overallScore}%. E o seu?"
             </div>
+            {hasPercentile && (
+              <p className="text-[10px] font-bold text-amber-300">
+                🏆 À frente de {betterThanPercent}% dos candidatos
+              </p>
+            )}
           </div>
 
           <div className="text-[9px] text-sky-200 font-semibold">

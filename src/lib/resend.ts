@@ -707,3 +707,58 @@ export async function sendJobAlertEmail(
     `,
   );
 }
+
+/** Digest semanal do candidato: resumo da semana + gancho de re-análise. */
+export async function sendWeeklyDigestEmail(
+  to: string,
+  opts: {
+    name: string | null;
+    analysesCount: number;
+    bestScore: number | null;
+    scoreDelta: number | null;
+    newMatchesCount: number;
+  }
+) {
+  const greeting = opts.name ? `Olá, ${opts.name.split(" ")[0]}!` : "Olá!";
+  const lines: string[] = [];
+  if (opts.analysesCount > 0) {
+    lines.push(
+      `<li>Você fez <strong>${opts.analysesCount}</strong> análise${opts.analysesCount > 1 ? "s" : ""} de currículo esta semana${opts.bestScore !== null ? ` — melhor nota: <strong>${opts.bestScore}/100</strong>` : ""}.</li>`
+    );
+  }
+  if (opts.scoreDelta !== null && opts.scoreDelta > 0) {
+    lines.push(`<li>Sua nota subiu <strong>+${opts.scoreDelta} pontos</strong> em relação à semana anterior. 📈</li>`);
+  }
+  if (opts.newMatchesCount > 0) {
+    lines.push(`<li><strong>${opts.newMatchesCount}</strong> vaga${opts.newMatchesCount > 1 ? "s" : ""} nova${opts.newMatchesCount > 1 ? "s" : ""} compatível${opts.newMatchesCount > 1 ? "eis" : ""} com seu currículo. 🎯</li>`);
+  }
+  await send(
+    to,
+    "📊 Sua semana no CarreirasMatch",
+    `
+      <h2 style="font-size:20px;">${greeting}</h2>
+      <p>Resumo da sua semana de busca:</p>
+      <ul style="font-size:14px;color:#334155;line-height:1.8;">${lines.join("")}</ul>
+      <p>Ajustou o currículo? Re-analise e veja sua nota subir.</p>
+      ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
+    `,
+  );
+}
+
+/** Alerta B2B: novos candidatos no banco de talentos compatíveis com as vagas abertas da empresa. */
+export async function sendCompanyNewTalentEmail(
+  to: string,
+  opts: { companyName: string; newTalentCount: number; areas: string[] }
+) {
+  const areasLabel = opts.areas.length > 0 ? ` nas áreas de ${opts.areas.join(", ")}` : "";
+  await send(
+    to,
+    `👋 ${opts.newTalentCount} candidato${opts.newTalentCount > 1 ? "s" : ""} novo${opts.newTalentCount > 1 ? "s" : ""} no banco de talentos`,
+    `
+      <h2 style="font-size:20px;">Novos candidatos para ${opts.companyName}</h2>
+      <p>Esta semana, <strong>${opts.newTalentCount}</strong> candidato${opts.newTalentCount > 1 ? "s" : ""} novo${opts.newTalentCount > 1 ? "s se cadastraram" : " se cadastrou"} no banco de talentos${areasLabel} — compatíveis com suas vagas abertas.</p>
+      <p>Rode o matching para ver a aderência de cada um e pedir contato.</p>
+      ${button(`${APP_URL}/empresa/talentos`, "Ver candidatos no banco de talentos")}
+    `,
+  );
+}

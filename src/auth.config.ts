@@ -46,6 +46,10 @@ const PUBLIC_PATHS = [
   "/esqueci-senha",
   "/redefinir-senha",
   "/desafio",
+  "/teste-curriculo-ats",
+  "/nota-do-curriculo",
+  "/selo",
+  "/insights",
 ];
 
 export const authConfig: NextAuthConfig = {

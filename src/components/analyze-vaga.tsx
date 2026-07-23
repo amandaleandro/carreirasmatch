@@ -236,12 +236,15 @@ export function AnalyzeVagaPage({
   allowedTracks = null,
   careerSegmentLabel = null,
   isAuthenticated = false,
+  hideHero = false,
 }: {
   suggestedTrack?: CareerTrack | null;
   lockedTrack?: CareerTrack | null;
   allowedTracks?: CareerTrack[] | null;
   careerSegmentLabel?: string | null;
   isAuthenticated?: boolean;
+  /** Landing pages SEO têm hero/h1 próprios; esconde o cabeçalho interno para não duplicar h1. */
+  hideHero?: boolean;
 } = {}) {
   const initialDraft = getInitialDraft();
   const [file, setFile] = useState<File | null>(null);
@@ -517,13 +520,14 @@ export function AnalyzeVagaPage({
 
   return (
     <div className="px-4 md:px-8 py-6 max-w-[1200px] mx-auto w-full space-y-5 font-sans bg-[#F8FAFC] dark:bg-[#071827] text-foreground">
-      {!isAuthenticated && (
+      {!isAuthenticated && !hideHero && (
         <a href="/gratuito" className="text-xs font-bold text-[#2563EB] hover:underline">
           ← Voltar para recursos gratuitos
         </a>
       )}
-      
+
       {/* Cabeçalho Unificado (Banner Limpo) */}
+      {!hideHero && (
       <div className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5.5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
@@ -575,6 +579,7 @@ export function AnalyzeVagaPage({
           </div>
         </div>
       </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5 items-start">

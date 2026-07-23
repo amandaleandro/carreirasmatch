@@ -15,6 +15,8 @@ import {
   sendScoreImprovedEmail,
   sendAnalysisCountMilestoneEmail,
   sendCompanyDormantNudgeEmail,
+  sendWeeklyDigestEmail,
+  sendCompanyNewTalentEmail,
 } from "@/lib/resend";
 import { createUrgencyCoupon } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/push";
@@ -518,6 +520,106 @@ async function sendCheckoutRecoveryEmails(now: Date): Promise<void> {
   }
 }
 
+/** Chave de dedupe semanal: a data (YYYY-MM-DD) da segunda-feira da semana corrente. */
+function weekKey(now: Date): string {
+  const monday = new Date(now);
+  const diff = (monday.getDay() + 6) % 7; // 0 = segunda
+  monday.setDate(monday.getDate() - diff);
+  return monday.toISOString().slice(0, 10);
+}
+
+/**
+ * Digest semanal do candidato ("sua semana"): só às segundas, só para quem teve
+ * atividade nos últimos 7 dias (análise nova ou vaga compatível nova). O
+ * sendOnce com a chave da semana garante 1 envio por usuário por semana mesmo
+ * com o tick rodando 4x/dia.
+ */
+async function sendWeeklyDigests(now: Date): Promise<void> {
+  if (now.getDay() !== 1) return; // segunda-feira
+  const since = new Date(now.getTime() - 7 * DAY_MS);
+  const prevWeekStart = new Date(now.getTime() - 14 * DAY_MS);
+
+  const recentAnalyses = await prisma.analysis.findMany({
+    where: { createdAt: { gte: since }, resume: { userId: { not: null } } },
+    select: {
+      overallScore: true,
+      resume: { select: { userId: true, user: { select: { name: true, email: true } } } },
+    },
+  });
+
+  const byUser = new Map<string, { name: string | null; email: string; scores: number[] }>();
+  for (const a of recentAnalyses) {
+    const userId = a.resume.userId;
+    const email = a.resume.user?.email;
+    if (!userId || !email) continue;
+    const entry = byUser.get(userId) ?? { name: a.resume.user?.name ?? null, email, scores: [] };
+    entry.scores.push(a.overallScore);
+    byUser.set(userId, entry);
+  }
+
+  for (const [userId, entry] of byUser) {
+    const [newMatchesCount, prevBest] = await Promise.all([
+      prisma.jobMatch.count({
+        where: { createdAt: { gte: since }, resume: { userId } },
+      }),
+      prisma.analysis.findFirst({
+        where: { createdAt: { gte: prevWeekStart, lt: since }, resume: { userId } },
+        orderBy: { overallScore: "desc" },
+        select: { overallScore: true },
+      }),
+    ]);
+
+    const bestScore = Math.max(...entry.scores);
+    const scoreDelta = prevBest ? bestScore - prevBest.overallScore : null;
+
+    await sendOnce("weekly_digest", `${userId}:${weekKey(now)}`, entry.email, () =>
+      sendWeeklyDigestEmail(entry.email, {
+        name: entry.name,
+        analysesCount: entry.scores.length,
+        bestScore,
+        scoreDelta,
+        newMatchesCount,
+      })
+    );
+  }
+}
+
+/**
+ * Alerta B2B semanal: empresas com vaga aberta recebem quantos candidatos novos
+ * (opt-in no banco de talentos) entraram na semana. Determinístico, sem IA — o
+ * matching fino a empresa roda ao clicar.
+ */
+async function sendCompanyNewTalentAlerts(now: Date): Promise<void> {
+  if (now.getDay() !== 1) return;
+  const since = new Date(now.getTime() - 7 * DAY_MS);
+
+  const newTalentCount = await prisma.user.count({
+    where: { discoverable: true, createdAt: { gte: since }, resumes: { some: {} } },
+  });
+  if (newTalentCount === 0) return;
+
+  const companies = await prisma.company.findMany({
+    where: { email: { not: "" }, vagas: { some: { status: "open" } } },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      vagas: { where: { status: "open" }, select: { area: true } },
+    },
+  });
+
+  for (const company of companies) {
+    const areas = [...new Set(company.vagas.map((v) => v.area).filter(Boolean))].slice(0, 3);
+    await sendOnce("company_new_talent", `${company.id}:${weekKey(now)}`, company.email, () =>
+      sendCompanyNewTalentEmail(company.email, {
+        companyName: company.name,
+        newTalentCount,
+        areas,
+      })
+    );
+  }
+}
+
 export async function runLifecycleEmailTick(): Promise<void> {
   const now = new Date();
   const steps: Array<[string, () => Promise<void>]> = [
@@ -535,6 +637,8 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["milestone_first_analysis", () => sendFirstAnalysisMilestones(now)],
     ["milestone_score_improved", () => sendScoreImprovedMilestones(now)],
     ["milestone_analysis_count", () => sendAnalysisCountMilestones(now)],
+    ["weekly_digest", () => sendWeeklyDigests(now)],
+    ["company_new_talent", () => sendCompanyNewTalentAlerts(now)],
   ];
   for (const [name, step] of steps) {
     try {

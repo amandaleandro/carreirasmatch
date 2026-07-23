@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { locationSlug } from "@/lib/location-slug";
 import { FREE_TOOL_PATHS } from "@/lib/tools-catalog";
+import { VOCATION_AREAS } from "@/lib/vocation-areas";
 
 const BASE_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
@@ -54,6 +55,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/mercado-de-trabalho`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: `${BASE_URL}/parceiros`, lastModified: now, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE_URL}/analise`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
+    { url: `${BASE_URL}/teste-curriculo-ats`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${BASE_URL}/nota-do-curriculo`, lastModified: now, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${BASE_URL}/insights`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
     { url: `${BASE_URL}/assinar`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${BASE_URL}/blog`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${BASE_URL}/sobre`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
@@ -67,6 +71,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const toolRoutes: MetadataRoute.Sitemap = PUBLIC_TOOL_PATHS.map((path) => ({
     url: `${BASE_URL}${path}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  // Landings programáticas de análise por área profissional (SEO).
+  const analysisAreaRoutes: MetadataRoute.Sitemap = VOCATION_AREAS.map((area) => ({
+    url: `${BASE_URL}/analise/${area.slug}`,
     lastModified: now,
     changeFrequency: "monthly",
     priority: 0.7,
@@ -116,5 +128,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     locationRoutes = [];
   }
 
-  return [...staticRoutes, ...toolRoutes, ...publicJobRoutes, ...locationRoutes, ...postRoutes];
+  return [...staticRoutes, ...toolRoutes, ...analysisAreaRoutes, ...publicJobRoutes, ...locationRoutes, ...postRoutes];
 }

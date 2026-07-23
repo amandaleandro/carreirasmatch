@@ -73,6 +73,15 @@ export async function generateNextPost(): Promise<Post> {
 }
 
 export async function runDailyTick(): Promise<void> {
+  // Post mensal do Termômetro (determinístico, dedupe por slug ano-mês);
+  // roda fora da cota diária de posts de IA.
+  try {
+    const { publishMonthlyInsightsPost } = await import("@/lib/insights-post");
+    await publishMonthlyInsightsPost();
+  } catch (error) {
+    console.error("blog-scheduler: failed to publish monthly insights post", error);
+  }
+
   const target = postsPerDay();
   const count = await prisma.post.count({
     where: { publishedAt: { gte: startOfTodaySaoPaulo() } },

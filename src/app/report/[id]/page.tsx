@@ -19,6 +19,9 @@ import { SubscriptionNudgeAutoOpen } from "@/components/subscription-nudge";
 import { ShareMatchCard } from "@/components/share-match-card";
 import { ReferralRewardBox } from "@/components/referral-reward-box";
 import { getUserReferralStats } from "@/lib/referrals";
+import { analyzeResumeBullets } from "@/lib/bullet-analysis";
+import { VerifiedBadgeBox } from "@/components/verified-badge-box";
+import type { StructuredResume } from "@/lib/groq";
 
 export const dynamic = "force-dynamic";
 
@@ -96,8 +99,43 @@ export default async function ReportPage({
         experienceSuggestions: JSON.parse(record.experienceSuggestions || "[]"),
         atsChecklist: JSON.parse(record.atsChecklist || "[]"),
         currentSummary: record.currentSummary || "",
+        grammarErrors: record.grammarErrors,
+        structureRating: record.structureRating,
+        structureFeedback: record.structureFeedback,
+        missingBasicInfo: record.missingBasicInfo,
       }
     : null;
+
+  // Currículo estruturado salvo na análise: alimenta a "Visão do ATS" e o
+  // diagnóstico determinístico das descrições de experiência.
+  let resumeStructured: StructuredResume | null = null;
+  try {
+    const parsed = JSON.parse(record.resumeStructured || "{}");
+    if (parsed && Array.isArray(parsed.experiences)) resumeStructured = parsed as StructuredResume;
+  } catch {
+    // JSON malformado: segue sem os cards determinísticos.
+  }
+  const bulletAnalysis = resumeStructured ? analyzeResumeBullets(resumeStructured) : null;
+
+  // Percentil do score frente às demais análises da mesma trilha (benchmark).
+  // Só mostra com amostra mínima para o número não ser ruído.
+  const [trackTotal, trackBelow] = await Promise.all([
+    prisma.analysis.count({ where: { careerTrack: record.careerTrack } }),
+    prisma.analysis.count({
+      where: { careerTrack: record.careerTrack, overallScore: { lt: record.overallScore } },
+    }),
+  ]);
+  const betterThanPercent =
+    trackTotal >= 20 ? Math.round((trackBelow / trackTotal) * 100) : null;
+
+  // Evolução: compara com a análise anterior do MESMO currículo (qualquer vaga).
+  // Motiva o ciclo "corrigiu → re-analisou → nota subiu".
+  const previousAnalysis = await prisma.analysis.findFirst({
+    where: { resumeId: record.resumeId, createdAt: { lt: record.createdAt } },
+    orderBy: { createdAt: "desc" },
+    select: { overallScore: true, atsScore: true, createdAt: true, jobTitle: true },
+  });
+  const scoreDelta = previousAnalysis ? record.overallScore - previousAnalysis.overallScore : null;
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-12 w-full space-y-10">
@@ -142,12 +180,34 @@ export default async function ReportPage({
         )}
       </header>
 
+      {previousAnalysis && scoreDelta !== null && scoreDelta !== 0 && (
+        <div
+          className={`rounded-2xl border p-4 flex items-center gap-3 ${
+            scoreDelta > 0
+              ? "border-emerald-200 dark:border-emerald-900 bg-emerald-50/60 dark:bg-emerald-950/30"
+              : "border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30"
+          }`}
+        >
+          <span className={`text-2xl font-black shrink-0 ${scoreDelta > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+            {scoreDelta > 0 ? `+${scoreDelta}` : scoreDelta}
+          </span>
+          <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">
+            {scoreDelta > 0 ? "Seu currículo evoluiu: " : "Nota abaixo da análise anterior: "}
+            este match ficou {Math.abs(scoreDelta)} ponto{Math.abs(scoreDelta) > 1 ? "s" : ""}{" "}
+            {scoreDelta > 0 ? "acima" : "abaixo"} da análise anterior deste currículo (
+            {previousAnalysis.jobTitle}, {previousAnalysis.createdAt.toLocaleDateString("pt-BR")}).
+            {scoreDelta < 0 && " Vagas diferentes exigem requisitos diferentes — veja as palavras-chave ausentes."}
+          </p>
+        </div>
+      )}
+
       {/* Card Gerado para Compartilhamento em Stories */}
       <ShareMatchCard
         jobTitle={record.jobTitle}
         overallScore={record.overallScore}
         userName={user?.name}
         userId={session.user.id}
+        betterThanPercent={betterThanPercent}
       />
 
       {analysis ? (
@@ -157,7 +217,11 @@ export default async function ReportPage({
             careerTrack={record.careerTrack as CareerTrack}
             jobTitle={record.jobTitle}
             behavioralResult={behavioralResult}
+            bulletAnalysis={bulletAnalysis}
+            resumeStructured={resumeStructured}
+            betterThanPercent={betterThanPercent}
           />
+          <VerifiedBadgeBox analysisId={id} overallScore={record.overallScore} />
           {!subscribed && segment !== "student" && (
             <>
               <SubscriptionUpsell segment={segment ?? "career_pro"} />
