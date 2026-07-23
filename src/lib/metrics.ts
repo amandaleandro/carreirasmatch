@@ -205,6 +205,17 @@ export const businessFlow = getOrCreate(
     })
 );
 
+export const funnelEvents = getOrCreate(
+  "carreiras_funnel_events",
+  () =>
+    new Gauge({
+      name: "carreiras_funnel_events",
+      help: "Eventos de funil de conversão (FunnelEvent) por nome e janela móvel",
+      labelNames: ["name", "period"] as const,
+      registers: [registry],
+    })
+);
+
 export const accessSummary = getOrCreate(
   "carreiras_access_summary",
   () =>
@@ -401,6 +412,11 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
         companyPaymentsPaid: await prisma.companyPayment.count({
           where: { status: "paid", paidAt: { gte: start } },
         }),
+        funnelEventGroups: await prisma.funnelEvent.groupBy({
+          by: ["name"],
+          where: { createdAt: { gte: start } },
+          _count: { _all: true },
+        }),
       }))
     ),
     prisma.pageView.groupBy({
@@ -457,6 +473,7 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
   businessRevenueCents.reset();
   businessFlow.reset();
   accessSummary.reset();
+  funnelEvents.reset();
   for (const snapshot of periodSnapshots) {
     for (const [entity, value] of Object.entries({
       users: snapshot.users,
@@ -502,6 +519,9 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
       { metric: "unique_sessions", period: snapshot.label },
       snapshot.uniqueSessions
     );
+    for (const group of snapshot.funnelEventGroups) {
+      funnelEvents.set({ name: group.name, period: snapshot.label }, group._count._all);
+    }
   }
 
   accessBreakdown.reset();
