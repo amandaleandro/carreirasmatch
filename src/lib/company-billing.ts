@@ -1,5 +1,22 @@
 import { prisma } from "@/lib/prisma";
 
+/** Plano recorrente: vagas e triagens ilimitadas por assinatura mensal. */
+export const COMPANY_PLAN = {
+  kind: "company_subscription",
+  label: "Plano Ilimitado",
+  priceCents: 19900,
+  periodDays: 30,
+};
+
+/** True se a empresa tem o plano recorrente ativo (dentro do período pago). */
+export function hasActiveCompanyPlan(company: { planStatus: string; planCurrentPeriodEnd: Date | null }): boolean {
+  return (
+    company.planStatus === "active" &&
+    company.planCurrentPeriodEnd != null &&
+    company.planCurrentPeriodEnd.getTime() > Date.now()
+  );
+}
+
 /** Pacotes de créditos de triagem que a empresa pode comprar. */
 export type ScreeningPack = {
   kind: string;
@@ -38,5 +55,29 @@ export async function grantScreeningCredits(companyPaymentId: string): Promise<n
       select: { screeningCredits: true },
     });
     return company.screeningCredits;
+  });
+}
+
+/**
+ * Ativa (ou renova) o plano recorrente da empresa de forma idempotente por
+ * pagamento: só estende o período na primeira transição do CompanyPayment
+ * para "paid". Retorna o novo `currentPeriodEnd`, ou null se o pagamento já
+ * estava pago (nada a fazer).
+ */
+export async function activateCompanyPlan(companyPaymentId: string): Promise<Date | null> {
+  return prisma.$transaction(async (tx) => {
+    const payment = await tx.companyPayment.findUnique({ where: { id: companyPaymentId } });
+    if (!payment || payment.status === "paid") return null;
+
+    await tx.companyPayment.update({
+      where: { id: payment.id },
+      data: { status: "paid", paidAt: new Date() },
+    });
+    const currentPeriodEnd = new Date(Date.now() + COMPANY_PLAN.periodDays * 24 * 60 * 60 * 1000);
+    await tx.company.update({
+      where: { id: payment.companyId },
+      data: { planStatus: "active", planCurrentPeriodEnd: currentPeriodEnd },
+    });
+    return currentPeriodEnd;
   });
 }

@@ -61,12 +61,15 @@ export function MercadoPagoSubscriptionBrick({
   payerEmail,
   segment,
   couponCode,
+  endpoint = "/api/billing/subscription",
   onSuccess,
 }: {
   amount: number;
   payerEmail: string;
   segment?: string;
   couponCode?: string;
+  /** Rota que processa a assinatura. Default: assinatura de candidato. */
+  endpoint?: string;
   onSuccess: (registerUrl?: string) => void;
 }) {
   const [cardholderName, setCardholderName] = useState("");
@@ -104,7 +107,7 @@ export function MercadoPagoSubscriptionBrick({
         throw new Error("Não foi possível validar os dados do cartão.");
       }
 
-      const res = await fetch("/api/billing/subscription", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

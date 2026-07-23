@@ -8,7 +8,7 @@ export async function PATCH(req: Request) {
   const { company, response } = await requireCompanyApi();
   if (!company) return response;
 
-  let body: { name?: string; cnpj?: string; city?: string; state?: string; logoUrl?: string };
+  let body: { name?: string; cnpj?: string; city?: string; state?: string; logoUrl?: string; phone?: string };
   try {
     body = await req.json();
   } catch {
@@ -33,6 +33,7 @@ export async function PATCH(req: Request) {
       city: (body.city ?? "").trim(),
       state: (body.state ?? "").trim().toUpperCase().slice(0, 2),
       logoUrl,
+      phone: (body.phone ?? "").trim(),
     },
   });
 

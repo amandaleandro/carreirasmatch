@@ -888,12 +888,16 @@ model Company {
   email          String       @unique
   passwordHash   String
   logoUrl        String       @default("")
+  phone          String       @default("")
   city           String       @default("")
   state          String       @default("")
   /// Quantas triagens gratuitas já usou; conta contra FREE_SCREENING_LIMIT.
   screeningCount Int          @default(0)
   /// Créditos de triagem comprados; consumidos quando o teto gratuito acaba.
   screeningCredits Int        @default(0)
+  /// Plano recorrente (vagas + triagens ilimitadas). "inactive" | "active" | "cancelled".
+  planStatus     String       @default("inactive")
+  planCurrentPeriodEnd DateTime?
   /// Página pública da empresa (marca empregadora). slug único quando ativa.
   slug           String?      @unique
   publicProfile  Boolean      @default(false)
@@ -984,8 +988,8 @@ model CompanyPayment {
   id          String    @id @default(cuid())
   companyId   String
   company     Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  kind        String // "screening_pack"
-  credits     Int // créditos concedidos ao confirmar o pagamento
+  kind        String // "screening_pack" | "company_subscription"
+  credits     Int // créditos concedidos ao confirmar o pagamento (0 para assinatura)
   amount      Int // valor em centavos
   status      String    @default("pending") // pending | paid | cancelled | refunded
   mpPaymentId String    @unique

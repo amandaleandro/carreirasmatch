@@ -310,6 +310,49 @@ export async function sendCompanyMemberInviteEmail(
   );
 }
 
+/** Confirma a ativação do plano recorrente da empresa (vagas + triagens ilimitadas). */
+export async function sendCompanySubscriptionConfirmationEmail(to: string, opts: { currentPeriodEnd: Date }) {
+  const renew = formatBrazilDate(opts.currentPeriodEnd);
+  await send(
+    to,
+    "Plano Ilimitado ativado 🚀",
+    `
+      <h2 style="font-size: 20px;">Seu Plano Ilimitado está ativo 🚀</h2>
+      <p>Tudo certo! Agora sua empresa publica vagas e roda triagens de currículo por IA sem limite de créditos.</p>
+      <p>Próxima renovação em <strong>${renew}</strong>. Você pode gerenciar ou cancelar quando quiser em Faturamento.</p>
+      ${button(`${APP_URL}/empresa/billing`, "Ver meu plano")}
+    `
+  );
+}
+
+/** Avisa a empresa que o plano recorrente foi cancelado. */
+export async function sendCompanySubscriptionCancelledEmail(to: string) {
+  await send(
+    to,
+    "👋 Seu Plano Ilimitado foi cancelado",
+    `
+      <h2 style="font-size: 20px;">👋 Plano cancelado</h2>
+      <p>Confirmamos o cancelamento do Plano Ilimitado da sua empresa. Não faremos novas cobranças.</p>
+      <p>Sua empresa continua com acesso até o fim do período já pago. Depois disso, a triagem volta a consumir os créditos avulsos do seu saldo.</p>
+      ${button(`${APP_URL}/empresa/billing`, "Reativar plano")}
+    `
+  );
+}
+
+/** Convida uma empresa cadastrada a publicar sua primeira vaga (nunca postou nenhuma). */
+export async function sendCompanyDormantNudgeEmail(to: string, opts: { companyName: string }) {
+  await send(
+    to,
+    "Sua vaga ainda não saiu do papel 👀",
+    `
+      <h2 style="font-size: 20px;">Bora publicar sua primeira vaga? 👀</h2>
+      <p>Oi, ${opts.companyName}! Notamos que sua empresa se cadastrou no ${BRAND} mas ainda não publicou nenhuma vaga.</p>
+      <p>Cadastrar uma vaga leva menos de 2 minutos e você já recebe candidatos ranqueados por aderência com IA, sem custo pra começar.</p>
+      ${button(`${APP_URL}/empresa/vagas/nova`, "Publicar minha primeira vaga")}
+    `
+  );
+}
+
 /** Avisa o candidato que a empresa agendou uma entrevista. */
 export async function sendInterviewScheduledEmail(
   to: string,

@@ -24,6 +24,7 @@ export default async function CompanyProfilePage() {
             city: company.city,
             state: company.state,
             logoUrl: company.logoUrl,
+            phone: company.phone,
           }}
           account={{
             name: session.user.name ?? "",

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { sendCompanyNewApplicationEmail } from "@/lib/resend";
+import { sendCompanyNewApplicationWhatsapp } from "@/lib/evolution";
 
 // Candidato se candidata a uma vaga de empresa publicada no feed.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -50,6 +51,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const emails = owners.map((o) => o.email).filter(Boolean);
     const candidateName = session.user.name?.trim() || "Um candidato";
     void sendCompanyNewApplicationEmail(emails, { candidateName, vagaTitle: vaga.title, vagaId: vaga.id });
+
+    const companyContact = await prisma.company.findUnique({ where: { id: vaga.companyId }, select: { phone: true } });
+    if (companyContact?.phone) {
+      void sendCompanyNewApplicationWhatsapp(companyContact.phone, { candidateName, vagaTitle: vaga.title, vagaId: vaga.id });
+    }
   }
 
   return NextResponse.json({ ok: true });

@@ -14,6 +14,7 @@ import {
   sendFirstAnalysisMilestoneEmail,
   sendScoreImprovedEmail,
   sendAnalysisCountMilestoneEmail,
+  sendCompanyDormantNudgeEmail,
 } from "@/lib/resend";
 import { createUrgencyCoupon } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/push";
@@ -403,6 +404,29 @@ async function sendAnalysisCountMilestones(now: Date): Promise<void> {
   }
 }
 
+/**
+ * Nudge de empresa dormente: empresas cadastradas entre 3 e 6 dias atrás que
+ * ainda não publicaram nenhuma vaga. Uma vez por empresa.
+ */
+async function sendCompanyDormantNudges(now: Date): Promise<void> {
+  const from = new Date(now.getTime() - 6 * DAY_MS);
+  const to = new Date(now.getTime() - 3 * DAY_MS);
+
+  const companies = await prisma.company.findMany({
+    where: { createdAt: { gte: from, lte: to } },
+    select: { id: true, name: true, email: true },
+  });
+
+  for (const company of companies) {
+    const vagaCount = await prisma.companyVaga.count({ where: { companyId: company.id } });
+    if (vagaCount > 0) continue;
+
+    await sendOnce("company_dormant_nudge", company.id, company.email, () =>
+      sendCompanyDormantNudgeEmail(company.email, { companyName: company.name })
+    );
+  }
+}
+
 async function sendJobAlerts(now: Date): Promise<void> {
   const alerts = await prisma.jobAlert.findMany({
     where: { active: true, user: { email: { not: null } } },
@@ -501,6 +525,7 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["expire_subscriptions", () => expireLapsedSubscriptions(now)],
     ["onboarding_nudges", () => sendOnboardingNudges(now)],
     ["lead_followups", () => sendLeadFollowUps(now)],
+    ["company_dormant_nudges", () => sendCompanyDormantNudges(now)],
     ["diagnostic_upgrades", () => sendDiagnosticUpgradeEmails(now)],
     ["convert_to_subscription", () => sendConvertToSubscriptionEmails(now)],
     ["convert_second_nudge", () => sendConvertSecondNudgeEmails(now)],

@@ -1,14 +1,20 @@
-import { CreditCard, Sparkles, CheckCircle2 } from "lucide-react";
+import { CreditCard, Sparkles, CheckCircle2, Infinity as InfinityIcon } from "lucide-react";
 import { requireCompanyPage, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
-import { SCREENING_PACKS } from "@/lib/company-billing";
+import { SCREENING_PACKS, COMPANY_PLAN, hasActiveCompanyPlan } from "@/lib/company-billing";
 import { CompanyBillingCheckout } from "@/components/company-billing-checkout";
+import { CompanySubscriptionCheckout } from "@/components/company-subscription-checkout";
 
 export const dynamic = "force-dynamic";
+
+function formatBRL(cents: number) {
+  return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 export default async function CompanyBillingPage() {
   const { company } = await requireCompanyPage();
   const freeRemaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount);
   const totalAvailable = freeRemaining + company.screeningCredits;
+  const planActive = hasActiveCompanyPlan(company);
 
   return (
     <main className="max-w-4xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
@@ -26,6 +32,30 @@ export default async function CompanyBillingPage() {
         </p>
       </div>
 
+      {/* Plano Ilimitado */}
+      <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0">
+            <InfinityIcon className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="font-bold text-slate-900 dark:text-white">{COMPANY_PLAN.label}</p>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Vagas e triagens de currículo por IA sem limite, por {formatBRL(COMPANY_PLAN.priceCents)}/mês.
+            </p>
+          </div>
+        </div>
+
+        {planActive ? (
+          <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+            <CheckCircle2 className="w-4 h-4" />
+            Plano ativo — renova em {company.planCurrentPeriodEnd?.toLocaleDateString("pt-BR")}
+          </p>
+        ) : (
+          <CompanySubscriptionCheckout priceCents={COMPANY_PLAN.priceCents} payerEmail={company.email} />
+        )}
+      </div>
+
       {/* Saldo Disponível Card */}
       <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
@@ -37,7 +67,10 @@ export default async function CompanyBillingPage() {
               Saldo Atual de Triagens
             </p>
             <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-0.5">
-              {totalAvailable} <span className="text-lg font-semibold text-slate-500">{totalAvailable === 1 ? "triagem" : "triagens"}</span>
+              {planActive ? "Ilimitado" : totalAvailable}{" "}
+              {!planActive && (
+                <span className="text-lg font-semibold text-slate-500">{totalAvailable === 1 ? "triagem" : "triagens"}</span>
+              )}
             </p>
           </div>
         </div>
@@ -53,7 +86,7 @@ export default async function CompanyBillingPage() {
       </div>
 
       {/* Checkout Options */}
-      <CompanyBillingCheckout packs={SCREENING_PACKS} payerEmail={company.email} />
+      {!planActive && <CompanyBillingCheckout packs={SCREENING_PACKS} payerEmail={company.email} />}
     </main>
   );
 }

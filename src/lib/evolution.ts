@@ -101,6 +101,31 @@ export async function notifyAdminPurchaseWhatsapp(opts: {
   );
 }
 
+/** Avisa a empresa (no WhatsApp cadastrado no perfil) de uma nova candidatura. */
+export async function sendCompanyNewApplicationWhatsapp(
+  phone: string,
+  opts: { candidateName: string; vagaTitle: string; vagaId: string }
+): Promise<void> {
+  if (!phone.trim()) return;
+  await sendText(
+    phone,
+    `🎯 Nova candidatura\n\n${opts.candidateName} se candidatou à sua vaga *${opts.vagaTitle}*.\n\nVeja os dados do candidato:\n${APP_URL}/empresa/vagas/${opts.vagaId}`
+  );
+}
+
+/** Avisa a empresa (no WhatsApp cadastrado no perfil) que um candidato liberou o contato. */
+export async function sendCompanyContactAcceptedWhatsapp(
+  phone: string,
+  opts: { candidateName: string; jobTitle?: string }
+): Promise<void> {
+  if (!phone.trim()) return;
+  const forJob = opts.jobTitle?.trim() ? ` para a vaga de *${opts.jobTitle.trim()}*` : "";
+  await sendText(
+    phone,
+    `🔓 Contato liberado\n\n${opts.candidateName} aceitou seu pedido de contato${forJob}. Veja os dados na sua central de contatos:\n${APP_URL}/empresa/contatos`
+  );
+}
+
 /** Avisa o admin de um novo chamado de suporte por WhatsApp. Chame com fire-and-forget (void). */
 export async function notifyAdminSupportTicketWhatsapp(opts: {
   ticketId: string;

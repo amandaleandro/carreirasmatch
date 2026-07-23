@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import {
   Search,
   KanbanSquare,
@@ -14,11 +16,39 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "CarreirasMatch para Empresas",
+  title: "Postar vaga grátis com recrutamento por IA | CarreirasMatch Empresas",
   description:
-    "Publique vagas, ranqueie candidatos por aderência com IA e monte um banco de talentos. Comece grátis, sem cartão de crédito.",
+    "Publique vagas grátis, ranqueie candidatos por aderência com IA e monte um banco de talentos para recrutamento e seleção. Comece sem cartão de crédito.",
   alternates: { canonical: "/empresas" },
 };
+
+const FAQ = [
+  {
+    question: "Postar vaga é grátis?",
+    answer:
+      "Sim. Cadastrar a empresa e publicar vagas no feed público é gratuito, sem cartão de crédito. Você paga apenas se quiser triagens extras de currículo por IA além da cota gratuita, ou o Plano Ilimitado para vagas e triagens sem limite.",
+  },
+  {
+    question: "Como funciona o recrutamento com IA?",
+    answer:
+      "A cada currículo recebido (seja por candidatura no feed ou upload manual em PDF), a IA compara o conteúdo com a descrição da vaga e devolve um score de aderência com justificativa, ranqueando os candidatos automaticamente.",
+  },
+  {
+    question: "Preciso de CNPJ para me cadastrar?",
+    answer:
+      "Não é obrigatório informar CNPJ no cadastro inicial. Você pode completar os dados da empresa (CNPJ, cidade, logo) a qualquer momento no perfil.",
+  },
+  {
+    question: "Consigo buscar candidatos sem ter uma vaga publicada?",
+    answer:
+      "Sim, o banco de talentos permite buscar por palavra-chave e pedir contato diretamente a candidatos que optaram por ser encontrados, mesmo sem uma vaga aberta.",
+  },
+  {
+    question: "O que é o Plano Ilimitado?",
+    answer:
+      "É a assinatura mensal que remove o limite de créditos de triagem por IA, além das vagas publicadas no feed já serem ilimitadas por padrão. Pode ser cancelado quando quiser.",
+  },
+];
 
 const FEATURES = [
   {
@@ -62,6 +92,9 @@ const STEPS = [
 export default function EmpresasLandingPage() {
   return (
     <div className="w-full">
+      <JsonLd data={faqJsonLd(FAQ)} />
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Empresas", path: "/empresas" }])} />
+
       <div className="relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -top-32 -left-24 h-[26rem] w-[26rem] rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 opacity-25 blur-3xl" />
@@ -163,6 +196,52 @@ export default function EmpresasLandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            Comece grátis, cresça quando precisar
+          </h2>
+          <div className="mt-10 grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+            <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Grátis</p>
+              <p className="mt-2 text-3xl font-extrabold text-neutral-900 dark:text-white">R$ 0</p>
+              <ul className="mt-4 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-400">
+                {["Vagas ilimitadas no feed público", "Triagens gratuitas iniciais por IA", "Banco de talentos e perfil público"].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl border-2 border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 p-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Plano Ilimitado</p>
+              <p className="mt-2 text-3xl font-extrabold text-neutral-900 dark:text-white">R$ 199<span className="text-base font-semibold text-neutral-500">/mês</span></p>
+              <ul className="mt-4 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-400">
+                {["Triagens de currículo por IA sem limite", "Tudo do plano grátis incluso", "Cancele quando quiser"].map((item) => (
+                  <li key={item} className="flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            Perguntas frequentes
+          </h2>
+          <div className="mt-8 max-w-2xl mx-auto space-y-4">
+            {FAQ.map((item) => (
+              <div key={item.question} className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5">
+                <h3 className="font-bold text-neutral-900 dark:text-white">{item.question}</h3>
+                <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{item.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 

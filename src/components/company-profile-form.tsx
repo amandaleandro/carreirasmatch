@@ -9,6 +9,7 @@ type CompanyData = {
   city: string;
   state: string;
   logoUrl: string;
+  phone: string;
 };
 
 type AccountData = {
@@ -140,6 +141,19 @@ export function CompanyProfileForm({
             <label className={labelClass}>UF</label>
             <input type="text" maxLength={2} value={org.state} onChange={(e) => setOrg({ ...org, state: e.target.value.toUpperCase() })} className={inputClass} />
           </div>
+        </div>
+        <div>
+          <label className={labelClass}>WhatsApp (opcional)</label>
+          <input
+            type="tel"
+            value={org.phone}
+            onChange={(e) => setOrg({ ...org, phone: e.target.value })}
+            className={inputClass}
+            placeholder="(11) 99999-9999"
+          />
+          <p className="text-xs text-neutral-500 mt-1">
+            Usamos para avisar de novas candidaturas e contatos liberados por WhatsApp, além do e-mail.
+          </p>
         </div>
         <div>
           <label className={labelClass}>Logo (URL)</label>
