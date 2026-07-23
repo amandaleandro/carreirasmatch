@@ -38,6 +38,13 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
+  // Requisitos eliminatórios (opcionais): um por linha, avaliados de forma
+  // binária antes do ranking (estilo Gupy).
+  const eliminatoryRequirements = String(formData.get("eliminatory") ?? "")
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .slice(0, 10);
   const files = formData.getAll("resumes").filter((f): f is File => f instanceof File);
 
   if (!title || !description) {
@@ -83,7 +90,7 @@ export async function POST(req: NextRequest) {
 
   let ranking;
   try {
-    ranking = await rankCandidates(title, description, candidates);
+    ranking = await rankCandidates(title, description, candidates, eliminatoryRequirements);
   } catch (error) {
     console.error("Falha ao ranquear candidatos:", error);
     return NextResponse.json(
@@ -106,6 +113,7 @@ export async function POST(req: NextRequest) {
         title,
         description,
         recommendation: ranking.recommendation ?? "",
+        eliminatoryRequirements: JSON.stringify(eliminatoryRequirements),
         candidates: {
           create: parsed.map((p, i) => {
             const scored = scoreById.get(String(i));
@@ -115,6 +123,8 @@ export async function POST(req: NextRequest) {
               fitScore: scored?.fitScore ?? 0,
               reason: scored?.reason ?? "",
               candidateName: scored?.candidateName || "",
+              eliminated: scored?.eliminated ?? false,
+              eliminationReason: scored?.eliminationReason ?? "",
             };
           }),
         },

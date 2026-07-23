@@ -758,6 +758,8 @@ export type CandidateRankingResult = {
     fitScore: number;
     reason: string;
     candidateName?: string;
+    eliminated?: boolean;
+    eliminationReason?: string;
   }[];
   recommendation: string;
 };
@@ -769,16 +771,24 @@ export type CandidateRankingResult = {
 export async function rankCandidates(
   jobTitle: string,
   jobText: string,
-  candidates: CandidateInput[]
+  candidates: CandidateInput[],
+  eliminatoryRequirements: string[] = []
 ): Promise<CandidateRankingResult> {
+  const hasEliminatory = eliminatoryRequirements.length > 0;
+  const eliminatoryBlock = hasEliminatory
+    ? `\nREQUISITOS ELIMINATÓRIOS (avalie ANTES da nota, de forma binária): o candidato que não demonstrar evidência clara de TODOS os requisitos abaixo deve vir com "eliminated": true e "eliminationReason" citando exatamente qual requisito faltou. Não elimine por suposição: só quando a ausência for clara no currículo. Candidatos eliminados ainda recebem fitScore normal (a empresa decide se reconsidera).\n${eliminatoryRequirements.map((r) => `- ${r}`).join("\n")}\n`
+    : "";
+  const eliminatoryFields = hasEliminatory
+    ? `, "eliminated": boolean, "eliminationReason": string (vazia se eliminated=false; senão 1 frase citando o requisito eliminatório ausente)`
+    : "";
   const systemPrompt = `Você é um recrutador técnico sênior. Avalie MÚLTIPLOS candidatos para UMA vaga e ranqueie-os pela aderência real do currículo aos requisitos.
 ${BASE_RULES}
 No campo "candidateId" da resposta, repita EXATAMENTE o valor de "ID DO CANDIDATO" fornecido, sem prefixos, numeração ou texto extra. Baseie a nota apenas no que o currículo demonstra frente aos requisitos da vaga; não invente qualificações.
 No campo "candidateName" de cada candidato, extraia o nome completo do candidato a partir do texto do currículo (caso não seja encontrado ou não esteja claro, use o valor de "IDENTIFICAÇÃO").
-Formato de resposta:
+${eliminatoryBlock}Formato de resposta:
 {
-  "ranking": [ { "candidateId": string, "candidateName": string, "fitScore": number (0-100), "reason": string (1-2 frases explicando a nota, citando pontos fortes e lacunas frente à vaga) } ] (uma entrada por candidato informado, ordenadas da maior para a menor aderência),
-  "recommendation": string (2-4 frases dizendo quais candidatos chamar primeiro para entrevista e por quê)
+  "ranking": [ { "candidateId": string, "candidateName": string, "fitScore": number (0-100), "reason": string (1-2 frases explicando a nota, citando pontos fortes e lacunas frente à vaga)${eliminatoryFields} } ] (uma entrada por candidato informado, ordenadas da maior para a menor aderência),
+  "recommendation": string (2-4 frases dizendo quais candidatos chamar primeiro para entrevista e por quê${hasEliminatory ? ", considerando que eliminados por requisito obrigatório não devem ser priorizados" : ""})
 }`;
 
   const candidatesBlock = candidates

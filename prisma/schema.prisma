@@ -1009,6 +1009,9 @@ model CompanyJob {
   title          String
   description    String
   recommendation String             @default("")
+  /// JSON string[] de requisitos eliminatórios (estilo Gupy): candidato sem
+  /// evidência de um deles é sinalizado como eliminado no ranking.
+  eliminatoryRequirements String    @default("[]")
   createdAt      DateTime           @default(now())
   candidates     CompanyCandidate[]
 
@@ -1029,6 +1032,9 @@ model CompanyCandidate {
   status        String     @default("none")
   /// Anotação interna da empresa sobre o candidato.
   note          String     @default("")
+  /// Reprovado automaticamente por requisito eliminatório da vaga.
+  eliminated        Boolean @default(false)
+  eliminationReason String  @default("")
   createdAt     DateTime   @default(now())
 
   @@index([jobId, fitScore])

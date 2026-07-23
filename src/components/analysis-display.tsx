@@ -6,6 +6,13 @@ import { ChecklistCard } from "@/components/checklist-card";
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
 import {
+  AtsResumeView,
+  BulletDiagnosticsCard,
+  ScorePercentileCard,
+} from "@/components/resume-quality-cards";
+import type { BulletAnalysisSummary } from "@/lib/bullet-analysis";
+import type { StructuredResume } from "@/lib/groq";
+import {
   SOFT_SKILL_LABELS,
   type SoftSkillDimension,
 } from "@/lib/behavioral-test";
@@ -611,6 +618,9 @@ export function AnalysisResult({
   careerTrack,
   jobTitle = "",
   behavioralResult,
+  bulletAnalysis,
+  resumeStructured,
+  betterThanPercent,
 }: {
   result: Analysis;
   careerTrack: CareerTrack;
@@ -621,6 +631,9 @@ export function AnalysisResult({
     personalityLabel: string;
     summary: string;
   } | null;
+  bulletAnalysis?: BulletAnalysisSummary | null;
+  resumeStructured?: StructuredResume | null;
+  betterThanPercent?: number | null;
 }) {
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
@@ -671,6 +684,13 @@ export function AnalysisResult({
               seniority={result.seniorityScore}
               ats={result.atsScore}
             />
+
+            {typeof betterThanPercent === "number" && (
+              <ScorePercentileCard
+                betterThanPercent={betterThanPercent}
+                trackLabel={TRACK_LABELS[careerTrack]}
+              />
+            )}
 
             <BehavioralFitCard jobTitle={jobTitle} behavioralResult={behavioralResult} />
 
@@ -813,6 +833,27 @@ export function AnalysisResult({
                 items={result.weaknesses}
               />
             </div>
+
+            {bulletAnalysis && <BulletDiagnosticsCard analysis={bulletAnalysis} />}
+
+            {resumeStructured && (
+              <AtsResumeView
+                resume={resumeStructured}
+                missingBasicInfo={
+                  Array.isArray(result.missingBasicInfo)
+                    ? result.missingBasicInfo
+                    : typeof result.missingBasicInfo === "string"
+                    ? (() => {
+                        try {
+                          return JSON.parse(result.missingBasicInfo) as string[];
+                        } catch {
+                          return [];
+                        }
+                      })()
+                    : []
+                }
+              />
+            )}
 
             <ListCard
               icon="🔧"

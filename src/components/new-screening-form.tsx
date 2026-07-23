@@ -7,6 +7,7 @@ export function NewScreeningForm() {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [eliminatory, setEliminatory] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,6 +54,7 @@ export function NewScreeningForm() {
       const formData = new FormData();
       formData.append("title", title);
       formData.append("description", description);
+      if (eliminatory.trim()) formData.append("eliminatory", eliminatory);
       for (const file of files) formData.append("resumes", file);
 
       const res = await fetch("/api/empresa/triagem", { method: "POST", body: formData });
@@ -106,6 +108,25 @@ export function NewScreeningForm() {
           className={inputClass}
           maxLength={5000}
         />
+      </div>
+
+      <div>
+        <label className={labelClass}>
+          Requisitos eliminatórios{" "}
+          <span className="font-normal text-neutral-500">(opcional, um por linha)</span>
+        </label>
+        <textarea
+          value={eliminatory}
+          onChange={(e) => setEliminatory(e.target.value)}
+          placeholder={"Ex:\nCNH categoria B\nInglês avançado\nDisponibilidade para viagens"}
+          rows={3}
+          className={inputClass}
+          maxLength={1000}
+        />
+        <p className="text-xs text-neutral-500 mt-1.5">
+          Candidatos sem evidência desses requisitos aparecem marcados como eliminados no ranking
+          (você ainda vê a nota e pode reconsiderar).
+        </p>
       </div>
 
       <div>

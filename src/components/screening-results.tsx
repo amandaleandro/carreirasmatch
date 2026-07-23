@@ -14,6 +14,8 @@ export type ScreeningCandidate = {
   status: CandidateStatus;
   note: string;
   rawText: string;
+  eliminated: boolean;
+  eliminationReason: string;
 };
 
 function scoreColor(score: number): string {
@@ -29,7 +31,7 @@ const STATUS_META: Record<Exclude<CandidateStatus, "none">, { label: string; bad
 };
 
 function toCsv(jobTitle: string, candidates: ScreeningCandidate[]): string {
-  const header = ["Posição", "Candidato", "Arquivo", "Aderência", "Status", "Justificativa", "Anotação"];
+  const header = ["Posição", "Candidato", "Arquivo", "Aderência", "Eliminado", "Status", "Justificativa", "Anotação"];
   const escape = (v: string) => `"${v.replace(/"/g, '""')}"`;
   const rows = candidates.map((c, i) =>
     [
@@ -37,6 +39,7 @@ function toCsv(jobTitle: string, candidates: ScreeningCandidate[]): string {
       c.candidateName || "",
       c.fileName,
       String(c.fitScore),
+      c.eliminated ? `Sim${c.eliminationReason ? ` (${c.eliminationReason})` : ""}` : "Não",
       c.status === "none" ? "" : STATUS_META[c.status].label,
       c.reason.replace(/\r?\n/g, " "),
       (c.note ?? "").replace(/\r?\n/g, " "),
@@ -198,7 +201,17 @@ export function ScreeningResults({
                       {STATUS_META[c.status].label}
                     </span>
                   )}
+                  {c.eliminated && (
+                    <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-300 border border-red-200 dark:border-red-900">
+                      Requisito eliminatório
+                    </span>
+                  )}
                 </div>
+                {c.eliminated && c.eliminationReason && (
+                  <p className="text-xs font-semibold text-red-600 dark:text-red-400 mt-2">
+                    {c.eliminationReason}
+                  </p>
+                )}
                 {c.reason && (
                   <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-2 leading-relaxed">{c.reason}</p>
                 )}

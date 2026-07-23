@@ -7,6 +7,7 @@ import { toAnalysisTeaser } from "@/lib/analysis-teaser";
 import { normalizeCareerSegment, tracksForSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyKeywords } from "@/lib/keyword-verify";
 import { analysisTotal, analysisDuration, freeAnalysisLimitHit } from "@/lib/metrics";
 import {
   FREE_ANALYSIS_DAILY_LIMIT,
@@ -323,6 +324,19 @@ export async function POST(req: NextRequest) {
         }
         (analysis as unknown as { missingBasicInfo: string[] }).missingBasicInfo = missing;
       }
+
+      // Camada determinística de keywords (estilo Jobscan): confere cada termo da IA
+      // contra a presença literal (normalizada) no currículo e reclassifica o que a IA
+      // errou — "encontrado" que não existe vira ausente e vice-versa. Estabiliza as
+      // listas entre execuções sem custo extra de tokens.
+      const verified = verifyKeywords(
+        analysis.keywordsFound,
+        analysis.keywordsMissing,
+        resumeText,
+        structuredForChecks
+      );
+      analysis.keywordsFound = verified.keywordsFound;
+      analysis.keywordsMissing = verified.keywordsMissing;
     }
 
     const resume =

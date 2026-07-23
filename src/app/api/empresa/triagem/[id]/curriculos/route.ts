@@ -17,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { id } = await params;
   const job = await prisma.companyJob.findFirst({
     where: { id, companyId: company.id },
-    select: { id: true, title: true, description: true },
+    select: { id: true, title: true, description: true, eliminatoryRequirements: true },
   });
   if (!job) return NextResponse.json({ error: "Triagem não encontrada." }, { status: 404 });
 
@@ -43,9 +43,17 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     resumeText: p.rawText,
   }));
 
+  let eliminatoryRequirements: string[] = [];
+  try {
+    const parsedReqs = JSON.parse(job.eliminatoryRequirements || "[]");
+    if (Array.isArray(parsedReqs)) eliminatoryRequirements = parsedReqs;
+  } catch {
+    // sem requisitos eliminatórios válidos, segue ranking normal
+  }
+
   let ranking;
   try {
-    ranking = await rankCandidates(job.title, job.description, candidates);
+    ranking = await rankCandidates(job.title, job.description, candidates, eliminatoryRequirements);
   } catch (error) {
     console.error("Falha ao ranquear currículos adicionais:", error);
     return NextResponse.json(
@@ -66,6 +74,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         fitScore: scored?.fitScore ?? 0,
         reason: scored?.reason ?? "",
         candidateName: scored?.candidateName || "",
+        eliminated: scored?.eliminated ?? false,
+        eliminationReason: scored?.eliminationReason ?? "",
       };
     }),
   });

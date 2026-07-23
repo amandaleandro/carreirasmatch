@@ -21,11 +21,19 @@ export default async function ScreeningResultPage({
   const job = await prisma.companyJob.findFirst({
     where: { id, companyId: company.id },
     include: {
-      candidates: { orderBy: { fitScore: "desc" } },
+      candidates: { orderBy: [{ eliminated: "asc" }, { fitScore: "desc" }] },
     },
   });
 
   if (!job) notFound();
+
+  let eliminatoryRequirements: string[] = [];
+  try {
+    const parsed = JSON.parse(job.eliminatoryRequirements || "[]");
+    if (Array.isArray(parsed)) eliminatoryRequirements = parsed;
+  } catch {
+    // sem requisitos válidos, não exibe o bloco
+  }
 
   const candidates: ScreeningCandidate[] = job.candidates.map((c) => ({
     id: c.id,
@@ -36,6 +44,8 @@ export default async function ScreeningResultPage({
     status: (c.status as CandidateStatus) ?? "none",
     note: c.note,
     rawText: c.rawText,
+    eliminated: c.eliminated,
+    eliminationReason: c.eliminationReason,
   }));
 
   return (
@@ -60,6 +70,24 @@ export default async function ScreeningResultPage({
           <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-5">
             <h2 className="text-sm font-semibold text-blue-900 dark:text-blue-200 mb-1.5">Recomendação</h2>
             <p className="text-sm text-blue-900/90 dark:text-blue-200/90 leading-relaxed">{job.recommendation}</p>
+          </div>
+        )}
+
+        {eliminatoryRequirements.length > 0 && (
+          <div className="rounded-2xl border border-red-200 dark:border-red-900 bg-red-50/50 dark:bg-red-950/20 p-4">
+            <h2 className="text-xs font-bold uppercase tracking-wide text-red-700 dark:text-red-300 mb-2">
+              Requisitos eliminatórios desta triagem
+            </h2>
+            <div className="flex flex-wrap gap-1.5">
+              {eliminatoryRequirements.map((r, i) => (
+                <span
+                  key={i}
+                  className="rounded-full border border-red-200 dark:border-red-900 bg-white dark:bg-neutral-950 px-2.5 py-0.5 text-xs font-semibold text-red-700 dark:text-red-300"
+                >
+                  {r}
+                </span>
+              ))}
+            </div>
           </div>
         )}
 
