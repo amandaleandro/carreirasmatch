@@ -374,6 +374,62 @@ export function StudyPlanCard({ plan }: { plan: StudyPlanPhased }) {
   );
 }
 
+const LOCKED_DELIVERABLES = [
+  ["📄", "Currículo otimizado em PDF", "Reescrito com as palavras-chave desta vaga, pronto para enviar."],
+  ["🔑", "Palavras-chave completas do ATS", "Todos os termos que o filtro automático procura — e onde inseri-los."],
+  ["🎤", "Perguntas de entrevista desta vaga", "O que o recrutador tende a perguntar, com base nos seus gaps."],
+  ["✉️", "Mensagem pronta para o recrutador", "Texto de apresentação personalizado para esta oportunidade."],
+  ["🗺️", "Plano de ação priorizado", "O que ajustar primeiro para subir seu score antes de aplicar."],
+  ["📚", "Plano de estudo dos gaps", "Como fechar as lacunas essenciais, recomendadas e futuras."],
+] as const;
+
+export function LockedDeliverablesUpsell({
+  overallScore,
+  children,
+}: {
+  overallScore: number;
+  children?: React.ReactNode;
+}) {
+  const gap = Math.max(70 - overallScore, 0);
+  return (
+    <div className="rounded-2xl border border-[#2563EB]/25 bg-[#FFFFFF] dark:bg-neutral-900 p-5 space-y-4 shadow-sm">
+      <div className="space-y-1">
+        <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">
+          {gap > 0
+            ? `Você está a ${gap} pontos de "recomendado aplicar". O caminho já está mapeado.`
+            : "Seu diagnóstico completo já está pronto. Só falta liberar."}
+        </h3>
+        <p className="text-xs text-[#64748B]">
+          Estes materiais já foram gerados para esta vaga e estão aguardando liberação:
+        </p>
+      </div>
+
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        {LOCKED_DELIVERABLES.map(([emoji, title, description]) => (
+          <div
+            key={title}
+            className="relative rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/40 p-3.5"
+          >
+            <div className="flex items-start gap-2.5">
+              <span className="text-base">{emoji}</span>
+              <div className="min-w-0 space-y-1">
+                <p className="text-xs font-bold text-[#071827] dark:text-white leading-snug">{title}</p>
+                <p className="text-[10px] text-[#64748B] leading-relaxed">{description}</p>
+                <p aria-hidden className="select-none blur-[5px] text-[10px] text-[#64748B] leading-relaxed">
+                  Conteúdo gerado para esta vaga com base no seu currículo e nos requisitos.
+                </p>
+              </div>
+              <span className="absolute right-3 top-3 text-[#64748B]">🔒</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {children}
+    </div>
+  );
+}
+
 export function AnalysisTeaserView({
   result,
   children,

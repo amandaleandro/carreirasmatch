@@ -5,6 +5,7 @@ import {
   Analysis,
   AnalysisResult,
   AnalysisTeaserView,
+  LockedDeliverablesUpsell,
   SimpleFitTeaser,
   CAREER_TRACK_OPTIONS,
   CareerTrack,
@@ -484,16 +485,19 @@ export function AnalyzeVagaPage({
           />
         ) : !result.loggedIn ? (
           <SimpleFitTeaser result={result}>
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-5 space-y-3 shadow-sm">
-              <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">Veja exatamente o que ajustar antes de aplicar</h3>
-              <p className="text-xs text-[#64748B]">
-                Libere palavras-chave, ajustes de currículo, plano de evolução, perguntas de entrevista e mensagem para o recrutador.
-              </p>
+            <LockedDeliverablesUpsell overallScore={result.overallScore}>
               <UnlockDiagnosticButton
                 analysisId={result.id}
                 price={result.diagnosticPrice}
                 payerEmail={getStoredLeadContact()?.email}
               />
+              <p className="text-[10px] text-[#64748B]">
+                Vai aplicar para várias vagas?{" "}
+                <a href="/assinar?segment=career_pro" className="font-bold text-[#2563EB] hover:underline">
+                  Assine o Profissional por R$ 24,90/mês
+                </a>{" "}
+                e libere análises e kits ilimitados.
+              </p>
               <p className="text-[10px] text-[#64748B]">
                 Sem cadastro prévio: você paga e cria sua conta em seguida para acessar. Já tem conta?{" "}
                 <a href="/login" className="font-bold text-[#2563EB] hover:underline">
@@ -501,17 +505,20 @@ export function AnalyzeVagaPage({
                 </a>
                 .
               </p>
-            </div>
+            </LockedDeliverablesUpsell>
           </SimpleFitTeaser>
         ) : (
           <AnalysisTeaserView result={result}>
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-5 space-y-3 shadow-sm">
-              <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">Veja exatamente o que ajustar antes de aplicar</h3>
-              <p className="text-xs text-[#64748B]">
-                Libere palavras-chave, ajustes de currículo, plano de evolução, perguntas de entrevista e mensagem para o recrutador.
-              </p>
+            <LockedDeliverablesUpsell overallScore={result.overallScore}>
               <UnlockDiagnosticButton analysisId={result.id} price={result.diagnosticPrice} />
-            </div>
+              <p className="text-[10px] text-[#64748B]">
+                Vai aplicar para várias vagas?{" "}
+                <a href="/assinar?segment=career_pro" className="font-bold text-[#2563EB] hover:underline">
+                  Assine o Profissional por R$ 24,90/mês
+                </a>{" "}
+                e libere análises e kits ilimitados desta e das próximas vagas.
+              </p>
+            </LockedDeliverablesUpsell>
           </AnalysisTeaserView>
         )}
       </div>
