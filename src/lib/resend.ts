@@ -5,9 +5,11 @@ import { formatBrazilDate } from "@/lib/brazil";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
-const FROM = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 const APP_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 const BRAND = "CarreirasMatch";
+// Com nome de exibição: sem isso, o Gmail mostra o e-mail cru como remetente em vez de "CarreirasMatch".
+const FROM = `${BRAND} <${process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev"}>`;
+const LOGO_URL = `${APP_URL}/logos/wordmark-dark.png`; // texto branco, p/ fundo azul do cabeçalho
 
 /**
  * Envelopa o conteúdo num layout de e-mail consistente. `bodyHtml` já vem com os
@@ -21,8 +23,10 @@ function layout(bodyHtml: string) {
         <td align="center">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.08);">
             <tr>
-              <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:22px 28px;">
-                <a href="${APP_URL}" style="font-size:18px;font-weight:800;color:#ffffff;text-decoration:none;">✨ ${BRAND}</a>
+              <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:24px 28px;">
+                <a href="${APP_URL}" style="text-decoration:none;">
+                  <img src="${LOGO_URL}" alt="${BRAND}" height="28" style="height:28px;width:auto;display:block;border:0;" />
+                </a>
               </td>
             </tr>
             <tr>
