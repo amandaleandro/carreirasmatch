@@ -24,6 +24,35 @@ export function BillingSection({
   const [showBrick, setShowBrick] = useState(false);
   const [couponCode, setCouponCode] = useState("");
   const [plan, setPlan] = useState<PlanId>("card_recurring");
+  const [showManage, setShowManage] = useState(false);
+  const [manageBusy, setManageBusy] = useState(false);
+  const [manageMessage, setManageMessage] = useState<string | null>(null);
+
+  async function manageSubscription(action: "pause" | "cancel") {
+    setManageBusy(true);
+    setManageMessage(null);
+    try {
+      const res = await fetch("/api/billing/subscription/manage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setManageMessage(data.error ?? "Não foi possível concluir. Tente novamente.");
+      } else {
+        setManageMessage(
+          action === "pause"
+            ? "Renovação pausada. Seu acesso continua até o fim do período já pago, e você reativa quando quiser."
+            : "Renovação cancelada. Seu acesso continua até o fim do período já pago."
+        );
+      }
+    } catch {
+      setManageMessage("Falha de conexão. Tente novamente.");
+    } finally {
+      setManageBusy(false);
+    }
+  }
 
   const isActive = subscriptionStatus === "active";
   const monthlyCents = parseBRLToCents(monthlyPrice);
@@ -140,6 +169,56 @@ export function BillingSection({
       <p className="text-xs text-neutral-500 dark:text-neutral-400">
         Cartão recorrente renova sozinho. Pix e anual são pagamento único e você renova quando quiser. Processado pelo Mercado Pago.
       </p>
+
+      {isActive && !showManage && (
+        <button
+          type="button"
+          onClick={() => setShowManage(true)}
+          className="text-xs text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 underline"
+        >
+          Precisa pausar ou cancelar a renovação?
+        </button>
+      )}
+
+      {isActive && showManage && (
+        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-4 space-y-3">
+          <p className="text-sm font-semibold">Conseguiu a vaga ou precisa de um tempo? 🎉</p>
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">
+            Você pode <strong>pausar a renovação</strong> em vez de cancelar: as cobranças param, seu acesso vale até o
+            fim do período já pago, e seu histórico de análises e candidaturas fica guardado para quando precisar de novo.
+          </p>
+          {manageMessage ? (
+            <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">{manageMessage}</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={manageBusy}
+                onClick={() => manageSubscription("pause")}
+                className="rounded-lg bg-blue-600 text-white text-xs font-bold px-4 py-2 hover:bg-blue-700 transition-colors disabled:opacity-50"
+              >
+                Pausar renovação
+              </button>
+              <button
+                type="button"
+                disabled={manageBusy}
+                onClick={() => manageSubscription("cancel")}
+                className="rounded-lg border border-neutral-300 dark:border-neutral-700 text-xs font-semibold px-4 py-2 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors disabled:opacity-50"
+              >
+                Cancelar de vez
+              </button>
+              <button
+                type="button"
+                disabled={manageBusy}
+                onClick={() => setShowManage(false)}
+                className="text-xs text-neutral-500 hover:underline px-2 py-2"
+              >
+                Voltar
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

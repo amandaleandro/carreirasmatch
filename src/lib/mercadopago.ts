@@ -121,6 +121,22 @@ export async function createPreapproval(input: {
   };
 }
 
+/**
+ * Muda o status da recorrência no Mercado Pago: "paused" interrompe as
+ * cobranças (reativável), "cancelled" encerra de vez, "authorized" reativa.
+ */
+export async function updatePreapprovalStatus(
+  id: string,
+  status: "paused" | "cancelled" | "authorized"
+): Promise<MercadoPagoPreapprovalResult> {
+  const preapproval = new PreApproval(getClient());
+  const response = await preapproval.update({ id, body: { status } });
+  return {
+    id: response.id!,
+    status: response.status as MercadoPagoPreapprovalStatus,
+  };
+}
+
 export async function getPreapproval(id: string): Promise<MercadoPagoPreapprovalResult> {
   const preapproval = new PreApproval(getClient());
   const response = await preapproval.get({ id });
