@@ -13,73 +13,73 @@ datasource db {
 }
 
 model User {
-  id                 String    @id @default(cuid())
-  name               String?
-  email              String?   @unique
-  phone              String?
-  whatsappMarketingOptIn Boolean @default(false)
-  emailVerified      DateTime?
-  image              String?
-  passwordHash       String?
-  careerSegment      String?
-  professionalArea   String?
-  city               String?
-  state              String?
-  hasFormalEducation Boolean?
-  discoverable       Boolean   @default(false)
-  interestedRoles    String    @default("[]")
-  themePreference    String    @default("system")
-  internshipChecklistProgress String @default("[]")
-  createdAt          DateTime  @default(now())
-  accounts           Account[]
-  sessions           Session[]
-  resumes            Resume[]
-  jobsAdded          Job[]
-  applications       Application[]
-  weeklyGoals        WeeklyGoal[]
-  courses            UserCourse[]
-  payments           Payment[]
-  subscription       Subscription?
-  profileSuggestions ProfileSuggestion[]
-  vocationTestResults VocationTestResult[]
-  studyScheduleItems StudyScheduleItem[]
-  classScheduleItems ClassScheduleItem[]
-  softSkillTestResults SoftSkillTestResult[]
-  passwordResetTokens PasswordResetToken[]
-  supportTickets     SupportTicket[]
-  freeToolUsages     FreeToolUsage[]
-  jobAlerts          JobAlert[]
-  pushSubscriptions  PushSubscription[]
-  opportunityReports OpportunityReport[]
-  contactRequests    TalentContactRequest[]
-  companyJobApplications CompanyJobApplication[]
-  gameScores             GameScore[]
+  id                          String                  @id @default(cuid())
+  name                        String?
+  email                       String?                 @unique
+  phone                       String?
+  whatsappMarketingOptIn      Boolean                 @default(false)
+  emailVerified               DateTime?
+  image                       String?
+  passwordHash                String?
+  careerSegment               String?
+  professionalArea            String?
+  city                        String?
+  state                       String?
+  hasFormalEducation          Boolean?
+  discoverable                Boolean                 @default(false)
+  interestedRoles             String                  @default("[]")
+  themePreference             String                  @default("system")
+  internshipChecklistProgress String                  @default("[]")
+  createdAt                   DateTime                @default(now())
+  accounts                    Account[]
+  sessions                    Session[]
+  resumes                     Resume[]
+  jobsAdded                   Job[]
+  applications                Application[]
+  weeklyGoals                 WeeklyGoal[]
+  courses                     UserCourse[]
+  payments                    Payment[]
+  subscription                Subscription?
+  profileSuggestions          ProfileSuggestion[]
+  vocationTestResults         VocationTestResult[]
+  studyScheduleItems          StudyScheduleItem[]
+  classScheduleItems          ClassScheduleItem[]
+  softSkillTestResults        SoftSkillTestResult[]
+  passwordResetTokens         PasswordResetToken[]
+  supportTickets              SupportTicket[]
+  freeToolUsages              FreeToolUsage[]
+  jobAlerts                   JobAlert[]
+  pushSubscriptions           PushSubscription[]
+  opportunityReports          OpportunityReport[]
+  contactRequests             TalentContactRequest[]
+  companyJobApplications      CompanyJobApplication[]
+  gameScores                  GameScore[]
 
   // Marketplace freelancer. Um mesmo User pode ser freelancer (freelancerProfile,
   // propostas) e/ou contratante (projetos que publicou).
-  freelancerProfile      FreelancerProfile?
-  freelanceProjects      FreelanceProject[]  @relation("ClientProjects")
-  freelanceProposals     FreelanceProposal[] @relation("FreelancerProposals")
+  freelancerProfile            FreelancerProfile?
+  freelanceProjects            FreelanceProject[]  @relation("ClientProjects")
+  freelanceProposals           FreelanceProposal[] @relation("FreelancerProposals")
   freelanceClientContracts     FreelanceContract[] @relation("ClientContracts")
   freelanceFreelancerContracts FreelanceContract[] @relation("FreelancerContracts")
-  freelanceReviewsWritten  FreelanceReview[]  @relation("ReviewAuthor")
-  freelanceReviewsReceived FreelanceReview[]  @relation("ReviewTarget")
-  freelanceClientThreads       FreelanceThread[] @relation("ClientThreads")
-  freelanceFreelancerThreads   FreelanceThread[] @relation("FreelancerThreads")
-  freelanceMessagesSent    FreelanceMessage[] @relation("FreelanceMessageSender")
+  freelanceReviewsWritten      FreelanceReview[]   @relation("ReviewAuthor")
+  freelanceReviewsReceived     FreelanceReview[]   @relation("ReviewTarget")
+  freelanceClientThreads       FreelanceThread[]   @relation("ClientThreads")
+  freelanceFreelancerThreads   FreelanceThread[]   @relation("FreelancerThreads")
+  freelanceMessagesSent        FreelanceMessage[]  @relation("FreelanceMessageSender")
 
   /// Cupom usado no cadastro (link de indicação ou campo manual). Serve para o
   /// influenciador dono do cupom rastrear quem se cadastrou por indicação dele.
-  signupCouponId     String?
-  signupCoupon       Coupon?   @relation("SignupCoupon", fields: [signupCouponId], references: [id], onDelete: SetNull)
+  signupCouponId String?
+  signupCoupon   Coupon? @relation("SignupCoupon", fields: [signupCouponId], references: [id], onDelete: SetNull)
   /// Cupom que este usuário é dono (perfil de influenciador). null para usuários comuns.
-  ownedCoupon        Coupon?   @relation("InfluencerCoupon")
+  ownedCoupon    Coupon? @relation("InfluencerCoupon")
 
   /// Indicação direta entre usuários (Desafio do Match e convites)
-  referredById       String?
-  referredBy         User?     @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
-  referrals          User[]    @relation("UserReferrals")
-  unlockedFullDiagnosticCredits Int @default(0)
+  referredById                  String?
+  referredBy                    User?   @relation("UserReferrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals                     User[]  @relation("UserReferrals")
+  unlockedFullDiagnosticCredits Int     @default(0)
 
   @@index([signupCouponId])
   @@index([referredById])
@@ -143,32 +143,32 @@ model Resume {
 }
 
 model Analysis {
-  id             String   @id @default(cuid())
-  resumeId       String
-  resume         Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  payments       Payment[]
-  leadId         String?
-  lead           Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
-  careerTrack    String
-  jobTitle       String
-  jobText        String
-  overallScore   Int
-  technicalScore Int
-  experienceScore Int
-  seniorityScore Int
-  atsScore       Int
+  id                      String        @id @default(cuid())
+  resumeId                String
+  resume                  Resume        @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  payments                Payment[]
+  leadId                  String?
+  lead                    Lead?         @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  careerTrack             String
+  jobTitle                String
+  jobText                 String
+  overallScore            Int
+  technicalScore          Int
+  experienceScore         Int
+  seniorityScore          Int
+  atsScore                Int
   applicationStatus       String
   applicationStatusReason String
-  keywordsFound  String
-  keywordsMissing String
-  suggestedSummary String
-  strengths      String
-  weaknesses     String
-  fixes          String
-  interviewQuestions String
-  studyPlan      String
-  recruiterMessage String
-  alternativeRoles String
+  keywordsFound           String
+  keywordsMissing         String
+  suggestedSummary        String
+  strengths               String
+  weaknesses              String
+  fixes                   String
+  interviewQuestions      String
+  studyPlan               String
+  recruiterMessage        String
+  alternativeRoles        String
   talkAboutYourselfAnswer String?
   transferableSkills      String?
   transitionNarrative     String?
@@ -179,43 +179,48 @@ model Analysis {
   weeklyApplicationPlan   String?
   pastFeedback            String?
   feedbackAnalysis        String?
-  experienceSuggestions   String   @default("[]")
-  atsChecklist            String   @default("[]")
-  currentSummary          String   @default("")
-  resumeStructured        String   @default("{}")
+  experienceSuggestions   String        @default("[]")
+  atsChecklist            String        @default("[]")
+  currentSummary          String        @default("")
+  resumeStructured        String        @default("{}")
   resumeOverride          String?
-  actionPlanProgress      String   @default("[]")
-  interviewProgress       String   @default("{}")
+  actionPlanProgress      String        @default("[]")
+  interviewProgress       String        @default("{}")
   grammarErrors           String?
   structureRating         String?
   structureFeedback       String?
   missingBasicInfo        String?
-  createdAt      DateTime @default(now())
-  applications   Application[]
+  jobDecoded              String?
+  jobRedFlags             String?
+  clarifyingQuestions     String?
+  clarifyingAnswers       String?
+  refinedAt               DateTime?
+  createdAt               DateTime      @default(now())
+  applications            Application[]
 }
 
 model Job {
-  id            String     @id @default(cuid())
-  url           String     @unique
+  id            String        @id @default(cuid())
+  url           String        @unique
   jobTitle      String
   jobText       String
   location      String?
-  city          String     @default("")
-  state         String     @default("")
-  source        String     @default("scrape")
-  company       String     @default("")
-  area          String     @default("")
-  subarea       String     @default("")
-  seniority     String     @default("")
-  workModel     String     @default("")
-  contractType  String     @default("")
-  entryLevel    Boolean    @default(false)
+  city          String        @default("")
+  state         String        @default("")
+  source        String        @default("scrape")
+  company       String        @default("")
+  area          String        @default("")
+  subarea       String        @default("")
+  seniority     String        @default("")
+  workModel     String        @default("")
+  contractType  String        @default("")
+  entryLevel    Boolean       @default(false)
   salaryMin     Int?
   expiresAt     DateTime?
   addedByUserId String?
-  addedBy       User?      @relation(fields: [addedByUserId], references: [id], onDelete: SetNull)
-  active        Boolean    @default(true)
-  createdAt     DateTime   @default(now())
+  addedBy       User?         @relation(fields: [addedByUserId], references: [id], onDelete: SetNull)
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
   matches       JobMatch[]
   applications  Application[]
 
@@ -246,25 +251,25 @@ model JobMatch {
 }
 
 model Application {
-  id         String   @id @default(cuid())
-  userId     String
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobId      String?
-  job        Job?     @relation(fields: [jobId], references: [id], onDelete: SetNull)
-  analysisId String?
-  analysis   Analysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull)
-  company    String   @default("")
-  jobTitle   String
-  jobUrl     String   @default("")
-  fitScore   Int?
-  status     String   @default("saved")
-  notes      String   @default("")
-  appliedAt  DateTime?
-  deadline   DateTime?
+  id          String                @id @default(cuid())
+  userId      String
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId       String?
+  job         Job?                  @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  analysisId  String?
+  analysis    Analysis?             @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+  company     String                @default("")
+  jobTitle    String
+  jobUrl      String                @default("")
+  fitScore    Int?
+  status      String                @default("saved")
+  notes       String                @default("")
+  appliedAt   DateTime?
+  deadline    DateTime?
   interviewAt DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  activities ApplicationActivity[]
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  activities  ApplicationActivity[]
 
   @@index([userId, status])
   @@index([userId, jobUrl])
@@ -297,27 +302,27 @@ model UserCourse {
 }
 
 model Payment {
-  id               String    @id @default(cuid())
-  userId           String
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  kind             String // "first_analysis" | "diagnostic" | "subscription"
-  segment          String
-  amount           Int // valor em centavos (já com desconto de cupom aplicado, se houver)
-  discountCents    Int       @default(0) // desconto concedido pelo cupom; amount + discountCents = preço cheio
-  status           String    @default("pending") // pending | paid | expired | cancelled | refunded
-  mpPaymentId      String    @unique
-  analysisId       String? // set for "first_analysis" (consumed by) and "diagnostic" (unlocks) payments
-  analysis         Analysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull)
-  couponId         String?
-  coupon           Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull)
-  paidAt           DateTime?
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-  sessionId        String    @default("")
-  source           String    @default("")
-  medium           String    @default("")
-  campaign         String    @default("")
-  content          String    @default("")
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind          String // "first_analysis" | "diagnostic" | "subscription"
+  segment       String
+  amount        Int // valor em centavos (já com desconto de cupom aplicado, se houver)
+  discountCents Int       @default(0) // desconto concedido pelo cupom; amount + discountCents = preço cheio
+  status        String    @default("pending") // pending | paid | expired | cancelled | refunded
+  mpPaymentId   String    @unique
+  analysisId    String? // set for "first_analysis" (consumed by) and "diagnostic" (unlocks) payments
+  analysis      Analysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+  couponId      String?
+  coupon        Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessionId     String    @default("")
+  source        String    @default("")
+  medium        String    @default("")
+  campaign      String    @default("")
+  content       String    @default("")
 
   @@index([userId])
   @@index([status])
@@ -336,16 +341,16 @@ model Coupon {
   /// "fixed" = usa os campos *DiscountCents; "percent" = usa os campos *DiscountPercent.
   discountType String @default("fixed")
 
-  oneOffDiscountCents       Int @default(200) // desconto em "Primeira Análise" e "Diagnóstico"
-  subscriptionDiscountCents Int @default(400) // desconto na assinatura
-  oneOffDiscountPercent     Int @default(0) // 0-100, usado quando discountType = "percent"
+  oneOffDiscountCents         Int @default(200) // desconto em "Primeira Análise" e "Diagnóstico"
+  subscriptionDiscountCents   Int @default(400) // desconto na assinatura
+  oneOffDiscountPercent       Int @default(0) // 0-100, usado quando discountType = "percent"
   subscriptionDiscountPercent Int @default(0) // 0-100, usado quando discountType = "percent"
 
   /// Percentual de comissão do influenciador sobre a receita líquida atribuída ao cupom.
   commissionPercent Int @default(0)
 
   /// null = sem data de expiração.
-  expiresAt DateTime?
+  expiresAt      DateTime?
   /// null = usos ilimitados. Comparado contra usageCount (resgates pagos).
   maxRedemptions Int?
 
@@ -357,10 +362,10 @@ model Coupon {
 
   /// Usuário influenciador dono deste cupom. Ele loga com conta normal e ganha
   /// acesso total ao sistema + o painel /influencer. Um cupom por influenciador.
-  ownerUserId String?  @unique
-  owner       User?    @relation("InfluencerCoupon", fields: [ownerUserId], references: [id], onDelete: SetNull)
+  ownerUserId String? @unique
+  owner       User?   @relation("InfluencerCoupon", fields: [ownerUserId], references: [id], onDelete: SetNull)
   /// Usuários que se cadastraram usando este cupom (indicação), pagos ou não.
-  signups     User[]   @relation("SignupCoupon")
+  signups     User[]  @relation("SignupCoupon")
 
   @@index([active])
 }
@@ -499,15 +504,15 @@ model ClassScheduleItem {
 }
 
 model SoftSkillTestResult {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  answers         String
-  skillScores     String
-  personalityType String
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers          String
+  skillScores      String
+  personalityType  String
   personalityLabel String
-  summary         String   @default("")
-  createdAt       DateTime @default(now())
+  summary          String   @default("")
+  createdAt        DateTime @default(now())
 
   @@index([userId])
 }
@@ -566,18 +571,18 @@ model Post {
 
 /// Ticket de suporte: uma conversa entre um usuário e o admin, dentro do sistema.
 model SupportTicket {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  subject   String
-  category  String   @default("other")
-  status    String   @default("open")
+  id              String           @id @default(cuid())
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject         String
+  category        String           @default("other")
+  status          String           @default("open")
   firstResponseAt DateTime?
-  resolvedAt       DateTime?
-  reopenCount      Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  messages  SupportMessage[]
+  resolvedAt      DateTime?
+  reopenCount     Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  messages        SupportMessage[]
 
   @@index([userId, updatedAt])
   @@index([status, updatedAt])
@@ -585,14 +590,14 @@ model SupportTicket {
 
 /// Mensagem dentro de um ticket. `fromAdmin` diz de que lado veio.
 model SupportMessage {
-  id          String        @id @default(cuid())
+  id          String              @id @default(cuid())
   ticketId    String
-  ticket      SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
-  fromAdmin   Boolean       @default(false)
+  ticket      SupportTicket       @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  fromAdmin   Boolean             @default(false)
   body        String
-  readByUser  Boolean       @default(false)
-  readByAdmin Boolean       @default(false)
-  createdAt   DateTime      @default(now())
+  readByUser  Boolean             @default(false)
+  readByAdmin Boolean             @default(false)
+  createdAt   DateTime            @default(now())
   attachments SupportAttachment[]
 
   @@index([ticketId, createdAt])
@@ -660,12 +665,12 @@ model ExternalCourse {
   lastSeenAt  DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  
-  partnerId   String?
-  partner     Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
-  featured    Boolean  @default(false)
-  couponCode  String   @default("")
-  couponDiscount String @default("")
+
+  partnerId      String?
+  partner        Partner? @relation(fields: [partnerId], references: [id], onDelete: SetNull)
+  featured       Boolean  @default(false)
+  couponCode     String   @default("")
+  couponDiscount String   @default("")
 
   @@index([active, area])
   @@index([state, city])
@@ -712,50 +717,50 @@ model RadarItem {
 }
 
 model PublicJobBulletin {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
-  url         String   @unique
+  url         String    @unique
   source      String
   city        String
   state       String
   publishedAt DateTime?
-  active      Boolean  @default(true)
-  lastSeenAt  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  active      Boolean   @default(true)
+  lastSeenAt  DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([active, state, city])
   @@index([source, publishedAt])
 }
 
 model SourceSync {
-  key          String   @id
-  label        String
-  kind         String
-  active       Boolean  @default(true)
-  lastRunAt    DateTime?
+  key           String    @id
+  label         String
+  kind          String
+  active        Boolean   @default(true)
+  lastRunAt     DateTime?
   lastSuccessAt DateTime?
-  itemCount    Int      @default(0)
-  lastError    String   @default("")
-  updatedAt    DateTime @updatedAt
+  itemCount     Int       @default(0)
+  lastError     String    @default("")
+  updatedAt     DateTime  @updatedAt
 }
 
 model OpportunitySource {
-  id            String   @id @default(cuid())
+  id            String              @id @default(cuid())
   name          String
-  url           String   @unique
-  kind          String   @default("job")
-  parser        String   @default("links")
-  state         String   @default("")
-  city          String   @default("")
-  active        Boolean  @default(true)
-  official      Boolean  @default(true)
+  url           String              @unique
+  kind          String              @default("job")
+  parser        String              @default("links")
+  state         String              @default("")
+  city          String              @default("")
+  active        Boolean             @default(true)
+  official      Boolean             @default(true)
   lastRunAt     DateTime?
   lastSuccessAt DateTime?
-  lastError     String   @default("")
-  itemCount     Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  lastError     String              @default("")
+  itemCount     Int                 @default(0)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
   opportunities PublicOpportunity[]
 
   @@index([active, kind])
@@ -763,35 +768,35 @@ model OpportunitySource {
 }
 
 model PublicOpportunity {
-  id             String   @id @default(cuid())
-  sourceId       String
-  source         OpportunitySource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
-  externalKey    String
-  title          String
-  company        String   @default("")
-  description    String   @default("")
-  url            String
-  city           String   @default("")
-  state          String   @default("")
-  area           String   @default("")
-  subarea        String   @default("")
-  education      String   @default("")
-  experience     String   @default("")
-  salary         String   @default("")
-  quantity       Int?
-  publishedAt    DateTime?
-  expiresAt      DateTime?
-  official       Boolean  @default(true)
-  riskScore      Int      @default(0)
-  riskReasons    String   @default("[]")
-  linkStatus     String   @default("unknown")
-  lastCheckedAt  DateTime?
-  active         Boolean  @default(true)
-  lastSeenAt     DateTime @default(now())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  clicks         OpportunityClick[]
-  reports        OpportunityReport[]
+  id            String              @id @default(cuid())
+  sourceId      String
+  source        OpportunitySource   @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  externalKey   String
+  title         String
+  company       String              @default("")
+  description   String              @default("")
+  url           String
+  city          String              @default("")
+  state         String              @default("")
+  area          String              @default("")
+  subarea       String              @default("")
+  education     String              @default("")
+  experience    String              @default("")
+  salary        String              @default("")
+  quantity      Int?
+  publishedAt   DateTime?
+  expiresAt     DateTime?
+  official      Boolean             @default(true)
+  riskScore     Int                 @default(0)
+  riskReasons   String              @default("[]")
+  linkStatus    String              @default("unknown")
+  lastCheckedAt DateTime?
+  active        Boolean             @default(true)
+  lastSeenAt    DateTime            @default(now())
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  clicks        OpportunityClick[]
+  reports       OpportunityReport[]
 
   @@unique([sourceId, externalKey])
   @@index([active, state, city])
@@ -831,48 +836,48 @@ model PushSubscription {
 }
 
 model OpportunityClick {
-  id            String   @id @default(cuid())
+  id            String            @id @default(cuid())
   opportunityId String
   opportunity   PublicOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
-  sessionId     String   @default("")
-  campaign      String   @default("")
-  createdAt     DateTime @default(now())
+  sessionId     String            @default("")
+  campaign      String            @default("")
+  createdAt     DateTime          @default(now())
 
   @@index([opportunityId, createdAt])
   @@index([campaign, createdAt])
 }
 
 model OpportunityReport {
-  id            String   @id @default(cuid())
+  id            String            @id @default(cuid())
   opportunityId String
   opportunity   PublicOpportunity @relation(fields: [opportunityId], references: [id], onDelete: Cascade)
   userId        String?
-  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user          User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
   reason        String
-  details       String   @default("")
-  status        String   @default("open")
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  details       String            @default("")
+  status        String            @default("open")
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   @@index([status, createdAt])
   @@index([opportunityId])
 }
 
 model PartnerSubmission {
-  id          String   @id @default(cuid())
-  organization String
+  id               String   @id @default(cuid())
+  organization     String
   organizationType String
-  contactName String
-  email       String
-  phone       String   @default("")
-  title       String
-  description String
-  url         String   @default("")
-  state       String   @default("")
-  city        String   @default("")
-  status      String   @default("pending")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  contactName      String
+  email            String
+  phone            String   @default("")
+  title            String
+  description      String
+  url              String   @default("")
+  state            String   @default("")
+  city             String   @default("")
+  status           String   @default("pending")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   @@index([status, createdAt])
   @@index([state, city])
@@ -882,33 +887,33 @@ model PartnerSubmission {
 /// candidato (User): senha própria em `passwordHash`, login via provider
 /// "company-credentials" do NextAuth.
 model Company {
-  id             String       @id @default(cuid())
-  name           String
-  cnpj           String       @default("")
-  email          String       @unique
-  passwordHash   String
-  logoUrl        String       @default("")
-  phone          String       @default("")
-  city           String       @default("")
-  state          String       @default("")
+  id                   String                 @id @default(cuid())
+  name                 String
+  cnpj                 String                 @default("")
+  email                String                 @unique
+  passwordHash         String
+  logoUrl              String                 @default("")
+  phone                String                 @default("")
+  city                 String                 @default("")
+  state                String                 @default("")
   /// Quantas triagens gratuitas já usou; conta contra FREE_SCREENING_LIMIT.
-  screeningCount Int          @default(0)
+  screeningCount       Int                    @default(0)
   /// Créditos de triagem comprados; consumidos quando o teto gratuito acaba.
-  screeningCredits Int        @default(0)
+  screeningCredits     Int                    @default(0)
   /// Plano recorrente (vagas + triagens ilimitadas). "inactive" | "active" | "cancelled".
-  planStatus     String       @default("inactive")
+  planStatus           String                 @default("inactive")
   planCurrentPeriodEnd DateTime?
   /// Página pública da empresa (marca empregadora). slug único quando ativa.
-  slug           String?      @unique
-  publicProfile  Boolean      @default(false)
-  description    String       @default("")
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  jobs           CompanyJob[]
-  vagas          CompanyVaga[]
-  contactRequests TalentContactRequest[]
-  payments       CompanyPayment[]
-  members        CompanyMember[]
+  slug                 String?                @unique
+  publicProfile        Boolean                @default(false)
+  description          String                 @default("")
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  jobs                 CompanyJob[]
+  vagas                CompanyVaga[]
+  contactRequests      TalentContactRequest[]
+  payments             CompanyPayment[]
+  members              CompanyMember[]
 
   @@index([email])
 }
@@ -934,32 +939,32 @@ model CompanyMember {
 /// (usuários discoverable) automaticamente pela aderência. Diferente de
 /// CompanyJob, que é a triagem de PDFs enviados manualmente pela empresa.
 model CompanyVaga {
-  id            String    @id @default(cuid())
-  companyId     String
-  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  title         String
-  description   String
-  area          String    @default("")
-  subarea       String    @default("")
-  state         String    @default("")
-  status        String    @default("open") // open | closed
+  id              String                  @id @default(cuid())
+  companyId       String
+  company         Company                 @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title           String
+  description     String
+  area            String                  @default("")
+  subarea         String                  @default("")
+  state           String                  @default("")
+  status          String                  @default("open") // open | closed
   /// Campos opcionais que enriquecem o anúncio e o feed.
-  salaryMin     Int?
-  workModel     String    @default("") // presencial | hibrido | remoto
-  seniority     String    @default("") // estagio | junior | pleno | senior
-  jobType       String    @default("") // clt | pj | estagio | temporario
+  salaryMin       Int?
+  workModel       String                  @default("") // presencial | hibrido | remoto
+  seniority       String                  @default("") // estagio | junior | pleno | senior
+  jobType         String                  @default("") // clt | pj | estagio | temporario
   /// Snapshot do último matching, sem dados de contato: JSON de
   /// { userId, firstName, professionalArea, city, state, fitScore, reason }.
   /// O status do contato e o contato em si são resolvidos ao vivo na leitura.
-  matchesJson   String    @default("")
-  lastMatchedAt DateTime?
+  matchesJson     String                  @default("")
+  lastMatchedAt   DateTime?
   /// Publicada no feed público de vagas? Quando true, existe um Job espelho.
-  publishedToFeed Boolean @default(false)
+  publishedToFeed Boolean                 @default(false)
   /// Id do Job (feed) espelho desta vaga, quando publicada.
-  feedJobId     String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  applications  CompanyJobApplication[]
+  feedJobId       String?
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  applications    CompanyJobApplication[]
 
   @@index([companyId, createdAt])
 }
@@ -1003,39 +1008,39 @@ model CompanyPayment {
 
 /// Uma triagem: a vaga que a empresa descreveu para ranquear currículos.
 model CompanyJob {
-  id             String             @id @default(cuid())
-  companyId      String
-  company        Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  title          String
-  description    String
-  recommendation String             @default("")
+  id                      String             @id @default(cuid())
+  companyId               String
+  company                 Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title                   String
+  description             String
+  recommendation          String             @default("")
   /// JSON string[] de requisitos eliminatórios (estilo Gupy): candidato sem
   /// evidência de um deles é sinalizado como eliminado no ranking.
-  eliminatoryRequirements String    @default("[]")
-  createdAt      DateTime           @default(now())
-  candidates     CompanyCandidate[]
+  eliminatoryRequirements String             @default("[]")
+  createdAt               DateTime           @default(now())
+  candidates              CompanyCandidate[]
 
   @@index([companyId, createdAt])
 }
 
 /// Um currículo enviado numa triagem, já pontuado contra a vaga.
 model CompanyCandidate {
-  id            String     @id @default(cuid())
-  jobId         String
-  job           CompanyJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  fileName      String
-  candidateName String     @default("")
-  rawText       String
-  fitScore      Int        @default(0)
-  reason        String     @default("")
+  id                String     @id @default(cuid())
+  jobId             String
+  job               CompanyJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  fileName          String
+  candidateName     String     @default("")
+  rawText           String
+  fitScore          Int        @default(0)
+  reason            String     @default("")
   /// Ação da empresa sobre o candidato: none | favorite | approved | rejected.
-  status        String     @default("none")
+  status            String     @default("none")
   /// Anotação interna da empresa sobre o candidato.
-  note          String     @default("")
+  note              String     @default("")
   /// Reprovado automaticamente por requisito eliminatório da vaga.
-  eliminated        Boolean @default(false)
-  eliminationReason String  @default("")
-  createdAt     DateTime   @default(now())
+  eliminated        Boolean    @default(false)
+  eliminationReason String     @default("")
+  createdAt         DateTime   @default(now())
 
   @@index([jobId, fitScore])
 }
@@ -1044,22 +1049,22 @@ model CompanyCandidate {
 /// O contato do candidato só é liberado para a empresa quando o candidato aceita
 /// (status "accepted") — dupla proteção de consentimento (opt-in + aceite).
 model TalentContactRequest {
-  id        String   @id @default(cuid())
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobTitle  String   @default("")
-  message   String   @default("")
-  status    String   @default("pending") // pending | accepted | declined
+  id              String    @id @default(cuid())
+  companyId       String
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobTitle        String    @default("")
+  message         String    @default("")
+  status          String    @default("pending") // pending | accepted | declined
   /// A empresa já viu que este pedido foi aceito? Zera o aviso in-app.
-  viewedByCompany Boolean @default(false)
+  viewedByCompany Boolean   @default(false)
   /// Anotação interna da empresa sobre este contato.
-  note      String   @default("")
+  note            String    @default("")
   /// Entrevista agendada pela empresa (quando o contato foi liberado).
-  interviewAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  interviewAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@unique([companyId, userId])
   @@index([userId, status])
@@ -1077,27 +1082,27 @@ model TalentContactRequest {
 /// (skills, portfólio, valor) e as métricas de reputação, atualizadas quando
 /// uma avaliação é criada.
 model FreelancerProfile {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  headline      String   @default("")
-  bio           String   @default("")
-  category      String   @default("")
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  headline        String   @default("")
+  bio             String   @default("")
+  category        String   @default("")
   /// JSON string[] de habilidades.
-  skills        String   @default("[]")
+  skills          String   @default("[]")
   /// Valor/hora em centavos. null = "a combinar".
   hourlyRateCents Int?
   /// JSON de { title, url, imageUrl, description }[].
-  portfolio     String   @default("[]")
+  portfolio       String   @default("[]")
   /// Aceitando novos projetos? Controla visibilidade na vitrine.
-  available     Boolean  @default(true)
-  published     Boolean  @default(false)
+  available       Boolean  @default(true)
+  published       Boolean  @default(false)
   /// Reputação desnormalizada a partir de FreelanceReview (direção → freelancer).
-  ratingSum     Int      @default(0)
-  ratingCount   Int      @default(0)
-  completedCount Int     @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  ratingSum       Int      @default(0)
+  ratingCount     Int      @default(0)
+  completedCount  Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([published, available, category])
 }
@@ -1105,27 +1110,27 @@ model FreelancerProfile {
 /// Projeto publicado por um contratante (User). O ciclo é
 /// open → (proposta aceita) in_progress → completed | cancelled.
 model FreelanceProject {
-  id            String   @id @default(cuid())
-  clientUserId  String
-  client        User     @relation("ClientProjects", fields: [clientUserId], references: [id], onDelete: Cascade)
-  title         String
-  description   String
-  category      String   @default("")
+  id             String              @id @default(cuid())
+  clientUserId   String
+  client         User                @relation("ClientProjects", fields: [clientUserId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  category       String              @default("")
   /// JSON string[] de habilidades desejadas.
-  skills        String   @default("[]")
+  skills         String              @default("[]")
   /// "fixed" | "hourly".
-  budgetType    String   @default("fixed")
+  budgetType     String              @default("fixed")
   budgetMinCents Int?
   budgetMaxCents Int?
-  workModel     String   @default("remoto") // remoto | presencial | hibrido
-  deadline      DateTime?
-  status        String   @default("open") // open | in_progress | completed | cancelled
-  proposalCount Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  proposals     FreelanceProposal[]
-  contract      FreelanceContract?
-  threads       FreelanceThread[]
+  workModel      String              @default("remoto") // remoto | presencial | hibrido
+  deadline       DateTime?
+  status         String              @default("open") // open | in_progress | completed | cancelled
+  proposalCount  Int                 @default(0)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  proposals      FreelanceProposal[]
+  contract       FreelanceContract?
+  threads        FreelanceThread[]
 
   @@index([status, createdAt])
   @@index([status, category, createdAt])
@@ -1135,18 +1140,18 @@ model FreelanceProject {
 /// Proposta de um freelancer a um projeto. Um freelancer só propõe uma vez por
 /// projeto.
 model FreelanceProposal {
-  id              String   @id @default(cuid())
-  projectId       String
-  project         FreelanceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  id               String             @id @default(cuid())
+  projectId        String
+  project          FreelanceProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   freelancerUserId String
-  freelancer      User     @relation("FreelancerProposals", fields: [freelancerUserId], references: [id], onDelete: Cascade)
-  coverLetter     String
-  bidCents        Int
-  estimatedDays   Int?
-  status          String   @default("pending") // pending | accepted | rejected | withdrawn
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  contract        FreelanceContract?
+  freelancer       User               @relation("FreelancerProposals", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  coverLetter      String
+  bidCents         Int
+  estimatedDays    Int?
+  status           String             @default("pending") // pending | accepted | rejected | withdrawn
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  contract         FreelanceContract?
 
   @@unique([projectId, freelancerUserId])
   @@index([freelancerUserId, status])
@@ -1156,21 +1161,21 @@ model FreelanceProposal {
 /// Acordo criado quando uma proposta é aceita. Um por projeto. Habilita a
 /// entrega e as avaliações mútuas. Sem pagamento real por enquanto.
 model FreelanceContract {
-  id               String   @id @default(cuid())
-  projectId        String   @unique
-  project          FreelanceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  proposalId       String   @unique
+  id               String            @id @default(cuid())
+  projectId        String            @unique
+  project          FreelanceProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  proposalId       String            @unique
   proposal         FreelanceProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
   clientUserId     String
-  client           User     @relation("ClientContracts", fields: [clientUserId], references: [id], onDelete: Cascade)
+  client           User              @relation("ClientContracts", fields: [clientUserId], references: [id], onDelete: Cascade)
   freelancerUserId String
-  freelancer       User     @relation("FreelancerContracts", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  freelancer       User              @relation("FreelancerContracts", fields: [freelancerUserId], references: [id], onDelete: Cascade)
   agreedCents      Int
-  status           String   @default("active") // active | delivered | completed | cancelled
+  status           String            @default("active") // active | delivered | completed | cancelled
   deliveredAt      DateTime?
   completedAt      DateTime?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   reviews          FreelanceReview[]
 
   @@index([clientUserId, status])
@@ -1180,17 +1185,17 @@ model FreelanceContract {
 /// Avaliação mútua após a conclusão de um contrato. Cada parte avalia a outra
 /// uma vez. `direction` diz de que lado veio.
 model FreelanceReview {
-  id           String   @id @default(cuid())
+  id           String            @id @default(cuid())
   contractId   String
   contract     FreelanceContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   authorUserId String
-  author       User     @relation("ReviewAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
+  author       User              @relation("ReviewAuthor", fields: [authorUserId], references: [id], onDelete: Cascade)
   targetUserId String
-  target       User     @relation("ReviewTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
-  direction    String   // client_to_freelancer | freelancer_to_client
-  rating       Int      // 1-5
-  comment      String   @default("")
-  createdAt    DateTime @default(now())
+  target       User              @relation("ReviewTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  direction    String // client_to_freelancer | freelancer_to_client
+  rating       Int // 1-5
+  comment      String            @default("")
+  createdAt    DateTime          @default(now())
 
   @@unique([contractId, authorUserId])
   @@index([targetUserId, createdAt])
@@ -1198,15 +1203,15 @@ model FreelanceReview {
 
 /// Conversa entre o contratante e um freelancer no contexto de um projeto.
 model FreelanceThread {
-  id               String   @id @default(cuid())
+  id               String             @id @default(cuid())
   projectId        String
-  project          FreelanceProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  project          FreelanceProject   @relation(fields: [projectId], references: [id], onDelete: Cascade)
   clientUserId     String
-  client           User     @relation("ClientThreads", fields: [clientUserId], references: [id], onDelete: Cascade)
+  client           User               @relation("ClientThreads", fields: [clientUserId], references: [id], onDelete: Cascade)
   freelancerUserId String
-  freelancer       User     @relation("FreelancerThreads", fields: [freelancerUserId], references: [id], onDelete: Cascade)
-  lastMessageAt    DateTime @default(now())
-  createdAt        DateTime @default(now())
+  freelancer       User               @relation("FreelancerThreads", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  lastMessageAt    DateTime           @default(now())
+  createdAt        DateTime           @default(now())
   messages         FreelanceMessage[]
 
   @@unique([projectId, freelancerUserId])
@@ -1216,32 +1221,32 @@ model FreelanceThread {
 
 /// Mensagem dentro de uma FreelanceThread.
 model FreelanceMessage {
-  id           String   @id @default(cuid())
-  threadId     String
-  thread       FreelanceThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
-  senderUserId String
-  sender       User     @relation("FreelanceMessageSender", fields: [senderUserId], references: [id], onDelete: Cascade)
-  body         String
-  readByClient Boolean  @default(false)
-  readByFreelancer Boolean @default(false)
-  createdAt    DateTime @default(now())
+  id               String          @id @default(cuid())
+  threadId         String
+  thread           FreelanceThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderUserId     String
+  sender           User            @relation("FreelanceMessageSender", fields: [senderUserId], references: [id], onDelete: Cascade)
+  body             String
+  readByClient     Boolean         @default(false)
+  readByFreelancer Boolean         @default(false)
+  createdAt        DateTime        @default(now())
 
   @@index([threadId, createdAt])
 }
 
 model Partner {
-  id           String            @id @default(cuid())
+  id           String           @id @default(cuid())
   name         String
-  cnpj         String            @default("")
-  email        String            @unique
+  cnpj         String           @default("")
+  email        String           @unique
   passwordHash String
-  logoUrl      String            @default("")
-  website      String            @default("")
-  description  String            @default("")
-  status       String            @default("active") // pending | active | suspended
-  credits      Int               @default(0) // créditos para destacar cursos
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  logoUrl      String           @default("")
+  website      String           @default("")
+  description  String           @default("")
+  status       String           @default("active") // pending | active | suspended
+  credits      Int              @default(0) // créditos para destacar cursos
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
   courses      ExternalCourse[]
   payments     PartnerPayment[]
 
@@ -1252,9 +1257,9 @@ model PartnerPayment {
   id          String    @id @default(cuid())
   partnerId   String
   partner     Partner   @relation(fields: [partnerId], references: [id], onDelete: Cascade)
-  kind        String    // "ad_pack"
-  credits     Int       // créditos concedidos ao confirmar o pagamento
-  amount      Int       // valor em centavos
+  kind        String // "ad_pack"
+  credits     Int // créditos concedidos ao confirmar o pagamento
+  amount      Int // valor em centavos
   status      String    @default("pending") // pending | paid | cancelled | refunded
   mpPaymentId String    @unique
   paidAt      DateTime?
@@ -1293,7 +1298,7 @@ model GameScore {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  game      String   // typer | quiz | memory
+  game      String // typer | quiz | memory
   area      String
   score     Int
   createdAt DateTime @default(now())

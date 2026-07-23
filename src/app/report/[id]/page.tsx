@@ -103,6 +103,9 @@ export default async function ReportPage({
         structureRating: record.structureRating,
         structureFeedback: record.structureFeedback,
         missingBasicInfo: record.missingBasicInfo,
+        jobDecoded: record.jobDecoded,
+        jobRedFlags: record.jobRedFlags,
+        clarifyingQuestions: record.clarifyingQuestions,
       }
     : null;
 
@@ -220,6 +223,7 @@ export default async function ReportPage({
             bulletAnalysis={bulletAnalysis}
             resumeStructured={resumeStructured}
             betterThanPercent={betterThanPercent}
+            analysisId={id}
           />
           <VerifiedBadgeBox analysisId={id} overallScore={record.overallScore} />
           {!subscribed && segment !== "student" && (

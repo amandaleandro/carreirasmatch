@@ -63,6 +63,9 @@ function analysisRecordToResumeAnalysis(record: {
   structureRating: string | null;
   structureFeedback: string | null;
   missingBasicInfo: string | null;
+  jobDecoded: string | null;
+  jobRedFlags: string | null;
+  clarifyingQuestions: string | null;
 }): ResumeAnalysis {
   return {
     overallScore: record.overallScore,
@@ -98,6 +101,9 @@ function analysisRecordToResumeAnalysis(record: {
     ...(record.structureRating ? { structureRating: record.structureRating } : {}),
     ...(record.structureFeedback ? { structureFeedback: record.structureFeedback } : {}),
     ...(record.missingBasicInfo ? { missingBasicInfo: JSON.parse(record.missingBasicInfo) } : {}),
+    ...(record.jobDecoded ? { jobDecoded: JSON.parse(record.jobDecoded) } : {}),
+    ...(record.jobRedFlags ? { jobRedFlags: JSON.parse(record.jobRedFlags) } : {}),
+    ...(record.clarifyingQuestions ? { clarifyingQuestions: JSON.parse(record.clarifyingQuestions) } : {}),
   } as ResumeAnalysis;
 }
 
@@ -397,6 +403,9 @@ export async function POST(req: NextRequest) {
         structureRating: (analysis as any).structureRating ?? null,
         structureFeedback: (analysis as any).structureFeedback ?? null,
         missingBasicInfo: (analysis as any).missingBasicInfo ? JSON.stringify((analysis as any).missingBasicInfo) : null,
+        jobDecoded: analysis.jobDecoded ? JSON.stringify(analysis.jobDecoded) : null,
+        jobRedFlags: analysis.jobRedFlags ? JSON.stringify(analysis.jobRedFlags) : null,
+        clarifyingQuestions: analysis.clarifyingQuestions ? JSON.stringify(analysis.clarifyingQuestions) : null,
         experienceSuggestions: JSON.stringify(analysis.experienceSuggestions ?? []),
         atsChecklist: JSON.stringify(analysis.atsChecklist ?? []),
         currentSummary: analysis.currentSummary ?? "",

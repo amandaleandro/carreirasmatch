@@ -27,6 +27,24 @@ export const resumeAnalysisSchema = z.object({
   structureRating: z.enum(["excellent", "good", "needs_improvement"]).optional(),
   structureFeedback: z.string().optional(),
   missingBasicInfo: z.array(z.string()).optional(),
+  jobDecoded: z.array(z.object({
+    termo: text, significa: text, ouSeja: text,
+  })).optional(),
+  jobRedFlags: textArray.optional(),
+  clarifyingQuestions: z.array(z.object({
+    question: text, why: text, targetKeyword: text,
+  })).optional(),
+}).passthrough();
+
+export const refinementSchema = z.object({
+  keywordsFound: textArray,
+  keywordsMissing: textArray,
+  technicalScore: score,
+  overallScore: score,
+  applicationStatus: z.enum(["apply_now", "adjust_first", "deprioritize"]),
+  applicationStatusReason: text,
+  suggestedBullets: z.array(z.object({ context: text, bullet: text })).min(1),
+  refinementSummary: text,
 }).passthrough();
 
 export const structuredResumeSchema = z.object({

@@ -1,7 +1,7 @@
 import { getSetting } from "@/lib/app-settings";
 import { GROQ_MODEL_SETTING_KEY } from "@/lib/groq-model-options";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
-import { profileSuggestionsSchema, resumeAnalysisSchema, structuredResumeSchema } from "@/lib/ai-schemas";
+import { profileSuggestionsSchema, refinementSchema, resumeAnalysisSchema, structuredResumeSchema } from "@/lib/ai-schemas";
 import {
   CAREER_SEGMENT_LABELS,
   normalizeCareerSegment,
@@ -221,6 +221,40 @@ export type ResumeAnalysis = {
   weeklyApplicationPlan?: string[];
   // Presente apenas quando pastFeedback é informado
   feedbackAnalysis?: string;
+  // Tradução da vaga: termos de "corporativês" decodificados + red flags do anúncio.
+  jobDecoded?: JobDecodedTerm[];
+  jobRedFlags?: string[];
+  // Perguntas para o candidato preencher lacunas que o PDF não mostra (não é
+  // erro do currículo, é experiência real que não foi escrita).
+  clarifyingQuestions?: ClarifyingQuestion[];
+};
+
+export type JobDecodedTerm = {
+  termo: string;
+  significa: string;
+  ouSeja: string;
+};
+
+export type ClarifyingQuestion = {
+  question: string;
+  why: string;
+  targetKeyword: string;
+};
+
+export type SuggestedBullet = {
+  context: string;
+  bullet: string;
+};
+
+export type RefinementResult = {
+  keywordsFound: string[];
+  keywordsMissing: string[];
+  technicalScore: number;
+  overallScore: number;
+  applicationStatus: ApplicationStatus;
+  applicationStatusReason: string;
+  suggestedBullets: SuggestedBullet[];
+  refinementSummary: string;
 };
 
 type TrackExtraField = {
@@ -346,7 +380,13 @@ REGRAS DE PONTUAÇÃO:
    - seniority/"Senioridade": nível comunicado claro e compatível.
    - links/"Links": contatos/links relevantes quando aplicável.
 
-17. currentSummary: copie fielmente (ou resuma se muito longo) o resumo/objetivo já existente. Se não houver, escreva exatamente: "Nenhum resumo profissional encontrado no currículo.".`;
+17. currentSummary: copie fielmente (ou resuma se muito longo) o resumo/objetivo já existente. Se não houver, escreva exatamente: "Nenhum resumo profissional encontrado no currículo.".
+
+18. jobDecoded: 3 a 6 termos/expressões de "corporativês" do TEXTO DA VAGA (não do currículo) traduzidos para linguagem direta. Para cada um: "termo" (o trecho exato do anúncio), "significa" (o que isso de fato indica sobre a rotina/empresa, sem rodeio) e "ouSeja" (o que o candidato deveria fazer/preparar por causa disso, prático). Só use termos que realmente aparecem na vaga, nunca invente. Se a vaga já for direta e sem jargão, retorne [].
+
+19. jobRedFlags: 0 a 3 sinais de alerta reais no texto da vaga (ex: salário oculto, exigências desproporcionais ao cargo, linguagem que sugere sobrecarga ou alta rotatividade). Frase curta e direta cada um. [] se não houver nenhum.
+
+20. clarifyingQuestions: 3 a 5 perguntas objetivas para o candidato preencher lacunas que o CURRÍCULO ESCRITO pode não capturar (não é lacuna de qualificação, é lacuna de informação — a pessoa pode ter feito algo e não ter escrito). Baseie cada pergunta numa keyword específica de keywordsMissing ou numa fraqueza específica de weaknesses. Cada item: "question" (pergunta direta, ex: "Você já usou Power BI ou similar em algum projeto ou estágio, mesmo informal?"), "why" (1 frase: por que essa pergunta importa para esta vaga), "targetKeyword" (a keyword/competência exata que a resposta pode confirmar).`;
 
 const JSON_ONLY_INSTRUCTION =
   "Responda SOMENTE com um objeto JSON válido, sem texto antes ou depois, seguindo exatamente este formato:";
@@ -479,7 +519,10 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
   "recruiterMessage": string,
   "alternativeRoles": string[] (só se deprioritize, senão []),
   "experienceSuggestions": [{ "role": string, "company": string, "current": string, "suggested": string }] (2-3 itens),
-  "atsChecklist": [{ "key": "formatting"|"clarity"|"keywords"|"results"|"seniority"|"links", "label": string, "description": string, "status": "pass"|"warning"|"fail" }] (as 6 categorias fixas)${
+  "atsChecklist": [{ "key": "formatting"|"clarity"|"keywords"|"results"|"seniority"|"links", "label": string, "description": string, "status": "pass"|"warning"|"fail" }] (as 6 categorias fixas),
+  "jobDecoded": [{ "termo": string, "significa": string, "ouSeja": string }] (3-6, [] se a vaga já for direta),
+  "jobRedFlags": string[] (0-3, [] se não houver),
+  "clarifyingQuestions": [{ "question": string, "why": string, "targetKeyword": string }] (3-5)${
     extraFieldsJson ? ",\n" + extraFieldsJson.replace(/,$/, "") : ""
   }
 }`;
@@ -505,6 +548,60 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
   // paga. Nenhum outro provedor entra na fila para esta chamada.
   return runJsonPrompt<ResumeAnalysis>(
     systemPrompt, userMessage, 0, 6000, undefined, resumeAnalysisSchema, "resume_analysis", "groq", ["groq", "openai"]
+  );
+}
+
+const REFINEMENT_SYSTEM_PROMPT = `Recrutador sênior, cético e direto. O candidato já recebeu uma análise de currículo × vaga e respondeu perguntas de esclarecimento sobre lacunas que o PDF não mostrava (experiência real não escrita). Sua tarefa: reavaliar keywords e scores à luz dessas respostas, e gerar bullets prontos para o candidato colar no currículo.
+
+REGRAS:
+- Só mova uma keyword de "ausente" para "encontrada" se a resposta do candidato confirmar evidência real e específica (não vale "sim, um pouco" sem contexto). Resposta vaga ou "não" mantém a keyword ausente.
+- Não reavalie nada que a resposta não tocou: copie o resto de keywordsFound/keywordsMissing sem alteração.
+- technicalScore e overallScore só sobem se keywords técnicas comprovadas migraram para "encontrada". Ajuste proporcional, sem inflar.
+- applicationStatus e applicationStatusReason: reaplique a mesma régua da análise original com os scores atualizados.
+- suggestedBullets: para cada resposta que confirmou uma experiência real, gere 1 bullet pronto (verbo de ação, 1 linha, sem inventar números que o candidato não deu) para colar na seção de experiência do currículo. "context" = onde encaixar (ex: cargo/empresa mencionado na resposta, ou "Habilidades"). Mínimo 1 item, só a partir de respostas com conteúdo real.
+- refinementSummary: 1-2 frases resumindo o que mudou (ou "Nenhuma lacuna nova confirmada" se nada mudou).
+- Nunca invente experiência que a resposta não afirma.`;
+
+/** Chamada leve de re-scoring: usa as respostas do candidato às clarifyingQuestions para
+ * atualizar keywords/scores sem repetir a análise completa (evita gastar o mesmo custo/tokens
+ * de uma reanálise do zero). */
+export async function refineAnalysisWithAnswers(
+  jobText: string,
+  keywordsFound: string[],
+  keywordsMissing: string[],
+  answers: { question: string; targetKeyword: string; answer: string }[]
+): Promise<RefinementResult> {
+  jobText = normalizeForPrompt(jobText, MAX_JOB_TEXT_CHARS);
+
+  const answersBlock = answers
+    .filter((a) => a.answer.trim())
+    .map((a) => `- Pergunta (alvo: ${a.targetKeyword}): ${a.question}\n  Resposta do candidato: ${a.answer.trim()}`)
+    .join("\n");
+
+  if (!answersBlock) {
+    return {
+      keywordsFound,
+      keywordsMissing,
+      technicalScore: 0,
+      overallScore: 0,
+      applicationStatus: "adjust_first",
+      applicationStatusReason: "",
+      suggestedBullets: [],
+      refinementSummary: "Nenhuma resposta informada.",
+    };
+  }
+
+  const userMessage = `DESCRIÇÃO DA VAGA:\n${jobText}\n\nKEYWORDS_ENCONTRADAS_ATUAIS: ${JSON.stringify(keywordsFound)}\nKEYWORDS_AUSENTES_ATUAIS: ${JSON.stringify(keywordsMissing)}\n\nRESPOSTAS DO CANDIDATO ÀS PERGUNTAS DE ESCLARECIMENTO:\n${answersBlock}\n\n${JSON_ONLY_INSTRUCTION}\n{
+  "keywordsFound": string[], "keywordsMissing": string[],
+  "technicalScore": number, "overallScore": number,
+  "applicationStatus": "apply_now" | "adjust_first" | "deprioritize",
+  "applicationStatusReason": string,
+  "suggestedBullets": [{ "context": string, "bullet": string }],
+  "refinementSummary": string
+}`;
+
+  return runJsonPrompt<RefinementResult>(
+    REFINEMENT_SYSTEM_PROMPT, userMessage, 0, 2000, undefined, refinementSchema, "resume_refinement", "groq", ["groq", "openai"]
   );
 }
 

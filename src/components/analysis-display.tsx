@@ -82,6 +82,21 @@ export type Analysis = {
   structureRating?: "excellent" | "good" | "needs_improvement" | string | null;
   structureFeedback?: string | null;
   missingBasicInfo?: string[] | string | null;
+  jobDecoded?: JobDecodedTerm[] | string | null;
+  jobRedFlags?: string[] | string | null;
+  clarifyingQuestions?: ClarifyingQuestion[] | string | null;
+};
+
+export type JobDecodedTerm = {
+  termo: string;
+  significa: string;
+  ouSeja: string;
+};
+
+export type ClarifyingQuestion = {
+  question: string;
+  why: string;
+  targetKeyword: string;
 };
 
 export const CAREER_TRACK_OPTIONS: { value: CareerTrack; label: string }[] = [
@@ -184,6 +199,166 @@ function Marker({ marker, index }: { marker: ListMarker; index: number }) {
       </span>
     );
   return <span className="mt-[7px] inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563EB]/60" />;
+}
+
+function parseMaybeJson<T>(value: T | string | null | undefined): T | null {
+  if (value == null) return null;
+  if (typeof value !== "string") return value;
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    return null;
+  }
+}
+
+function JobDecodedCard({
+  jobDecoded,
+  jobRedFlags,
+}: {
+  jobDecoded: JobDecodedTerm[] | null;
+  jobRedFlags: string[] | null;
+}) {
+  const hasDecoded = jobDecoded && jobDecoded.length > 0;
+  const hasRedFlags = jobRedFlags && jobRedFlags.length > 0;
+  if (!hasDecoded && !hasRedFlags) return null;
+
+  return (
+    <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4">
+      <CardHeader icon="🗺️" tone="primary" title="Tradução da vaga" />
+
+      {hasDecoded && (
+        <ul className="space-y-3">
+          {jobDecoded!.map((item, i) => (
+            <li key={i} className="rounded-2xl bg-[#F8FAFC] dark:bg-neutral-950/30 border border-[#E2E8F0] dark:border-neutral-800 p-3.5 space-y-1.5">
+              <p className="text-xs font-bold text-[#071827] dark:text-white">
+                &ldquo;{item.termo}&rdquo;
+              </p>
+              <p className="text-xs text-[#64748B] dark:text-neutral-300 font-medium leading-relaxed">
+                {item.significa}
+              </p>
+              <p className="text-xs text-[#2563EB] dark:text-blue-400 font-semibold leading-relaxed">
+                → {item.ouSeja}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {hasRedFlags && (
+        <div className="pt-1 space-y-1.5">
+          <p className="text-[10px] font-bold uppercase tracking-wider text-[#EF4444]">Sinais de alerta no anúncio</p>
+          <ul className="space-y-1.5 text-xs text-[#EF4444]">
+            {jobRedFlags!.map((flag, i) => (
+              <li key={i} className="flex items-start gap-1.5 font-medium">
+                <span className="mt-[5px] inline-block h-1.5 w-1.5 rounded-full bg-[#EF4444]" />
+                <span>{flag}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ClarifyingQuestionsCard({
+  analysisId,
+  questions,
+}: {
+  analysisId: string;
+  questions: ClarifyingQuestion[] | null;
+}) {
+  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [result, setResult] = useState<{
+    refinementSummary: string;
+    suggestedBullets: { context: string; bullet: string }[];
+  } | null>(null);
+
+  if (!questions || questions.length === 0) return null;
+
+  const answeredCount = Object.values(answers).filter((a) => a.trim()).length;
+
+  async function handleSubmit() {
+    setStatus("loading");
+    try {
+      const res = await fetch(`/api/analysis/${analysisId}/refine`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          answers: questions!.map((q, i) => ({
+            question: q.question,
+            targetKeyword: q.targetKeyword,
+            answer: answers[i] ?? "",
+          })),
+        }),
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setResult(data);
+      setStatus("done");
+    } catch {
+      setStatus("error");
+    }
+  }
+
+  if (status === "done" && result) {
+    return (
+      <div className="rounded-3xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/40 dark:bg-emerald-950/20 p-5 space-y-3">
+        <CardHeader icon="✅" tone="success" title="Análise atualizada com suas respostas" />
+        <p className="text-xs text-[#64748B] dark:text-neutral-300 font-medium">{result.refinementSummary}</p>
+        {result.suggestedBullets.length > 0 && (
+          <ul className="space-y-2">
+            {result.suggestedBullets.map((b, i) => (
+              <li key={i} className="rounded-xl bg-white dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 p-3 space-y-1">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">{b.context}</p>
+                <p className="text-xs text-[#071827] dark:text-white font-medium">{b.bullet}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4">
+      <CardHeader
+        icon="❓"
+        tone="primary"
+        title="Fez algo disso e não escreveu no currículo?"
+        aside={`${answeredCount}/${questions.length}`}
+      />
+      <p className="text-xs text-[#64748B] dark:text-neutral-300 -mt-2">
+        Responda o que fizer sentido. O que você confirmar aqui pode virar palavra-chave encontrada e um bullet pronto pro currículo.
+      </p>
+      <div className="space-y-3">
+        {questions.map((q, i) => (
+          <div key={i} className="space-y-1.5">
+            <label className="block text-xs font-bold text-[#071827] dark:text-white">{q.question}</label>
+            <p className="text-[10px] text-[#64748B] dark:text-neutral-400">{q.why}</p>
+            <textarea
+              value={answers[i] ?? ""}
+              onChange={(e) => setAnswers((prev) => ({ ...prev, [i]: e.target.value }))}
+              rows={2}
+              placeholder="Sua resposta (deixe em branco se não se aplica)"
+              className="w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/30 p-2.5 text-xs text-[#071827] dark:text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-[#2563EB]/30"
+            />
+          </div>
+        ))}
+      </div>
+      {status === "error" && (
+        <p className="text-xs text-[#EF4444] font-medium">Não foi possível atualizar a análise. Tente novamente.</p>
+      )}
+      <button
+        onClick={handleSubmit}
+        disabled={answeredCount === 0 || status === "loading"}
+        className="w-full rounded-xl bg-[#2563EB] text-white text-xs font-bold py-2.5 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#1d4ed8] transition-colors"
+      >
+        {status === "loading" ? "Atualizando análise..." : "Atualizar análise com minhas respostas"}
+      </button>
+    </div>
+  );
 }
 
 export function KeywordCard({
@@ -677,6 +852,7 @@ export function AnalysisResult({
   bulletAnalysis,
   resumeStructured,
   betterThanPercent,
+  analysisId,
 }: {
   result: Analysis;
   careerTrack: CareerTrack;
@@ -690,6 +866,7 @@ export function AnalysisResult({
   bulletAnalysis?: BulletAnalysisSummary | null;
   resumeStructured?: StructuredResume | null;
   betterThanPercent?: number | null;
+  analysisId?: string;
 }) {
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
@@ -750,6 +927,11 @@ export function AnalysisResult({
 
             <BehavioralFitCard jobTitle={jobTitle} behavioralResult={behavioralResult} />
 
+            <JobDecodedCard
+              jobDecoded={parseMaybeJson<JobDecodedTerm[]>(result.jobDecoded)}
+              jobRedFlags={parseMaybeJson<string[]>(result.jobRedFlags)}
+            />
+
             <SummaryCard
               icon="✉️"
               tone="primary"
@@ -774,6 +956,13 @@ export function AnalysisResult({
                 variant="missing"
               />
             </div>
+
+            {analysisId && (
+              <ClarifyingQuestionsCard
+                analysisId={analysisId}
+                questions={parseMaybeJson<ClarifyingQuestion[]>(result.clarifyingQuestions)}
+              />
+            )}
 
             {/* Análise Gramatical, Dados Faltantes & Estrutura */}
             {(() => {
