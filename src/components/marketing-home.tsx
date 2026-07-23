@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
 import Image from "next/image";
 import Link from "next/link";
 import { HeroInstantScanner } from "@/components/hero-instant-scanner";
@@ -80,6 +82,69 @@ const faqs = [
   ["O CarreirasMatch garante contratação?", "Auxiliamos você a apresentar seu perfil de forma impecável e se preparar melhor, porém a decisão final de contratação cabe à empresa."],
 ];
 
+const founderWeek = [
+  ["SEG", "Papo com recrutadora", "10:00"],
+  ["SEG", "Entrevista — Analista", "14:00"],
+  ["TER", "Entrevista — DevOps", "15:00"],
+  ["QUA", "Entrevista — Analista de Sistemas", "10:00"],
+  ["QUI", "Entrevista — Analista", "14:00"],
+  ["QUI", "1ª impressão com o time", "16:00"],
+] as const;
+
+function SocialProof({ analysisCount }: { analysisCount: number }) {
+  const calendarShot = existsSync(join(process.cwd(), "public", "prova-social", "agenda-entrevistas.png"));
+
+  return (
+    <section className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950">
+      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:px-8 lg:grid-cols-[1.1fr_.9fr] lg:items-center">
+        <div className="space-y-5">
+          <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Testado na vida real</p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+            5 entrevistas em uma semana. A agenda é a prova.
+          </h2>
+          <blockquote className="border-l-4 border-blue-600 pl-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+            &ldquo;Eu criei o CarreirasMatch para resolver o meu próprio problema: currículo bom, zero resposta.
+            Na primeira semana usando a versão otimizada, marquei <strong className="text-slate-900 dark:text-white">5 entrevistas</strong> —
+            fora as vagas em inglês que nem cheguei a agendar.&rdquo;
+          </blockquote>
+          <p className="text-xs font-bold text-slate-900 dark:text-white">
+            Amanda, criadora do CarreirasMatch
+          </p>
+          {analysisCount >= 50 && (
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-400">
+              <TrendingUp className="h-4 w-4" />
+              {analysisCount.toLocaleString("pt-BR")} análises de currículo já realizadas
+            </div>
+          )}
+        </div>
+
+        {calendarShot ? (
+          <Image
+            src="/prova-social/agenda-entrevistas.png"
+            alt="Agenda semanal com 5 entrevistas marcadas"
+            width={1425}
+            height={1205}
+            className="w-full rounded-3xl border border-slate-200 shadow-lg dark:border-slate-800"
+          />
+        ) : (
+          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-lg dark:border-slate-800 dark:bg-slate-900">
+            <p className="mb-4 text-[11px] font-bold uppercase tracking-wider text-slate-500">Uma semana da agenda da Amanda</p>
+            <ul className="space-y-2.5">
+              {founderWeek.map(([day, title, time]) => (
+                <li key={day + title} className="flex items-center gap-3 rounded-xl bg-white p-3 text-xs shadow-2xs dark:bg-slate-800">
+                  <span className="w-10 shrink-0 text-center text-[10px] font-extrabold text-blue-600 dark:text-blue-400">{day}</span>
+                  <span className="flex-1 font-semibold text-slate-800 dark:text-slate-200">{title}</span>
+                  <span className="text-[10px] font-bold text-slate-400">{time}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 function PrimaryCta({ label = "Analisar meu currículo grátis" }: { label?: string }) {
   return (
     <Link
@@ -92,7 +157,7 @@ function PrimaryCta({ label = "Analisar meu currículo grátis" }: { label?: str
   );
 }
 
-export function MarketingHome() {
+export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number }) {
   return (
     <div className="w-full overflow-hidden font-sans">
       {/* HERO SECTION */}
@@ -125,11 +190,11 @@ export function MarketingHome() {
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-white">
-              Encontrou uma vaga? Otimize seu currículo antes de se candidatar.
+              Se candidata e ninguém responde? O problema pode ser o filtro, não você.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-white/80 max-w-2xl">
-              Compare seu currículo com os requisitos exigidos pela empresa, identifique palavras-chave essenciais e gere a versão otimizada em PDF pronta para entrevista.
+              A maioria dos currículos é descartada pelo filtro automático (ATS) antes de um recrutador ler. Compare o seu com a vaga real, descubra o que está te eliminando e envie a versão otimizada em PDF.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
@@ -154,6 +219,9 @@ export function MarketingHome() {
       </section>
 
       <main>
+        {/* PROVA SOCIAL */}
+        <SocialProof analysisCount={analysisCount} />
+
         {/* EXEMPLO PRÁTICO */}
         <section id="exemplo" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-20 md:px-8">
           <div className="mx-auto max-w-3xl text-center space-y-3">
@@ -373,7 +441,7 @@ export function MarketingHome() {
                     <span className="text-[11px] text-slate-300 font-semibold">/mês</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    Adapte seu currículo para todas as vagas.
+                    2 kits avulsos já custam R$ 25,80. Quem busca ativamente aplica em 10+ vagas — aqui é ilimitado.
                   </p>
 
                   <div className="pt-4 border-t border-white/10 space-y-2.5 text-xs font-semibold text-slate-200">
@@ -399,6 +467,9 @@ export function MarketingHome() {
                   <span>Assinar R$ 24,90/mês</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+                <p className="text-center text-[10px] font-semibold text-slate-400">
+                  Sem fidelidade · cancele em 2 cliques
+                </p>
               </div>
             </div>
           </div>

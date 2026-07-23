@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { MarketingHome } from "@/components/marketing-home";
+import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
@@ -16,7 +17,9 @@ export default async function Home() {
   const session = await auth();
 
   if (!session?.user) {
-    return <MarketingHome />;
+    // Contador real para prova social; se o banco oscilar, a home não pode cair.
+    const analysisCount = await prisma.analysis.count().catch(() => 0);
+    return <MarketingHome analysisCount={analysisCount} />;
   }
 
   redirect("/analise");
