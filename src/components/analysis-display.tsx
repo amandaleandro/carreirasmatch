@@ -376,7 +376,7 @@ export function StudyPlanCard({ plan }: { plan: StudyPlanPhased }) {
 
 const LOCKED_DELIVERABLES = [
   ["📄", "Currículo otimizado em PDF", "Reescrito com as palavras-chave desta vaga, pronto para enviar."],
-  ["🔑", "Palavras-chave completas do ATS", "Todos os termos que o filtro automático procura — e onde inseri-los."],
+  ["🔑", "Palavras-chave completas do ATS", "Todos os termos que o filtro automático procura, e onde inseri-los."],
   ["🎤", "Perguntas de entrevista desta vaga", "O que o recrutador tende a perguntar, com base nos seus gaps."],
   ["✉️", "Mensagem pronta para o recrutador", "Texto de apresentação personalizado para esta oportunidade."],
   ["🗺️", "Plano de ação priorizado", "O que ajustar primeiro para subir seu score antes de aplicar."],

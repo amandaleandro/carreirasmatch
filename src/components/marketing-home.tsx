@@ -84,10 +84,10 @@ const faqs = [
 
 const founderWeek = [
   ["SEG", "Papo com recrutadora", "10:00"],
-  ["SEG", "Entrevista — Analista", "14:00"],
-  ["TER", "Entrevista — DevOps", "15:00"],
-  ["QUA", "Entrevista — Analista de Sistemas", "10:00"],
-  ["QUI", "Entrevista — Analista", "14:00"],
+  ["SEG", "Entrevista: Analista", "14:00"],
+  ["TER", "Entrevista: DevOps", "15:00"],
+  ["QUA", "Entrevista: Analista de Sistemas", "10:00"],
+  ["QUI", "Entrevista: Analista", "14:00"],
   ["QUI", "1ª impressão com o time", "16:00"],
 ] as const;
 
@@ -104,7 +104,7 @@ function SocialProof({ analysisCount }: { analysisCount: number }) {
           </h2>
           <blockquote className="border-l-4 border-blue-600 pl-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             &ldquo;Eu criei o CarreirasMatch para resolver o meu próprio problema: currículo bom, zero resposta.
-            Na primeira semana usando a versão otimizada, marquei <strong className="text-slate-900 dark:text-white">5 entrevistas</strong> —
+            Na primeira semana usando a versão otimizada, marquei <strong className="text-slate-900 dark:text-white">5 entrevistas</strong>,
             fora as vagas em inglês que nem cheguei a agendar.&rdquo;
           </blockquote>
           <p className="text-xs font-bold text-slate-900 dark:text-white">
@@ -441,7 +441,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                     <span className="text-[11px] text-slate-300 font-semibold">/mês</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    2 kits avulsos já custam R$ 25,80. Quem busca ativamente aplica em 10+ vagas — aqui é ilimitado.
+                    2 kits avulsos já custam R$ 25,80. Quem busca ativamente aplica em 10+ vagas. Aqui é ilimitado.
                   </p>
 
                   <div className="pt-4 border-t border-white/10 space-y-2.5 text-xs font-semibold text-slate-200">

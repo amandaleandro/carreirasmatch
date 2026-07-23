@@ -114,7 +114,7 @@ export function PublicSubscriptionCheckout({
         <blockquote className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xs space-y-3">
           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             &ldquo;Eu criei o CarreirasMatch para resolver o meu próprio problema: currículo bom, zero resposta.
-            Na primeira semana usando a versão otimizada, marquei <strong className="text-slate-900 dark:text-white">5 entrevistas</strong> —
+            Na primeira semana usando a versão otimizada, marquei <strong className="text-slate-900 dark:text-white">5 entrevistas</strong>,
             fora as vagas em inglês que nem cheguei a agendar.&rdquo;
           </p>
           <footer className="text-xs font-bold text-slate-900 dark:text-white">Amanda, criadora do CarreirasMatch</footer>
@@ -123,7 +123,7 @@ export function PublicSubscriptionCheckout({
           <p className="text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">Faça a conta</p>
           <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-200">
             2 kits avulsos custam <strong>R$ 25,80</strong>. A assinatura custa menos que isso e libera análises e kits
-            <strong> ilimitados</strong> — quem busca ativamente aplica em 10+ vagas por mês.
+            <strong> ilimitados</strong>. Quem busca ativamente aplica em 10+ vagas por mês.
           </p>
         </div>
       </section>

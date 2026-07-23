@@ -602,7 +602,7 @@ export async function sendAnalysisRecoveryEmail(
   const gap = Math.max(70 - opts.score, 0);
   const gapLine =
     gap > 0
-      ? `<p>Faltam <strong>${gap} pontos</strong> para o seu perfil entrar na faixa de "recomendado aplicar" — e o caminho já está mapeado no seu relatório: currículo otimizado em PDF, palavras-chave do ATS e as perguntas prováveis da entrevista.</p>`
+      ? `<p>Faltam <strong>${gap} pontos</strong> para o seu perfil entrar na faixa de "recomendado aplicar", e o caminho já está mapeado no seu relatório: currículo otimizado em PDF, palavras-chave do ATS e as perguntas prováveis da entrevista.</p>`
       : `<p>Seu perfil já está na faixa de "recomendado aplicar" 🎉 O relatório completo tem o currículo otimizado em PDF e a preparação de entrevista para você aplicar com tudo.</p>`;
   await send(
     to,
@@ -612,7 +612,7 @@ export async function sendAnalysisRecoveryEmail(
       <p>Sua análise${forJob} fechou em <strong>${opts.score}% de aderência</strong> hoje. O material completo já foi gerado para essa vaga e está esperando você.</p>
       ${gapLine}
       ${button(`${APP_URL}/report/${opts.analysisId}`, "Abrir meu relatório")}
-      <p>Vagas boas fecham rápido — quem ajusta o currículo antes de aplicar sai na frente de quem manda o genérico 🏃</p>
+      <p>Vagas boas fecham rápido: quem ajusta o currículo antes de aplicar sai na frente de quem manda o genérico 🏃</p>
     `
   );
 }
