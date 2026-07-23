@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { prisma } from "@/lib/prisma";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 import {
   FREELANCE_CATEGORIES,
   parseSkills,
@@ -29,7 +31,9 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Marketplace de Freelancers | CarreirasMatch",
-  description: "Encontre profissionais qualificados para o seu projeto ou ofereça seus serviços como freelancer.",
+  description:
+    "Encontre profissionais qualificados para o seu projeto ou ofereça seus serviços como freelancer sem taxas abusivas.",
+  alternates: { canonical: "/freelancers" },
 };
 
 type Props = { searchParams: Promise<{ cat?: string }> };
@@ -47,8 +51,14 @@ export default async function FreelancersPage({ searchParams }: Props) {
 
   const selectedCategoryObj = FREELANCE_CATEGORIES.find((c) => c.value === category);
 
+  const breadcrumbs = breadcrumbJsonLd([
+    { name: "Início", path: "/" },
+    { name: "Freelancers", path: "/freelancers" },
+  ]);
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-[#080c14] text-slate-900 dark:text-slate-100">
+      <JsonLd data={breadcrumbs} />
       <PublicSiteHeader />
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-8 space-y-10">

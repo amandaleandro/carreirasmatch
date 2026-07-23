@@ -10,13 +10,17 @@ import {
   UserCheck,
   AlertCircle,
 } from "lucide-react";
-import { requireAuthPage } from "@/lib/require-auth-page";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
 export default async function FreelancerHubPage() {
-  const session = await requireAuthPage();
+  const session = await auth();
+  if (!session?.user) {
+    redirect("/freelancers");
+  }
 
   const [profile, proposalCount, projectCount] = await Promise.all([
     prisma.freelancerProfile.findUnique({ where: { userId: session.user.id } }),

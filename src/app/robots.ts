@@ -16,6 +16,7 @@ const DISALLOW = [
   "/api/",
   "/admin",
   "/dashboard",
+  "/freelancer/",
   "/settings",
   "/report",
   "/resume",
