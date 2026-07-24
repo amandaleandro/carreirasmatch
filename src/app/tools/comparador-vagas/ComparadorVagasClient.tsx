@@ -14,12 +14,17 @@ import {
   BarChart3,
   FileText,
   Briefcase,
-  Layers,
+  Link as LinkIcon,
+  Download,
+  RefreshCw,
 } from "lucide-react";
 
 interface JobInput {
+  url?: string;
   title: string;
   description: string;
+  fetchingUrl?: boolean;
+  fetchError?: string | null;
 }
 
 interface JobComparisonResult {
@@ -39,8 +44,8 @@ interface JobComparisonResult {
 
 export function ComparadorVagasClient() {
   const [jobs, setJobs] = useState<JobInput[]>([
-    { title: "", description: "" },
-    { title: "", description: "" },
+    { url: "", title: "", description: "" },
+    { url: "", title: "", description: "" },
   ]);
   const [resumeText, setResumeText] = useState("");
   const [loading, setLoading] = useState(false);
@@ -49,7 +54,7 @@ export function ComparadorVagasClient() {
 
   const addJobInput = () => {
     if (jobs.length >= 5) return;
-    setJobs((prev) => [...prev, { title: "", description: "" }]);
+    setJobs((prev) => [...prev, { url: "", title: "", description: "" }]);
   };
 
   const removeJobInput = (index: number) => {
@@ -57,16 +62,65 @@ export function ComparadorVagasClient() {
     setJobs((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateJob = (index: number, field: keyof JobInput, value: string) => {
+  const updateJob = (index: number, field: keyof JobInput, value: unknown) => {
     setJobs((prev) =>
       prev.map((j, i) => (i === index ? { ...j, [field]: value } : j))
     );
   };
 
+  async function handleFetchJobUrl(index: number) {
+    const job = jobs[index];
+    if (!job.url?.trim()) return;
+
+    updateJob(index, "fetchingUrl", true);
+    updateJob(index, "fetchError", null);
+
+    try {
+      const res = await fetch("/api/tools/fetch-job-by-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: job.url.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro ao puxar vaga do link.");
+
+      const formattedTitle = data.companyName
+        ? `${data.jobTitle} — ${data.companyName}`
+        : data.jobTitle;
+
+      setJobs((prev) =>
+        prev.map((j, i) =>
+          i === index
+            ? {
+                ...j,
+                title: formattedTitle || j.title,
+                description: data.description || j.description,
+                fetchingUrl: false,
+                fetchError: null,
+              }
+            : j
+        )
+      );
+    } catch (err) {
+      setJobs((prev) =>
+        prev.map((j, i) =>
+          i === index
+            ? {
+                ...j,
+                fetchingUrl: false,
+                fetchError: err instanceof Error ? err.message : "Erro ao importar link.",
+              }
+            : j
+        )
+      );
+    }
+  }
+
   async function handleCompare() {
     const validJobs = jobs.filter((j) => j.title.trim() && j.description.trim());
     if (validJobs.length < 2) {
-      setError("Preencha pelo menos 2 vagas (título e descrição) para realizar a comparação.");
+      setError("Preencha pelo menos 2 vagas (título e descrição) ou puxe os dados via link para comparar.");
       return;
     }
 
@@ -112,7 +166,7 @@ export function ComparadorVagasClient() {
             Comparador Avançado de Vagas
           </h1>
           <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
-            Compare de 2 a 5 vagas lado a lado com Inteligência Artificial e descubra qual oportunidade oferece o maior retorno e menor esforço de adaptação.
+            Compare de 2 a 5 vagas lado a lado. Cole o texto ou insira os links das vagas (Gupy, LinkedIn, etc) para importar automaticamente dados e requisitos.
           </p>
         </div>
       </div>
@@ -159,7 +213,47 @@ export function ComparadorVagasClient() {
                 )}
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
+                {/* Import via URL */}
+                <div className="space-y-1.5 p-3 rounded-2xl bg-purple-50/40 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30">
+                  <label className="text-[11px] font-bold text-purple-950 dark:text-purple-200 flex items-center justify-between">
+                    <span>Puxar Dados via Link / URL da Vaga <span className="text-purple-600/70 font-normal">(Gupy, LinkedIn, etc)</span>:</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <div className="relative flex-1">
+                      <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+                      <input
+                        type="url"
+                        value={job.url || ""}
+                        onChange={(e) => updateJob(idx, "url", e.target.value)}
+                        placeholder="https://gupy.io/... ou https://..."
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-white dark:bg-neutral-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-purple-500 transition-all"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleFetchJobUrl(idx)}
+                      disabled={!job.url?.trim() || job.fetchingUrl}
+                      className="px-3.5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-xs transition-all flex items-center gap-1.5 shrink-0 cursor-pointer disabled:opacity-50 shadow-sm"
+                    >
+                      {job.fetchingUrl ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Puxando...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Download className="w-3.5 h-3.5" />
+                          <span>Puxar Dados</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                  {job.fetchError && (
+                    <p className="text-[11px] text-rose-500 font-medium pt-0.5">{job.fetchError}</p>
+                  )}
+                </div>
+
                 <div>
                   <label className="text-[11px] font-bold text-slate-700 dark:text-slate-300 mb-1 block">
                     Título da Vaga / Empresa:
@@ -181,7 +275,7 @@ export function ComparadorVagasClient() {
                     rows={6}
                     value={job.description}
                     onChange={(e) => updateJob(idx, "description", e.target.value)}
-                    placeholder="Cole aqui a descrição completa da vaga, atribuições e requisitos..."
+                    placeholder="Cole aqui a descrição da vaga ou use o botão 'Puxar Dados' acima..."
                     className="w-full p-3.5 rounded-xl bg-slate-50/70 dark:bg-neutral-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:border-purple-500 dark:focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all resize-none leading-relaxed"
                   />
                 </div>
