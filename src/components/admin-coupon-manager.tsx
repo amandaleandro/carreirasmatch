@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { Download, TrendingUp } from "lucide-react";
 
 type CouponSignupUser = {
   id: string;
@@ -420,6 +421,34 @@ export function AdminCouponManager() {
     return name.includes(q) || email.includes(q) || code.includes(q) || influencer.includes(q);
   });
 
+  function exportSignupsCSV() {
+    if (filteredSignups.length === 0) return;
+
+    const headers = ["Influenciadora", "Cupom", "Nome Usuario", "Email Usuario", "Data Cadastro", "Status Assinatura", "Total Pago (R$)"];
+    const rows = filteredSignups.map((item) => {
+      const totalPaid = (item.payments?.reduce((sum, p) => sum + p.amount, 0) ?? 0) / 100;
+      const isSub = item.subscription?.status === "active" ? "Assinante Ativo" : "Conta Gratuita";
+      return [
+        `"${(item.influencerName || "").replace(/"/g, '""')}"`,
+        `"${(item.couponCode || "").replace(/"/g, '""')}"`,
+        `"${(item.name || "Sem nome").replace(/"/g, '""')}"`,
+        `"${(item.email || "").replace(/"/g, '""')}"`,
+        `"${formatDate(item.createdAt)}"`,
+        `"${isSub}"`,
+        totalPaid.toFixed(2),
+      ].join(",");
+    });
+
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `cadastrados_cupons_influenciadoras_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   return (
     <div className="space-y-8">
       <form onSubmit={handleCreate} className="space-y-3">
@@ -608,13 +637,22 @@ export function AdminCouponManager() {
                 Lista de pessoas que criaram conta utilizando a indicação ou cupom de cada influenciadora.
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 text-xs font-semibold px-3 py-1.5">
                 Total: {allSignups.length} cadastrados
               </span>
               <span className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 text-xs font-semibold px-3 py-1.5">
                 {allSignups.filter((s) => s.subscription?.status === "active").length} assinantes
               </span>
+              <button
+                type="button"
+                onClick={exportSignupsCSV}
+                disabled={filteredSignups.length === 0}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors disabled:opacity-50 cursor-pointer shadow-xs"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Exportar CSV ({filteredSignups.length})
+              </button>
             </div>
           </div>
         </div>

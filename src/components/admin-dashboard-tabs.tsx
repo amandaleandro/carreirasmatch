@@ -16,6 +16,8 @@ import {
   FileText,
   Activity,
   Zap,
+  Download,
+  AlertTriangle,
 } from "lucide-react";
 import { AdminUserLookup } from "@/components/admin-user-lookup";
 import { AdminGroqModel } from "@/components/admin-groq-model";
@@ -263,6 +265,51 @@ export function AdminDashboardTabs({
     });
   }, [recentSupportTickets, supportSearch]);
 
+  function exportUsersCSV() {
+    if (filteredUsers.length === 0) return;
+    const headers = ["Nome", "Email", "Segmento", "Data Cadastro", "Curriculos", "Assinatura"];
+    const rows = filteredUsers.map((u) => [
+      `"${(u.name || "Sem nome").replace(/"/g, '""')}"`,
+      `"${(u.email || "").replace(/"/g, '""')}"`,
+      `"${(u.careerSegment || "sem segmento").replace(/"/g, '""')}"`,
+      `"${formatDate(u.createdAt)}"`,
+      u._count.resumes,
+      `"${u.subscription?.status === "active" ? "Assinante" : "Gratuito"}"`,
+    ].join(","));
+
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `usuarios_recentes_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function exportPaymentsCSV() {
+    if (filteredPayments.length === 0) return;
+    const headers = ["Usuario", "Email", "Tipo", "Segmento", "Valor (R$)", "Status", "Data"];
+    const rows = filteredPayments.map((p) => [
+      `"${(p.user.name || "Usuário").replace(/"/g, '""')}"`,
+      `"${(p.user.email || "").replace(/"/g, '""')}"`,
+      `"${p.kind}"`,
+      `"${p.segment}"`,
+      (p.amount / 100).toFixed(2),
+      `"${p.status}"`,
+      `"${formatDate(p.paidAt ?? p.createdAt)}"`,
+    ].join(","));
+
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `pagamentos_recentes_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
   const tabs: TabItem[] = [
     { id: "metrics", label: "Métricas & Telemetria", icon: BarChart3 },
     { id: "coupons", label: "Cupons & Influenciadoras", icon: Ticket, badge: "Cadastrados" },
@@ -274,6 +321,43 @@ export function AdminDashboardTabs({
 
   return (
     <div className="space-y-8">
+      {/* Banner de Alertas e Notificações no Topo */}
+      {(stats.openSupportTickets > 0 || stats.openOpportunityReports > 0) && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/90 p-4 dark:border-amber-900/60 dark:bg-amber-950/40 flex flex-wrap items-center justify-between gap-3 text-sm shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+              <AlertTriangle className="w-4 h-4" />
+            </div>
+            <p className="font-medium text-amber-900 dark:text-amber-200">
+              <strong className="font-bold">Atenção Operacional:</strong> Você possui{" "}
+              {stats.openSupportTickets > 0 && `${stats.openSupportTickets} chamado(s) de suporte pendente(s)`}
+              {stats.openSupportTickets > 0 && stats.openOpportunityReports > 0 && " e "}
+              {stats.openOpportunityReports > 0 && `${stats.openOpportunityReports} denúncia(s) de vaga para revisar`}
+              .
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            {stats.openSupportTickets > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveTab("support")}
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer shadow-xs"
+              >
+                Ver Chamados ({stats.openSupportTickets})
+              </button>
+            )}
+            {stats.openOpportunityReports > 0 && (
+              <button
+                type="button"
+                onClick={() => setActiveTab("jobs")}
+                className="px-3.5 py-1.5 text-xs font-semibold rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors cursor-pointer shadow-xs"
+              >
+                Ver Denúncias ({stats.openOpportunityReports})
+              </button>
+            )}
+          </div>
+        </div>
+      )}
       {/* Abas de Navegação */}
       <div className="border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none">
         <nav className="flex space-x-2 sm:space-x-4 min-w-max pb-px">
@@ -692,17 +776,27 @@ export function AdminDashboardTabs({
           {/* Listas de Usuários Novos e Pagamentos */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Usuários Recentes</h2>
-                <div className="relative w-48">
-                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Filtrar usuário..."
-                    value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    className="w-full rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-2 py-1 text-xs"
-                  />
+                <div className="flex items-center gap-2">
+                  <div className="relative w-40 sm:w-48">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Filtrar..."
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                      className="w-full rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-2 py-1 text-xs"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={exportUsersCSV}
+                    title="Exportar CSV de Usuários"
+                    className="p-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -725,17 +819,27 @@ export function AdminDashboardTabs({
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4">
-              <div className="flex items-center justify-between gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">Pagamentos Recentes</h2>
-                <div className="relative w-48">
-                  <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Filtrar pagamento..."
-                    value={paymentSearch}
-                    onChange={(e) => setPaymentSearch(e.target.value)}
-                    className="w-full rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-2 py-1 text-xs"
-                  />
+                <div className="flex items-center gap-2">
+                  <div className="relative w-40 sm:w-48">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Filtrar..."
+                      value={paymentSearch}
+                      onChange={(e) => setPaymentSearch(e.target.value)}
+                      className="w-full rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-2 py-1 text-xs"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={exportPaymentsCSV}
+                    title="Exportar CSV de Pagamentos"
+                    className="p-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
               <div className="divide-y divide-slate-100 dark:divide-slate-800">
