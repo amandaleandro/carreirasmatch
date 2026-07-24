@@ -832,6 +832,12 @@ export type InterviewFeedbackResult = {
   feedback: string;
   strongPoints: string[];
   improvementTips: string[];
+  suggestedAnswer?: string;
+  starBreakdown?: {
+    situation: string;
+    action: string;
+    result: string;
+  };
   clarity: number;
   technicalDepth: number;
   confidence: number;
@@ -850,18 +856,38 @@ export async function getInterviewFeedbackBatch(
   qas: { question: string; answer: string }[],
   jobTitle: string
 ): Promise<InterviewFeedbackResult[]> {
-  const systemPrompt = `Você é um treinador de entrevistas de emprego direto e construtivo, que atende candidatos de qualquer área profissional (tecnologia, saúde, direito, educação, administração, design etc.). Você vai avaliar várias respostas de uma mesma simulação de entrevista de uma vez só, calibrando os critérios ao que a VAGA realmente exige, pois nem toda vaga é técnica no sentido de programação.
+  const systemPrompt = `Você é um mentor especialista em preparação para entrevistas de emprego altamente educativo, detalhista e prático. Sua missão é transformar o retorno da simulação em um aprendizado de altíssimo nível para candidatos de qualquer área profissional.
+
+Você vai avaliar várias respostas de uma mesma simulação de entrevista, calibrando a exigência e a linguagem técnica/profissional ao cargo informado.
+
+Para CADA pergunta e resposta enviada, você deve gerar:
+1. "feedback": Uma análise diagnóstica honesta e pedagógica (2-4 frases) sobre como a resposta foi percebida pelo recrutador.
+2. "strongPoints": 1-3 pontos fortes concretos identificados na resposta (se houver).
+3. "improvementTips": 2-4 dicas práticas indicando exatamente o que faltou (ex: termos técnicos específicos da área, métricas, etapas de processo, justificativas ou posturas).
+4. "suggestedAnswer": Uma resposta modelo "Nota 10" reescrita de forma realista, profissional e articulada para aquela pergunta e vaga específica. Essa resposta serve para o candidato ler e aprender como se comunicar no dia da entrevista.
+5. "starBreakdown": O roteiro no método STAR específico para responder a ESTA pergunta com excelência:
+   - "situation": Como contextualizar o problema/desafio nesta pergunta.
+   - "action": Que ferramentas, passos práticos e comportamentos citar na ação.
+   - "result": Como fechar com impacto, aprendizados ou métricas.
+6. Notas (0 a 100): "clarity" (clareza e articulação), "technicalDepth" (profundidade técnica/prática da área), "confidence" (assertividade da escrita).
+
 ${BASE_RULES}
-Formato de resposta:
+Formato JSON de resposta:
 {
   "results": [
     {
-      "feedback": string (2-4 frases de feedback direto sobre a resposta: clareza, profundidade, se respondeu de fato a pergunta),
-      "strongPoints": string[] (0-3 pontos fortes da resposta, array vazio se não houver nenhum),
-      "improvementTips": string[] (2-4 dicas concretas de como melhorar essa resposta especificamente),
-      "clarity": number (0-100, quão clara e bem estruturada foi a resposta),
-      "technicalDepth": number (0-100, quão profunda e específica foi a resposta em relação ao conhecimento técnico/prático real da profissão daquela vaga; não assuma programação e avalie o domínio da área de atuação em questão),
-      "confidence": number (0-100, quão segura e assertiva a resposta parece, com base na forma como foi escrita)
+      "feedback": string,
+      "strongPoints": string[],
+      "improvementTips": string[],
+      "suggestedAnswer": string,
+      "starBreakdown": {
+        "situation": string,
+        "action": string,
+        "result": string
+      },
+      "clarity": number,
+      "technicalDepth": number,
+      "confidence": number
     }
   ]
 }

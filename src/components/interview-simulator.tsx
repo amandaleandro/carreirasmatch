@@ -6,6 +6,12 @@ type Feedback = {
   feedback: string;
   strongPoints: string[];
   improvementTips: string[];
+  suggestedAnswer?: string;
+  starBreakdown?: {
+    situation: string;
+    action: string;
+    result: string;
+  };
 };
 
 export function InterviewSimulator({
@@ -116,7 +122,7 @@ export function InterviewSimulator({
                       </p>
                       {feedback.strongPoints.length > 0 && (
                         <div>
-                          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500 mb-1">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-600 dark:text-emerald-400 mb-1">
                             Pontos fortes
                           </p>
                           <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
@@ -127,7 +133,7 @@ export function InterviewSimulator({
                         </div>
                       )}
                       <div>
-                        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500 mb-1">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-amber-600 dark:text-amber-400 mb-1">
                           Como melhorar
                         </p>
                         <ul className="space-y-1 list-disc list-inside text-sm text-neutral-700 dark:text-neutral-300">
@@ -136,6 +142,16 @@ export function InterviewSimulator({
                           ))}
                         </ul>
                       </div>
+                      {feedback.suggestedAnswer && (
+                        <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-200 dark:border-purple-900/50 space-y-1 text-xs">
+                          <p className="font-semibold text-purple-900 dark:text-purple-300">
+                            ✨ Exemplo de Resposta Modelo (Nota 10):
+                          </p>
+                          <p className="italic text-purple-950 dark:text-purple-200">
+                            &quot;{feedback.suggestedAnswer}&quot;
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
