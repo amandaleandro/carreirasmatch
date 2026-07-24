@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { SettingsForm } from "@/components/settings-form";
 import { ProfileForm } from "@/components/profile-form";
+import { ChangePasswordForm } from "@/components/change-password-form";
 import { InterestedRolesForm } from "@/components/interested-roles-form";
 import { CourseListForm } from "@/components/course-list-form";
 import { BillingSection } from "@/components/billing-section";
@@ -109,6 +110,14 @@ export default async function SettingsPage({
           initialName={user?.name ?? session.user.name ?? ""}
           initialImage={user?.image ?? null}
         />
+      </section>
+
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <h2 className="text-lg font-semibold mb-1">Segurança & Senha</h2>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
+          Altere a senha da sua conta a qualquer momento.
+        </p>
+        <ChangePasswordForm />
       </section>
 
       <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
