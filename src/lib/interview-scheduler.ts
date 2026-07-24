@@ -43,6 +43,8 @@ export async function processInterviewReminders(): Promise<InterviewReminderResu
       timeStyle: "short",
     });
 
+    const interviewDate = app.interviewAt;
+
     await sendOnce("interview_reminder_24h", dedupeKey, userEmail, async () => {
       await sendInterviewScheduledEmail(userEmail, {
         companyName,
@@ -54,7 +56,7 @@ export async function processInterviewReminders(): Promise<InterviewReminderResu
         applicationId: app.id,
         userEmail,
         companyName,
-        interviewAt: app.interviewAt,
+        interviewAt: interviewDate,
       });
     });
   }
