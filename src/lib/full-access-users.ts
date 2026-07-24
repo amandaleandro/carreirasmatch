@@ -1,6 +1,9 @@
 import { prisma } from "@/lib/prisma";
 
-const FULL_ACCESS_EMAILS = new Set(["amandaleandrosoares@gmail.com"]);
+const FULL_ACCESS_EMAILS = new Set([
+  "amandaleandrosoares@gmail.com",
+  "amandaleandrosoarrs@gmail.com",
+]);
 
 export function hasFullAccessEmail(email: string | null | undefined): boolean {
   return FULL_ACCESS_EMAILS.has(email?.trim().toLowerCase() ?? "");
