@@ -35,10 +35,16 @@ export const ANALYTICS_EVENTS = {
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];
 
 type PlausibleFn = (event: string, options?: { props?: Record<string, string | number | boolean> }) => void;
+type FbqFn = (type: string, eventName: string, params?: Record<string, unknown>) => void;
+type LintrkFn = (action: string, data: { conversion_id?: number | string }) => void;
+type GtagFn = (command: string, targetId: string, params?: Record<string, unknown>) => void;
 
 declare global {
   interface Window {
     plausible?: PlausibleFn;
+    fbq?: FbqFn;
+    lintrk?: LintrkFn;
+    gtag?: GtagFn;
   }
 }
 
@@ -46,7 +52,45 @@ declare global {
 export function track(event: AnalyticsEvent, props?: Record<string, string | number | boolean>) {
   if (typeof window === "undefined") return;
   try {
+    // 1. Plausible Analytics
     window.plausible?.(event, props ? { props } : undefined);
+
+    // 2. Meta Pixel (Facebook & Instagram Ads)
+    if (typeof window.fbq === "function") {
+      switch (event) {
+        case ANALYTICS_EVENTS.SIGNUP_COMPLETED:
+          window.fbq("track", "CompleteRegistration");
+          break;
+        case ANALYTICS_EVENTS.ANALYSIS_STARTED:
+          window.fbq("track", "Lead", { content_name: "analysis" });
+          break;
+        case ANALYTICS_EVENTS.CHECKOUT_STARTED:
+          window.fbq("track", "InitiateCheckout");
+          break;
+        case ANALYTICS_EVENTS.PAYMENT_CONFIRMED:
+        case ANALYTICS_EVENTS.SUBSCRIPTION_CONFIRMED:
+          window.fbq("track", "Purchase", {
+            currency: "BRL",
+            value: typeof props?.value === "number" ? props.value : 0,
+          });
+          break;
+        default:
+          window.fbq("trackCustom", event, props ?? {});
+          break;
+      }
+    }
+
+    // 3. LinkedIn Insight Tag
+    if (typeof window.lintrk === "function") {
+      window.lintrk("track", { conversion_id: event });
+    }
+
+    // 4. Google Ads / GA4
+    if (typeof window.gtag === "function") {
+      window.gtag("event", event, props ?? {});
+    }
+
+    // 5. Backend Event Logging
     const body = JSON.stringify({
       name: event,
       path: window.location.pathname,

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Manrope } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
 import { Analytics } from "@/components/analytics";
+import { MarketingPixels } from "@/components/marketing-pixels";
 import { AdsenseScript } from "@/components/adsense-script";
 import { AccessTracker } from "@/components/access-tracker";
 import { DashSanitizer } from "@/components/dash-sanitizer";
@@ -83,6 +84,7 @@ export default function RootLayout({
         />
         <AppShell>{children}</AppShell>
         <Analytics />
+        <MarketingPixels />
         <Suspense fallback={null}>
           <AccessTracker />
         </Suspense>

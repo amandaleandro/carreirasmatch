@@ -38,6 +38,15 @@ export type ToolCatalogEntry = {
 
 export const TOOLS_CATALOG: ToolCatalogEntry[] = [
   {
+    href: "/verificador-ats",
+    title: "Verificador ATS Gratuito de Currículo",
+    description: "Descubra gratuitamente se o seu currículo consegue ser lido pelos robôs e sistemas de recrutamento.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "sparkles",
+    color: "blue",
+    free: true,
+  },
+  {
     href: "/tools/ats-checklist",
     title: "Checklist de currículo ATS",
     description: "Revise estrutura, palavras-chave e legibilidade antes de enviar seu currículo.",

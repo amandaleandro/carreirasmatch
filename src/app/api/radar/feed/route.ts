@@ -33,7 +33,7 @@ export async function GET(req: Request) {
 
     // Busca vagas recentes no banco do feed
     const jobs = await prisma.job.findMany({
-      take: 20,
+      take: 100,
       orderBy: { createdAt: "desc" },
       select: {
         id: true,

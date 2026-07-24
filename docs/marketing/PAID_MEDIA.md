@@ -23,23 +23,16 @@ de terceiros no site (fonte de receita, não de tráfego).
   configurado (em vez de servir um `ads.txt` estático que poderia apontar
   para a conta errada).
 
-## O que não existe (confirmado por busca no código)
+## Infraestrutura de Rastreamento (Meta Pixel, LinkedIn Insight Tag, Google Ads)
 
-Não foi encontrado no código nenhum indício de:
+A infraestrutura de mensuração de anúncios foi implementada de forma modular e opt-in:
 
-- **Google Ads / Google Search Ads** (nenhum snippet de conversão, nenhum
-  `gtag(` no repositório);
-- **Meta Pixel / Facebook Pixel** (nenhum `fbq(`, nenhuma tag do Meta);
-- **TikTok Pixel** ou qualquer outro pixel de rede social;
-- **Google Analytics (GA4)** (não há `gtag`/`G-XXXX` no código; o único
-  analytics ativo é o Plausible + endpoint próprio, ver `GROWTH_METRICS.md`).
-
-Ou seja: hoje o produto **não compra tráfego pago** e **não tem
-instrumentação de conversão para nenhuma plataforma de anúncio**. Se uma
-campanha paga for lançada, o pixel/tag correspondente ainda precisa ser
-implementado do zero — nenhuma parte da integração já existe no código,
-mesmo desligada por env var (diferente do AdSense, que já está pronto e só
-falta a env).
+- **Meta Pixel (Instagram/Facebook)**: Habilitado ao definir `NEXT_PUBLIC_META_PIXEL_ID`. Dispara eventos padrão (`CompleteRegistration`, `Lead`, `InitiateCheckout`, `Purchase`).
+- **LinkedIn Insight Tag**: Habilitado ao definir `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`.
+- **Google Ads / GA4**: Habilitado ao definir `NEXT_PUBLIC_GOOGLE_ADS_ID`.
+- **Componente centralizado**: `src/components/marketing-pixels.tsx` (carregado no `RootLayout`).
+- **Mapeamento de eventos**: `src/lib/analytics.ts` canaliza todas as chamadas de `track(ANALYTICS_EVENTS.*)` para os pixels ativos.
+- **Playbook de Campanhas**: Consulte `CAMPAIGN_PLAYBOOK_2026.md` para regras de UTMs e públicos.
 
 ## Implicação prática
 

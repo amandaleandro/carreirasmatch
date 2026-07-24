@@ -73,3 +73,38 @@ export const profileSuggestionsSchema = z.object({
     city: z.string().optional(),
   })).min(1),
 });
+
+export const atsStandaloneSchema = z.object({
+  atsReadabilityScore: score,
+  resumeQualityScore: score,
+  summary: text,
+  detectedContactInfo: z.object({
+    name: z.string(),
+    email: z.string(),
+    phone: z.string(),
+    location: z.string(),
+    linkedin: z.string(),
+    experiencesCount: z.number().int().min(0),
+    skillsCount: z.number().int().min(0),
+  }),
+  formattingIssues: z.array(z.object({
+    severity: z.enum(["critical", "warning", "info"]),
+    title: text,
+    description: text,
+    suggestion: text,
+  })),
+  qualityFixes: z.array(z.object({
+    category: z.enum(["verbs", "metrics", "summary", "structure", "repetition"]),
+    issue: text,
+    action: text,
+    example: text,
+  })),
+  atsChecklist: z.array(z.object({
+    key: z.string(),
+    label: text,
+    status: z.enum(["pass", "warning", "fail"]),
+    description: text,
+  })),
+  actionPlan: textArray.min(1),
+}).passthrough();
+

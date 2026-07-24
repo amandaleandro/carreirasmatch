@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { hasToolAccess } from "@/lib/tool-access";
 import { ToolAccessGate } from "@/components/ToolAccessGate";
-import { CompareJobsForm } from "./CompareJobsForm";
+import { ComparadorVagasClient } from "../comparador-vagas/ComparadorVagasClient";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
 import { hasFullAccessEmail } from "@/lib/full-access-users";
 
@@ -19,5 +19,5 @@ export default async function CompareJobsPage() {
     return <ToolAccessGate hasSegment={Boolean(user?.careerSegment)} />;
   }
 
-  return <CompareJobsForm />;
+  return <ComparadorVagasClient />;
 }
