@@ -112,6 +112,123 @@ function extractSalary(text: string): { label: string; value: number } | undefin
   return { label: `R$ ${raw}`, value };
 }
 
+const KNOWN_COMPANY_NAMES: Record<string, string> = {
+  rdstation: "RD Station",
+  arcoeducacao: "Arco Educação",
+  xpinc: "XP Inc",
+  zupinnovation: "Zup Innovation",
+  capco: "Capco",
+  nubank: "Nubank",
+  cloudwalk: "CloudWalk",
+  quintoandar: "QuintoAndar",
+  hotmart: "Hotmart",
+  gympass: "Gympass",
+  wellhub: "Wellhub",
+  lojasrenner: "Lojas Renner",
+  cacaushow: "Cacau Show",
+  mdiasbranco: "M. Dias Branco",
+  c6bank: "C6 Bank",
+  picpay: "PicPay",
+  fastshop: "Fast Shop",
+  pagseguro: "PagSeguro",
+  flashapp: "Flash",
+  ciandt: "CI&T",
+  pipefy: "Pipefy",
+  ebanx: "EBANX",
+  olist: "Olist",
+  wildlife: "Wildlife Studios",
+  assai: "Assaí Atacadista",
+  localiza: "Localiza",
+  petz: "Petz",
+  riachuelo: "Riachuelo",
+  grupoboticario: "Grupo Boticário",
+  tenda: "Construtora Tenda",
+  cyrela: "Cyrela",
+  jsl: "JSL",
+  atento: "Atento",
+  americanas: "Americanas",
+  raiadrogasil: "RaiaDrogasil",
+  suzano: "Suzano",
+  vibraenergia: "Vibra Energia",
+  gpa: "Grupo Pão de Açúcar",
+  vivo: "Vivo",
+  stone: "Stone",
+  vtex: "VTEX",
+  monks: "Media.Monks",
+  clara: "Clara",
+  brex: "Brex",
+  stripe: "Stripe",
+  canonical: "Canonical",
+  elastic: "Elastic",
+  datadog: "Datadog",
+  cloudflare: "Cloudflare",
+  figma: "Figma",
+  thoughtworks: "Thoughtworks",
+  turing: "Turing",
+  postman: "Postman",
+  vercel: "Vercel",
+  gitlab: "GitLab",
+  grafanalabs: "Grafana Labs",
+  mongodb: "MongoDB",
+  checkr: "Checkr",
+};
+
+export function formatCompanyName(slug: string): string {
+  if (!slug) return "Empresa";
+  const norm = slug.trim().toLowerCase();
+  if (KNOWN_COMPANY_NAMES[norm]) return KNOWN_COMPANY_NAMES[norm];
+
+  return slug
+    .replace(/[-_]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .split(" ")
+    .map((w) =>
+      w.length <= 3 && !["de", "da", "do", "dos", "das", "e"].includes(w.toLowerCase())
+        ? w.toUpperCase()
+        : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()
+    )
+    .join(" ");
+}
+
+export function extractCompanyFromUrl(urlStr: string): string {
+  try {
+    const url = new URL(urlStr);
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    const pathSegments = url.pathname.split("/").filter(Boolean);
+
+    if (hostname.includes("greenhouse.io")) {
+      const forParam = url.searchParams.get("for");
+      if (forParam) return formatCompanyName(forParam);
+      if (pathSegments.length > 0 && pathSegments[0] !== "embed" && pathSegments[0] !== "v1") {
+        return formatCompanyName(pathSegments[0]);
+      }
+      if (pathSegments.length > 2 && pathSegments[0] === "v1" && pathSegments[1] === "boards") {
+        return formatCompanyName(pathSegments[2]);
+      }
+    }
+
+    if (hostname.includes("lever.co")) {
+      if (pathSegments.length > 0) return formatCompanyName(pathSegments[0]);
+    }
+
+    if (hostname.includes("gupy.io") || hostname.includes("solides.jobs")) {
+      const subdomain = hostname.split(".")[0];
+      if (subdomain && !["job-boards", "jobs", "boards"].includes(subdomain)) {
+        return formatCompanyName(subdomain);
+      }
+    }
+
+    const parts = hostname.split(".");
+    let mainLabel = parts[0];
+    if (["job-boards", "boards", "jobs", "careers"].includes(mainLabel) && parts.length > 1) {
+      mainLabel = parts[1];
+    }
+    return formatCompanyName(mainLabel);
+  } catch {
+    return "Empresa";
+  }
+}
+
 export type JobTags = {
   seniority?: string;
   workModel?: string;
@@ -129,16 +246,14 @@ export function deriveJobTags(job: {
   jobText: string;
   url: string;
   location?: string | null;
+  company?: string | null;
 }): JobTags {
   const haystack = `${job.jobTitle} ${job.jobText}`;
 
-  let company = "Empresa";
-  try {
-    const hostname = new URL(job.url).hostname.replace(/^www\./, "");
-    const label = hostname.split(".")[0];
-    if (label) company = label.charAt(0).toUpperCase() + label.slice(1);
-  } catch {
-    // keep fallback
+  let company = job.company?.trim() || "";
+  const lowerComp = company.toLowerCase();
+  if (!company || lowerComp === "job-boards" || lowerComp === "boards" || lowerComp === "jobs" || lowerComp === "empresa") {
+    company = extractCompanyFromUrl(job.url);
   }
 
   const workModel = matchFirst(haystack, WORK_MODEL_PATTERNS);

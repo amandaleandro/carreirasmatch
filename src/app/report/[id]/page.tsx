@@ -22,6 +22,8 @@ import { getUserReferralStats } from "@/lib/referrals";
 import { analyzeResumeBullets } from "@/lib/bullet-analysis";
 import { VerifiedBadgeBox } from "@/components/verified-badge-box";
 import type { StructuredResume } from "@/lib/groq";
+import { getRecommendedPartnerCourses } from "@/lib/analysis-recommendations";
+import { PartnerCoursesRecommendation } from "@/components/partner-courses-recommendation";
 
 export const dynamic = "force-dynamic";
 
@@ -139,6 +141,9 @@ export default async function ReportPage({
     select: { overallScore: true, atsScore: true, createdAt: true, jobTitle: true },
   });
   const scoreDelta = previousAnalysis ? record.overallScore - previousAnalysis.overallScore : null;
+
+  const missingKeywords: string[] = JSON.parse(record.keywordsMissing || "[]");
+  const recommendedCourses = await getRecommendedPartnerCourses(missingKeywords, record.jobTitle);
 
   return (
     <main className="max-w-3xl mx-auto px-4 py-12 w-full space-y-10">
@@ -263,6 +268,9 @@ export default async function ReportPage({
           </AnalysisTeaserView>
         </div>
       )}
+
+      {/* Cursos Recomendados por Parceiros baseados nas lacunas do candidato */}
+      <PartnerCoursesRecommendation courses={recommendedCourses} />
 
       {/* Recompensa de Indicação para liberar sem pagar */}
       <ReferralRewardBox

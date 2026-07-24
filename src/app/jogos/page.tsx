@@ -78,6 +78,29 @@ export default async function GamesHubPage({
           </p>
         </header>
 
+        {/* Banner Ensino Médio & Faculdade vs Técnico */}
+        <section className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white rounded-3xl p-6 md:p-8 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 max-w-xl">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-200">
+              <Brain className="h-3.5 w-3.5" />
+              Novo Módulo de Estudo
+            </div>
+            <h2 className="text-xl md:text-2xl font-extrabold">
+              Ensino Médio, ENEM & Escolha de Faculdade vs Técnico
+            </h2>
+            <p className="text-xs md:text-sm text-blue-100 leading-relaxed">
+              Estude todas as matérias com resumos, quizzes e flashcards gerados por IA Gemini, e conecte seus pontos fortes com cursos técnicos e faculdades.
+            </p>
+          </div>
+
+          <Link
+            href="/ensino-medio"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-blue-50 text-blue-950 font-black text-xs md:text-sm shadow-md transition-all shrink-0 active:scale-95"
+          >
+            Acessar Ensino Médio
+          </Link>
+        </section>
+
         {/* Grid de Seleção de Jogos */}
         <section className="grid gap-4 md:grid-cols-3">
           {/* Card Jogo 1: Speed Typer */}

@@ -477,8 +477,9 @@ export async function runJsonAcrossProviders(
   }
   aiCacheEvents.inc({ operation, result: "miss" });
 
-  const orderedEndpoints = endpointsForRequest(endpoints, preferredProviderId);
-  console.log(`[AI] routing=${preferredProviderId ? `preferred:${preferredProviderId}` : process.env.AI_ROUTING_MODE || "free_first"} order=${orderedEndpoints.map((endpoint) => endpoint.id).join(",")}`);
+  const effectivePreferred = preferredProviderId || process.env.PREFERRED_AI_PROVIDER || process.env.AI_PREFERRED_PROVIDER;
+  const orderedEndpoints = endpointsForRequest(endpoints, effectivePreferred);
+  console.log(`[AI] routing=${effectivePreferred ? `preferred:${effectivePreferred}` : process.env.AI_ROUTING_MODE || "free_first"} order=${orderedEndpoints.map((endpoint) => endpoint.id).join(",")}`);
 
   const requestPromise = (async () => {
     const retries = boundedEnvNumber("AI_MAX_RETRIES", 2, 0, 3);

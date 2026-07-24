@@ -15,6 +15,9 @@ import { fetchJobicyJobs } from "./jobicy";
 import { fetchRemotiveJobs } from "./remotive";
 import { fetchGreenhouseJobs, isGreenhouseConfigured } from "./greenhouse";
 import { fetchLeverJobs, isLeverConfigured } from "./lever";
+import { fetchAshbyJobs, isAshbyConfigured } from "./ashby";
+import { fetchSmartRecruitersJobs, isSmartRecruitersConfigured } from "./smartrecruiters";
+import { fetchWebSearchJobs } from "./websearch";
 import { FetchedJob, JobSearchTerms } from "./types";
 import { classifyJobForStorage } from "@/lib/feed-tags";
 
@@ -62,6 +65,7 @@ export async function fetchNewJobsFromAllSources(
     { name: "remotejobsorg", fetch: () => fetchRemoteJobsOrgJobs(filterKeywords) },
     { name: "jobicy", fetch: () => fetchJobicyJobs(filterKeywords) },
     { name: "remotive", fetch: () => fetchRemotiveJobs(filterKeywords) },
+    { name: "websearch", fetch: () => fetchWebSearchJobs(filterKeywords) },
   ];
   if (isIndeedConfigured()) {
     sources.push({ name: "indeed", fetch: () => fetchIndeedJobs(searchTerms?.titlePt, location) });
@@ -80,6 +84,12 @@ export async function fetchNewJobsFromAllSources(
   }
   if (isLeverConfigured()) {
     sources.push({ name: "lever", fetch: () => fetchLeverJobs(undefined, filterKeywords) });
+  }
+  if (isAshbyConfigured()) {
+    sources.push({ name: "ashby", fetch: () => fetchAshbyJobs(undefined, filterKeywords) });
+  }
+  if (isSmartRecruitersConfigured()) {
+    sources.push({ name: "smartrecruiters", fetch: () => fetchSmartRecruitersJobs(undefined, filterKeywords) });
   }
   if (isJoobleConfigured()) {
     sources.push({ name: "jooble", fetch: () => fetchJoobleJobs(searchTerms?.titlePt) });

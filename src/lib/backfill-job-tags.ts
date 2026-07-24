@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { classifyJobForStorage } from "@/lib/feed-tags";
+import { stripHtmlFromText } from "@/lib/job-snippet";
 
 function jobRetentionDays(): number {
   const raw = Number(process.env.JOB_RETENTION_DAYS);
@@ -86,12 +87,15 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
   let updated = 0;
 
   for (const job of jobs) {
-    const tags = classifyJobForStorage(job);
+    const cleanedJobText = stripHtmlFromText(job.jobText);
+    const jobWithCleanText = { ...job, jobText: cleanedJobText };
+    const tags = classifyJobForStorage(jobWithCleanText);
     const nextExpiresAt =
       job.expiresAt ?? new Date(job.createdAt.getTime() + retentionMs);
 
     const changed =
       tags.company !== job.company ||
+      cleanedJobText !== job.jobText ||
       tags.area !== job.area ||
       tags.subarea !== job.subarea ||
       tags.seniority !== job.seniority ||
@@ -108,6 +112,7 @@ export async function backfillJobTags(): Promise<{ scanned: number; updated: num
     await prisma.job.update({
       where: { id: job.id },
       data: {
+        jobText: cleanedJobText,
         company: tags.company,
         area: tags.area,
         subarea: tags.subarea,

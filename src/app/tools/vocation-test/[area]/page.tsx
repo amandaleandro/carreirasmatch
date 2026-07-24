@@ -49,6 +49,7 @@ export default async function VocationTestAreaPage({
         initialResult={initialResult}
         alreadyEnrolled
         loggedIn
+        hasCompletedGeneralTest
       />
     );
   }
@@ -56,14 +57,25 @@ export default async function VocationTestAreaPage({
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
-  const lastResult = await prisma.vocationTestResult.findFirst({
-    where: { userId: session.user.id, areaSlug: area.slug },
-    orderBy: { createdAt: "desc" },
-  });
+  const [lastResult, generalTestResult] = await Promise.all([
+    prisma.vocationTestResult.findFirst({
+      where: { userId: session.user.id, areaSlug: area.slug },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.vocationTestResult.findFirst({
+      where: { userId: session.user.id, areaSlug: "discover" },
+      select: { id: true },
+    }),
+  ]);
 
   const initialResult = lastResult ? (JSON.parse(lastResult.result) as VocationResult) : null;
 
   return (
-    <VocationTestForm area={area} initialResult={initialResult} alreadyEnrolled={alreadyEnrolled} />
+    <VocationTestForm
+      area={area}
+      initialResult={initialResult}
+      alreadyEnrolled={alreadyEnrolled}
+      hasCompletedGeneralTest={Boolean(generalTestResult)}
+    />
   );
 }

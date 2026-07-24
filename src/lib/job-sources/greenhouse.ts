@@ -1,6 +1,7 @@
-import * as cheerio from "cheerio";
 import { FetchedJob } from "./types";
 import { isBrazilRelevantLocation } from "./location-filter";
+import { formatCompanyName } from "@/lib/feed-tags";
+import { stripHtmlFromText } from "@/lib/job-snippet";
 
 const BOARD_API_URL = "https://boards-api.greenhouse.io/v1/boards/{board}/jobs";
 const MAX_JOB_TEXT_LENGTH = 12000;
@@ -16,6 +17,25 @@ const DEFAULT_BOARDS = [
   "hotmart",
   "gympass",
   "wellhub",
+  "stone",
+  "vtex",
+  "monks",
+  "clara",
+  "brex",
+  "stripe",
+  "canonical",
+  "elastic",
+  "datadog",
+  "cloudflare",
+  "figma",
+  "thoughtworks",
+  "turing",
+  "postman",
+  "vercel",
+  "gitlab",
+  "grafanalabs",
+  "mongodb",
+  "checkr",
 ];
 
 type GreenhouseJob = {
@@ -31,7 +51,7 @@ type GreenhouseResponse = {
 };
 
 function htmlToPlainText(html: string): string {
-  return cheerio.load(html).text().replace(/\s+/g, " ").trim().slice(0, MAX_JOB_TEXT_LENGTH);
+  return stripHtmlFromText(html).slice(0, MAX_JOB_TEXT_LENGTH);
 }
 
 // Greenhouse (ATS) expõe um job board público por empresa, sem necessidade de
@@ -70,6 +90,7 @@ async function fetchBoardJobs(board: string): Promise<FetchedJob[]> {
       jobTitle: job.title,
       jobText: htmlToPlainText(job.content),
       source: "greenhouse",
+      company: formatCompanyName(board),
       location: job.location?.name,
     }));
 }

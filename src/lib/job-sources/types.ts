@@ -3,6 +3,7 @@ export type FetchedJob = {
   jobTitle: string;
   jobText: string;
   source: string;
+  company?: string;
   location?: string;
 };
 

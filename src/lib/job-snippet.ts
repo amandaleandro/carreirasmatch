@@ -29,17 +29,21 @@ function decodeEntities(text: string): string {
   });
 }
 
+export function stripHtmlFromText(text: string): string {
+  if (!text) return "";
+  let plain = decodeEntities(text);
+  plain = plain.replace(/<[^>]*>/g, " ");
+  plain = decodeEntities(plain);
+  return plain
+    .replace(/Copiar link|Erro ao copiar link|Compartilhar vaga|Link copiado|Ir para candidatura|Descrição da vaga|Responsável pelo atendimento/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 /**
  * Turns a raw job description (which may contain HTML markup and entities)
  * into a clean plain-text snippet suitable for a card preview.
  */
 export function cleanJobSnippet(text: string, maxLength = 220): string {
-  const plain = decodeEntities(
-    text
-      // Drop tags entirely, but keep a space so words don't run together.
-      .replace(/<[^>]*>/g, " ")
-  )
-    .replace(/\s+/g, " ")
-    .trim();
-  return plain.slice(0, maxLength);
+  return stripHtmlFromText(text).slice(0, maxLength);
 }

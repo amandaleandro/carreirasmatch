@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
-import { ScreeningResults, type ScreeningCandidate } from "@/components/screening-results";
+import { CompanyScreeningView } from "@/components/company-screening-view";
+import type { ScreeningCandidate } from "@/components/screening-results";
 import { DeleteScreeningButton } from "@/components/delete-screening-button";
 import { AddResumesForm } from "@/components/add-resumes-form";
 
@@ -93,7 +94,7 @@ export default async function ScreeningResultPage({
 
         <AddResumesForm jobId={job.id} />
 
-        <ScreeningResults jobTitle={job.title} candidates={candidates} />
+        <CompanyScreeningView jobTitle={job.title} candidates={candidates} />
       </div>
     </div>
   );

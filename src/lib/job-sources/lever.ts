@@ -1,6 +1,7 @@
-import * as cheerio from "cheerio";
 import { FetchedJob } from "./types";
 import { isBrazilRelevantLocation } from "./location-filter";
+import { formatCompanyName } from "@/lib/feed-tags";
+import { stripHtmlFromText } from "@/lib/job-snippet";
 
 const POSTINGS_API_URL = "https://api.lever.co/v0/postings/{company}";
 const MAX_JOB_TEXT_LENGTH = 12000;
@@ -26,7 +27,7 @@ type LeverPosting = {
 };
 
 function htmlToPlainText(html: string): string {
-  return cheerio.load(html).text().replace(/\s+/g, " ").trim().slice(0, MAX_JOB_TEXT_LENGTH);
+  return stripHtmlFromText(html).slice(0, MAX_JOB_TEXT_LENGTH);
 }
 
 // Lever (ATS) expõe um feed público de vagas por empresa
@@ -65,6 +66,7 @@ async function fetchCompanyPostings(company: string): Promise<FetchedJob[]> {
       jobTitle: posting.text,
       jobText: htmlToPlainText(posting.descriptionPlain!),
       source: "lever",
+      company: formatCompanyName(company),
       location: posting.categories?.location,
     }));
 }

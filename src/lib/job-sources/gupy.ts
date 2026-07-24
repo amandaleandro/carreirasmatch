@@ -34,9 +34,6 @@ const DEFAULT_GUPY_COMPANIES = [
   "vibraenergia", // energia
   "c6bank", // banco
   "picpay", // fintech
-  // Empresas com programas grandes/recorrentes de estágio, trainee e jovem
-  // aprendiz (grande volume de vagas de entrada), validadas contra o feed
-  // público da Gupy.
   "gpa", // varejo/supermercado (Pão de Açúcar)
   "vivo", // telecom
   "claro", // telecom
@@ -45,6 +42,14 @@ const DEFAULT_GUPY_COMPANIES = [
   "fastshop", // varejo eletrônicos
   "weg", // indústria
   "ecorodovias", // infraestrutura/logística
+  "ambev", // bebidas/bens de consumo
+  "stefanini", // tecnologia/serviços
+  "movida", // locação/serviços
+  "unidas", // locação/serviços
+  "mondelez", // alimentos
+  "dasa", // saúde/diagnósticos
+  "serasa", // serviços financeiros
+  "compassouol", // tecnologia/consultoria
 ];
 
 export function isGupyConfigured(): boolean {

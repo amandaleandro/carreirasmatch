@@ -93,11 +93,13 @@ export function VocationTestForm({
   initialResult,
   alreadyEnrolled = false,
   loggedIn = false,
+  hasCompletedGeneralTest = true,
 }: {
   area: VocationAreaConfig;
   initialResult: VocationResult | null;
   alreadyEnrolled?: boolean;
   loggedIn?: boolean;
+  hasCompletedGeneralTest?: boolean;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [enjoysProblemSolving, setEnjoysProblemSolving] = useState<string[]>([]);
@@ -183,6 +185,26 @@ export function VocationTestForm({
             className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             Calcular chance no SISU →
+          </Link>
+        </div>
+      )}
+
+      {!alreadyEnrolled && !hasCompletedGeneralTest && (
+        <div className="mb-6 rounded-2xl border border-amber-300 dark:border-amber-900/60 bg-amber-50/80 dark:bg-amber-950/30 p-4 text-xs text-amber-900 dark:text-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+          <div>
+            <p className="font-bold mb-0.5 text-amber-950 dark:text-amber-100">
+              💡 Recomendação de Orientação Vocacional
+            </p>
+            <p>
+              Para alunos do Ensino Médio, o ideal é fazer a <strong>Etapa 1 (Quiz Geral)</strong>{" "}
+              primeiro para descobrir quais áreas mais combinam com você antes de testar a fundo a área de {area.label}.
+            </p>
+          </div>
+          <Link
+            href="/tools/vocation-test/discover"
+            className="shrink-0 font-semibold text-blue-600 dark:text-blue-400 hover:underline bg-white dark:bg-neutral-900 px-3.5 py-2 rounded-xl border border-amber-200 dark:border-amber-800 text-xs shadow-xs"
+          >
+            Fazer Quiz Geral (Etapa 1) →
           </Link>
         </div>
       )}

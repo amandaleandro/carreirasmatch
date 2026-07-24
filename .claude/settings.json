@@ -109,7 +109,16 @@
       "Bash(ssh root@177.153.62.190 'cd /opt/carreiras-match && docker compose ps --format \"table {{.Service}}\\\\t{{.Status}}\" && echo --- && docker logs carreiras-match-app --tail 10 2>&1 | grep -i \"ready\\\\|error\\\\|migrat\"')",
       "Bash(ssh root@177.153.62.190 'ps aux | grep -E \"docker compose|next build\" | grep -v grep')",
       "Bash(ssh root@177.153.62.190 'cd /opt/carreiras-match && COMPOSE_PARALLEL_LIMIT=1 docker compose build app 2>&1 | tail -15')",
-      "Bash(ssh root@177.153.62.190 'docker logs carreiras-match-app --tail 10 2>&1 | grep -i \"ready\\\\|error\\\\|migrat\" && docker compose ps --format \"table {{.Service}}\\\\t{{.Status}}\"')"
+      "Bash(ssh root@177.153.62.190 'docker logs carreiras-match-app --tail 10 2>&1 | grep -i \"ready\\\\|error\\\\|migrat\" && docker compose ps --format \"table {{.Service}}\\\\t{{.Status}}\"')",
+      "Bash(ssh root@177.153.62.190 'docker logs carreiras-match-app --tail 40 2>&1')",
+      "WebFetch(domain:web.dio.me)",
+      "WebFetch(domain:www.dio.me)",
+      "WebFetch(domain:www.escolavirtual.gov.br)",
+      "WebFetch(domain:avasus.ufrn.edu.br)",
+      "WebFetch(domain:www.fgv.br)",
+      "WebFetch(domain:www5.fgv.br)",
+      "WebFetch(domain:www.gov.br)",
+      "Bash(awk '/^model /{m=$2} /area[ \\\\t]+String/{print m\": \"$0}' prisma/schema.prisma)"
     ]
   }
 }

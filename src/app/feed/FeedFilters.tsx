@@ -85,7 +85,6 @@ export function FeedFilters({
       sort,
       [key]: value,
     };
-    // Trocar o estado invalida a cidade selecionada anteriormente (pode não existir no novo estado).
     if (key === "state") next.city = "all";
     for (const [paramKey, paramValue] of Object.entries(next)) {
       if (paramValue && paramValue !== "all" && paramValue !== "aligned") params.set(paramKey, paramValue);
@@ -118,6 +117,8 @@ export function FeedFilters({
 
   return (
     <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3.5 sm:p-4 shadow-sm shadow-slate-900/5 space-y-3">
+      
+      {/* Barra Superior de Filtros */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-900 pb-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 pr-1">
@@ -131,7 +132,7 @@ export function FeedFilters({
             <button
               type="button"
               onClick={toggleInternshipOnly}
-              className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+              className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                 seniority === "Estagio"
                   ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
                   : "border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -144,7 +145,7 @@ export function FeedFilters({
           <button
             type="button"
             onClick={toggleEntryLevelOnly}
-            className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
+            className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
               entryLevel === "yes"
                 ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20"
                 : "border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800"
@@ -159,7 +160,7 @@ export function FeedFilters({
             <button
               type="button"
               onClick={clearFilters}
-              className="text-xs font-semibold text-neutral-500 hover:text-neutral-800 dark:hover:text-neutral-200 transition-colors"
+              className="text-xs font-semibold text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
             >
               Limpar filtros ✕
             </button>
@@ -182,6 +183,7 @@ export function FeedFilters({
         </div>
       </div>
 
+      {/* Grid de Selects */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-2">
         <select value={tier} onChange={(e) => setParam("tier", e.target.value)} className={selectClass}>
           {TIER_OPTIONS.map((opt) => (
@@ -266,6 +268,68 @@ export function FeedFilters({
           </select>
         )}
       </div>
+
+      {/* Chips de Filtros Ativos */}
+      {hasActiveFilters && (
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-neutral-100 dark:border-neutral-900">
+          <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mr-1">Filtros ativos:</span>
+          {tier !== "aligned" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Score: {TIER_OPTIONS.find((t) => t.value === tier)?.label ?? tier}
+              <button type="button" onClick={() => setParam("tier", "aligned")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {workModel !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Modelo: {workModel}
+              <button type="button" onClick={() => setParam("workModel", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {area !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Área: {area}
+              <button type="button" onClick={() => setParam("area", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {subarea !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Subárea: {subarea}
+              <button type="button" onClick={() => setParam("subarea", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {seniority !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Senioridade: {seniority}
+              <button type="button" onClick={() => setParam("seniority", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {contractType !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Contrato: {contractType}
+              <button type="button" onClick={() => setParam("contractType", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {state !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              UF: {state}
+              <button type="button" onClick={() => setParam("state", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {city !== "all" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Cidade: {city}
+              <button type="button" onClick={() => setParam("city", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+          {entryLevel === "yes" && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Sem experiência
+              <button type="button" onClick={() => setParam("entryLevel", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
+        </div>
+      )}
+
     </div>
   );
 }

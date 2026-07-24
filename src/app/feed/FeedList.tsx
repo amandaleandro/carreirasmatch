@@ -53,12 +53,186 @@ function XIcon({ className }: { className?: string }) {
   );
 }
 
+function BuildingIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M3 21h18M5 21V7l8-4v18M13 21V11l6 3v7M9 9h.01M9 13h.01M9 17h.01M16 17h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function MapPinIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M12 21s-7-5.333-7-11.5a7 7 0 0 1 14 0C19 15.667 12 21 12 21z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="12" cy="9.5" r="2.5" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function SparklesIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ExternalLinkIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function BookmarkIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="m19 21-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function WandIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="m15 4-2 2m0 0 4 4m-4-4L4 15a2 2 0 0 0 0 2.83l1.17 1.17a2 2 0 0 0 2.83 0L17 10m2 8h.01M20 15h.01M15 20h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function CheckCircleIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M22 4 12 14.01l-3-3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TrashIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ArrowRightIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TargetIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="6" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="2" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function LoadingSpinner({ className }: { className?: string }) {
+  return (
+    <svg className={`animate-spin ${className}`} viewBox="0 0 24 24" fill="none">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+    </svg>
+  );
+}
+
+function LaptopIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M20 16V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10m-2 4h20a1 1 0 0 0 1-1v-1H1a1 1 0 0 0 1 1z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function BriefcaseIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function TagIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="7" y1="7" x2="7.01" y2="7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CurrencyDollarIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <line x1="12" y1="1" x2="12" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function StarIcon({ className, filled }: { className?: string; filled?: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" fill={filled ? "currentColor" : "none"} className={className}>
+      <path
+        d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ShareIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <circle cx="18" cy="5" r="3" stroke="currentColor" strokeWidth="2" />
+      <circle cx="6" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+      <circle cx="18" cy="19" r="3" stroke="currentColor" strokeWidth="2" />
+      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" stroke="currentColor" strokeWidth="2" />
+      <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function ChevronDownIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 function ReasonIcon({ kind }: { kind: ReasonBullet["kind"] }) {
   if (kind === "positive")
-    return <span className="h-5 w-5 rounded-full bg-[#22C55E]/15 flex items-center justify-center shrink-0"><CheckIcon className="h-2.5 w-2.5 text-[#22C55E]" /></span>;
+    return (
+      <span className="h-5 w-5 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0 mt-0.5">
+        <CheckIcon className="h-2.5 w-2.5 text-emerald-600 dark:text-emerald-400" />
+      </span>
+    );
   if (kind === "warning")
-    return <span className="h-5 w-5 rounded-full bg-[#F59E0B]/15 flex items-center justify-center shrink-0"><WarningIcon className="h-2.5 w-2.5 text-[#F59E0B]" /></span>;
-  return <span className="h-5 w-5 rounded-full bg-[#EF4444]/15 flex items-center justify-center shrink-0"><XIcon className="h-2.5 w-2.5 text-[#EF4444]" /></span>;
+    return (
+      <span className="h-5 w-5 rounded-full bg-amber-500/15 flex items-center justify-center shrink-0 mt-0.5">
+        <WarningIcon className="h-2.5 w-2.5 text-amber-600 dark:text-amber-400" />
+      </span>
+    );
+  return (
+    <span className="h-5 w-5 rounded-full bg-rose-500/15 flex items-center justify-center shrink-0 mt-0.5">
+      <XIcon className="h-2.5 w-2.5 text-rose-600 dark:text-rose-400" />
+    </span>
+  );
 }
 
 export function FeedList({
@@ -72,8 +246,8 @@ export function FeedList({
 }) {
   if (matches.length === 0) {
     return (
-      <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-950 p-8 text-center shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
-        <p className="text-xs font-semibold text-[#64748B] dark:text-neutral-400">
+      <div className="rounded-3xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-8 text-center shadow-xs">
+        <p className="text-xs font-semibold text-slate-500 dark:text-neutral-400">
           Nenhuma vaga localizada para os filtros selecionados.
         </p>
       </div>
@@ -81,7 +255,7 @@ export function FeedList({
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4 md:space-y-5">
       {matches.map((match) => (
         <FeedCard
           key={match.id}
@@ -99,28 +273,28 @@ const TIER_COLOR_SCHEMES: Record<
   { badge: string; text: string; ring: string; lightDot: string }
 > = {
   excellent: {
-    badge: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20",
-    text: "text-[#22C55E]",
+    badge: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-500/25 shadow-2xs",
+    text: "text-emerald-600 dark:text-emerald-400",
     ring: "#22C55E",
-    lightDot: "bg-[#22C55E]",
+    lightDot: "bg-emerald-500",
   },
   good: {
-    badge: "bg-[#22C55E]/10 text-[#22C55E] border-[#22C55E]/20",
-    text: "text-[#22C55E]",
+    badge: "bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-500/25 shadow-2xs",
+    text: "text-emerald-600 dark:text-emerald-400",
     ring: "#22C55E",
-    lightDot: "bg-[#22C55E]",
+    lightDot: "bg-emerald-500",
   },
   medium: {
-    badge: "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20",
-    text: "text-[#F59E0B]",
+    badge: "bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-500/25 shadow-2xs",
+    text: "text-amber-600 dark:text-amber-400",
     ring: "#F59E0B",
-    lightDot: "bg-[#F59E0B]",
+    lightDot: "bg-amber-500",
   },
   low: {
-    badge: "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20",
-    text: "text-[#EF4444]",
+    badge: "bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-500/25 shadow-2xs",
+    text: "text-rose-600 dark:text-rose-400",
     ring: "#EF4444",
-    lightDot: "bg-[#EF4444]",
+    lightDot: "bg-rose-500",
   },
 };
 
@@ -137,12 +311,16 @@ function FeedCard({
   const [careerTrack, setCareerTrack] = useState<CareerTrack>(defaultCareerTrack);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados interativos
+  const [expanded, setExpanded] = useState(false);
+  const [starred, setStarred] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const tier = tierFromScore(match.fitScore);
   const colors = TIER_COLOR_SCHEMES[tier];
   const tags = deriveJobTags(match.job);
   const bullets = reasonBullets(match.reason, tier);
-  const description = match.job.jobText.replace(/\s+/g, " ").trim().slice(0, 160);
 
   async function handleFullAnalysis() {
     setError(null);
@@ -165,118 +343,274 @@ function FeedCard({
     }
   }
 
+  function handleShare(e: React.MouseEvent) {
+    e.preventDefault();
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(match.job.url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  const companyName = tags.company || "Empresa";
+  const companyInitial = companyName !== "Empresa" ? companyName.charAt(0).toUpperCase() : null;
+
   return (
-    <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.015)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.035)] hover:-translate-y-[1px] transition-all duration-300 space-y-4">
+    <div className="group rounded-3xl border border-slate-200/80 dark:border-neutral-800/90 bg-white dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 space-y-4">
       
       {/* Cabeçalho do Card */}
-      <div className="flex items-start justify-between gap-4">
-        <div className="space-y-1.5 min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Badge de Match Integrado */}
-            <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider border ${colors.badge}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${colors.lightDot} animate-pulse`} />
-              {match.fitScore}% Match · {TIER_LABEL[tier]}
-            </span>
-            <span className="text-[10px] font-bold text-[#64748B]">via {match.job.source}</span>
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-start gap-3.5 min-w-0 flex-1">
+          
+          {/* Avatar / Badge de Logo da Empresa */}
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border border-blue-200/60 dark:border-blue-800/40 flex items-center justify-center font-extrabold text-sm text-blue-600 dark:text-blue-400 shrink-0 shadow-2xs mt-0.5">
+            {companyInitial ? (
+              <span>{companyInitial}</span>
+            ) : (
+              <BuildingIcon className="w-5 h-5 text-blue-500" />
+            )}
           </div>
-          <a
-            href={match.job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block font-title font-bold text-base md:text-lg text-[#071827] dark:text-white hover:text-[#2563EB] transition-colors leading-tight"
-          >
-            {match.job.jobTitle}
-          </a>
-          <p className="text-xs text-[#64748B] dark:text-neutral-400 font-semibold">
-            {tags.company} · {tags.location || match.job.location || "Remoto / Brasil"}
-          </p>
+
+          <div className="space-y-1 min-w-0 flex-1">
+            
+            {/* Top Row: Badge de Fit Score e Source */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold uppercase tracking-wider border ${colors.badge}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${colors.lightDot} animate-pulse`} />
+                {match.fitScore}% MATCH · {TIER_LABEL[tier]}
+              </span>
+              <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-500">
+                via <span className="font-semibold text-slate-600 dark:text-neutral-400 capitalize">{match.job.source}</span>
+              </span>
+            </div>
+
+            {/* Título da Vaga */}
+            <a
+              href={match.job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-title font-bold text-base md:text-lg text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug group/link"
+            >
+              <span className="line-clamp-1">{match.job.jobTitle}</span>
+              <ExternalLinkIcon className="w-4 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0 text-blue-600" />
+            </a>
+
+            {/* Subtítulo: Empresa e Localização */}
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 dark:text-neutral-400 font-medium">
+              <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-neutral-300">
+                <BuildingIcon className="w-3.5 h-3.5 text-slate-400" />
+                {companyName}
+              </span>
+              <span className="text-slate-300 dark:text-neutral-700">•</span>
+              <span className="flex items-center gap-1">
+                <MapPinIcon className="w-3.5 h-3.5 text-slate-400" />
+                {tags.location || match.job.location || "Remoto / Brasil"}
+              </span>
+            </div>
+          </div>
         </div>
+
+        {/* Botões Rápidos de Ação: Favoritar & Compartilhar */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setStarred(!starred)}
+            className={`p-2 rounded-xl transition-all cursor-pointer ${
+              starred
+                ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
+                : "text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-neutral-800"
+            }`}
+            title={starred ? "Remover dos favoritos" : "Salvar nos favoritos"}
+          >
+            <StarIcon className="w-4 h-4" filled={starred} />
+          </button>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={handleShare}
+              className="p-2 rounded-xl text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+              title="Copiar link da vaga"
+            >
+              <ShareIcon className="w-4 h-4" />
+            </button>
+            {copied && (
+              <span className="absolute -bottom-8 right-0 bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-lg whitespace-nowrap z-10 animate-in fade-in zoom-in duration-200">
+                Link copiado!
+              </span>
+            )}
+          </div>
+        </div>
+
       </div>
 
-      {/* Descrição Curta */}
-      {description && (
-        <p className="text-xs text-[#64748B] dark:text-neutral-300 leading-relaxed font-medium">
-          {description}…
-        </p>
+      {/* Descrição com Expansão ("Ver mais / Ver menos") */}
+      {match.job.jobText && (
+        <div className="bg-slate-50/60 dark:bg-neutral-950/40 p-3.5 rounded-xl border border-slate-100 dark:border-neutral-800/80 space-y-2">
+          <p className={`text-xs text-slate-600 dark:text-neutral-300 leading-relaxed font-normal ${expanded ? "" : "line-clamp-3"}`}>
+            {match.job.jobText}
+          </p>
+          {match.job.jobText.length > 180 && (
+            <button
+              type="button"
+              onClick={() => setExpanded(!expanded)}
+              className="inline-flex items-center gap-1 text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+            >
+              <span>{expanded ? "Ver menos" : "Ver mais da descrição"}</span>
+              <ChevronDownIcon className={`w-3 h-3 transition-transform duration-200 ${expanded ? "rotate-180" : ""}`} />
+            </button>
+          )}
+        </div>
       )}
 
-      {/* Tags da Vaga */}
-      <div className="flex flex-wrap gap-1.5">
+      {/* Badges de Tags da Vaga */}
+      <div className="flex flex-wrap items-center gap-1.5">
         {tags.salary && (
-          <span className="rounded-lg bg-[#22C55E]/10 border border-[#22C55E]/20 text-[#22C55E] text-[10px] font-bold px-2.5 py-0.5">
+          <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold px-2.5 py-1 shadow-2xs">
+            <CurrencyDollarIcon className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
             {tags.salary}
           </span>
         )}
-        {[tags.contractType, tags.seniority, tags.workModel, tags.area].filter(Boolean).map((tag, idx) => (
+        {tags.workModel && (
+          <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100/80 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 text-[11px] font-semibold px-2.5 py-1">
+            <LaptopIcon className="w-3 h-3 text-slate-400 dark:text-neutral-400" />
+            {tags.workModel}
+          </span>
+        )}
+        {tags.contractType && (
+          <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100/80 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 text-[11px] font-semibold px-2.5 py-1">
+            <BriefcaseIcon className="w-3 h-3 text-slate-400 dark:text-neutral-400" />
+            {tags.contractType}
+          </span>
+        )}
+        {tags.seniority && (
+          <span className="inline-flex items-center gap-1 rounded-lg bg-slate-100/80 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 text-[11px] font-semibold px-2.5 py-1">
+            <SparklesIcon className="w-3 h-3 text-slate-400 dark:text-neutral-400" />
+            {tags.seniority}
+          </span>
+        )}
+        {[tags.area].filter(Boolean).map((tag, idx) => (
           <span
             key={`${tag}-${idx}`}
-            className="rounded-lg bg-[#F8FAFC] dark:bg-neutral-800 border border-[#E2E8F0] dark:border-neutral-750 text-[#64748B] dark:text-neutral-300 text-[10px] font-bold px-2.5 py-0.5"
+            className="inline-flex items-center gap-1 rounded-lg bg-slate-100/80 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 text-slate-600 dark:text-neutral-400 text-[11px] font-medium px-2.5 py-1"
           >
+            <TagIcon className="w-3 h-3 text-slate-400" />
             {tag}
           </span>
         ))}
       </div>
 
-      {/* Análise de Aderência */}
-      <div className="rounded-2xl border border-[#E2E8F0]/80 dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/40 p-4 space-y-2">
-        <p className="text-xs font-bold text-[#071827] dark:text-white tracking-tight">Análise de Aderência</p>
+      {/* Análise de Aderência AI com Diagnóstico Integrado */}
+      <div className="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-gradient-to-br from-blue-50/40 via-slate-50/50 to-indigo-50/30 dark:from-neutral-950/60 dark:via-neutral-900/40 dark:to-indigo-950/20 p-4 space-y-3 shadow-2xs">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="p-1 rounded-lg bg-blue-600/10 text-blue-600 dark:text-blue-400">
+              <SparklesIcon className="w-3.5 h-3.5" />
+            </div>
+            <p className="text-xs font-bold text-slate-900 dark:text-white tracking-tight">Análise de Aderência AI</p>
+          </div>
+          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-blue-100/60 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300">
+            Resumo inteligente
+          </span>
+        </div>
+
         <ul className="space-y-2">
           {bullets.map((bullet, index) => (
-            <li key={index} className="flex items-start gap-2.5 text-xs text-[#64748B] dark:text-neutral-300 leading-relaxed font-medium">
+            <li key={index} className="flex items-start gap-2.5 text-xs text-slate-600 dark:text-neutral-300 leading-relaxed font-medium">
               <ReasonIcon kind={bullet.kind} />
               <span className="flex-1 mt-0.5">{bullet.text}</span>
             </li>
           ))}
         </ul>
+
+        {/* CTA Integrado: Diagnóstico Completo */}
+        <div className="pt-2.5 border-t border-blue-100/80 dark:border-blue-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-medium">
+            Ver análise detalhada com pontos fortes e lacunas do seu perfil
+          </p>
+          <button
+            type="button"
+            onClick={handleFullAnalysis}
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold px-4 py-2 text-xs shadow-sm shadow-blue-500/20 transition-all hover:shadow-md active:scale-95 cursor-pointer shrink-0 disabled:opacity-50"
+          >
+            {loading ? (
+              <>
+                <LoadingSpinner className="w-3.5 h-3.5" />
+                <span>Analisando...</span>
+              </>
+            ) : (
+              <>
+                <span>Diagnóstico completo</span>
+                <ArrowRightIcon className="w-3.5 h-3.5" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {error && <p className="text-xs text-[#EF4444] font-semibold">{error}</p>}
+      {error && <p className="text-xs text-rose-600 font-semibold px-1">{error}</p>}
 
-      {/* Barra de Ações Horizontal */}
-      <div className="border-t border-[#E2E8F0] dark:border-neutral-800 pt-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Barra de Ações do Rodapé (Momento + Kanban / CV / Candidatou-se) */}
+      <div className="border-t border-slate-100 dark:border-neutral-800/80 pt-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
         
-        {/* Lado Esquerdo: Filtro de Momento */}
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider shrink-0">Momento:</span>
-          <select
-            value={careerTrack}
-            onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
-            className="rounded-xl border border-[#E2E8F0] dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-800 dark:text-neutral-200 px-3 py-1.5 text-xs font-semibold outline-none focus:border-[#2563EB] shadow-xs cursor-pointer max-w-[200px]"
-          >
-            {CAREER_TRACK_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Lado Direito: Botões de Ação */}
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Descartar */}
-          <form action={discardFeedMatch.bind(null, match.id)}>
-            <button type="submit" className="text-xs font-bold text-neutral-400 hover:text-[#EF4444] px-2 py-1.5 rounded-lg transition-colors cursor-pointer">
-              Descartar
-            </button>
-          </form>
+        {/* Lado Esquerdo: Filtro de Momento & Links Secundários */}
+        <div className="flex flex-wrap items-center gap-2.5">
+          
+          {/* Seletor de Momento */}
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-neutral-800/60 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-neutral-700/80">
+            <span className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+              <TargetIcon className="w-3 h-3 text-slate-400" />
+              Momento:
+            </span>
+            <select
+              value={careerTrack}
+              onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
+              className="bg-transparent text-slate-800 dark:text-neutral-200 text-xs font-semibold outline-none cursor-pointer pr-1"
+            >
+              {CAREER_TRACK_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value} className="dark:bg-neutral-900">
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Vaga Original */}
           <a
             href={match.job.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-bold text-[#64748B] hover:text-[#2563EB] px-2.5 py-1.5 rounded-lg transition-colors flex items-center gap-0.5"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-blue-600 dark:text-neutral-400 dark:hover:text-blue-400 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
           >
-            Vaga original ↗
+            <span>Vaga original</span>
+            <ExternalLinkIcon className="w-3 h-3" />
           </a>
 
-          {/* Salvar no Kanban */}
+          {/* Descartar */}
+          <form action={discardFeedMatch.bind(null, match.id)}>
+            <button
+              type="submit"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 px-2 py-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
+              title="Descartar esta vaga"
+            >
+              <TrashIcon className="w-3.5 h-3.5" />
+              <span>Descartar</span>
+            </button>
+          </form>
+        </div>
+
+        {/* Lado Direito: Ações de Workflow */}
+        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/80 dark:bg-neutral-800/50 rounded-2xl border border-slate-200/60 dark:border-neutral-750/60">
+          
+          {/* Salvar Kanban */}
           <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
             <button
               type="submit"
-              className="rounded-xl border border-[#E2E8F0] hover:border-[#64748B] dark:border-neutral-700 text-[#071827] dark:text-white bg-white dark:bg-neutral-900 font-bold px-3.5 py-2 text-xs shadow-xs transition-all flex items-center gap-1 cursor-pointer active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-200 font-semibold px-3 py-1.5 text-xs shadow-2xs transition-all cursor-pointer border border-slate-200/80 dark:border-neutral-700 active:scale-95"
             >
-              Salvar Kanban
+              <BookmarkIcon className="w-3.5 h-3.5 text-slate-500" />
+              <span>Salvar Kanban</span>
             </button>
           </form>
 
@@ -284,9 +618,10 @@ function FeedCard({
           <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")}>
             <button
               type="submit"
-              className="rounded-xl border border-[#F59E0B]/30 bg-[#F59E0B]/5 hover:bg-[#F59E0B]/10 text-[#F59E0B] font-bold px-3.5 py-2 text-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-semibold px-3 py-1.5 text-xs transition-colors cursor-pointer border border-amber-500/20 active:scale-95"
             >
-              Ajustar CV
+              <WandIcon className="w-3.5 h-3.5 text-amber-500" />
+              <span>Ajustar CV</span>
             </button>
           </form>
 
@@ -294,20 +629,12 @@ function FeedCard({
           <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")}>
             <button
               type="submit"
-              className="rounded-xl border border-[#2563EB]/30 bg-[#2563EB]/5 hover:bg-[#2563EB]/10 text-[#2563EB] font-bold px-3.5 py-2 text-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-semibold px-3 py-1.5 text-xs transition-colors cursor-pointer border border-blue-500/20 active:scale-95"
             >
-              Candidatou-se
+              <CheckCircleIcon className="w-3.5 h-3.5 text-blue-500" />
+              <span>Candidatou-se</span>
             </button>
           </form>
-
-          {/* Diagnóstico */}
-          <button
-            onClick={handleFullAnalysis}
-            disabled={loading}
-            className="rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-bold px-4 py-2 text-xs shadow-sm shadow-[#2563EB]/25 transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer active:scale-[0.98]"
-          >
-            {loading ? "Analisando..." : "Diagnóstico completo →"}
-          </button>
         </div>
 
       </div>

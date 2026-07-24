@@ -11,6 +11,7 @@ import { computeJourneyMetrics } from "@/lib/applications";
 import { formatBrazilDate, formatBrazilDateTime } from "@/lib/brazil";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { Trophy } from "lucide-react";
+import { CareerScoreEvolutionChart } from "@/components/career-score-evolution-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -164,8 +165,18 @@ export default async function DashboardPage() {
     ["applied", "interview", "technical_test", "offer"].includes(item.status)
   ).length;
 
+  const scoreDataPoints = analyses.map((a) => ({
+    id: a.id,
+    jobTitle: a.jobTitle,
+    overallScore: a.overallScore,
+    atsScore: a.atsScore,
+    dateLabel: formatBrazilDate(a.createdAt).slice(0, 5),
+  })).reverse();
+
   return (
     <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8 font-sans bg-[#F8FAFC] dark:bg-[#071827] text-foreground">
+      {/* Gráfico de Evolução do Score de Aderência */}
+      <CareerScoreEvolutionChart dataPoints={scoreDataPoints} />
       <div data-tour="dash-overview" className="animate-in fade-in duration-300">
         <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/25">
           Visão geral
