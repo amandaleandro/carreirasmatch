@@ -2,6 +2,15 @@
 
 import { useCallback, useEffect, useState } from "react";
 
+type CouponSignupUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  createdAt: string;
+  subscription: { status: string; currentPeriodEnd: string | null } | null;
+  payments: Array<{ amount: number; kind: string }>;
+};
+
 type Coupon = {
   id: string;
   code: string;
@@ -18,6 +27,7 @@ type Coupon = {
   maxRedemptions: number | null;
   usageCount: number;
   createdAt: string;
+  signups?: CouponSignupUser[];
 };
 
 type ReportRow = {
@@ -304,6 +314,10 @@ export function AdminCouponManager() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
+  const [signupSearch, setSignupSearch] = useState("");
+  const [selectedCouponFilter, setSelectedCouponFilter] = useState<string | "all">("all");
+  const [signupStatusFilter, setSignupStatusFilter] = useState<"all" | "subscribers" | "payers">("all");
+
   const load = useCallback(() => {
     fetch("/api/admin/coupons")
       .then((res) => res.json())
@@ -378,6 +392,34 @@ export function AdminCouponManager() {
   const totalNet = report.reduce((sum, row) => sum + row.netRevenueCents, 0);
   const totalGross = report.reduce((sum, row) => sum + row.grossRevenueCents, 0);
 
+  const allSignups = (coupons ?? []).flatMap((c) =>
+    (c.signups ?? []).map((signup) => ({
+      ...signup,
+      couponCode: c.code,
+      influencerName: c.influencerName,
+      couponId: c.id,
+    }))
+  );
+
+  const filteredSignups = allSignups.filter((item) => {
+    if (selectedCouponFilter !== "all" && item.couponId !== selectedCouponFilter) return false;
+
+    if (signupStatusFilter === "subscribers") {
+      if (item.subscription?.status !== "active") return false;
+    } else if (signupStatusFilter === "payers") {
+      if (!item.payments || item.payments.length === 0) return false;
+    }
+
+    if (!signupSearch.trim()) return true;
+    const q = signupSearch.toLowerCase();
+    const name = item.name?.toLowerCase() ?? "";
+    const email = item.email?.toLowerCase() ?? "";
+    const code = item.couponCode.toLowerCase();
+    const influencer = item.influencerName.toLowerCase();
+
+    return name.includes(q) || email.includes(q) || code.includes(q) || influencer.includes(q);
+  });
+
   return (
     <div className="space-y-8">
       <form onSubmit={handleCreate} className="space-y-3">
@@ -402,6 +444,7 @@ export function AdminCouponManager() {
               <th className="py-2 pr-4 font-medium">Influenciador</th>
               <th className="py-2 pr-4 font-medium">Desconto</th>
               <th className="py-2 pr-4 font-medium">Comissão</th>
+              <th className="py-2 pr-4 font-medium">Cadastrados</th>
               <th className="py-2 pr-4 font-medium">Usos</th>
               <th className="py-2 pr-4 font-medium">Expira</th>
               <th className="py-2 pr-4 font-medium">Status</th>
@@ -411,6 +454,7 @@ export function AdminCouponManager() {
           <tbody className="divide-y divide-neutral-100 dark:divide-neutral-900">
             {(coupons ?? []).map((coupon) => {
               const status = statusOf(coupon);
+              const signupsCount = coupon.signups?.length ?? 0;
               return (
                 <tr key={coupon.id} className="align-top">
                   <td className="py-3 pr-4 font-mono font-semibold">{coupon.code}</td>
@@ -422,6 +466,19 @@ export function AdminCouponManager() {
                   </td>
                   <td className="py-3 pr-4 text-xs text-neutral-500">{describeDiscount(coupon)}</td>
                   <td className="py-3 pr-4 text-xs text-neutral-500">{coupon.commissionPercent}%</td>
+                  <td className="py-3 pr-4">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedCouponFilter(coupon.id);
+                        const el = document.getElementById("signups-table-section");
+                        if (el) el.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                    >
+                      {signupsCount} cadastros
+                    </button>
+                  </td>
                   <td className="py-3 pr-4">
                     {coupon.usageCount}
                     {coupon.maxRedemptions !== null && (
@@ -455,7 +512,7 @@ export function AdminCouponManager() {
             })}
             {editingId && (
               <tr>
-                <td colSpan={8} className="py-4">
+                <td colSpan={9} className="py-4">
                   <form onSubmit={handleEditSubmit} className="space-y-3 rounded-md bg-neutral-50 dark:bg-neutral-900/50 p-4">
                     <p className="text-xs font-medium text-neutral-600 dark:text-neutral-400">
                       Editando {editForm.code} - o código não pode ser alterado.
@@ -474,7 +531,7 @@ export function AdminCouponManager() {
             )}
             {coupons && coupons.length === 0 && (
               <tr>
-                <td colSpan={8} className="py-6 text-center text-neutral-500">
+                <td colSpan={9} className="py-6 text-center text-neutral-500">
                   Nenhum cupom criado ainda.
                 </td>
               </tr>
@@ -538,6 +595,150 @@ export function AdminCouponManager() {
                 </tr>
               </tfoot>
             )}
+          </table>
+        </div>
+      </div>
+
+      <div id="signups-table-section" className="border-t border-neutral-200 dark:border-neutral-800 pt-6 space-y-4">
+        <div>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 className="font-semibold text-base">Usuários Cadastrados por Cupom de Influenciadora</h3>
+              <p className="mt-1 text-sm text-neutral-500">
+                Lista de pessoas que criaram conta utilizando a indicação ou cupom de cada influenciadora.
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900 text-xs font-semibold px-3 py-1.5">
+                Total: {allSignups.length} cadastrados
+              </span>
+              <span className="rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 text-xs font-semibold px-3 py-1.5">
+                {allSignups.filter((s) => s.subscription?.status === "active").length} assinantes
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Filtros dinâmicos */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <input
+            type="text"
+            placeholder="Buscar por nome, e-mail, cupom ou influenciadora..."
+            value={signupSearch}
+            onChange={(e) => setSignupSearch(e.target.value)}
+            className="flex-1 rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 text-sm"
+          />
+
+          <select
+            value={selectedCouponFilter}
+            onChange={(e) => setSelectedCouponFilter(e.target.value)}
+            className="rounded-md border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 px-3 py-2 text-sm"
+          >
+            <option value="all">Todas as Influenciadoras</option>
+            {(coupons ?? []).map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.influencerName} ({c.code}) - {c.signups?.length ?? 0} cadastros
+              </option>
+            ))}
+          </select>
+
+          <div className="flex items-center rounded-md border border-neutral-200 dark:border-neutral-800 p-0.5 bg-neutral-100 dark:bg-neutral-900 shrink-0 text-xs">
+            <button
+              type="button"
+              onClick={() => setSignupStatusFilter("all")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+                signupStatusFilter === "all"
+                  ? "bg-white dark:bg-neutral-800 shadow-xs font-semibold"
+                  : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+              }`}
+            >
+              Todos
+            </button>
+            <button
+              type="button"
+              onClick={() => setSignupStatusFilter("subscribers")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+                signupStatusFilter === "subscribers"
+                  ? "bg-white dark:bg-neutral-800 shadow-xs font-semibold"
+                  : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+              }`}
+            >
+              Assinantes
+            </button>
+            <button
+              type="button"
+              onClick={() => setSignupStatusFilter("payers")}
+              className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
+                signupStatusFilter === "payers"
+                  ? "bg-white dark:bg-neutral-800 shadow-xs font-semibold"
+                  : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+              }`}
+            >
+              Com pagamentos
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
+          <table className="w-full text-sm">
+            <thead className="text-left text-xs uppercase tracking-wide text-neutral-500 bg-neutral-50 dark:bg-neutral-900/50">
+              <tr className="border-b border-neutral-200 dark:border-neutral-800">
+                <th className="py-2.5 px-4 font-medium">Influenciadora / Cupom</th>
+                <th className="py-2.5 px-4 font-medium">Usuário Cadastrado</th>
+                <th className="py-2.5 px-4 font-medium">Data do Cadastro</th>
+                <th className="py-2.5 px-4 font-medium">Status Assinatura</th>
+                <th className="py-2.5 px-4 font-medium text-right">Pagamentos</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-900">
+              {filteredSignups.map((signup) => {
+                const totalPaidCents = signup.payments?.reduce((sum, p) => sum + p.amount, 0) ?? 0;
+                const isSub = signup.subscription?.status === "active";
+                return (
+                  <tr key={signup.id} className="hover:bg-neutral-50 dark:hover:bg-neutral-900/40">
+                    <td className="py-3 px-4">
+                      <span className="font-semibold text-neutral-900 dark:text-white">{signup.influencerName}</span>
+                      <span className="block font-mono text-xs text-blue-600 dark:text-blue-400">{signup.couponCode}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      <p className="font-medium text-neutral-900 dark:text-white">{signup.name ?? "Sem nome"}</p>
+                      <p className="text-xs text-neutral-500">{signup.email ?? "-"}</p>
+                    </td>
+                    <td className="py-3 px-4 text-xs text-neutral-500 whitespace-nowrap">
+                      {formatDate(signup.createdAt)}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span
+                        className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${
+                          isSub
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900"
+                            : "bg-neutral-50 text-neutral-600 border-neutral-200 dark:bg-neutral-900 dark:text-neutral-400 dark:border-neutral-800"
+                        }`}
+                      >
+                        {isSub ? "Assinante Ativo" : "Conta Gratuita"}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <p className="font-semibold text-neutral-900 dark:text-white">
+                        {totalPaidCents > 0 ? formatCurrency(totalPaidCents) : "R$ 0,00"}
+                      </p>
+                      <span className="text-xs text-neutral-500">
+                        {signup.payments?.length ?? 0} pagamento(s)
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+              {filteredSignups.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-neutral-500">
+                    {signupSearch.trim() || selectedCouponFilter !== "all" || signupStatusFilter !== "all"
+                      ? "Nenhum usuário encontrado com os filtros selecionados."
+                      : "Nenhum cadastro vinculado a cupons de influenciadoras até o momento."}
+                  </td>
+                </tr>
+              )}
+            </tbody>
           </table>
         </div>
       </div>

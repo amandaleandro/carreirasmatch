@@ -2,7 +2,8 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
-import { Search, CheckCircle2, ArrowRight, ShieldCheck, Target } from "lucide-react";
+import { Search, CheckCircle2, ArrowRight, ShieldCheck, Target, Sparkles } from "lucide-react";
+import { triggerConfetti } from "@/lib/confetti";
 
 export function HeroInstantScanner() {
   const [roleQuery, setRoleQuery] = useState("");
@@ -48,17 +49,24 @@ export function HeroInstantScanner() {
         gaps,
       });
       setScanning(false);
-    }, 1000);
+      triggerConfetti({ count: 40, originY: 0.5 });
+    }, 1200);
   }
 
   return (
-    <div className="rounded-3xl border border-white/20 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-2xl space-y-6 font-sans">
+    <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-2xl space-y-6 font-sans">
+      {/* Laser Scanning Effect */}
+      {scanning && <div className="animate-laser-sweep z-20" />}
+
       <div className="flex items-center justify-between">
         <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-500/20 text-blue-200 border border-blue-400/30">
           <Target className="w-3.5 h-3.5 text-blue-400" />
           Diagnóstico de Aderência
         </span>
-        <span className="text-[11px] text-white/70 font-medium">100% Gratuito</span>
+        <span className="text-[11px] text-white/70 font-medium inline-flex items-center gap-1">
+          <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+          100% Gratuito
+        </span>
       </div>
 
       <div className="space-y-1.5">
@@ -84,7 +92,7 @@ export function HeroInstantScanner() {
         <button
           type="submit"
           disabled={scanning}
-          className="w-full rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3.5 text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+          className="w-full btn-shine-glow rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3.5 text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2"
         >
           {scanning ? (
             <span className="inline-flex items-center gap-2">
@@ -102,7 +110,7 @@ export function HeroInstantScanner() {
 
       {/* Simulated Live Result */}
       {result && (
-        <div className="rounded-2xl border border-white/20 bg-slate-950/95 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-300">
+        <div className="rounded-2xl border border-white/20 bg-slate-950/95 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-300 shadow-2xl">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-white/60 font-bold">Cargo Simulado</p>
@@ -110,7 +118,9 @@ export function HeroInstantScanner() {
             </div>
             <div className="text-right">
               <span className="text-2xl font-extrabold text-blue-400">{result.score}%</span>
-              <span className="block text-[10px] font-bold text-emerald-400">Alta Compatibilidade</span>
+              <span className="block text-[10px] font-bold text-emerald-400 badge-pulse-glow px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 mt-0.5">
+                Alta Compatibilidade
+              </span>
             </div>
           </div>
 
@@ -118,7 +128,7 @@ export function HeroInstantScanner() {
             <p className="text-[10px] font-bold uppercase tracking-wider text-white/70">Pontos Fortes Identificados:</p>
             <div className="flex flex-wrap gap-1.5">
               {result.skills.map((s) => (
-                <span key={s} className="rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold inline-flex items-center gap-1">
+                <span key={s} className="rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold inline-flex items-center gap-1 transition-transform hover:scale-105">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   {s}
                 </span>
@@ -129,7 +139,7 @@ export function HeroInstantScanner() {
           <div className="pt-2">
             <Link
               href={`/analise?role=${encodeURIComponent(result.role)}`}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3 text-xs shadow-md transition-all"
+              className="w-full btn-shine-glow inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3 text-xs shadow-md transition-all"
             >
               <span>Ver diagnóstico completo do seu currículo</span>
               <ArrowRight className="w-4 h-4" />
@@ -140,3 +150,4 @@ export function HeroInstantScanner() {
     </div>
   );
 }
+

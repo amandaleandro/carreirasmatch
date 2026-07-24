@@ -24,7 +24,7 @@ de free vs. pago, ver [PRODUCT_OVERVIEW.md](PRODUCT_OVERVIEW.md).
    O tour não bloqueia a tela — os elementos ficam clicáveis por baixo do
    destaque — e pode ser reaberto a qualquer momento pelo botão de ajuda.
 4. Cerca de 1,2s depois de qualquer acesso à área logada (se ainda não visto,
-   `localStorage` chave `upcoming-features-modal:v5:seen`), abre a **modal de
+   `localStorage` chave `upcoming-features-modal:v6:seen`), abre a **modal de
    novidades** (`src/components/upcoming-features-modal.tsx`), listando o
    que já está no ar (Desafio do Match, Freelancer, Jogos, Radar de
    Concursos/Vestibulares, Mentorias, Todas as Vagas) e o que está em

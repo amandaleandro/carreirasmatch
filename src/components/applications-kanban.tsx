@@ -10,6 +10,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { updateApplicationStatus } from "@/app/applications/actions";
+import { triggerConfetti } from "@/lib/confetti";
 
 type ApplicationItem = {
   id: string;
@@ -68,12 +69,16 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
   const [isPending, startTransition] = useTransition();
 
   function handleStatusChange(id: string, newStatus: string) {
+    if (newStatus === "interview" || newStatus === "offer") {
+      triggerConfetti({ count: 75, originY: 0.5 });
+    }
     startTransition(async () => {
       const fd = new FormData();
       fd.append("status", newStatus);
       await updateApplicationStatus(id, fd);
     });
   }
+
 
   return (
     <div className="w-full font-sans">

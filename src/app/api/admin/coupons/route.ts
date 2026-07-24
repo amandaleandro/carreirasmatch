@@ -12,7 +12,23 @@ export async function GET() {
   const [coupons, report] = await Promise.all([
     prisma.coupon.findMany({
       orderBy: { createdAt: "desc" },
-      include: { owner: { select: { email: true } } },
+      include: {
+        owner: { select: { email: true } },
+        signups: {
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            createdAt: true,
+            subscription: { select: { status: true, currentPeriodEnd: true } },
+            payments: {
+              where: { status: "paid" },
+              select: { amount: true, kind: true },
+            },
+          },
+        },
+      },
     }),
     couponReport(),
   ]);

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { triggerConfetti } from "@/lib/confetti";
 import { ChecklistCard } from "@/components/checklist-card";
+
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
 import {
@@ -798,6 +800,12 @@ export function ScoreHero({
   seniority: number;
   ats: number;
 }) {
+  useEffect(() => {
+    if (overall >= 75) {
+      triggerConfetti({ count: 70, originY: 0.4 });
+    }
+  }, [overall]);
+
   const config = STATUS_CONFIG[status];
   const subScores = [
     { label: "Técnica", value: technical },
@@ -807,14 +815,16 @@ export function ScoreHero({
   ];
   return (
     <div
-      className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)]"
+      className={`relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] ${
+        overall >= 75 ? "shimmer-card" : ""
+      }`}
     >
       <div className="flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left relative z-10">
         <div className="shrink-0 relative bg-[#F8FAFC] dark:bg-neutral-950 p-2 rounded-full border border-[#E2E8F0] dark:border-neutral-800">
           <CircularScore value={overall} size={110} strokeWidth={9} />
         </div>
         <div className="space-y-1.5 min-w-0">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${config.chipClass}`}>
+          <span className={`inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider border ${config.chipClass} ${overall >= 75 ? "badge-pulse-glow" : ""}`}>
             <span className={`h-1.5 w-1.5 rounded-full ${config.dotClass} animate-pulse`} />
             {config.label}
           </span>
@@ -831,7 +841,7 @@ export function ScoreHero({
         {subScores.map((s) => (
           <div
             key={s.label}
-            className="flex flex-col items-center gap-2.5 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/20 p-3 hover:border-[#2563EB] transition-all duration-300"
+            className="flex flex-col items-center gap-2.5 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-950/20 p-3 hover:border-[#2563EB] transition-all duration-300 hover:scale-[1.02]"
           >
             <CircularScore value={s.value} size={44} strokeWidth={4.5} />
             <span className="text-[10px] font-bold text-[#64748B] dark:text-neutral-300">
@@ -843,6 +853,7 @@ export function ScoreHero({
     </div>
   );
 }
+
 
 export function AnalysisResult({
   result,

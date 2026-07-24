@@ -505,3 +505,97 @@ select option {
   animation: shake 0.2s ease-in-out 2;
 }
 
+/* ---------------------------------------------------------------------------
+   Efeitos Visuais Premium & Micro-interações
+--------------------------------------------------------------------------- */
+
+/* Laser Sweep (Scanner de AI e ATS) */
+@keyframes laserSweep {
+  0% { top: 0%; opacity: 0.2; }
+  50% { opacity: 0.95; }
+  100% { top: 100%; opacity: 0.2; }
+}
+
+.animate-laser-sweep {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #3b82f6, #60a5fa, #22c55e, transparent);
+  box-shadow: 0 0 15px 3px rgba(59, 130, 246, 0.6), 0 0 25px 6px rgba(34, 197, 94, 0.4);
+  animation: laserSweep 1.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Card Shimmer Border (Linear / Vercel style) */
+@keyframes borderRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.shimmer-card {
+  position: relative;
+  background: var(--surface);
+  border-radius: 1rem;
+  z-index: 1;
+}
+
+.shimmer-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: calc(1rem + 1px);
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.4), rgba(245, 158, 11, 0.4), rgba(34, 197, 94, 0.4), rgba(37, 99, 235, 0.4));
+  background-size: 300% 300%;
+  animation: borderRotate 6s ease infinite;
+  z-index: -1;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.shimmer-card:hover::before {
+  opacity: 1;
+}
+
+/* Primary Button Shine Ray */
+.btn-shine-glow {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.btn-shine-glow::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: rotate(25deg);
+  transition: all 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-shine-glow:hover::after {
+  left: 120%;
+}
+
+/* Badge Glow */
+.badge-pulse-glow {
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
+  animation: pulseGlow 2.5s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.25); }
+  100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
+}
+
+

@@ -1,99 +1,168 @@
 "use client";
 
-import { useCallback, useEffect, useId } from "react";
+import { useCallback, useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { useUiPanels } from "@/components/ui-panels";
 import {
+  ArrowRight,
   Bell,
+  Building2,
   CheckCircle2,
+  Clock,
   Gamepad2,
   GraduationCap,
   Handshake,
   Landmark,
+  Layers,
   Mail,
+  MessageSquarePlus,
   RefreshCw,
   Rss,
   ScrollText,
   Sparkles,
   Trophy,
+  Wand2,
   X,
 } from "lucide-react";
 
-// Sobe a versão sempre que a lista muda de verdade: quem já fechou a modal
-// precisa ver o que saiu depois.
-const STORAGE_KEY = "upcoming-features-modal:v5:seen";
+// Versão atualizada da chave de novidades no localStorage
+const STORAGE_KEY = "upcoming-features-modal:v6:seen";
 
-/** Já está no ar - o que a pessoa pode usar agora. */
+export type FeatureTab = "shipped" | "upcoming" | "all";
+
+/** Recursos já lançados e disponíveis para uso */
 const SHIPPED = [
   {
     title: "Desafio do Match",
-    description: "Indique amigos com seu link e desbloqueie créditos de Kit Candidatura a cada 3 indicações confirmadas.",
+    description: "Indique amigos com seu link exclusivo e ganhe créditos de diagnóstico completo a cada 3 indicações confirmadas.",
+    tag: "Indicação & Créditos",
+    badge: "Novo!",
     href: "/desafio",
     icon: Trophy,
+    colorClass: "emerald",
   },
   {
-    title: "Marketplace freelancer",
-    description: "Publique um perfil e ofereça serviços ou publique um projeto e contrate outro profissional - tudo dentro da plataforma.",
+    title: "Marketplace Freelancer",
+    description: "Ofereça seus serviços profissionais, publique portfólio ou contrate especialistas para seus projetos.",
+    tag: "Serviços & Projetos",
+    badge: "Popular",
     href: "/freelancer",
     icon: Handshake,
+    colorClass: "indigo",
   },
   {
-    title: "Jogos de carreira",
-    description: "7 minijogos para treinar digitação, vocabulário técnico e conhecimento de mercado, com ranking diário, mensal e anual.",
+    title: "Gerador de Carta de Apresentação",
+    description: "Crie cartas de apresentação personalizadas para cada vaga com ajuste de tom e dicas de envio.",
+    tag: "Inteligência Artificial",
+    badge: "Ferramenta",
+    href: "/tools/cover-letter",
+    icon: Wand2,
+    colorClass: "purple",
+  },
+  {
+    title: "7 Jogos de Carreira",
+    description: "Minijogos interativos para treinar agilidade de digitação, vocabulário corporativo e mercado com ranking mensal.",
+    tag: "Gamificação",
+    badge: "7 Minijogos",
     href: "/jogos",
     icon: Gamepad2,
+    colorClass: "purple",
   },
   {
-    title: "Radar de concursos",
-    description: "Novos editais, inscrições e provas de concursos públicos reunidos e atualizados ao longo do dia.",
+    title: "Radar de Concursos Públicos",
+    description: "Acompanhe editais abertos, prazos de inscrição, salários e provas atualizados diariamente.",
+    tag: "Serviço Público",
+    badge: "Atualizado 3x/dia",
     href: "/concursos",
     icon: Landmark,
+    colorClass: "blue",
   },
   {
-    title: "Radar de vestibulares",
-    description: "Vestibulares, ENEM, Sisu, ProUni e bolsas mais recentes, tudo num lugar só.",
+    title: "Radar de Vestibulares & Enem",
+    description: "Painel completo de vestibulares, bolsas ProUni, Fies, Sisu e cronograma do ENEM.",
+    tag: "Estudantes",
+    badge: "Bolsas & Provas",
     href: "/vestibulares",
     icon: ScrollText,
+    colorClass: "amber",
   },
   {
-    title: "Mentorias em vídeo",
-    description: "Mentorias e cursos gratuitos de carreira, entrevista e currículo, selecionados do YouTube.",
+    title: "Mentorias & Cursos Gratuitos",
+    description: "Aulas e mentorias em vídeo selecionadas dos melhores especialistas para currículo, entrevistas e carreira.",
+    tag: "Capacitação",
+    badge: "100% Grátis",
     href: "/mentorias",
     icon: GraduationCap,
+    colorClass: "cyan",
   },
   {
-    title: "Todas as vagas, sem curadoria",
-    description: "Além do feed selecionado para o seu momento, veja o catálogo completo de vagas abertas na plataforma.",
+    title: "Catálogo Global de Vagas",
+    description: "Explore o catálogo completo de oportunidades abertas no mercado sem restrição de filtros automáticos.",
+    tag: "Busca Completa",
+    badge: "Feed Geral",
     href: "/todas-as-vagas",
     icon: Rss,
+    colorClass: "rose",
+  },
+  {
+    title: "Portal B2B & Triagem para Empresas",
+    description: "Empresas podem publicar vagas e realizar triagem automatizada com Inteligência Artificial em lote.",
+    tag: "Empresas",
+    badge: "Módulo B2B",
+    href: "/empresa/login",
+    icon: Building2,
+    colorClass: "violet",
   },
 ];
 
-/** Ainda não existe - o que estamos priorizando. */
+/** Recursos em desenvolvimento / Roadmap */
 const UPCOMING = [
   {
-    title: "Alertas de concursos e vestibulares",
-    description: "Escolha seus temas e receba um aviso por e-mail assim que surgir um edital novo no radar.",
-    status: "Próximo",
+    title: "Alertas de Concursos & Vestibulares por E-mail",
+    description: "Cadastre suas áreas de interesse, banca ou estado e receba notificações no e-mail assim que sair edital novo.",
+    status: "Em Breve",
+    tag: "Notificações",
     icon: Mail,
+    colorClass: "blue",
   },
   {
-    title: "Lembretes de prazo e entrevista",
-    description: "Avisos por e-mail para não perder data de candidatura, teste técnico ou entrevista.",
-    status: "Próximo",
+    title: "Lembretes de Prazos, Testes e Entrevistas",
+    description: "Avisos automáticos por e-mail e painel para você não perder prazos de candidatura, testes ou entrevistas.",
+    status: "Em Breve",
+    tag: "Produtividade",
     icon: Bell,
+    colorClass: "amber",
   },
   {
-    title: "Reanálise rápida do currículo",
-    description: "Depois de editar o currículo, comparar de novo com a mesma vaga sem refazer tudo.",
-    status: "Depois",
+    title: "Reanálise Rápida de Currículo em 1 Clique",
+    description: "Editou seu currículo no Otimizador? Compare de novo com a vaga original em 1 clique sem reenviar tudo.",
+    status: "Em Breve",
+    tag: "Inteligência Artificial",
     icon: RefreshCw,
+    colorClass: "emerald",
+  },
+  {
+    title: "Alertas & Resumos Semanais via WhatsApp",
+    description: "Receba lembretes de candidaturas e resumo das melhores vagas da semana direto no seu WhatsApp.",
+    status: "Em Planejamento",
+    tag: "Canais Diretos",
+    icon: MessageSquarePlus,
+    colorClass: "emerald",
+  },
+  {
+    title: "Simulador de Entrevista por Voz (Audio AI)",
+    description: "Pratique respostas para entrevistas em tempo real conversando em áudio com avaliação de tom e clareza.",
+    status: "Planejado",
+    tag: "IA Interativa",
+    icon: Sparkles,
+    colorClass: "rose",
   },
 ];
 
 export function UpcomingFeaturesModal() {
   const titleId = useId();
   const { newsOpen: open, openNews, closeNews } = useUiPanels();
+  const [activeTab, setActiveTab] = useState<FeatureTab>("shipped");
 
   useEffect(() => {
     try {
@@ -129,128 +198,217 @@ export function UpcomingFeaturesModal() {
   return (
     <>
       {open && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center px-4 py-6">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
+          {/* Backdrop com blur escuro elegante */}
           <button
             type="button"
             aria-label="Fechar novidades"
-            className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
+            className="fixed inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity"
             onClick={close}
           />
 
+          {/* Modal Container */}
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-slate-950/25 dark:border-neutral-800 dark:bg-neutral-950"
+            className="relative w-full max-w-3xl overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-slate-950/30 dark:border-neutral-800 dark:bg-neutral-950 my-auto"
           >
-            <div className="border-b border-neutral-200 bg-gradient-to-r from-blue-50 via-white to-amber-50 px-5 py-5 dark:border-neutral-800 dark:from-blue-950/35 dark:via-neutral-950 dark:to-amber-950/20 sm:px-6">
+            {/* Header da Modal */}
+            <div className="relative border-b border-neutral-200 bg-gradient-to-r from-blue-50/80 via-white to-indigo-50/80 px-6 py-5 dark:border-neutral-800 dark:from-blue-950/40 dark:via-neutral-950 dark:to-indigo-950/30">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">
-                    <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-                    Novidades
-                  </p>
-                  <h2 id={titleId} className="mt-2 text-xl font-bold tracking-tight text-neutral-950 dark:text-white">
-                    O que acabou de chegar no CarreirasMatch
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-blue-200/80 bg-blue-100/60 px-2.5 py-0.5 text-xs font-semibold text-blue-700 dark:border-blue-800/60 dark:bg-blue-950/60 dark:text-blue-300">
+                    <Sparkles className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                    Central de Novidades & Roadmap
+                  </div>
+                  <h2 id={titleId} className="mt-2 text-xl font-extrabold tracking-tight text-neutral-950 dark:text-white sm:text-2xl">
+                    O que há de novo no CarreirasMatch
                   </h2>
-                  <p className="mt-1.5 max-w-xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                    Agora você acompanha vagas, concursos e vestibulares e ainda estuda de graça, tudo num lugar só.
+                  <p className="mt-1 max-w-xl text-xs sm:text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                    Descubra os recursos recém-chegados à plataforma e acompanhe o que estamos construindo para acelerar sua carreira.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={close}
-                  className="rounded-lg p-2 text-neutral-500 transition hover:bg-white/70 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-white"
+                  className="rounded-xl border border-neutral-200/60 bg-white/80 p-2 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
                   aria-label="Fechar modal de novidades"
                 >
-                  <X className="h-5 w-5" strokeWidth={1.9} />
+                  <X className="h-5 w-5" strokeWidth={2} />
+                </button>
+              </div>
+
+              {/* Filtro por Abas */}
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("shipped")}
+                  className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                    activeTab === "shipped"
+                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/25 dark:bg-emerald-500"
+                      : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                  }`}
+                >
+                  <CheckCircle2 className="h-3.5 w-3.5" />
+                  Já Disponíveis ({SHIPPED.length})
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("upcoming")}
+                  className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                    activeTab === "upcoming"
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/25 dark:bg-blue-500"
+                      : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                  }`}
+                >
+                  <Clock className="h-3.5 w-3.5" />
+                  Em Breve ({UPCOMING.length})
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("all")}
+                  className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold transition-all ${
+                    activeTab === "all"
+                      ? "bg-neutral-900 text-white shadow-md dark:bg-white dark:text-neutral-900"
+                      : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800"
+                  }`}
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                  Ver Todos ({SHIPPED.length + UPCOMING.length})
                 </button>
               </div>
             </div>
 
-            <div className="max-h-[70vh] overflow-y-auto px-5 py-5 sm:px-6">
-              <h3 className="mb-3 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-400">
-                <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={2} />
-                Já disponível
-              </h3>
-              <div className="grid gap-3">
-                {SHIPPED.map((feature) => {
-                  const Icon = feature.icon;
-                  return (
-                    <Link
-                      key={feature.title}
-                      href={feature.href}
-                      onClick={close}
-                      className="block rounded-lg border border-emerald-200 bg-emerald-50/50 p-4 transition hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/20 dark:hover:bg-emerald-950/40"
-                    >
-                      <div className="flex gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300">
-                          <Icon className="h-5 w-5" strokeWidth={1.9} />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <h4 className="text-sm font-bold text-neutral-950 dark:text-white">
+            {/* Conteúdo com Scroll */}
+            <div className="max-h-[60vh] overflow-y-auto px-5 py-5 sm:px-6">
+              {/* Seção 1: Já Disponíveis */}
+              {(activeTab === "shipped" || activeTab === "all") && (
+                <div className={activeTab === "all" ? "mb-8" : ""}>
+                  {activeTab === "all" && (
+                    <h3 className="mb-3.5 inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                      <CheckCircle2 className="h-4 w-4" />
+                      Já no Ar ({SHIPPED.length})
+                    </h3>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {SHIPPED.map((feature) => {
+                      const Icon = feature.icon;
+                      return (
+                        <Link
+                          key={feature.title}
+                          href={feature.href}
+                          onClick={close}
+                          className="group relative flex flex-col justify-between rounded-xl border border-emerald-200/80 bg-emerald-50/40 p-4 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50 hover:shadow-md dark:border-emerald-900/50 dark:bg-emerald-950/15 dark:hover:border-emerald-800 dark:hover:bg-emerald-950/35"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2.5">
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700 dark:bg-emerald-950/80 dark:text-emerald-300">
+                                <Icon className="h-4.5 w-4.5" strokeWidth={2} />
+                              </span>
+                              <span className="inline-flex items-center rounded-md bg-emerald-100/80 px-2 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200">
+                                {feature.badge}
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-bold text-neutral-900 dark:text-white group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
                               {feature.title}
                             </h4>
-                            <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-                              Testar agora →
+                            <p className="mt-1 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+                              {feature.description}
+                            </p>
+                          </div>
+
+                          <div className="mt-3.5 flex items-center justify-between border-t border-emerald-200/50 pt-2.5 dark:border-emerald-900/40">
+                            <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
+                              {feature.tag}
+                            </span>
+                            <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 dark:text-emerald-400 group-hover:translate-x-0.5 transition-transform">
+                              Testar agora
+                              <ArrowRight className="h-3.5 w-3.5" />
                             </span>
                           </div>
-                          <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-              <h3 className="mb-3 mt-6 inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-blue-700 dark:text-blue-300">
-                <Sparkles className="h-3.5 w-3.5" strokeWidth={2} />
-                Em construção
-              </h3>
-              <div className="grid gap-3">
-                {UPCOMING.map((feature) => {
-                  const Icon = feature.icon;
-                  return (
-                    <article
-                      key={feature.title}
-                      className="rounded-lg border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900/70"
-                    >
-                      <div className="flex gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
-                          <Icon className="h-5 w-5" strokeWidth={1.9} />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-start justify-between gap-2">
-                            <h4 className="text-sm font-bold text-neutral-950 dark:text-white">
+              {/* Seção 2: Em Breve */}
+              {(activeTab === "upcoming" || activeTab === "all") && (
+                <div>
+                  {activeTab === "all" && (
+                    <h3 className="mb-3.5 inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-400">
+                      <Clock className="h-4 w-4" />
+                      Em Desenvolvimento ({UPCOMING.length})
+                    </h3>
+                  )}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    {UPCOMING.map((feature) => {
+                      const Icon = feature.icon;
+                      return (
+                        <article
+                          key={feature.title}
+                          className="flex flex-col justify-between rounded-xl border border-neutral-200/90 bg-white p-4 transition-all hover:border-blue-200 dark:border-neutral-800 dark:bg-neutral-900/60 dark:hover:border-neutral-700"
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2.5">
+                              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/60 dark:text-blue-300">
+                                <Icon className="h-4.5 w-4.5" strokeWidth={2} />
+                              </span>
+                              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-2.5 py-0.5 text-[10px] font-bold text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/40">
+                                <span className="h-1.5 w-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                {feature.status}
+                              </span>
+                            </div>
+                            <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
                               {feature.title}
                             </h4>
-                            <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-950/40 dark:text-amber-300">
-                              {feature.status}
+                            <p className="mt-1 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
+                              {feature.description}
+                            </p>
+                          </div>
+
+                          <div className="mt-3.5 flex items-center justify-between border-t border-neutral-100 pt-2.5 dark:border-neutral-800/60">
+                            <span className="text-[11px] font-medium text-neutral-500 dark:text-neutral-400">
+                              {feature.tag}
+                            </span>
+                            <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400">
+                              Em breve no app
                             </span>
                           </div>
-                          <p className="mt-1 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
-                            {feature.description}
-                          </p>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
 
-              <div className="mt-5 flex flex-col gap-3 rounded-lg border border-blue-100 bg-blue-50 p-4 dark:border-blue-900/60 dark:bg-blue-950/25 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm font-medium text-blue-950 dark:text-blue-100">
-                  Quer acompanhar a evolução? O roadmap completo fica registrado na documentação do produto.
-                </p>
+              {/* Banner de Sugestão e Feedback */}
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-blue-200/80 bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-blue-50/90 p-4 dark:border-blue-900/60 dark:from-blue-950/40 dark:via-indigo-950/20 dark:to-blue-950/40">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/20">
+                    <MessageSquarePlus className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h5 className="text-xs sm:text-sm font-bold text-blue-950 dark:text-blue-100">
+                      Sentiu falta de algum recurso?
+                    </h5>
+                    <p className="text-xs text-blue-800/80 dark:text-blue-300">
+                      Sua sugestão vai direto para a equipe de produto priorizar no próximo ciclo.
+                    </p>
+                  </div>
+                </div>
                 <Link
                   href="/contato"
                   onClick={close}
-                  className="inline-flex shrink-0 items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  className="w-full sm:w-auto inline-flex shrink-0 items-center justify-center rounded-xl bg-blue-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-blue-700 shadow-md shadow-blue-600/20"
                 >
-                  Sugerir feature
+                  Sugerir recurso →
                 </Link>
               </div>
             </div>
@@ -260,3 +418,4 @@ export function UpcomingFeaturesModal() {
     </>
   );
 }
+
