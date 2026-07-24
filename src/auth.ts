@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { authConfig } from "@/auth.config";
 import { normalizeEmail } from "@/lib/email";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { checkRateLimit, recordFailedAttempt, clearRateLimit, getClientIp } from "@/lib/rate-limit";
 import { claimLeadResumesForUser } from "@/lib/leads";
 
 const LOGIN_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
@@ -36,15 +36,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!email || !password) return null;
 
         const ip = getClientIp(request);
-        const rateLimit = checkRateLimit(`login:${ip}:${email}`, LOGIN_LIMIT);
+        const rateLimitKey = `login:${ip}:${email}`;
+        const rateLimit = checkRateLimit(rateLimitKey, LOGIN_LIMIT);
         if (!rateLimit.allowed) return null;
 
         const user = await prisma.user.findUnique({ where: { email } });
-        if (!user?.passwordHash) return null;
+        if (!user?.passwordHash) {
+          recordFailedAttempt(rateLimitKey, LOGIN_LIMIT);
+          return null;
+        }
 
         const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
+        if (!valid) {
+          recordFailedAttempt(rateLimitKey, LOGIN_LIMIT);
+          return null;
+        }
 
+        clearRateLimit(rateLimitKey);
         void claimLeadResumesForUser(email, user.id);
 
         return { id: user.id, name: user.name, email: user.email };
