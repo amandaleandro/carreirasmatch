@@ -14,8 +14,8 @@ import {
   couponDiscountCents,
   normalizeCouponCode,
   registerCouponUsage,
-  type CouponRules,
 } from "@/lib/coupons";
+import type { CouponRules } from "@/lib/coupons";
 
 function makeCoupon(overrides: Partial<CouponRules> = {}): CouponRules {
   return {

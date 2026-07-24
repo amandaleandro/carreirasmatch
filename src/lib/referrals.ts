@@ -2,14 +2,17 @@ import { prisma } from "@/lib/prisma";
 
 export const REFERRALS_NEEDED_FOR_REWARD = 3;
 
+import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
+
 /**
  * Obtém as métricas de indicação do usuário:
  * - quantidade de amigos indicados
  * - indicações necessárias para o próximo prêmio
  * - quantos créditos de diagnóstico completo disponíveis
+ * - se possui assinatura mensal ativa
  */
 export async function getUserReferralStats(userId: string) {
-  const [user, totalReferrals] = await Promise.all([
+  const [user, totalReferrals, hasSubscription] = await Promise.all([
     prisma.user.findUnique({
       where: { id: userId },
       select: { unlockedFullDiagnosticCredits: true },
@@ -17,6 +20,7 @@ export async function getUserReferralStats(userId: string) {
     prisma.user.count({
       where: { referredById: userId },
     }),
+    hasActiveSubscriptionAccess(userId),
   ]);
 
   const credits = user?.unlockedFullDiagnosticCredits ?? 0;
@@ -29,6 +33,7 @@ export async function getUserReferralStats(userId: string) {
     neededForNext,
     credits,
     referralsNeeded: REFERRALS_NEEDED_FOR_REWARD,
+    hasActiveSubscription: hasSubscription,
   };
 }
 

@@ -12,6 +12,7 @@ interface DesafioFormProps {
   referralStats?: {
     totalReferrals: number;
     credits: number;
+    hasActiveSubscription?: boolean;
   } | null;
 }
 
@@ -126,6 +127,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
           userId={userId}
           totalReferrals={referralStats?.totalReferrals ?? 0}
           credits={referralStats?.credits ?? 0}
+          hasActiveSubscription={referralStats?.hasActiveSubscription}
         />
       )}
 

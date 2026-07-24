@@ -8,6 +8,7 @@ interface ReferralRewardBoxProps {
   totalReferrals: number;
   credits: number;
   referralsNeeded?: number;
+  hasActiveSubscription?: boolean;
 }
 
 export function ReferralRewardBox({
@@ -15,6 +16,7 @@ export function ReferralRewardBox({
   totalReferrals,
   credits,
   referralsNeeded = 3,
+  hasActiveSubscription = false,
 }: ReferralRewardBoxProps) {
   const [copied, setCopied] = useState(false);
 
@@ -39,17 +41,30 @@ export function ReferralRewardBox({
             <Gift className="w-5 h-5" />
           </div>
           <div>
-            <h4 className="font-title font-bold text-sm text-[#071827] dark:text-white">Recompensa de Indicação</h4>
-            <p className="text-[10px] text-[#64748B]">Indique amigos e libere diagnósticos completos grátis</p>
+            <h4 className="font-title font-bold text-sm text-[#071827] dark:text-white">Recompensa por Indicação</h4>
+            <p className="text-[10px] text-[#64748B]">
+              {hasActiveSubscription
+                ? "Indique amigos e ganhe descontos e benefícios na sua próxima mensalidade"
+                : "Indique 3 amigos e ganhe 1 Diagnóstico Completo Grátis + Desconto na Assinatura Mensal"}
+            </p>
           </div>
         </div>
 
-        {credits > 0 && (
-          <div className="flex items-center gap-1 bg-[#22C55E]/15 text-[#22C55E] font-bold text-[10px] px-3 py-1 rounded-full border border-[#22C55E]/20 animate-pulse">
-            <Sparkles className="w-3 h-3" />
-            <span>{credits} {credits === 1 ? "Análise Grátis Liberada!" : "Análises Grátis Liberadas!"}</span>
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          {hasActiveSubscription ? (
+            <div className="flex items-center gap-1 bg-[#2563EB]/15 text-[#2563EB] font-bold text-[10px] px-3 py-1 rounded-full border border-[#2563EB]/20">
+              <Sparkles className="w-3 h-3 text-[#2563EB]" />
+              <span>Assinante (Análises Inclusas)</span>
+            </div>
+          ) : (
+            credits > 0 && (
+              <div className="flex items-center gap-1 bg-[#22C55E]/15 text-[#22C55E] font-bold text-[10px] px-3 py-1 rounded-full border border-[#22C55E]/20 animate-pulse">
+                <Sparkles className="w-3 h-3" />
+                <span>{credits} {credits === 1 ? "Análise Grátis Liberada!" : "Análises Grátis Liberadas!"}</span>
+              </div>
+            )
+          )}
+        </div>
       </div>
 
       {/* Progresso visual (Semáforo/Tema Azul Principal) */}
@@ -76,10 +91,22 @@ export function ReferralRewardBox({
         </div>
 
         <p className="text-[11px] text-[#64748B] leading-relaxed">
-          {referralsNeeded - currentTierCount === 0 ? (
-            <span className="text-[#22C55E] font-bold">🎉 Parabéns! Meta atingida, 1 Diagnóstico Completo liberado na sua conta!</span>
+          {hasActiveSubscription ? (
+            referralsNeeded - currentTierCount === 0 ? (
+              <span className="text-[#22C55E] font-bold">🎉 Meta atingida! Desconto de renovação ativado na sua assinatura mensal!</span>
+            ) : (
+              <>
+                Como assinante, seus diagnósticos já são ilimitados. Falta(m) <strong className="text-[#071827] dark:text-white font-bold">{referralsNeeded - currentTierCount} amigo(s)</strong> para liberar desconto na sua próxima mensalidade!
+              </>
+            )
           ) : (
-            <>Falta(m) apenas <strong className="text-[#071827] dark:text-white font-bold">{referralsNeeded - currentTierCount} amigo(s)</strong> para liberar seu diagnóstico grátis.</>
+            referralsNeeded - currentTierCount === 0 ? (
+              <span className="text-[#22C55E] font-bold">🎉 Meta atingida! 1 Diagnóstico Grátis liberado e desconto ativo para assinar o plano mensal!</span>
+            ) : (
+              <>
+                Falta(m) apenas <strong className="text-[#071827] dark:text-white font-bold">{referralsNeeded - currentTierCount} amigo(s)</strong> para liberar seu diagnóstico grátis e desconto na assinatura.
+              </>
+            )
           )}
         </p>
       </div>
