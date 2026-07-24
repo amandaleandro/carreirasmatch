@@ -33,12 +33,27 @@ function getSessionId() {
   }
 }
 
+function isDevelopmentOrLocalhost() {
+  if (typeof window === "undefined") return false;
+  const host = window.location.hostname;
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    host === "::1" ||
+    host.endsWith(".local") ||
+    process.env.NODE_ENV === "development"
+  );
+}
+
 export function AccessTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!pathname) return;
+
+    // Ignora completamente o envio de estatisticas em ambiente local / desenvolvimento
+    if (isDevelopmentOrLocalhost()) return;
 
     // Ao acessar o painel admin (so o dono acessa), marca este navegador para
     // nunca mais entrar na contagem de visitas.

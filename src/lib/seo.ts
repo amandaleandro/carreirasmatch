@@ -27,6 +27,20 @@ export function organizationJsonLd() {
   };
 }
 
+/** SoftwareApplication: descreve o produto para buscadores e LLMs (ex.: ChatGPT Search). */
+export function softwareApplicationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: SITE_NAME,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    url: BASE_URL,
+    description:
+      "Plataforma que compara currículo e vaga, identifica lacunas, palavras-chave ATS e gera um kit de candidatura.",
+  };
+}
+
 /** WebSite + SearchAction, ajuda o Google a exibir a sitelinks search box. */
 export function webSiteJsonLd() {
   return {

@@ -39,6 +39,16 @@ export default function robots(): MetadataRoute.Robots {
         disallow: DISALLOW,
       },
       {
+        userAgent: "OAI-SearchBot",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
+        userAgent: "ChatGPT-User",
+        allow: "/",
+        disallow: DISALLOW,
+      },
+      {
         userAgent: "*",
         allow: "/",
         disallow: DISALLOW,

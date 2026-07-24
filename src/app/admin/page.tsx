@@ -294,7 +294,14 @@ export default async function AdminPage() {
       }),
       prisma.pageView.groupBy({
         by: ["sessionId"],
-        where: { createdAt: { gte: since24h }, path: { not: "/admin" } },
+        where: {
+          createdAt: { gte: since24h },
+          NOT: [
+            { path: { startsWith: "/admin" } },
+            { path: { startsWith: "/api" } },
+            { path: { startsWith: "/auth" } },
+          ],
+        },
       }),
       prisma.funnelEvent.groupBy({
         by: ["name"],

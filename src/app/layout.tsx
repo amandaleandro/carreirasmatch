@@ -6,7 +6,7 @@ import { AdsenseScript } from "@/components/adsense-script";
 import { AccessTracker } from "@/components/access-tracker";
 import { DashSanitizer } from "@/components/dash-sanitizer";
 import { JsonLd } from "@/components/json-ld";
-import { BASE_URL, SITE_NAME, organizationJsonLd, webSiteJsonLd } from "@/lib/seo";
+import { BASE_URL, SITE_NAME, organizationJsonLd, softwareApplicationJsonLd, webSiteJsonLd } from "@/lib/seo";
 import { Suspense } from "react";
 import Script from "next/script";
 import "./globals.css";
@@ -71,6 +71,7 @@ export default function RootLayout({
         <AdsenseScript />
         <JsonLd id="jsonld-org" data={organizationJsonLd()} />
         <JsonLd id="jsonld-website" data={webSiteJsonLd()} />
+        <JsonLd id="jsonld-software" data={softwareApplicationJsonLd()} />
       </head>
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <Script

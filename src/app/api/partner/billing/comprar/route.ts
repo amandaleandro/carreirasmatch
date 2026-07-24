@@ -32,8 +32,32 @@ export async function POST(req: NextRequest) {
 
   const payerIdentification =
     typeof formData.payer?.identification?.type === "string" &&
-    typeof formData.payer?.identification?.number === "string"
-      ? { type: formData.payer.identification.type, number: formData.payer.identification.number }
+    formData.payer.identification.type.trim() !== "" &&
+    typeof formData.payer?.identification?.number === "string" &&
+    formData.payer.identification.number.trim() !== ""
+      ? { type: formData.payer.identification.type.trim(), number: formData.payer.identification.number.trim() }
+      : undefined;
+
+  const rawIssuerId = formData.issuer_id ?? formData.issuerId;
+  const parsedIssuerId =
+    rawIssuerId !== undefined && rawIssuerId !== null && String(rawIssuerId).trim() !== ""
+      ? Number(rawIssuerId)
+      : undefined;
+  const issuerId = parsedIssuerId && !isNaN(parsedIssuerId) && parsedIssuerId > 0 ? parsedIssuerId : undefined;
+
+  const rawInstallments = formData.installments;
+  const parsedInstallments =
+    rawInstallments !== undefined && rawInstallments !== null && String(rawInstallments).trim() !== ""
+      ? Number(rawInstallments)
+      : undefined;
+  const installments = parsedInstallments && !isNaN(parsedInstallments) && parsedInstallments > 0 ? parsedInstallments : undefined;
+
+  const token = typeof formData.token === "string" && formData.token.trim() !== "" ? formData.token.trim() : undefined;
+  const paymentMethodId =
+    typeof formData.payment_method_id === "string" && formData.payment_method_id.trim() !== ""
+      ? formData.payment_method_id.trim()
+      : typeof formData.paymentMethodId === "string" && formData.paymentMethodId.trim() !== ""
+      ? formData.paymentMethodId.trim()
       : undefined;
 
   let result;
@@ -41,18 +65,16 @@ export async function POST(req: NextRequest) {
     result = await createPayment({
       transactionAmount: pack.priceCents / 100,
       description: `CarreirasMatch Parceiros - ${pack.label}`,
-      token: typeof formData.token === "string" ? formData.token : undefined,
-      paymentMethodId: typeof formData.payment_method_id === "string" ? formData.payment_method_id : undefined,
-      issuerId:
-        typeof formData.issuer_id === "string" || typeof formData.issuer_id === "number"
-          ? Number(formData.issuer_id)
-          : undefined,
-      installments: typeof formData.installments === "number" ? formData.installments : undefined,
+      token,
+      paymentMethodId,
+      issuerId,
+      installments,
       payerEmail: partner.email,
       payerIdentification,
       externalReference: `partner:${partner.id}:${pack.kind}`,
     });
   } catch (err) {
+    console.error("[MercadoPago Partner Payment Error]:", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : "Erro ao processar pagamento." },
       { status: 400 }

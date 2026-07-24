@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 import { ANALYTICS_EVENTS, getStoredAttribution, track } from "@/lib/analytics";
 
@@ -36,9 +36,84 @@ export function MercadoPagoPaymentBrick({
   const [pix, setPix] = useState<PixResult>(null);
   const [registerUrl, setRegisterUrl] = useState<string | null>(null);
 
+  // Valores que mudam com frequência (ex: cada tecla do cupom) não podem entrar
+  // nas deps do onSubmit: o SDK do MP reinicializa o Brick inteiro quando essas
+  // referências mudam, apagando os dados do cartão em digitação.
+  const latest = useRef({ analysisId, couponCode, segment });
+  latest.current = { analysisId, couponCode, segment };
+
   useEffect(() => {
     ensureInitialized();
   }, []);
+
+  const initialization = useMemo(
+    () => ({
+      amount,
+      payer: {
+        email: payerEmail || undefined,
+        entityType: "individual" as const,
+      },
+    }),
+    [amount, payerEmail],
+  );
+
+  const customization = useMemo(
+    () => ({
+      paymentMethods: { creditCard: "all" as const, bankTransfer: "all" as const },
+    }),
+    [],
+  );
+
+  const handleSubmit = useCallback(
+    async (formData: unknown) => {
+      const { analysisId, couponCode, segment } = latest.current;
+      setError(null);
+      track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind });
+      try {
+        const res = await fetch("/api/billing/payment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            kind,
+            analysisId,
+            formData,
+            couponCode,
+            segment,
+            attribution: getStoredAttribution(),
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Erro ao processar pagamento.");
+
+        if (data.pix) {
+          track(ANALYTICS_EVENTS.PIX_GENERATED, { kind });
+          setRegisterUrl(data.registerUrl ?? null);
+          setPix(data.pix);
+        } else if (data.status === "approved") {
+          // Anônimo: manda definir a senha (a conta já foi criada). Logado: callback normal.
+          if (data.registerUrl) {
+            window.location.href = data.registerUrl;
+          } else {
+            onSuccess();
+          }
+        } else if (data.status === "rejected") {
+          setError("Pagamento recusado. Tente outro cartão.");
+        } else {
+          setError("Pagamento em análise. Você será avisado quando for confirmado.");
+        }
+      } catch (err) {
+        track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { kind });
+        setError(err instanceof Error ? err.message : "Erro inesperado.");
+        throw err;
+      }
+    },
+    [kind, onSuccess],
+  );
+
+  const handleError = useCallback(
+    (err: { message?: string }) => setError(err.message ?? "Erro ao carregar o formulário de pagamento."),
+    [],
+  );
 
   if (pix) {
     return (
@@ -75,52 +150,10 @@ export function MercadoPagoPaymentBrick({
   return (
     <div className="space-y-2">
       <Payment
-        initialization={{ amount, payer: payerEmail ? { email: payerEmail } : undefined }}
-        customization={{
-          paymentMethods: { creditCard: "all", bankTransfer: "all" },
-        }}
-        onSubmit={async (formData) => {
-          setError(null);
-          track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind });
-          try {
-            const res = await fetch("/api/billing/payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                kind,
-                analysisId,
-                formData,
-                couponCode,
-                segment,
-                attribution: getStoredAttribution(),
-              }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error ?? "Erro ao processar pagamento.");
-
-            if (data.pix) {
-              track(ANALYTICS_EVENTS.PIX_GENERATED, { kind });
-              setRegisterUrl(data.registerUrl ?? null);
-              setPix(data.pix);
-            } else if (data.status === "approved") {
-              // Anônimo: manda definir a senha (a conta já foi criada). Logado: callback normal.
-              if (data.registerUrl) {
-                window.location.href = data.registerUrl;
-              } else {
-                onSuccess();
-              }
-            } else if (data.status === "rejected") {
-              setError("Pagamento recusado. Tente outro cartão.");
-            } else {
-              setError("Pagamento em análise. Você será avisado quando for confirmado.");
-            }
-          } catch (err) {
-            track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { kind });
-            setError(err instanceof Error ? err.message : "Erro inesperado.");
-            throw err;
-          }
-        }}
-        onError={(err) => setError(err.message ?? "Erro ao carregar o formulário de pagamento.")}
+        initialization={initialization}
+        customization={customization}
+        onSubmit={handleSubmit}
+        onError={handleError}
       />
       {error && <p className="text-sm text-red-500">{error}</p>}
     </div>

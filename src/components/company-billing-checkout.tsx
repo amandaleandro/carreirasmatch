@@ -84,7 +84,13 @@ export function CompanyBillingCheckout({ packs, payerEmail }: { packs: Pack[]; p
       <div className="space-y-2">
         <Payment
           key={selected.kind}
-          initialization={{ amount: selected.priceCents / 100, payer: payerEmail ? { email: payerEmail } : undefined }}
+          initialization={{
+            amount: selected.priceCents / 100,
+            payer: {
+              email: payerEmail || undefined,
+              entityType: "individual",
+            },
+          }}
           customization={{ paymentMethods: { creditCard: "all", bankTransfer: "all" } }}
           onSubmit={async (formData) => {
             setError(null);
