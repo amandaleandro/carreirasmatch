@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-all",
+      "schedule": "0 6,14,22 * * *"
+    },
+    {
+      "path": "/api/cron/job-alerts",
+      "schedule": "0 8,16,23 * * *"
+    },
+    {
+      "path": "/api/cron/radar-alerts",
+      "schedule": "0 9,17 * * *"
+    }
+  ]
+}

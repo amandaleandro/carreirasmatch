@@ -663,6 +663,10 @@ export async function syncRegisteredCourseSources() {
   return { courses, errors };
 }
 
+import { syncUberHubData } from "@/lib/uberhub-sync";
+import { syncAllCitiesData } from "@/lib/city-scrapers/multi-city-sync";
+import { syncAllCDLData } from "@/lib/cdl-scrapers/cdl-sync";
+
 export async function syncAllExternalSources() {
   const results = await Promise.allSettled([
     syncAprendaMaisCourses(),
@@ -674,6 +678,9 @@ export async function syncAllExternalSources() {
     syncEscolaVirtualCourses(),
     syncDioCourses(),
     syncEscolaVirtualGovCourses(),
+    syncUberHubData(),
+    syncAllCitiesData(),
+    syncAllCDLData(),
   ]);
   const errors = results.flatMap((result) =>
     result.status === "rejected"

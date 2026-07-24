@@ -358,9 +358,9 @@ export function AdminDashboardTabs({
           </div>
         </div>
       )}
-      {/* Abas de Navegação */}
-      <div className="border-b border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none">
-        <nav className="flex space-x-2 sm:space-x-4 min-w-max pb-px">
+      {/* Abas de Navegação Responsivas em Pill Buttons */}
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-3">
+        <nav className="flex flex-wrap items-center gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -368,21 +368,31 @@ export function AdminDashboardTabs({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-4 py-3 text-sm font-semibold border-b-2 transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all cursor-pointer ${
                   isActive
-                    ? "border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-400"
-                    : "border-transparent text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-700"
+                    ? "bg-blue-600 text-white shadow-xs font-bold"
+                    : "bg-slate-100 text-slate-700 dark:bg-slate-800/80 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800"
                 }`}
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
                 {tab.count !== undefined && tab.count > 0 && (
-                  <span className="ml-1 px-2 py-0.5 text-xs font-bold rounded-full bg-rose-500 text-white">
+                  <span
+                    className={`ml-1 px-2 py-0.5 text-xs font-bold rounded-full ${
+                      isActive ? "bg-white text-blue-600" : "bg-rose-500 text-white"
+                    }`}
+                  >
                     {tab.count}
                   </span>
                 )}
                 {tab.badge && (
-                  <span className="ml-1 px-2 py-0.5 text-[10px] uppercase font-extrabold rounded-md bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300">
+                  <span
+                    className={`ml-1 px-1.5 py-0.5 text-[10px] uppercase font-extrabold rounded-md ${
+                      isActive
+                        ? "bg-blue-500 text-white"
+                        : "bg-purple-100 text-purple-700 dark:bg-purple-950 dark:text-purple-300"
+                    }`}
+                  >
                     {tab.badge}
                   </span>
                 )}
@@ -581,6 +591,110 @@ export function AdminDashboardTabs({
                   )}
                 </tbody>
               </table>
+            </div>
+          </section>
+
+          {/* Usuários Cadastrados & Pagamentos Recentes na Visão Geral */}
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Usuários Cadastrados Recentes</h2>
+                  <p className="text-xs text-slate-500">Últimas contas criadas na plataforma.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-36 sm:w-44">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Filtrar..."
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                      className="w-full rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-2 py-1 text-xs"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={exportUsersCSV}
+                    title="Exportar CSV de Usuários"
+                    className="p-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {filteredUsers.map((user) => (
+                  <div key={user.id} className="py-3 flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 dark:text-white truncate">{user.name ?? "Sem nome"}</p>
+                      <p className="text-xs text-slate-500 truncate">{user.email ?? "-"}</p>
+                      <p className="text-xs text-slate-400">
+                        {user.careerSegment ?? "sem segmento"} · {formatDate(user.createdAt)}
+                      </p>
+                    </div>
+                    <div className="text-right text-xs text-slate-500 shrink-0">
+                      <p>{user._count.resumes} currículo(s)</p>
+                      <span
+                        className={`inline-flex mt-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                          user.subscription?.status === "active"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900"
+                            : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                        }`}
+                      >
+                        {user.subscription?.status === "active" ? "Assinante" : "Gratuito"}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">Pagamentos Recentes</h2>
+                  <p className="text-xs text-slate-500">Últimas transações e cobranças.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="relative w-36 sm:w-44">
+                    <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Filtrar..."
+                      value={paymentSearch}
+                      onChange={(e) => setPaymentSearch(e.target.value)}
+                      className="w-full rounded-md border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 pl-8 pr-2 py-1 text-xs"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={exportPaymentsCSV}
+                    title="Exportar CSV de Pagamentos"
+                    className="p-1.5 rounded-md border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+              <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                {filteredPayments.map((payment) => (
+                  <div key={payment.id} className="py-3 flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="font-semibold text-slate-900 dark:text-white truncate">{payment.user.name ?? payment.user.email ?? "Usuário"}</p>
+                      <p className="text-xs text-slate-500">
+                        {payment.kind} · {payment.segment} · {formatDate(payment.paidAt ?? payment.createdAt)}
+                      </p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-bold text-slate-900 dark:text-white">{formatCurrency(payment.amount)}</p>
+                      <span className={`inline-flex mt-1 rounded-full border px-2 py-0.5 text-xs ${paymentStatusClasses[payment.status] ?? paymentStatusClasses.pending}`}>
+                        {payment.status}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         </div>

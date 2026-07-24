@@ -2,6 +2,7 @@ export type EmploymentStatusKey =
   | "unemployed_active"
   | "employed_open"
   | "career_transition"
+  | "student"
   | "first_job"
   | "freelance";
 
@@ -26,6 +27,12 @@ export const EMPLOYMENT_STATUS_CONFIG: Record<
     icon: "🔄",
     description: "Mudando de área ou pivotando competências",
     badgeColor: "bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20",
+  },
+  student: {
+    label: "Estudante / Universitário(a)",
+    icon: "📚",
+    description: "Estudando e se preparando para o mercado de trabalho",
+    badgeColor: "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border-cyan-500/20",
   },
   first_job: {
     label: "Primeiro Emprego / Estágio",
@@ -125,8 +132,30 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
       tip: "Crie um pequeno projeto autoral mostrando como sua bagagem antiga ajuda no novo setor.",
       memeTitle: "Transição Sem Filtro",
       memeSetup: "Amigos: 'Nossa, você é muito corajoso de mudar de área!'",
-      memePunchline: "Eu tentando entender 45 abas abertas no navegador: ☕😵‍сль",
+      memePunchline: "Eu tentando entender 45 abas abertas no navegador: ☕😵‍💫",
       memeTag: "Vida Real",
+    },
+  ],
+  student: [
+    {
+      id: 1,
+      quote: "A educação é a arma mais poderosa que você pode usar para mudar o seu mundo.",
+      author: "Nelson Mandela",
+      tip: "Monte um repositório no GitHub com seus melhores trabalhos acadêmicos e projetos de aula.",
+      memeTitle: "Semana de Provas vs Estágio",
+      memeSetup: "Professor: 'A entrega do projeto final é amanhã às 23:59.'",
+      memePunchline: "Eu conciliando aula, prova, TCC e mandando currículo às 02:00 da manhã: 'Está tudo sob controle!' ☕📚🔥",
+      memeTag: "Rotina de Estudante",
+    },
+    {
+      id: 2,
+      quote: "Investir em conhecimento rende os melhores juros para o seu futuro profissional.",
+      author: "Benjamin Franklin",
+      tip: "Adicione os cursos extras e certificações em andamento no seu currículo.",
+      memeTitle: "Vaga de Estágio Exigente",
+      memeSetup: "Requisito do Estágio: 'Dominar 12 linguagens, ter 5 certificações internacionais e falar alemão instrumental.'",
+      memePunchline: "Eu no 2º semestre da faculdade: 'Mas a vaga paga bolsa de R$ 800 reais...' 😅🎓",
+      memeTag: "Vida de Universitário",
     },
   ],
   first_job: [

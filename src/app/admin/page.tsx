@@ -265,7 +265,7 @@ export default async function AdminPage() {
   };
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8 font-sans">
+    <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8 font-sans">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
           <Link
