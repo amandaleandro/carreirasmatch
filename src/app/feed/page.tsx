@@ -37,6 +37,7 @@ export default async function FeedPage({
 }: {
   searchParams: Promise<{
     page?: string;
+    q?: string;
     tier?: string;
     workModel?: string;
     area?: string;
@@ -161,6 +162,15 @@ export default async function FeedPage({
   if (params.state) {
     filtered = filtered.filter(
       (e) => bypassesLocationFilter(e.tags.workModel) || e.match.job.state === params.state
+    );
+  }
+  if (params.q) {
+    const qLower = params.q.toLowerCase();
+    filtered = filtered.filter(
+      (e) =>
+        e.match.job.jobTitle.toLowerCase().includes(qLower) ||
+        e.match.job.jobText.toLowerCase().includes(qLower) ||
+        e.tags.company.toLowerCase().includes(qLower)
     );
   }
   if (params.city) {

@@ -383,3 +383,40 @@ export function reasonBullets(reason: string, tier: FeedTier): ReasonBullet[] {
     return { text, kind };
   });
 }
+
+const COMMON_TECH_SKILLS: [RegExp, string][] = [
+  [/\b(kubernetes|k8s)\b/i, "Kubernetes"],
+  [/\bterraform\b/i, "Terraform"],
+  [/\bdocker\b/i, "Docker"],
+  [/\baws\b|amazon web services/i, "AWS"],
+  [/\bgcp\b|google cloud/i, "GCP"],
+  [/\bazure\b/i, "Azure"],
+  [/\bpython\b/i, "Python"],
+  [/\breact\b|reactjs|react\.js/i, "React"],
+  [/\bnode\.?js\b|\bnode\b/i, "Node.js"],
+  [/\btypescript\b|\bts\b/i, "TypeScript"],
+  [/\bjavascript\b|\bjs\b/i, "JavaScript"],
+  [/\bdevops\b/i, "DevOps"],
+  [/\bsre\b|site reliability/i, "SRE"],
+  [/\bci\/?cd\b|pipelines?/i, "CI/CD"],
+  [/\bsql\b|\bpostgres(ql)?\b/i, "SQL"],
+  [/\bpowerbi\b|power bi/i, "PowerBI"],
+  [/\bexcel\b/i, "Excel"],
+  [/\bjava\b/i, "Java"],
+  [/\bgolang\b|\bgo\b/i, "Go"],
+  [/\bc#\b|\b\.net\b/i, ".NET"],
+  [/\blinux\b/i, "Linux"],
+  [/\bgraphql\b/i, "GraphQL"],
+];
+
+export function extractTechSkills(text: string): string[] {
+  if (!text) return [];
+  const found: string[] = [];
+  for (const [regex, label] of COMMON_TECH_SKILLS) {
+    if (regex.test(text) && !found.includes(label)) {
+      found.push(label);
+      if (found.length >= 6) break;
+    }
+  }
+  return found;
+}

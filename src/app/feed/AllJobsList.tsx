@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { deriveJobTags } from "@/lib/feed-tags";
+import { stripHtmlFromText } from "@/lib/job-snippet";
 
 type Job = {
   id: string;
@@ -142,6 +143,7 @@ function AllJobCard({ job }: { job: Job }) {
   const tags = deriveJobTags(job);
   const companyName = tags.company || "Empresa";
   const companyInitial = companyName !== "Empresa" ? companyName.charAt(0).toUpperCase() : null;
+  const cleanDescription = stripHtmlFromText(job.jobText);
 
   function handleShare(e: React.MouseEvent) {
     e.preventDefault();
@@ -167,21 +169,28 @@ function AllJobCard({ job }: { job: Job }) {
           </div>
 
           <div className="space-y-1 min-w-0 flex-1">
-            <span className="text-[11px] font-medium text-slate-400 dark:text-neutral-500">
-              via <span className="font-semibold text-slate-600 dark:text-neutral-400 capitalize">{job.source}</span>
-            </span>
+            {/* Tag da Fonte em linha própria */}
+            <div>
+              <span className="text-[11px] font-semibold text-slate-400 dark:text-neutral-500 uppercase tracking-wider">
+                via <span className="text-slate-600 dark:text-neutral-400 capitalize">{job.source}</span>
+              </span>
+            </div>
 
-            <a
-              href={job.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 font-title font-bold text-base md:text-lg text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug group/link"
-            >
-              <span className="line-clamp-1">{job.jobTitle}</span>
-              <ExternalLinkIcon className="w-4 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0 text-blue-600" />
-            </a>
+            {/* Título da Vaga em bloco próprio */}
+            <div>
+              <a
+                href={job.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 font-title font-bold text-base md:text-lg text-slate-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors leading-snug group/link"
+              >
+                <span className="line-clamp-1">{job.jobTitle}</span>
+                <ExternalLinkIcon className="w-4 h-4 opacity-0 group-hover/link:opacity-100 transition-opacity shrink-0 text-blue-600" />
+              </a>
+            </div>
 
-            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 dark:text-neutral-400 font-medium">
+            {/* Empresa e Localização */}
+            <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 dark:text-neutral-400 font-medium pt-0.5">
               <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-neutral-300">
                 <BuildingIcon className="w-3.5 h-3.5 text-slate-400" />
                 {companyName}
@@ -228,13 +237,13 @@ function AllJobCard({ job }: { job: Job }) {
         </div>
       </div>
 
-      {/* Descrição com Expansão */}
-      {job.jobText && (
+      {/* Descrição limpa (sem tags HTML) com Expansão */}
+      {cleanDescription && (
         <div className="bg-slate-50/60 dark:bg-neutral-950/40 p-3.5 rounded-xl border border-slate-100 dark:border-neutral-800/80 space-y-2">
           <p className={`text-xs text-slate-600 dark:text-neutral-300 leading-relaxed font-normal ${expanded ? "" : "line-clamp-3"}`}>
-            {job.jobText}
+            {cleanDescription}
           </p>
-          {job.jobText.length > 180 && (
+          {cleanDescription.length > 180 && (
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
@@ -247,8 +256,8 @@ function AllJobCard({ job }: { job: Job }) {
         </div>
       )}
 
-      {/* Badges de Tags */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pt-1 border-t border-slate-100 dark:border-neutral-800/80">
+      {/* Badges de Tags e Botão Ver Vaga Original */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-neutral-800/80">
         <div className="flex flex-wrap items-center gap-1.5">
           {tags.salary && (
             <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold px-2.5 py-1 shadow-2xs">
@@ -290,7 +299,7 @@ function AllJobCard({ job }: { job: Job }) {
           href={job.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 hover:border-slate-400 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-slate-800 dark:text-white text-xs font-bold px-4 py-2 shadow-2xs hover:shadow-xs transition-all active:scale-95"
+          className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 hover:border-slate-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-slate-800 dark:text-white text-xs font-bold px-4 py-2 shadow-2xs hover:shadow-xs transition-all active:scale-95 shrink-0"
         >
           <span>Ver vaga original</span>
           <ExternalLinkIcon className="w-3.5 h-3.5 text-slate-500" />

@@ -34,6 +34,7 @@ export function FeedFilters({
   citiesByState: Record<string, string[]>;
   contractTypes: string[];
   current: {
+    q?: string;
     tier?: string;
     workModel?: string;
     area?: string;
@@ -60,6 +61,7 @@ export function FeedFilters({
   const sort = current.sort ?? "fit";
 
   const hasActiveFilters =
+    Boolean(current.q) ||
     tier !== "aligned" ||
     workModel !== "all" ||
     area !== "all" ||
@@ -73,6 +75,7 @@ export function FeedFilters({
   function setParam(key: string, value: string) {
     const params = new URLSearchParams();
     const next = {
+      q: current.q ?? "",
       tier,
       workModel,
       area,
@@ -118,6 +121,27 @@ export function FeedFilters({
   return (
     <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3.5 sm:p-4 shadow-sm shadow-slate-900/5 space-y-3">
       
+      {/* Campo de Busca Rápida por Palavra-Chave */}
+      <div className="relative">
+        <input
+          type="text"
+          placeholder="🔍 Buscar por cargo, tecnologia ou empresa (ex: React, DevOps, SRE)..."
+          defaultValue={current.q ?? ""}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              setParam("q", (e.target as HTMLInputElement).value);
+            }
+          }}
+          onBlur={(e) => {
+            const val = (e.target as HTMLInputElement).value;
+            if (val !== (current.q ?? "")) {
+              setParam("q", val);
+            }
+          }}
+          className="w-full h-10 px-4 rounded-xl border border-neutral-200/90 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900 text-xs font-semibold text-neutral-800 dark:text-neutral-200 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/40 transition-all placeholder:text-neutral-400 shadow-2xs"
+        />
+      </div>
+
       {/* Barra Superior de Filtros */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-900 pb-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -273,6 +297,12 @@ export function FeedFilters({
       {hasActiveFilters && (
         <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-neutral-100 dark:border-neutral-900">
           <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mr-1">Filtros ativos:</span>
+          {current.q && (
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
+              Busca: "{current.q}"
+              <button type="button" onClick={() => setParam("q", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
+            </span>
+          )}
           {tier !== "aligned" && (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
               Score: {TIER_OPTIONS.find((t) => t.value === tier)?.label ?? tier}

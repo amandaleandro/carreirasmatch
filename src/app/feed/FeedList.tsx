@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { saveFeedMatchAsApplication } from "@/app/applications/actions";
 import { discardFeedMatch } from "./actions";
@@ -10,8 +10,10 @@ import {
   reasonBullets,
   tierFromScore,
   TIER_LABEL,
+  extractTechSkills,
   type ReasonBullet,
 } from "@/lib/feed-tags";
+import { stripHtmlFromText } from "@/lib/job-snippet";
 
 export type FeedMatch = {
   id: string;
@@ -73,7 +75,7 @@ function MapPinIcon({ className }: { className?: string }) {
 function SparklesIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className}>
-      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -215,6 +217,30 @@ function ChevronDownIcon({ className }: { className?: string }) {
   );
 }
 
+function ViewGridIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+function ViewListIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" className={className}>
+      <line x1="8" y1="6" x2="21" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="12" x2="21" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="8" y1="18" x2="21" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="3" y1="6" x2="3.01" y2="6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="3" y1="12" x2="3.01" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="3" y1="18" x2="3.01" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function ReasonIcon({ kind }: { kind: ReasonBullet["kind"] }) {
   if (kind === "positive")
     return (
@@ -244,6 +270,44 @@ export function FeedList({
   resumeId: string;
   defaultCareerTrack: CareerTrack;
 }) {
+  const [viewMode, setViewMode] = useState<"detailed" | "compact">("detailed");
+  const [selectedMatchIds, setSelectedMatchIds] = useState<string[]>([]);
+  const [copiedBatch, setCopiedBatch] = useState(false);
+
+  const metrics = useMemo(() => {
+    const total = matches.length;
+    const excellent = matches.filter((m) => m.fitScore >= 85).length;
+    const remote = matches.filter((m) => {
+      const tags = deriveJobTags(m.job);
+      return tags.workModel === "Remoto" || m.job.jobTitle.toLowerCase().includes("remoto");
+    }).length;
+    return { total, excellent, remote };
+  }, [matches]);
+
+  function toggleSelectAll() {
+    if (selectedMatchIds.length === matches.length) {
+      setSelectedMatchIds([]);
+    } else {
+      setSelectedMatchIds(matches.map((m) => m.id));
+    }
+  }
+
+  function toggleSelectMatch(id: string) {
+    setSelectedMatchIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }
+
+  function copySelectedLinks() {
+    const selectedMatches = matches.filter((m) => selectedMatchIds.includes(m.id));
+    const text = selectedMatches.map((m) => `${m.job.jobTitle}: ${m.job.url}`).join("\n");
+    if (typeof window !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedBatch(true);
+      setTimeout(() => setCopiedBatch(false), 2500);
+    }
+  }
+
   if (matches.length === 0) {
     return (
       <div className="rounded-3xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-8 text-center shadow-xs">
@@ -255,15 +319,116 @@ export function FeedList({
   }
 
   return (
-    <div className="space-y-4 md:space-y-5">
-      {matches.map((match) => (
-        <FeedCard
-          key={match.id}
-          match={match}
-          resumeId={resumeId}
-          defaultCareerTrack={defaultCareerTrack}
-        />
-      ))}
+    <div className="space-y-4">
+      {/* BARRA SUPERIOR DE MÉTRICAS & ALTERNADOR DE VISUALIZAÇÃO */}
+      <div className="rounded-2xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+        
+        {/* Métricas do Feed */}
+        <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600 dark:text-neutral-300">
+          <span className="font-bold text-slate-900 dark:text-white">
+            {metrics.total} {metrics.total === 1 ? "vaga encontrada" : "vagas encontradas"}
+          </span>
+          <span className="text-slate-300 dark:text-neutral-700">•</span>
+          <span className="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            {metrics.excellent} Excelente Match
+          </span>
+          <span className="text-slate-300 dark:text-neutral-700">•</span>
+          <span className="inline-flex items-center gap-1 font-medium text-slate-500 dark:text-neutral-400">
+            <LaptopIcon className="w-3.5 h-3.5 text-slate-400" />
+            {metrics.remote} Remotas
+          </span>
+        </div>
+
+        {/* Direita: Botões de Ação em Lote e Alternador de Visão */}
+        <div className="flex items-center gap-2.5 justify-between sm:justify-end">
+          
+          {/* Seleção em Lote */}
+          {selectedMatchIds.length > 0 && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={copySelectedLinks}
+                className="relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-2xs transition-all cursor-pointer"
+              >
+                <ShareIcon className="w-3.5 h-3.5" />
+                <span>Copiar {selectedMatchIds.length} links</span>
+                {copiedBatch && (
+                  <span className="absolute -bottom-8 right-0 bg-slate-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg shadow-lg whitespace-nowrap z-20">
+                    Links copiados!
+                  </span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* Toggle de Selecionar Todos */}
+          <button
+            type="button"
+            onClick={toggleSelectAll}
+            className="text-[11px] font-semibold text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white px-2 py-1 rounded-lg hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+          >
+            {selectedMatchIds.length === matches.length ? "Desmarcar todas" : "Selecionar todas"}
+          </button>
+
+          {/* Alternador de Modo: Cards vs Lista Enxuta */}
+          <div className="flex items-center p-1 bg-slate-100 dark:bg-neutral-900 rounded-xl border border-slate-200/80 dark:border-neutral-800">
+            <button
+              type="button"
+              onClick={() => setViewMode("detailed")}
+              className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                viewMode === "detailed"
+                  ? "bg-white dark:bg-neutral-800 text-blue-600 dark:text-blue-400 shadow-2xs"
+                  : "text-slate-400 hover:text-slate-700 dark:hover:text-neutral-200"
+              }`}
+              title="Modo Cards Detalhados"
+            >
+              <ViewGridIcon className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("compact")}
+              className={`p-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                viewMode === "compact"
+                  ? "bg-white dark:bg-neutral-800 text-blue-600 dark:text-blue-400 shadow-2xs"
+                  : "text-slate-400 hover:text-slate-700 dark:hover:text-neutral-200"
+              }`}
+              title="Modo Lista Compacta"
+            >
+              <ViewListIcon className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* LISTAGEM DE CARDS OU LISTA COMPACTA */}
+      {viewMode === "detailed" ? (
+        <div className="space-y-4 md:space-y-5">
+          {matches.map((match) => (
+            <FeedCard
+              key={match.id}
+              match={match}
+              resumeId={resumeId}
+              defaultCareerTrack={defaultCareerTrack}
+              isSelected={selectedMatchIds.includes(match.id)}
+              onToggleSelect={() => toggleSelectMatch(match.id)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-3xl border border-slate-200/80 dark:border-neutral-800/90 bg-white dark:bg-neutral-900/60 divide-y divide-slate-100 dark:divide-neutral-800/80 overflow-hidden shadow-2xs">
+          {matches.map((match) => (
+            <CompactFeedRow
+              key={match.id}
+              match={match}
+              resumeId={resumeId}
+              defaultCareerTrack={defaultCareerTrack}
+              isSelected={selectedMatchIds.includes(match.id)}
+              onToggleSelect={() => toggleSelectMatch(match.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -302,17 +467,20 @@ function FeedCard({
   match,
   resumeId,
   defaultCareerTrack,
+  isSelected,
+  onToggleSelect,
 }: {
   match: FeedMatch;
   resumeId: string;
   defaultCareerTrack: CareerTrack;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
 }) {
   const router = useRouter();
   const [careerTrack, setCareerTrack] = useState<CareerTrack>(defaultCareerTrack);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // Estados interativos
   const [expanded, setExpanded] = useState(false);
   const [starred, setStarred] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -321,6 +489,7 @@ function FeedCard({
   const colors = TIER_COLOR_SCHEMES[tier];
   const tags = deriveJobTags(match.job);
   const bullets = reasonBullets(match.reason, tier);
+  const techSkills = extractTechSkills(match.job.jobText);
 
   async function handleFullAnalysis() {
     setError(null);
@@ -354,14 +523,24 @@ function FeedCard({
 
   const companyName = tags.company || "Empresa";
   const companyInitial = companyName !== "Empresa" ? companyName.charAt(0).toUpperCase() : null;
+  const cleanDescription = stripHtmlFromText(match.job.jobText);
 
   return (
-    <div className="group rounded-3xl border border-slate-200/80 dark:border-neutral-800/90 bg-white dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 space-y-4">
+    <div className={`group rounded-3xl border ${isSelected ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-200/80 dark:border-neutral-800/90"} bg-white dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 space-y-4`}>
       
       {/* Cabeçalho do Card */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3.5 min-w-0 flex-1">
           
+          {/* Checkbox de Seleção Múltipla */}
+          <input
+            type="checkbox"
+            checked={!!isSelected}
+            onChange={onToggleSelect}
+            className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer mt-3 shrink-0"
+            title="Selecionar esta vaga"
+          />
+
           {/* Avatar / Badge de Logo da Empresa */}
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border border-blue-200/60 dark:border-blue-800/40 flex items-center justify-center font-extrabold text-sm text-blue-600 dark:text-blue-400 shrink-0 shadow-2xs mt-0.5">
             {companyInitial ? (
@@ -445,12 +624,12 @@ function FeedCard({
       </div>
 
       {/* Descrição com Expansão ("Ver mais / Ver menos") */}
-      {match.job.jobText && (
+      {cleanDescription && (
         <div className="bg-slate-50/60 dark:bg-neutral-950/40 p-3.5 rounded-xl border border-slate-100 dark:border-neutral-800/80 space-y-2">
           <p className={`text-xs text-slate-600 dark:text-neutral-300 leading-relaxed font-normal ${expanded ? "" : "line-clamp-3"}`}>
-            {match.job.jobText}
+            {cleanDescription}
           </p>
-          {match.job.jobText.length > 180 && (
+          {cleanDescription.length > 180 && (
             <button
               type="button"
               onClick={() => setExpanded(!expanded)}
@@ -463,7 +642,7 @@ function FeedCard({
         </div>
       )}
 
-      {/* Badges de Tags da Vaga */}
+      {/* Badges de Tags da Vaga e Tecnologias Extraídas */}
       <div className="flex flex-wrap items-center gap-1.5">
         {tags.salary && (
           <span className="inline-flex items-center gap-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/25 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold px-2.5 py-1 shadow-2xs">
@@ -489,13 +668,14 @@ function FeedCard({
             {tags.seniority}
           </span>
         )}
-        {[tags.area].filter(Boolean).map((tag, idx) => (
+
+        {/* Chips de Tecnologias Requeridas Extraídas */}
+        {techSkills.map((skill) => (
           <span
-            key={`${tag}-${idx}`}
-            className="inline-flex items-center gap-1 rounded-lg bg-slate-100/80 dark:bg-neutral-800 border border-slate-200/80 dark:border-neutral-700 text-slate-600 dark:text-neutral-400 text-[11px] font-medium px-2.5 py-1"
+            key={skill}
+            className="inline-flex items-center gap-1 rounded-lg bg-blue-50/80 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-800/40 text-blue-700 dark:text-blue-300 text-[10px] font-bold px-2 py-0.5"
           >
-            <TagIcon className="w-3 h-3 text-slate-400" />
-            {tag}
+            #{skill}
           </span>
         ))}
       </div>
@@ -551,22 +731,58 @@ function FeedCard({
 
       {error && <p className="text-xs text-rose-600 font-semibold px-1">{error}</p>}
 
-      {/* Barra de Ações do Rodapé (Momento + Kanban / CV / Candidatou-se) */}
-      <div className="border-t border-slate-100 dark:border-neutral-800/80 pt-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      {/* RODAPÉ EM 2 NÍVEIS TOTALMENTE ALINHADO */}
+      <div className="border-t border-slate-100 dark:border-neutral-800/80 pt-3.5 space-y-3">
         
-        {/* Lado Esquerdo: Filtro de Momento & Links Secundários */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        {/* Nível 1: Botões de Ação Principais do Workflow */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {/* Salvar Kanban */}
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, null)} className="w-full">
+            <button
+              type="submit"
+              className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-200 font-semibold text-xs border border-slate-200/90 dark:border-neutral-700 shadow-2xs hover:border-slate-300 transition-all cursor-pointer active:scale-[0.98]"
+            >
+              <BookmarkIcon className="w-3.5 h-3.5 text-slate-500" />
+              <span>Salvar Kanban</span>
+            </button>
+          </form>
+
+          {/* Ajustar CV */}
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")} className="w-full">
+            <button
+              type="submit"
+              className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-bold text-xs border border-amber-500/25 transition-colors cursor-pointer active:scale-[0.98]"
+            >
+              <WandIcon className="w-3.5 h-3.5 text-amber-500" />
+              <span>Ajustar CV</span>
+            </button>
+          </form>
+
+          {/* Candidatou-se */}
+          <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")} className="w-full">
+            <button
+              type="submit"
+              className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-bold text-xs border border-blue-500/25 transition-colors cursor-pointer active:scale-[0.98]"
+            >
+              <CheckCircleIcon className="w-3.5 h-3.5 text-blue-500" />
+              <span>Candidatou-se</span>
+            </button>
+          </form>
+        </div>
+
+        {/* Nível 2: Sub-barra de Utilitários (Momento + Vaga Original + Descartar) */}
+        <div className="pt-2 border-t border-slate-100/60 dark:border-neutral-800/50 flex flex-wrap items-center justify-between gap-2.5 text-xs">
           
           {/* Seletor de Momento */}
-          <div className="flex items-center gap-2 bg-slate-50 dark:bg-neutral-800/60 px-3 py-1.5 rounded-xl border border-slate-200/80 dark:border-neutral-700/80">
-            <span className="text-[10px] font-bold text-slate-500 dark:text-neutral-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
+          <div className="flex items-center gap-2 bg-slate-50 dark:bg-neutral-950/60 px-3 py-1 rounded-xl border border-slate-200/70 dark:border-neutral-800">
+            <span className="text-[10px] font-bold text-slate-400 dark:text-neutral-500 uppercase tracking-wider shrink-0 flex items-center gap-1">
               <TargetIcon className="w-3 h-3 text-slate-400" />
               Momento:
             </span>
             <select
               value={careerTrack}
               onChange={(e) => setCareerTrack(e.target.value as CareerTrack)}
-              className="bg-transparent text-slate-800 dark:text-neutral-200 text-xs font-semibold outline-none cursor-pointer pr-1"
+              className="bg-transparent text-slate-700 dark:text-neutral-300 text-xs font-semibold outline-none cursor-pointer pr-1"
             >
               {CAREER_TRACK_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value} className="dark:bg-neutral-900">
@@ -576,69 +792,133 @@ function FeedCard({
             </select>
           </div>
 
-          {/* Vaga Original */}
-          <a
-            href={match.job.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-blue-600 dark:text-neutral-400 dark:hover:text-blue-400 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors"
-          >
-            <span>Vaga original</span>
-            <ExternalLinkIcon className="w-3 h-3" />
-          </a>
-
-          {/* Descartar */}
-          <form action={discardFeedMatch.bind(null, match.id)}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 px-2 py-1.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
-              title="Descartar esta vaga"
+          {/* Links da direita */}
+          <div className="flex items-center gap-3 ml-auto">
+            <a
+              href={match.job.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 font-semibold text-slate-500 hover:text-blue-600 dark:text-neutral-400 dark:hover:text-blue-400 transition-colors"
             >
-              <TrashIcon className="w-3.5 h-3.5" />
-              <span>Descartar</span>
-            </button>
-          </form>
-        </div>
+              <span>Vaga original</span>
+              <ExternalLinkIcon className="w-3 h-3" />
+            </a>
 
-        {/* Lado Direito: Ações de Workflow */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-100/80 dark:bg-neutral-800/50 rounded-2xl border border-slate-200/60 dark:border-neutral-750/60">
-          
-          {/* Salvar Kanban */}
-          <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-200 font-semibold px-3 py-1.5 text-xs shadow-2xs transition-all cursor-pointer border border-slate-200/80 dark:border-neutral-700 active:scale-95"
-            >
-              <BookmarkIcon className="w-3.5 h-3.5 text-slate-500" />
-              <span>Salvar Kanban</span>
-            </button>
-          </form>
+            <span className="text-slate-300 dark:text-neutral-700">•</span>
 
-          {/* Ajustar CV */}
-          <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-semibold px-3 py-1.5 text-xs transition-colors cursor-pointer border border-amber-500/20 active:scale-95"
-            >
-              <WandIcon className="w-3.5 h-3.5 text-amber-500" />
-              <span>Ajustar CV</span>
-            </button>
-          </form>
+            <form action={discardFeedMatch.bind(null, match.id)}>
+              <button
+                type="submit"
+                className="inline-flex items-center gap-1 font-semibold text-slate-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                title="Descartar esta vaga"
+              >
+                <TrashIcon className="w-3.5 h-3.5" />
+                <span>Descartar</span>
+              </button>
+            </form>
+          </div>
 
-          {/* Candidatou-se */}
-          <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")}>
-            <button
-              type="submit"
-              className="inline-flex items-center gap-1.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-semibold px-3 py-1.5 text-xs transition-colors cursor-pointer border border-blue-500/20 active:scale-95"
-            >
-              <CheckCircleIcon className="w-3.5 h-3.5 text-blue-500" />
-              <span>Candidatou-se</span>
-            </button>
-          </form>
         </div>
 
       </div>
 
+    </div>
+  );
+}
+
+/**
+ * COMPONENT DE LINHA COMPACTA PARA VARREDURA RÁPIDA
+ */
+function CompactFeedRow({
+  match,
+  resumeId,
+  defaultCareerTrack,
+  isSelected,
+  onToggleSelect,
+}: {
+  match: FeedMatch;
+  resumeId: string;
+  defaultCareerTrack: CareerTrack;
+  isSelected?: boolean;
+  onToggleSelect?: () => void;
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const tier = tierFromScore(match.fitScore);
+  const colors = TIER_COLOR_SCHEMES[tier];
+  const tags = deriveJobTags(match.job);
+
+  async function handleFullAnalysis() {
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.set("resumeId", resumeId);
+      formData.set("jobTitle", match.job.jobTitle);
+      formData.set("jobText", match.job.jobText);
+      formData.set("careerTrack", defaultCareerTrack);
+
+      const res = await fetch("/api/analyze", { method: "POST", body: formData });
+      const data = await res.json();
+      if (res.ok) router.push(`/report/${data.id}`);
+    } catch {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 hover:bg-slate-50/80 dark:hover:bg-neutral-800/40 transition-colors ${isSelected ? "bg-blue-50/50 dark:bg-blue-950/20" : ""}`}>
+      <div className="flex items-center gap-3 min-w-0 flex-1">
+        <input
+          type="checkbox"
+          checked={!!isSelected}
+          onChange={onToggleSelect}
+          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0"
+        />
+
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase shrink-0 border ${colors.badge}`}>
+          {match.fitScore}% Match
+        </span>
+
+        <div className="min-w-0 flex-1">
+          <a
+            href={match.job.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-xs md:text-sm text-slate-900 dark:text-white hover:text-blue-600 transition-colors truncate block"
+          >
+            {match.job.jobTitle}
+          </a>
+          <p className="text-[11px] text-slate-500 dark:text-neutral-400 truncate">
+            {tags.company} • {tags.location || match.job.location || "Remoto"} • via {match.job.source}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2 shrink-0 justify-end">
+        <form action={saveFeedMatchAsApplication.bind(null, match.id, null)}>
+          <button type="submit" className="p-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 text-slate-600 dark:text-neutral-300 hover:bg-white text-xs font-medium cursor-pointer" title="Salvar Kanban">
+            <BookmarkIcon className="w-3.5 h-3.5" />
+          </button>
+        </form>
+
+        <a
+          href={match.job.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="p-1.5 rounded-lg text-slate-500 hover:text-blue-600 cursor-pointer"
+          title="Ver vaga original"
+        >
+          <ExternalLinkIcon className="w-3.5 h-3.5" />
+        </a>
+
+        <button
+          onClick={handleFullAnalysis}
+          disabled={loading}
+          className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 text-xs shadow-2xs transition-all cursor-pointer disabled:opacity-50"
+        >
+          {loading ? "..." : "Diagnóstico →"}
+        </button>
+      </div>
     </div>
   );
 }
