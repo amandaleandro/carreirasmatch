@@ -11,9 +11,15 @@
 export const ANALYTICS_EVENTS = {
   ANALYSIS_STARTED: "analysis_started",
   ANALYSIS_COMPLETED: "analysis_completed",
+  ANALYSIS_FAILED: "analysis_failed",
+  ANALYSIS_REANALYZED: "analysis_reanalyzed",
   DIAGNOSTIC_TEASER_VIEWED: "diagnostic_teaser_viewed",
+  PAYWALL_DWELL_TIME: "paywall_dwell_time",
+  PAYWALL_PREVIEW_CLICKED: "paywall_preview_clicked",
   UNLOCK_CLICKED: "unlock_clicked",
   CHECKOUT_STARTED: "checkout_started",
+  CHECKOUT_DISMISSED: "checkout_dismissed",
+  PAYMENT_METHOD_SELECTED: "payment_method_selected",
   PAYMENT_CONFIRMED: "payment_confirmed",
   SUBSCRIPTION_STARTED: "subscription_started",
   SIGNUP_COMPLETED: "signup_completed",
@@ -22,6 +28,8 @@ export const ANALYTICS_EVENTS = {
   CHECKOUT_FAILED: "checkout_failed",
   PIX_GENERATED: "pix_generated",
   SUBSCRIPTION_CONFIRMED: "subscription_confirmed",
+  INTERVIEW_SIMULATOR_STARTED: "interview_simulator_started",
+  BEHAVIORAL_TEST_COMPLETED: "behavioral_test_completed",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

@@ -16,7 +16,16 @@ const pageViewSchema = z.object({
 function referrerHost(value: string) {
   if (!value) return "";
   try {
-    return new URL(value).hostname.slice(0, 253);
+    const host = new URL(value).hostname.slice(0, 253);
+    if (
+      host === "carreirasmatch.com.br" ||
+      host === "www.carreirasmatch.com.br" ||
+      host === "localhost" ||
+      host === "127.0.0.1"
+    ) {
+      return "";
+    }
+    return host;
   } catch {
     return "";
   }

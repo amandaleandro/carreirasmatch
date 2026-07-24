@@ -27,6 +27,19 @@ export function UnlockDiagnosticButton({
   if (showBrick) {
     return (
       <div className="space-y-3">
+        <div className="flex justify-between items-center text-xs text-neutral-500">
+          <span className="font-semibold text-neutral-700 dark:text-neutral-300">Pagamento seguro via Mercado Pago</span>
+          <button
+            type="button"
+            onClick={() => {
+              track(ANALYTICS_EVENTS.CHECKOUT_DISMISSED, { kind: "diagnostic" });
+              setShowBrick(false);
+            }}
+            className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 underline cursor-pointer"
+          >
+            Cancelar
+          </button>
+        </div>
         <CouponCodeInput value={couponCode} onChange={setCouponCode} />
         <MercadoPagoPaymentBrick
           amount={amount}

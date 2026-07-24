@@ -14,11 +14,12 @@ import {
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
+import { getBrazilGreeting } from "@/lib/brazil";
 
 export const dynamic = "force-dynamic";
 
 export default async function CompanyDashboardPage() {
-  const { company } = await requireCompanyPage();
+  const { session, company } = await requireCompanyPage();
 
   const [jobs, openVagas, acceptedContacts] = await Promise.all([
     prisma.companyJob.findMany({
@@ -32,6 +33,7 @@ export default async function CompanyDashboardPage() {
 
   const freeRemaining = Math.max(0, FREE_SCREENING_LIMIT - company.screeningCount);
   const remaining = freeRemaining + company.screeningCredits;
+  const greeting = getBrazilGreeting(session.user?.name ?? company.name);
 
   const stats = [
     { label: "Triagens Realizadas", value: jobs.length, href: "/empresa", icon: FileSearch, color: "blue" },
@@ -49,10 +51,10 @@ export default async function CompanyDashboardPage() {
             Painel de Recrutamento
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Painel da Empresa
+            {greeting}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">
-            Descreva a vaga, envie os currículos em PDF e receba um ranking por aderência técnica.
+            Bem-vindo ao painel de triagem e inteligência de recrutamento da {company.name}.
           </p>
         </div>
 

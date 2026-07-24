@@ -8,10 +8,12 @@ import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segm
 import { toolsForSegment } from "@/lib/tools-catalog";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { computeJourneyMetrics } from "@/lib/applications";
-import { formatBrazilDate, formatBrazilDateTime } from "@/lib/brazil";
+import { formatBrazilDate, formatBrazilDateTime, getBrazilGreeting } from "@/lib/brazil";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { Trophy } from "lucide-react";
 import { CareerScoreEvolutionChart } from "@/components/career-score-evolution-chart";
+import { DailyMotivationCard } from "@/components/daily-motivation-card";
+import { updateEmploymentStatusAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -36,7 +38,7 @@ export default async function DashboardPage() {
     }),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { careerSegment: true, professionalArea: true },
+      select: { careerSegment: true, professionalArea: true, name: true, employmentStatus: true },
     }),
     prisma.softSkillTestResult.findFirst({
       where: { userId: session.user.id },
@@ -90,36 +92,36 @@ export default async function DashboardPage() {
   const { recommended: recommendedTools } = toolsForSegment(segment, userAreaSlug);
   const topRecommendedTool = recommendedTools[0];
 
-  const firstName = (session.user.name ?? session.user.email ?? "").split(" ")[0];
+  const greeting = getBrazilGreeting(session.user.name ?? user?.name ?? undefined);
 
   if (analyses.length === 0) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center font-sans">
+      <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center font-sans space-y-6">
         <h1 className="text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
-          Bem-vindo{firstName ? `, ${firstName}` : ""}!
+          {greeting}
         </h1>
-        <p className="text-[#64748B] dark:text-neutral-400 mt-2">
+        <p className="text-[#64748B] dark:text-neutral-400">
           Você ainda não fez nenhum diagnóstico. Envie seu currículo e uma vaga
           para ver sua aderência e seu plano de ação aqui.
         </p>
+
+        {/* Dose Diária de Motivação mesmo sem análises ainda */}
+        <div className="text-left">
+          <DailyMotivationCard
+            initialStatus={user?.employmentStatus}
+            onStatusChange={async (newStatus) => {
+              "use server";
+              await updateEmploymentStatusAction(newStatus);
+            }}
+          />
+        </div>
+
         <Link
           href="/"
-          className="inline-block mt-6 rounded-xl bg-[#2563EB] text-white font-semibold px-6 py-3 hover:bg-[#1D4ED8] hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.98] transition-all cursor-pointer"
+          className="inline-block mt-4 rounded-xl bg-[#2563EB] text-white font-semibold px-6 py-3 hover:bg-[#1D4ED8] hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.98] transition-all cursor-pointer"
         >
           Fazer meu primeiro diagnóstico
         </Link>
-        <p className="text-sm text-[#64748B] mt-4">
-          {segment ? (
-            <>Seu momento: {CAREER_SEGMENT_LABELS[segment]}</>
-          ) : (
-            <>
-              <Link href="/settings" className="text-[#2563EB] hover:underline">
-                Conte qual é o seu momento
-              </Link>{" "}
-              para recomendações mais precisas.
-            </>
-          )}
-        </p>
       </div>
     );
   }
@@ -182,12 +184,21 @@ export default async function DashboardPage() {
           Visão geral
         </span>
         <h1 className="text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
-          Seu mapa da próxima oportunidade
+          {greeting}
         </h1>
-        <p className="text-[#64748B] dark:text-neutral-400 mt-2 text-sm">
-          Clareza sobre seu momento e direção certa para avançar com confiança na sua carreira.
+        <p className="text-[#64748B] dark:text-neutral-400 mt-1 text-sm">
+          Este é o seu mapa da próxima oportunidade com clareza e direção para avançar na carreira.
         </p>
       </div>
+
+      {/* Card da Dose Diária de Motivação & Meme */}
+      <DailyMotivationCard
+        initialStatus={user?.employmentStatus}
+        onStatusChange={async (newStatus) => {
+          "use server";
+          await updateEmploymentStatusAction(newStatus);
+        }}
+      />
 
       {isTopPlayer && (
         <div className="rounded-3xl border border-amber-300 dark:border-amber-500/20 bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent p-6 space-y-4 shadow-sm relative overflow-hidden animate-in fade-in duration-250">
@@ -208,18 +219,23 @@ export default async function DashboardPage() {
               <Link
                 key={vaga.id}
                 href={`/vagas/empresa/${vaga.id}`}
-                className="rounded-2xl border border-[#E2E8F0] dark:border-amber-800 bg-white dark:bg-neutral-900 p-4 shadow-sm hover:border-[#2563EB] transition-all flex flex-col justify-between"
+                className="group relative rounded-2xl border border-amber-500/30 dark:border-amber-700/50 bg-gradient-to-b from-amber-500/5 to-transparent dark:bg-neutral-900 p-4 shadow-xs hover:border-amber-500 hover:shadow-md transition-all flex flex-col justify-between"
               >
                 <div>
-                  <span className="text-[10px] font-bold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/40 px-2 py-0.5 rounded">
-                    {vaga.area}
-                  </span>
-                  <h3 className="mt-2 font-title font-bold text-sm text-[#071827] dark:text-white line-clamp-2 leading-tight">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-500/20">
+                      {vaga.area}
+                    </span>
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                      Prioritária
+                    </span>
+                  </div>
+                  <h3 className="mt-2.5 font-title font-bold text-sm text-[#071827] dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-tight">
                     {vaga.title}
                   </h3>
                   <p className="text-xs text-[#64748B] mt-1">{vaga.company.name}</p>
                 </div>
-                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-3 inline-block">
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 mt-4 inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                   Ver Vaga Exclusiva →
                 </span>
               </Link>

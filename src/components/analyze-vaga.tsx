@@ -352,7 +352,10 @@ export function AnalyzeVagaPage({
         analysisId: data.id,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const errorMsg = err instanceof Error ? err.message : "Erro inesperado.";
+      track(ANALYTICS_EVENTS.ANALYSIS_FAILED, { careerTrack, error: errorMsg });
+      saveDraft();
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

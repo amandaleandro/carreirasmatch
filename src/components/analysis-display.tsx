@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { triggerConfetti } from "@/lib/confetti";
 import { ChecklistCard } from "@/components/checklist-card";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
@@ -624,8 +625,22 @@ export function AnalysisTeaserView({
   >;
   children?: React.ReactNode;
 }) {
+  useEffect(() => {
+    const startTime = Date.now();
+    return () => {
+      const dwellSeconds = Math.round((Date.now() - startTime) / 1000);
+      if (dwellSeconds >= 1) {
+        track(ANALYTICS_EVENTS.PAYWALL_DWELL_TIME, { seconds: dwellSeconds });
+      }
+    };
+  }, []);
+
+  const handlePreviewClick = (feature: string) => {
+    track(ANALYTICS_EVENTS.PAYWALL_PREVIEW_CLICKED, { feature });
+  };
+
   return (
-    <section className="space-y-4 font-sans">
+    <section className="space-y-5 font-sans">
       <div className={`rounded-2xl border p-4 ${STATUS_CONFIG[result.applicationStatus].chipClass}`}>
         <p className="font-title font-bold text-sm">
           {STATUS_CONFIG[result.applicationStatus].label}
@@ -633,8 +648,8 @@ export function AnalysisTeaserView({
         <p className="text-xs mt-1 leading-relaxed opacity-90">{result.applicationStatusReason}</p>
       </div>
 
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] p-5 shadow-sm space-y-4">
-        <h2 className="font-title font-bold text-sm text-[#071827]">Análise preliminar</h2>
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-5 shadow-sm space-y-4">
+        <h2 className="font-title font-bold text-sm text-[#071827] dark:text-white">Análise preliminar</h2>
         <ScoreBar label="Aderência geral" value={result.overallScore} />
         <ScoreBar label="Currículo / ATS" value={result.atsScore} />
       </div>
@@ -650,20 +665,80 @@ export function AnalysisTeaserView({
         variant="missing"
       />
 
-      <ListCard
-        icon="💪"
-        tone="success"
-        marker="check"
-        title="Pontos fortes"
-        items={result.strengths}
-      />
-      <ListCard
-        icon="⚠️"
-        tone="warning"
-        marker="alert"
-        title="Pontos fracos"
-        items={result.weaknesses}
-      />
+      <div className="grid gap-5 md:grid-cols-2">
+        <ListCard
+          icon="💪"
+          tone="success"
+          marker="check"
+          title="Pontos fortes"
+          items={result.strengths}
+        />
+        <ListCard
+          icon="⚠️"
+          tone="warning"
+          marker="alert"
+          title="Pontos fracos"
+          items={result.weaknesses}
+        />
+      </div>
+
+      {/* Previews Borrados de Alto Valor com Cadeado (Efeito FOMO) */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between">
+          <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white flex items-center gap-2">
+            <span>🔒</span>
+            <span>Entregáveis exclusivos desta vaga (Bloqueados)</span>
+          </h3>
+          <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+            Liberação Imediata
+          </span>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          {/* Card Blur 1: Resumo Profissional Otimizado */}
+          <div
+            onClick={() => handlePreviewClick("suggested_summary")}
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/30 dark:bg-blue-950/20 p-5 transition-all hover:border-blue-400"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                <span>📝</span> Resumo Profissional Sugerido
+              </span>
+              <span className="text-xs">🔒</span>
+            </div>
+            <div className="select-none blur-[4px] opacity-60 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-mono">
+              Profissional orientado a resultados com vasta experiência em otimização de processos, liderança de projetos e entrega contínua de alto valor...
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-neutral-900/70 backdrop-blur-[2px] opacity-90 group-hover:opacity-100 transition-opacity">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-neutral-800 px-3 py-1.5 rounded-xl shadow-md border border-blue-100 dark:border-blue-800 flex items-center gap-1.5">
+                <span>🔑</span> Clique para desbloquear este resumo
+              </span>
+            </div>
+          </div>
+
+          {/* Card Blur 2: Pergunta de Entrevista Customizada */}
+          <div
+            onClick={() => handlePreviewClick("interview_questions")}
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/20 p-5 transition-all hover:border-indigo-400"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                <span>🎤</span> Perguntas Prováveis de Entrevista
+              </span>
+              <span className="text-xs">🔒</span>
+            </div>
+            <div className="select-none blur-[4px] opacity-60 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-mono">
+              1. Como você lidou com o desafio de integração técnica citado na vaga?...
+              2. Explique sua metodologia ao priorizar entregas sob pressão...
+            </div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-neutral-900/70 backdrop-blur-[2px] opacity-90 group-hover:opacity-100 transition-opacity">
+              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-neutral-800 px-3 py-1.5 rounded-xl shadow-md border border-indigo-100 dark:border-indigo-800 flex items-center gap-1.5">
+                <span>🔑</span> Clique para desbloquear o simulador
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {children}
     </section>

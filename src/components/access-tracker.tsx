@@ -69,33 +69,63 @@ export function AccessTracker() {
     // Navegadores marcados (dono/equipe) nao contam.
     if (isOptedOut()) return;
 
-    const body = JSON.stringify({
-      sessionId: getSessionId(),
-      path: pathname,
-      referrer: document.referrer,
-      source: searchParams.get("utm_source") ?? "",
-      medium: searchParams.get("utm_medium") ?? "",
-      campaign: searchParams.get("utm_campaign") ?? "",
-      content: searchParams.get("utm_content") ?? "",
-      term: searchParams.get("utm_term") ?? "",
-    });
+    const rawSource = searchParams.get("utm_source") ?? "";
+    const rawMedium = searchParams.get("utm_medium") ?? "";
+    const rawCampaign = searchParams.get("utm_campaign") ?? "";
+    const rawContent = searchParams.get("utm_content") ?? "";
+    const rawTerm = searchParams.get("utm_term") ?? "";
 
-    const parsed = JSON.parse(body) as {
-      sessionId: string; source: string; medium: string; campaign: string; content: string;
-    };
+    const currentSessionId = getSessionId();
+
     let previous: Record<string, string> = {};
     try {
       previous = JSON.parse(localStorage.getItem("cm_attribution") ?? "{}") as Record<string, string>;
     } catch {
       previous = {};
     }
-    localStorage.setItem("cm_attribution", JSON.stringify({
-      sessionId: parsed.sessionId,
-      source: parsed.source || previous.source || "",
-      medium: parsed.medium || previous.medium || "",
-      campaign: parsed.campaign || previous.campaign || "",
-      content: parsed.content || previous.content || "",
-    }));
+
+    const attribution = {
+      sessionId: currentSessionId,
+      source: rawSource || previous.source || "",
+      medium: rawMedium || previous.medium || "",
+      campaign: rawCampaign || previous.campaign || "",
+      content: rawContent || previous.content || "",
+      term: rawTerm || previous.term || "",
+    };
+
+    try {
+      localStorage.setItem("cm_attribution", JSON.stringify(attribution));
+    } catch {
+      // ignora indisponibilidade de storage
+    }
+
+    let externalReferrer = "";
+    if (document.referrer) {
+      try {
+        const refUrl = new URL(document.referrer);
+        const currentHost = window.location.hostname;
+        if (
+          refUrl.hostname !== currentHost &&
+          !refUrl.hostname.endsWith("carreirasmatch.com.br") &&
+          refUrl.hostname !== "localhost"
+        ) {
+          externalReferrer = document.referrer;
+        }
+      } catch {
+        externalReferrer = "";
+      }
+    }
+
+    const body = JSON.stringify({
+      sessionId: currentSessionId,
+      path: pathname,
+      referrer: externalReferrer,
+      source: attribution.source,
+      medium: attribution.medium,
+      campaign: attribution.campaign,
+      content: attribution.content,
+      term: attribution.term,
+    });
 
     if (navigator.sendBeacon) {
       navigator.sendBeacon("/api/analytics/page-view", new Blob([body], { type: "application/json" }));

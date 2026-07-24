@@ -442,7 +442,12 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     }),
     prisma.pageView.groupBy({
       by: ["referrerHost"],
-      where: { createdAt: { gte: periods[2].start } },
+      where: {
+        createdAt: { gte: periods[2].start },
+        referrerHost: {
+          notIn: ["carreirasmatch.com.br", "www.carreirasmatch.com.br", "localhost", "127.0.0.1", ""],
+        },
+      },
       _count: { _all: true },
       orderBy: { _count: { referrerHost: "desc" } },
       take: 10,

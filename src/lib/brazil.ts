@@ -24,3 +24,24 @@ export function formatBrazilDateTime(
   });
 }
 
+export function getBrazilGreeting(name?: string): string {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone: BRAZIL_TIME_ZONE,
+    hour: "numeric",
+    hour12: false,
+  });
+  const hour = parseInt(formatter.format(new Date()), 10);
+
+  let greeting = "Olá";
+  if (hour >= 5 && hour < 12) {
+    greeting = "Bom dia";
+  } else if (hour >= 12 && hour < 18) {
+    greeting = "Boa tarde";
+  } else {
+    greeting = "Boa noite";
+  }
+
+  const firstName = name ? name.trim().split(" ")[0] : "";
+  return firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
+}
+
