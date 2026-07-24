@@ -440,8 +440,32 @@ export function AdminDashboardTabs({
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {filteredAnalyses.map((analysis) => {
-                    const displayName = analysis.resume.user?.name || "Sem nome";
-                    const displayEmail = analysis.resume.user?.email || "-";
+                    const contactInfo = (() => {
+                      try {
+                        const structured = JSON.parse(analysis.resumeStructured || "{}");
+                        return {
+                          name: (structured?.contact?.name as string | undefined)?.trim() || "",
+                          email: (structured?.contact?.email as string | undefined)?.trim() || "",
+                        };
+                      } catch {
+                        return { name: "", email: "" };
+                      }
+                    })();
+
+                    const cleanFileName = (fileName: string) => {
+                      let name = fileName.replace(/\.[^/.]+$/, "");
+                      name = name.replace(/^(curriculo|currículo|cv|resume|perfil)\s*(de|do|da)?\s*/i, "");
+                      name = name.replace(/[-_]+/g, " ");
+                      return name
+                        .split(" ")
+                        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                        .join(" ")
+                        .trim();
+                    };
+
+                    const displayName =
+                      analysis.resume.user?.name || contactInfo.name || cleanFileName(analysis.resume.fileName) || "Sem nome";
+                    const displayEmail = analysis.resume.user?.email || contactInfo.email || "-";
                     return (
                       <tr key={analysis.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                         <td className="py-3 pr-4">
