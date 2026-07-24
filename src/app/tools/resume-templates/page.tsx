@@ -14,7 +14,7 @@ const TEMPLATES = [
 export default function ResumeTemplatesPage() {
   return (
     <main className="mx-auto w-full max-w-4xl px-4 py-12">
-      <Link href="/gratuito" className="text-sm text-blue-600 hover:underline dark:text-blue-400">Voltar para recursos gratuitos</Link>
+      <Link href="/tools" className="text-sm font-semibold text-blue-600 hover:underline dark:text-blue-400">← Voltar para Ferramentas</Link>
       <header className="mb-8 mt-4">
         <span className="text-xs font-bold uppercase tracking-wider text-violet-600">Cadastro grátis</span>
         <h1 className="mt-2 text-3xl font-bold">Modelos de currículo por perfil</h1>

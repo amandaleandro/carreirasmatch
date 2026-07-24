@@ -28,6 +28,8 @@ export const metadata = {
   description: "Ferramentas práticas e simuladores para impulsionar seu desempenho profissional.",
 };
 
+import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
+
 export default async function ToolsPage() {
   const session = await auth();
   const user = session?.user?.id
@@ -36,9 +38,17 @@ export default async function ToolsPage() {
         select: { careerSegment: true, professionalArea: true },
       })
     : null;
+
+  const isPaidUser = session?.user?.id
+    ? await hasActiveSubscriptionAccess(session.user.id)
+    : false;
+
   const segment = normalizeCareerSegment(user?.careerSegment);
   const userAreaSlug = matchAreaSlug(user?.professionalArea);
   const { recommended, others } = toolsForSegment(segment, userAreaSlug);
+
+  // Se o usuário já definiu o momento de carreira, exibimos exclusivamente as ferramentas do momento dele.
+  const displayTools = segment ? recommended : [...recommended, ...others];
 
   return (
     <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 w-full space-y-10">
@@ -65,31 +75,31 @@ export default async function ToolsPage() {
         <div className="relative z-10 max-w-3xl space-y-4">
           <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider rounded-full px-3.5 py-1 bg-blue-500/15 text-blue-300 border border-blue-400/30 backdrop-blur-md">
             <Wrench className="w-3.5 h-3.5 text-blue-400" />
-            <span>Hub de Ferramentas</span>
+            <span>Hub de Ferramentas Personalizadas</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-200">
-            Ferramentas Práticas de Alta Performance
+            Ferramentas Selecionadas para o seu Momento
           </h1>
 
           <p className="text-slate-300 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed font-normal">
-            Simuladores de entrevista, revisores de currículo, calculadoras e assistentes desenvolvidos para acelerar cada etapa do seu crescimento.
+            Simuladores, orientações e assistentes ajustados ao seu objetivo profissional para impulsionar seu progresso.
           </p>
 
           {segment ? (
             <div className="pt-2 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/15">
-              <span className="text-slate-300">Recomendações ativas para:</span>
-              <strong className="text-white font-bold">{CAREER_SEGMENT_LABELS[segment]}</strong>
+              <span className="text-slate-300">Exibindo ferramentas para:</span>
+              <strong className="text-amber-300 font-bold">{CAREER_SEGMENT_LABELS[segment]}</strong>
               <span className="text-slate-400">•</span>
-              <Link href="/settings" className="text-amber-300 hover:underline font-semibold">
+              <Link href="/settings" className="text-blue-300 hover:underline font-semibold">
                 Alterar momento
               </Link>
             </div>
           ) : (
             <div className="pt-2 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/15">
-              <span className="text-slate-300">Quer ver recomendações sob medida?</span>
+              <span className="text-slate-300">Defina seu momento para filtrar as ferramentas certas:</span>
               <Link href="/settings" className="text-amber-300 hover:underline font-bold">
-                Configure seu perfil →
+                Escolher momento →
               </Link>
             </div>
           )}
@@ -111,36 +121,49 @@ export default async function ToolsPage() {
           </div>
           <div className="flex items-center gap-2">
             <Star className="w-4 h-4 text-purple-400 shrink-0" />
-            <span>Ferramentas Gratuitas</span>
+            <span>{session?.user?.id ? "Acesso Liberado" : "Ferramentas Gratuitas"}</span>
           </div>
         </div>
       </section>
 
-      {/* Recommended Tools Grid */}
-      {recommended.length > 0 && (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-              <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-              Recomendadas para seu perfil ({recommended.length})
-            </h2>
+      {/* Humorous Banner for Free Account Users */}
+      {session?.user?.id && !isPaidUser && (
+        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-blue-500/10 border border-amber-500/30 p-6 sm:p-7 shadow-sm transition-all hover:border-amber-500/50">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+            <div className="space-y-2 max-w-2xl">
+              <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-0.5 rounded-full">
+                <span>☕ Alerta de Carreira no Modo Econômico</span>
+              </div>
+              <h3 className="text-lg font-extrabold text-slate-900 dark:text-white leading-tight">
+                Seu currículo não merece trabalhar a meio-vapor! 🚀
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                Você está no cadastro gratuito. Que tal sair da fila e destravar análises ilimitadas por IA, simulações de entrevista prioritárias e relatórios completos? O café é por sua conta, o emprego é por nossa! 😉
+              </p>
+            </div>
+            <Link
+              href="/assinar"
+              className="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-xs sm:text-sm px-5 py-3.5 shadow-md transition-all hover:scale-[1.02]"
+            >
+              <Sparkles className="w-4 h-4 text-amber-300" />
+              <span>Quero o Plano Pro ✨</span>
+            </Link>
           </div>
-          <ToolGrid tools={recommended} highlight />
         </section>
       )}
 
-      {/* Other Tools Grid */}
-      {others.length > 0 && (
-        <section className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-          {recommended.length > 0 && (
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-              <SlidersHorizontal className="w-4 h-4" />
-              Outras ferramentas disponíveis ({others.length})
-            </h2>
-          )}
-          <ToolGrid tools={others} locked={false} />
-        </section>
-      )}
+      {/* Recommended Tools Grid - Only tools for user's career moment */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
+            {segment
+              ? `Ferramentas para seu momento (${displayTools.length})`
+              : `Todas as ferramentas disponíveis (${displayTools.length})`}
+          </h2>
+        </div>
+        <ToolGrid tools={displayTools} highlight isLoggedIn={Boolean(session?.user?.id)} />
+      </section>
     </main>
   );
 }
@@ -149,17 +172,35 @@ function ToolGrid({
   tools,
   highlight,
   locked,
+  isLoggedIn = false,
 }: {
   tools: ToolCatalogEntry[];
   highlight?: boolean;
   locked?: boolean;
+  isLoggedIn?: boolean;
 }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => {
         const isLocked = Boolean(locked) && !tool.free && !tool.accountFree;
 
-        const badge = tool.free ? (
+        const badge = isLoggedIn ? (
+          highlight ? (
+            <span className="rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1">
+              <Star className="w-3 h-3 fill-amber-500" />
+              Recomendada
+            </span>
+          ) : isLocked ? (
+            <span className="rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 px-2.5 py-0.5 text-xs font-semibold inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              Bloqueada
+            </span>
+          ) : (
+            <span className="rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold">
+              Disponível
+            </span>
+          )
+        ) : tool.free ? (
           <span className="rounded-md bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold">
             100% Grátis
           </span>

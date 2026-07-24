@@ -6,13 +6,15 @@ import { ContentPage } from "@/components/content-page";
 import { VideoCard } from "@/components/video-card";
 import { Pagination } from "@/components/Pagination";
 
+import { auth } from "@/auth";
+
 const VIDEOS_PER_PAGE = 12;
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Vídeos Educativos & Mentorias Gratuitas | CarreirasMatch",
+  title: "Vídeos Educativos & Mentorias | CarreirasMatch",
   description:
-    "Assista a vídeos educativos, mentorias e cursos gratuitos sobre carreira, tecnologia, idiomas, finanças e desenvolvimento profissional.",
+    "Assista a vídeos educativos, mentorias e cursos recomendados sobre carreira, tecnologia, idiomas, finanças e desenvolvimento profissional.",
   alternates: { canonical: "/mentorias" },
 };
 
@@ -21,6 +23,8 @@ export default async function MentoriasPage({
 }: {
   searchParams: Promise<{ area?: string; page?: string }>;
 }) {
+  const session = await auth();
+  const isLoggedIn = Boolean(session?.user?.id);
   const { area = "", page: pageParam } = await searchParams;
   const where = { active: true, ...(area ? { area } : {}) };
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
@@ -47,7 +51,7 @@ export default async function MentoriasPage({
     <ContentPage
       eyebrow="Biblioteca de Conteúdo & Treinamento"
       title="Vídeos & Mentorias para Evolução Profissional"
-      description="Conteúdo educativo gratuito e selecionado sobre carreira, tecnologia, finanças, idiomas, soft skills e inteligência artificial."
+      description="Conteúdo educativo selecionado sobre carreira, tecnologia, finanças, idiomas, soft skills e inteligência artificial."
       maxWidthClass="max-w-6xl"
     >
       <div className="space-y-8">
@@ -60,10 +64,10 @@ export default async function MentoriasPage({
             <div>
               <div className="flex items-center gap-2">
                 <span className="font-bold text-slate-900 dark:text-white text-base">
-                  Mentorias e Aulas Gratuitas
+                  {isLoggedIn ? "Mentorias & Aulas Disponíveis" : "Mentorias e Aulas Gratuitas"}
                 </span>
                 <span className="rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 text-xs font-semibold">
-                  100% Grátis
+                  {isLoggedIn ? "Acesso Liberado" : "100% Grátis"}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-0.5">

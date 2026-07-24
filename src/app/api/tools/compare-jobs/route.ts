@@ -1,79 +1,75 @@
-import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
-import { compareJobs, JobComparisonInput } from "@/lib/tools";
-import { PDFParse } from "pdf-parse";
+import { NextResponse } from "next/server";
+import { runJsonPrompt } from "@/lib/groq";
+import { z } from "zod";
 
-const MAX_RESUME_FILE_SIZE_BYTES = 5 * 1024 * 1024;
+const compareJobsSchema = z.object({
+  comparisons: z.array(
+    z.object({
+      jobTitle: z.string(),
+      companyName: z.string(),
+      matchScore: z.number().int().min(0).max(100),
+      effortToAdapt: z.enum(["Baixo", "Médio", "Alto"]),
+      keyRequirementsFound: z.array(z.string()),
+      criticalGaps: z.array(z.string()),
+      recommendationVerdict: z.string(),
+      tag: z.enum([
+        "Melhor aposta agora",
+        "Mais fácil de aplicar hoje",
+        "Melhor crescimento futuro",
+        "Exige preparação antes",
+      ]),
+    })
+  ),
+  overallWinnerIndex: z.number().int(),
+  comparisonSummary: z.string(),
+});
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const { session, response } = await requireToolAccess("/tools/compare-jobs");
-    if (!session) return response!;
+    const body = await req.json();
+    const { jobs = [], resumeText = "" } = body;
 
-    const formData = await req.formData();
-    const file = formData.get("resume") as File | null;
-    const jobsRaw = formData.get("jobs") as string | null;
-
-    if (!file) {
+    if (!Array.isArray(jobs) || jobs.length < 2) {
       return NextResponse.json(
-        { error: "Envie o currículo (PDF)." },
+        { error: "Envie pelo menos 2 vagas para realizar a comparação." },
         { status: 400 }
       );
     }
 
-    if (file.size > MAX_RESUME_FILE_SIZE_BYTES) {
-      return NextResponse.json(
-        { error: "O arquivo do currículo deve ter no máximo 5MB." },
-        { status: 413 }
-      );
-    }
+    const systemPrompt = `Você é um estrategista de carreira e consultor especialista em recrutamento.
+Sua missão é comparar até 5 vagas de emprego enviadas pelo usuário, cruzando com o perfil/currículo informado (se disponível).
 
-    if (!jobsRaw) {
-      return NextResponse.json(
-        { error: "Informe pelo menos 2 vagas para comparar." },
-        { status: 400 }
-      );
-    }
+Para cada vaga, avalie:
+- matchScore (0-100%): Nível de alinhamento entre o currículo e os requisitos da vaga.
+- effortToAdapt ("Baixo" | "Médio" | "Alto"): O esforço de ajuste necessário no currículo.
+- keyRequirementsFound: 3-5 requisitos que o candidato atende.
+- criticalGaps: 2-3 lacunas críticas.
+- recommendationVerdict: Veredito conciso sobre valer a pena aplicar agora.
+- tag: Atribua uma das tags ("Melhor aposta agora" | "Mais fácil de aplicar hoje" | "Melhor crescimento futuro" | "Exige preparação antes").
 
-    let jobs: JobComparisonInput[];
-    try {
-      jobs = JSON.parse(jobsRaw) as JobComparisonInput[];
-    } catch {
-      return NextResponse.json(
-        { error: "Não foi possível ler as vagas informadas." },
-        { status: 400 }
-      );
-    }
-    const validJobs = jobs
-      .filter((j) => j.jobTitle.trim() && j.jobText.trim())
-      .map((j, i) => ({ ...j, id: j.id ?? String(i) }));
+Identifique qual das vagas é a vencedora (overallWinnerIndex: 0-indexed) e forneça um resumo comparativo motivador.`;
 
-    if (validJobs.length < 2) {
-      return NextResponse.json(
-        { error: "Informe pelo menos 2 vagas com cargo e descrição preenchidos." },
-        { status: 400 }
-      );
-    }
+    const userMessage = `CURRÍCULO DO CANDIDATO:
+${resumeText || "Perfil geral de profissional em busca de recolocação/crescimento."}
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const parser = new PDFParse({ data: buffer });
-    const parsed = await parser.getText();
-    await parser.destroy();
-    const resumeText = parsed.text.trim();
+VAGAS A COMPARAR:
+${jobs.map((j: { title: string; description: string }, idx: number) => `--- VAGA ${idx + 1}: ${j.title} ---\n${j.description}`).join("\n\n")}`;
 
-    if (!resumeText) {
-      return NextResponse.json(
-        { error: "Não foi possível extrair texto do PDF enviado." },
-        { status: 422 }
-      );
-    }
+    const result = await runJsonPrompt(
+      systemPrompt,
+      userMessage,
+      0.2,
+      3000,
+      undefined,
+      compareJobsSchema,
+      "compare_jobs"
+    );
 
-    const result = await compareJobs(resumeText, validJobs);
-    return NextResponse.json(result);
+    return NextResponse.json({ success: true, result });
   } catch (error) {
-    console.error("Erro ao comparar vagas:", error);
+    console.error("Erro na comparação de vagas:", error);
     return NextResponse.json(
-      { error: "Erro ao processar. Tente novamente." },
+      { error: "Falha ao comparar vagas." },
       { status: 500 }
     );
   }

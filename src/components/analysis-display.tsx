@@ -14,7 +14,10 @@ import {
   ScorePercentileCard,
 } from "@/components/resume-quality-cards";
 import type { BulletAnalysisSummary } from "@/lib/bullet-analysis";
+import { build3StepMakeovers } from "@/lib/bullet-analysis";
 import type { StructuredResume } from "@/lib/groq";
+import { ATSHelperModal } from "@/components/ATSHelperModal";
+import { BulletPointMakeover } from "@/components/BulletPointMakeover";
 import {
   SOFT_SKILL_LABELS,
   type SoftSkillDimension,
@@ -858,7 +861,175 @@ export function SimpleFitTeaser({
   );
 }
 
+export function Recruiter7SecondHeatmapCard({
+  jobTitle,
+  structured,
+  bulletAnalysis,
+}: {
+  jobTitle: string;
+  structured?: StructuredResume | null;
+  bulletAnalysis?: BulletAnalysisSummary | null;
+}) {
+  const hasHeadline = !!jobTitle || !!structured?.experiences?.[0]?.role;
+  const hasContact = !!structured?.contact?.email || !!structured?.contact?.phone;
+  const hasTech = (structured?.skills?.length ?? 0) > 0;
+
+  const zone1Pass = hasHeadline && hasContact && hasTech;
+  const zone2Score = bulletAnalysis?.score ?? 70;
+  const zone2Pass = zone2Score >= 70;
+
+  const hasEducation = (structured?.education?.length ?? 0) > 0;
+  const hasLinks = !!structured?.contact?.linkedin || !!structured?.contact?.github;
+  const zone3Pass = hasEducation || hasLinks;
+
+  return (
+    <div className="rounded-3xl border border-purple-200/80 dark:border-purple-900/60 bg-gradient-to-b from-purple-50/50 via-white to-white dark:from-purple-950/20 dark:via-neutral-900 dark:to-neutral-900 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 font-bold text-lg">
+            ⏱️
+          </div>
+          <div>
+            <h3 className="text-base font-title font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <span>Recruiter 7-Second Heatmap</span>
+              <span className="text-[10px] font-mono font-normal uppercase px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
+                Auditoria de Leitura Rápida
+              </span>
+            </h3>
+            <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              O recrutador leva 7 segundos na primeira triagem. Veja como seu currículo pontua em cada zona.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+        {/* Zone 1 */}
+        <div className={`p-4 rounded-2xl border transition-all ${
+          zone1Pass
+            ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 text-emerald-950 dark:text-emerald-200"
+            : "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50 text-amber-950 dark:text-amber-200"
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold text-xs">Zona 1: Top Hook</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/5 dark:bg-white/10">1–2 Segundos</span>
+          </div>
+          <p className="text-[11px] font-medium opacity-90 mb-2">
+            <strong>Target Title + Core Tech Stack:</strong> {hasHeadline ? jobTitle || "Cargo Identificado" : "Falta Título Alvo claro"}
+          </p>
+          <div className="text-[10px] flex items-center gap-1 font-semibold">
+            {zone1Pass ? "✅ Contexto imediato garantido no topo." : "⚠️ Ajuste seu cabeçalho para exibir seu cargo alvo."}
+          </div>
+        </div>
+
+        {/* Zone 2 */}
+        <div className={`p-4 rounded-2xl border transition-all ${
+          zone2Pass
+            ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 text-emerald-950 dark:text-emerald-200"
+            : "bg-red-50/50 dark:bg-red-950/20 border-red-200 dark:border-red-900/50 text-red-950 dark:text-red-200"
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold text-xs">Zona 2: Escopo & Impacto</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/5 dark:bg-white/10">3–5 Segundos ⭐</span>
+          </div>
+          <p className="text-[11px] font-medium opacity-90 mb-2">
+            <strong>Ação + Ferramenta = Resultado:</strong> {zone2Score}% das frases usam verbos de ação e métricas.
+          </p>
+          <div className="text-[10px] flex items-center gap-1 font-semibold">
+            {zone2Pass ? "✅ Frases de impacto claras." : "❗ Frases parecem lista passiva de tarefas."}
+          </div>
+        </div>
+
+        {/* Zone 3 */}
+        <div className={`p-4 rounded-2xl border transition-all ${
+          zone3Pass
+            ? "bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/50 text-emerald-950 dark:text-emerald-200"
+            : "bg-amber-50/50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-900/50 text-amber-950 dark:text-amber-200"
+        }`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-bold text-xs">Zona 3: Sanity Check</span>
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/5 dark:bg-white/10">6–7 Segundos</span>
+          </div>
+          <p className="text-[11px] font-medium opacity-90 mb-2">
+            <strong>Requisitos Básicos e Links:</strong> {hasEducation ? "Formação presente" : "Sem formação clara"} • {hasLinks ? "Links incluídos" : "Sem links"}
+          </p>
+          <div className="text-[10px] flex items-center gap-1 font-semibold">
+            {zone3Pass ? "✅ Checagem rápida bem sucedida." : "⚠️ Adicione LinkedIn ou portfólio."}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function ScoreEvidenceTableCard({
+  keywordsFound,
+  keywordsMissing,
+}: {
+  keywordsFound: string[];
+  keywordsMissing: string[];
+}) {
+  return (
+    <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/40 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <span className="text-xl">🔍</span>
+          <div>
+            <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">
+              Decomposição do Score por Evidências
+            </h3>
+            <p className="text-xs text-[#64748B] dark:text-neutral-400">
+              Não apenas uma nota. Veja exatamente quais requisitos foram comprovados no seu currículo.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr className="border-b border-[#E2E8F0] dark:border-neutral-800 text-[#64748B] dark:text-neutral-400 font-semibold uppercase tracking-wider text-[10px]">
+              <th className="py-2.5 px-3">Requisito / Habilidade</th>
+              <th className="py-2.5 px-3">Evidência no Currículo</th>
+              <th className="py-2.5 px-3">Status</th>
+              <th className="py-2.5 px-3">Próxima Ação</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-[#E2E8F0] dark:divide-neutral-800 text-neutral-800 dark:text-neutral-200">
+            {keywordsFound.slice(0, 4).map((kw, i) => (
+              <tr key={`found-${i}`} className="hover:bg-neutral-50 dark:hover:bg-neutral-950/30">
+                <td className="py-3 px-3 font-semibold text-neutral-900 dark:text-white">{kw}</td>
+                <td className="py-3 px-3 text-[#22C55E] font-medium">Comprovado nas palavras-chave do perfil</td>
+                <td className="py-3 px-3">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    Forte ✅
+                  </span>
+                </td>
+                <td className="py-3 px-3 text-[#64748B]">Usar como exemplo prático na entrevista</td>
+              </tr>
+            ))}
+
+            {keywordsMissing.slice(0, 4).map((kw, i) => (
+              <tr key={`missing-${i}`} className="hover:bg-neutral-50 dark:hover:bg-neutral-950/30">
+                <td className="py-3 px-3 font-semibold text-neutral-900 dark:text-white">{kw}</td>
+                <td className="py-3 px-3 text-[#EF4444] font-medium">Não localizado explicitamente</td>
+                <td className="py-3 px-3">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-600 dark:text-red-400">
+                    Lacuna ⚠️
+                  </span>
+                </td>
+                <td className="py-3 px-3 text-[#64748B]">Inserir no currículo caso possua experiência</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 export function ScoreHero({
+
   status,
   reason,
   overall,
@@ -956,6 +1127,7 @@ export function AnalysisResult({
 }) {
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
+  const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
 
   const tabs = [
     { id: "overview", label: "Visão Geral", emoji: "📊" },
@@ -1004,6 +1176,28 @@ export function AnalysisResult({
               ats={result.atsScore}
             />
 
+            {/* Recruiter 7-Second Heatmap Card */}
+            <Recruiter7SecondHeatmapCard
+              jobTitle={jobTitle}
+              structured={resumeStructured}
+              bulletAnalysis={bulletAnalysis}
+            />
+
+            {/* Score por Evidências Table */}
+            <ScoreEvidenceTableCard
+              keywordsFound={result.keywordsFound}
+              keywordsMissing={result.keywordsMissing}
+            />
+
+            {/* Botão de Abertura do Assistente ATS */}
+            <button
+              onClick={() => setIsAtsModalOpen(true)}
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>⚡</span>
+              <span>Copiar Respostas Otimizadas para Formulários ATS (Gupy, Workday, Greenhouse, Lever)</span>
+            </button>
+
             {typeof betterThanPercent === "number" && (
               <ScorePercentileCard
                 betterThanPercent={betterThanPercent}
@@ -1030,6 +1224,11 @@ export function AnalysisResult({
         {/* ABA: Currículo & Gaps */}
         {activeTab === "gaps" && (
           <>
+            {/* Makeover 3 Passos */}
+            <BulletPointMakeover
+              makeovers={build3StepMakeovers(resumeStructured?.experiences)}
+            />
+
             <div className="grid gap-5 md:grid-cols-2">
               <KeywordCard
                 title="Palavras-chave encontradas"
@@ -1037,6 +1236,7 @@ export function AnalysisResult({
                 variant="found"
               />
               <KeywordCard
+
                 title="Palavras-chave ausentes"
                 items={result.keywordsMissing}
                 variant="missing"
@@ -1333,6 +1533,15 @@ export function AnalysisResult({
         )}
 
       </div>
+
+      <ATSHelperModal
+        isOpen={isAtsModalOpen}
+        onClose={() => setIsAtsModalOpen(false)}
+        jobTitle={jobTitle}
+        suggestedSummary={result.suggestedSummary}
+        keywordsFound={result.keywordsFound}
+        experienceSuggestions={result.experienceSuggestions}
+      />
     </section>
   );
 }

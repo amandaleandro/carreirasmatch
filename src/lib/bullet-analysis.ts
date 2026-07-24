@@ -206,3 +206,33 @@ export function analyzeResumeBullets(resumeStructured: StructuredResume): Bullet
 
   return { diagnostics, score };
 }
+
+export type MakeoverItem = {
+  role: string;
+  company: string;
+  step1DutyChecklist: string;
+  step2AddingTools: string;
+  step3RecruiterGrade: string;
+  whyItWins: string;
+};
+
+export function build3StepMakeovers(
+  experiences?: Array<{ role: string; company: string; description: string }>
+): MakeoverItem[] {
+  if (!experiences || experiences.length === 0) return [];
+  return experiences.slice(0, 3).map((exp) => {
+    const rawDesc = exp.description?.split("\n")[0]?.trim() || exp.description?.trim() || "Responsável pelas rotinas e tarefas da área.";
+    const cleanRole = exp.role?.trim() || "Profissional";
+    const cleanCompany = exp.company?.trim() || "Empresa";
+    
+    return {
+      role: cleanRole,
+      company: cleanCompany,
+      step1DutyChecklist: rawDesc.toLowerCase().startsWith("responsavel") ? rawDesc : `Responsável por ${rawDesc}`,
+      step2AddingTools: `Gerenciei as atividades de ${cleanRole} utilizando ferramentas técnicas e acompanhando o fluxo de trabalho.`,
+      step3RecruiterGrade: `Otimizou os processos de ${cleanRole}, reduzindo tempos de execução em 25% e entregando resultados com impacto mensurável.`,
+      whyItWins: "Ação clara com verbo no passado, menção de ferramentas de trabalho e métrica mensurável de resultado.",
+    };
+  });
+}
+

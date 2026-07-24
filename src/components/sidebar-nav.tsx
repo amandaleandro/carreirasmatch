@@ -37,29 +37,56 @@ type NavItem = {
   tour?: string;
 };
 
-const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame, tour: "nav-desafio" },
-  { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
-  { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
-  { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
-  { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
-  { href: "/freelancer", label: "Freelancer", icon: Handshake, tour: "nav-freelancer" },
-  { href: "/jogos", label: "Jogos", icon: Gamepad2, tour: "nav-jogos" },
-  { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
-  { href: "/profile", label: "Desenvolvimento", icon: Sparkles },
-  { href: "/action-plan", label: "Plano de Ação", icon: Target },
-  { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
-  { href: "/history", label: "Relatórios", icon: BarChart3 },
-  { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
-  { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
-  { href: "/concursos", label: "Radar de concursos", icon: Landmark, tour: "nav-concursos" },
-  { href: "/vestibulares", label: "Radar de vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
-  { href: "/suporte", label: "Suporte", icon: LifeBuoy },
-  { href: "/settings", label: "Perfil", icon: User },
-];
+type NavGroup = {
+  title: string;
+  items: NavItem[];
+};
 
-const COMING_SOON_ITEMS: { label: string; icon: NavItem["icon"] }[] = [];
+const NAV_GROUPS: NavGroup[] = [
+  {
+    title: "Principal",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
+      { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
+    ],
+  },
+  {
+    title: "Oportunidades",
+    items: [
+      { href: "/radar", label: "Radar de Oportunidades 📡", icon: Rss, tour: "nav-radar" },
+      { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
+      { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
+      { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+      { href: "/tools/clipper", label: "Clipper de Vagas ✂️", icon: Wrench },
+      { href: "/tools/comparador-vagas", label: "Comparador de Vagas 📊", icon: BarChart3 },
+      { href: "/freelancer", label: "Freelancer", icon: Handshake, tour: "nav-freelancer" },
+    ],
+  },
+
+  {
+    title: "Crescimento & IA",
+    items: [
+      { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
+      { href: "/action-plan", label: "Plano de Ação", icon: Target },
+      { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame, tour: "nav-desafio" },
+      { href: "/jogos", label: "Jogos", icon: Gamepad2, tour: "nav-jogos" },
+      { href: "/profile", label: "Desenvolvimento", icon: Sparkles },
+    ],
+  },
+  {
+    title: "Recursos & Suporte",
+    items: [
+      { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
+      { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+      { href: "/concursos", label: "Radar Concursos", icon: Landmark, tour: "nav-concursos" },
+      { href: "/vestibulares", label: "Radar Vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
+      { href: "/history", label: "Relatórios", icon: BarChart3 },
+      { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+      { href: "/settings", label: "Perfil", icon: User },
+    ],
+  },
+];
 
 const ADMIN_NAV_ITEM: NavItem = { href: "/admin", label: "Admin", icon: ShieldCheck };
 const INFLUENCER_NAV_ITEM: NavItem = { href: "/influencer", label: "Influencer", icon: TrendingUp };
@@ -73,11 +100,6 @@ export function SidebarNav({
 }) {
   const pathname = usePathname();
   const { openNews, openTour } = useUiPanels();
-  const navItems = [
-    ...NAV_ITEMS,
-    ...(isInfluencer ? [INFLUENCER_NAV_ITEM] : []),
-    ...(isAdmin ? [ADMIN_NAV_ITEM] : []),
-  ];
 
   return (
     <aside className="hidden md:flex w-64 shrink-0 flex-col bg-[#071827] text-white h-screen sticky top-0 border-r border-slate-800/80">
@@ -85,43 +107,67 @@ export function SidebarNav({
         <BrandLogo heightClassName="h-12" onDark />
       </div>
 
-      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-1">
-        {navItems.map((item) => {
-          const active = pathname.startsWith(item.href);
-          const Icon = item.icon;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              data-tour={item.tour}
-              className={`group flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm transition-all ${
-                active
-                  ? "bg-[#0e2032] text-white font-bold border border-blue-500/30 shadow-xs"
-                  : "text-[#94a3b8] hover:bg-white/[0.05] hover:text-white hover:translate-x-0.5 font-medium"
-              }`}
-            >
-              <Icon strokeWidth={2} className={`h-5 w-5 shrink-0 transition-colors ${active ? "text-blue-500" : "text-[#64748b] group-hover:text-blue-400"}`} />
-              <span className="truncate">{item.label}</span>
-            </Link>
-          );
-        })}
+      <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-5">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.title} className="space-y-1">
+            <h3 className="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              {group.title}
+            </h3>
+            {group.items.map((item) => {
+              const active = pathname.startsWith(item.href);
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  data-tour={item.tour}
+                  className={`group flex items-center gap-3 rounded-xl px-3.5 py-2 text-sm transition-all ${
+                    active
+                      ? "bg-[#0e2032] text-white font-bold border border-blue-500/30 shadow-xs"
+                      : "text-[#94a3b8] hover:bg-white/[0.05] hover:text-white hover:translate-x-0.5 font-medium"
+                  }`}
+                >
+                  <Icon strokeWidth={2} className={`h-4.5 w-4.5 shrink-0 transition-colors ${active ? "text-blue-500" : "text-[#64748b] group-hover:text-blue-400"}`} />
+                  <span className="truncate">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
 
-        {COMING_SOON_ITEMS.map((item) => {
-          const Icon = item.icon;
-          return (
-            <div
-              key={item.label}
-              title="Em breve"
-              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-500 cursor-not-allowed"
-            >
-              <Icon strokeWidth={1.75} className="h-5 w-5 shrink-0" />
-              {item.label}
-              <span className="ml-auto text-[10px] uppercase tracking-wide bg-white/5 rounded px-1.5 py-0.5">
-                em breve
-              </span>
-            </div>
-          );
-        })}
+        {(isAdmin || isInfluencer) && (
+          <div className="space-y-1 pt-2 border-t border-slate-800/60">
+            <h3 className="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
+              Gestão
+            </h3>
+            {isInfluencer && (
+              <Link
+                href={INFLUENCER_NAV_ITEM.href}
+                className={`group flex items-center gap-3 rounded-xl px-3.5 py-2 text-sm transition-all ${
+                  pathname.startsWith(INFLUENCER_NAV_ITEM.href)
+                    ? "bg-[#0e2032] text-white font-bold border border-blue-500/30"
+                    : "text-[#94a3b8] hover:bg-white/[0.05] hover:text-white font-medium"
+                }`}
+              >
+                <TrendingUp strokeWidth={2} className="h-4.5 w-4.5 text-[#64748b] group-hover:text-blue-400" />
+                <span>Influencer</span>
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                href={ADMIN_NAV_ITEM.href}
+                className={`group flex items-center gap-3 rounded-xl px-3.5 py-2 text-sm transition-all ${
+                  pathname.startsWith(ADMIN_NAV_ITEM.href)
+                    ? "bg-[#0e2032] text-white font-bold border border-blue-500/30"
+                    : "text-[#94a3b8] hover:bg-white/[0.05] hover:text-white font-medium"
+                }`}
+              >
+                <ShieldCheck strokeWidth={2} className="h-4.5 w-4.5 text-[#64748b] group-hover:text-blue-400" />
+                <span>Admin</span>
+              </Link>
+            )}
+          </div>
+        )}
       </nav>
 
       <div className="p-4 space-y-3">

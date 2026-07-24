@@ -143,14 +143,6 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     color: "emerald",
   },
   {
-    href: "/tools/linkedin-review",
-    title: "Análise de LinkedIn",
-    description: "Receba sugestões de headline e seção sobre.",
-    segments: ["first_job", "internship", "career_change", "career_pro"],
-    icon: "linkedin",
-    color: "blue",
-  },
-  {
     href: "/tools/github-review",
     title: "Análise de GitHub",
     description: "Descubra quais repositórios destacar no currículo.",
