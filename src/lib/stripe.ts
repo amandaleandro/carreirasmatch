@@ -9,7 +9,10 @@ import type { CareerSegment } from "@/lib/career-segments";
  * "Do not guess as to what the required Stripe API version should be.
  * Leave the API version argument empty when initializing the Stripe client".
  */
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
+// O build do Next pode avaliar este módulo sem carregar as variáveis de runtime
+// da VPS. Uma chave placeholder mantém a inicialização segura no build; as
+// chamadas reais continuam exigindo STRIPE_SECRET_KEY no ambiente de produção.
+export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "sk_test_build_placeholder");
 
 export type CreateStripeSessionOptions = {
   userId?: string;
