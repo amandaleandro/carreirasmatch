@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { ContentPage } from "@/components/content-page";
 import { AllJobsList } from "@/app/feed/AllJobsList";
 import { Pagination } from "@/components/Pagination";
 import { AllJobsFilterForm } from "./AllJobsFilterForm";
 import { locationSearchVariants, stateSearchVariants } from "@/lib/brazil-locations";
+import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +38,7 @@ export default async function AllJobsPage({
   const page = Math.max(1, Number(params.page) || 1);
   const { q, area, city, state, workModel, contractType } = params;
 
-  const andFilters: any[] = [];
+  const andFilters: Prisma.JobWhereInput[] = [];
   if (q?.trim()) {
     andFilters.push({
       OR: locationSearchVariants(q.trim()).flatMap((variant) => [
@@ -93,8 +93,12 @@ export default async function AllJobsPage({
     // de `location` (cobre vagas que ainda não passaram pelo backfill/parser).
     andFilters.push({
       OR: [
-        ...locationSearchVariants(city).map((variant) => ({ city: { contains: variant, mode: "insensitive" } })),
-        ...locationSearchVariants(city).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+        ...locationSearchVariants(city).map<Prisma.JobWhereInput>((variant) => ({
+          city: { contains: variant, mode: "insensitive" },
+        })),
+        ...locationSearchVariants(city).map<Prisma.JobWhereInput>((variant) => ({
+          location: { contains: variant, mode: "insensitive" },
+        })),
       ],
     });
   }
@@ -102,7 +106,9 @@ export default async function AllJobsPage({
     andFilters.push({
       OR: [
         { state: state.trim().toUpperCase() },
-        ...stateSearchVariants(state).map((variant) => ({ location: { contains: variant, mode: "insensitive" } })),
+        ...stateSearchVariants(state).map<Prisma.JobWhereInput>((variant) => ({
+          location: { contains: variant, mode: "insensitive" },
+        })),
       ],
     });
   }

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
-import { getSubjectBySlug, HIGH_SCHOOL_SUBJECTS } from "@/lib/ensino-medio";
+import { getSubjectBySlug } from "@/lib/ensino-medio";
 
 export interface GeneratedSimulado {
   title: string;

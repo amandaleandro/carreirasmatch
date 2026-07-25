@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+import * as cheerio from "cheerio";
 
 async function inspectCDLEndpoints() {
   // 1. Cursos

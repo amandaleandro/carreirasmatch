@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from "react";
-import type { ScreeningCandidate } from "@/components/screening-results";
+import type { CandidateStatus, ScreeningCandidate } from "@/components/screening-results";
 
 interface CompanyCandidateKanbanProps {
   candidates: ScreeningCandidate[];
   onGenerateInterviewScript?: (candidate: ScreeningCandidate) => void;
 }
 
-const STAGES = [
+const STAGES: Array<{ id: CandidateStatus; label: string; color: string }> = [
   { id: "none", label: "Recebidos", color: "bg-neutral-100 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-200" },
   { id: "screening", label: "Em Triagem", color: "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200" },
   { id: "interview", label: "Entrevista", color: "bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-200" },
@@ -21,7 +21,7 @@ export function CompanyCandidateKanban({ candidates: initialCandidates, onGenera
   const [candidatesList, setCandidatesList] = useState<ScreeningCandidate[]>(initialCandidates);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const moveCandidate = async (candidateId: string, newStatus: string) => {
+  const moveCandidate = async (candidateId: string, newStatus: CandidateStatus) => {
     setUpdatingId(candidateId);
     try {
       const res = await fetch("/api/empresa/candidates/status", {
@@ -31,7 +31,7 @@ export function CompanyCandidateKanban({ candidates: initialCandidates, onGenera
       });
       if (res.ok) {
         setCandidatesList((prev) =>
-          prev.map((c) => (c.id === candidateId ? { ...c, status: newStatus as any } : c))
+          prev.map((c) => (c.id === candidateId ? { ...c, status: newStatus } : c))
         );
       }
     } catch (e) {
@@ -96,7 +96,10 @@ export function CompanyCandidateKanban({ candidates: initialCandidates, onGenera
                     <div className="pt-1 flex flex-col gap-1">
                       <select
                         value={candidate.status || "none"}
-                        onChange={(e) => moveCandidate(candidate.id, e.target.value)}
+                        onChange={(e) => {
+                          const stage = STAGES.find((item) => item.id === e.target.value);
+                          if (stage) void moveCandidate(candidate.id, stage.id);
+                        }}
                         className="w-full text-[10px] rounded border border-neutral-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 p-1 font-medium text-neutral-700 dark:text-neutral-300"
                       >
                         {STAGES.map((s) => (

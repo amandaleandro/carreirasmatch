@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Users, Copy, Check, Gift, Sparkles } from "lucide-react";
+import { Copy, Check, Gift, Sparkles } from "lucide-react";
 
 interface ReferralRewardBoxProps {
   userId: string;

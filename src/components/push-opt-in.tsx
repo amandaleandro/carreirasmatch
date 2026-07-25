@@ -26,7 +26,7 @@ export function PushOptIn() {
       "PushManager" in window &&
       "Notification" in window;
     if (!supported) {
-      setState("unsupported");
+      queueMicrotask(() => setState("unsupported"));
       return;
     }
 

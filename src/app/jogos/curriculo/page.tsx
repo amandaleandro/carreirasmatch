@@ -73,7 +73,7 @@ export default function CurriculoPage() {
   }, []);
 
   useEffect(() => {
-    startRound(area);
+    queueMicrotask(() => startRound(area));
   }, [area, startRound]);
 
   async function saveScore(score: number) {

@@ -16,6 +16,9 @@ o diagnóstico em ações."
 **Headline da home (`src/components/marketing-home.tsx`):** "Pare de se
 candidatar no escuro." com CTA primário "Analisar currículo e vaga" → `/analise`.
 
+Para a síntese executiva de posicionamento, casa de mensagem, funil e copy
+recomendada, consulte [../PRODUCT_AND_MARKETING_BRIEF.md](../PRODUCT_AND_MARKETING_BRIEF.md).
+
 ## Documentos
 
 | Documento | Cobre |

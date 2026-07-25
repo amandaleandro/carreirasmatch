@@ -83,7 +83,6 @@ export function VocationHubClient({
   hasCompletedGeneralTest: initialHasCompleted,
   recommendedAreas,
   areaOfTheDay,
-  loggedIn,
 }: VocationHubClientProps) {
   const testedSlugs = new Set(initialTestedSlugs);
   const recommendedSlugSet = new Set(recommendedAreas.map((a) => a.areaSlug));

@@ -9,6 +9,7 @@ import {
   Rss,
   KanbanSquare,
   FileText,
+  FileEdit,
   User,
   Sparkles,
   Target,
@@ -30,6 +31,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
+import type { CareerSegment } from "@/lib/career-segments";
 
 type NavItem = {
   href: string;
@@ -91,15 +93,165 @@ const NAV_GROUPS: NavGroup[] = [
   },
 ];
 
+const STUDENT_NAV_GROUPS: NavGroup[] = [
+  {
+    title: "Minha jornada",
+    items: [
+      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
+      { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico", icon: GraduationCap },
+      { href: "/cursos-gratuitos", label: "Cursos gratuitos", icon: BookOpen, tour: "nav-tools" },
+    ],
+  },
+  {
+    title: "Explorar oportunidades",
+    items: [
+      { href: "/vestibulares", label: "Radar Vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
+      { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+      { href: "/jogos", label: "Jogos", icon: Gamepad2, tour: "nav-jogos" },
+    ],
+  },
+  {
+    title: "Recursos & Suporte",
+    items: [
+      { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+      { href: "/settings", label: "Perfil", icon: User },
+    ],
+  },
+];
+
+const APPRENTICE_NAV_GROUPS: NavGroup[] = [
+  { title: "Minha jornada", items: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/jovem-aprendiz", label: "Jovem Aprendiz", icon: GraduationCap },
+    { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen },
+  ] },
+  { title: "Preparação", items: [
+    { href: "/tools/apprentice-areas", label: "Áreas de atuação", icon: Target },
+    { href: "/tools/apprentice-companies", label: "Empresas", icon: Briefcase },
+      { href: "/tools/apprentice-guide", label: "Guia do Aprendiz", icon: BookOpen, tour: "nav-tools" },
+    { href: "/cursos-gratuitos", label: "Cursos gratuitos", icon: BookOpen },
+  ] },
+  { title: "Vagas", items: [
+    { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
+    { href: "/radar", label: "Radar de Oportunidades", icon: Target },
+    { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
+    { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+  ] },
+  { title: "Suporte", items: [
+    { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+    { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+    { href: "/settings", label: "Perfil", icon: User },
+  ] },
+];
+
+const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
+  { title: "Minha jornada", items: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/primeiro-emprego", label: "Primeiro emprego", icon: Briefcase },
+    { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência", icon: FileText },
+  ] },
+  { title: "Preparação", items: [
+    { href: "/tools/first-job-guide", label: "Guia do primeiro emprego", icon: BookOpen },
+    { href: "/vagas-de-hoje", label: "Vagas de hoje", icon: Search },
+    { href: "/cursos-gratuitos", label: "Cursos gratuitos", icon: BookOpen },
+  ] },
+  { title: "Vagas", items: [
+    { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
+    { href: "/radar", label: "Radar de Oportunidades", icon: Target },
+    { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
+    { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+  ] },
+  { title: "Suporte", items: [
+    { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+    { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+    { href: "/settings", label: "Perfil", icon: User },
+  ] },
+];
+
+const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
+  { title: "Minha jornada", items: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/estagio", label: "Estágios", icon: Briefcase },
+    { href: "/feed", label: "Feed de estágios", icon: Rss, tour: "nav-feed" },
+    { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
+  ] },
+  { title: "Organização", items: [
+    { href: "/tools/internship-guide", label: "Guia de estágio", icon: BookOpen },
+    { href: "/tools/internship-checklist", label: "Checklist de estágio", icon: FileText },
+    { href: "/tools/internship-calculator", label: "Calculadora de bolsa", icon: BarChart3 },
+    { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
+  ] },
+  { title: "Vagas", items: [
+    { href: "/feed", label: "Feed de Vagas", icon: Rss },
+    { href: "/radar", label: "Radar de Oportunidades", icon: Target },
+    { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
+    { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+  ] },
+  { title: "Suporte", items: [
+    { href: "/mentorias", label: "Mentorias", icon: GraduationCap },
+    { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+    { href: "/settings", label: "Perfil", icon: User },
+  ] },
+];
+
+const CONCURSEIRO_NAV_GROUPS: NavGroup[] = [
+  { title: "Minha preparação", items: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/concursos", label: "Radar de Concursos", icon: Landmark, tour: "nav-concursos" },
+    { href: "/concurso", label: "Preparação para concurso", icon: ScrollText },
+  ] },
+  { title: "Ferramentas de estudo", items: [
+    { href: "/tools/concurso", label: "Plano e simulados", icon: BookOpen, tour: "nav-tools" },
+    { href: "/tools/leitor-edital", label: "Leitor de edital", icon: FileText },
+    { href: "/tools/essay-grader", label: "Corretor de redação", icon: FileEdit },
+  ] },
+  { title: "Suporte", items: [
+    { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+    { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+    { href: "/settings", label: "Perfil", icon: User },
+  ] },
+];
+
+const OAB_NAV_GROUPS: NavGroup[] = [
+  { title: "Minha preparação", items: [
+    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/oab", label: "Preparação para OAB", icon: Landmark },
+  ] },
+  { title: "Ferramentas de estudo", items: [
+    { href: "/tools/oab", label: "Simulados OAB", icon: BookOpen, tour: "nav-tools" },
+    { href: "/tools/oab/segunda-fase", label: "Segunda fase", icon: FileText },
+  ] },
+  { title: "Suporte", items: [
+    { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
+    { href: "/suporte", label: "Suporte", icon: LifeBuoy },
+    { href: "/settings", label: "Perfil", icon: User },
+  ] },
+];
+
+function navGroupsForSegment(segment: CareerSegment | null | undefined): NavGroup[] {
+  switch (segment) {
+    case "student": return STUDENT_NAV_GROUPS;
+    case "apprentice": return APPRENTICE_NAV_GROUPS;
+    case "first_job": return FIRST_JOB_NAV_GROUPS;
+    case "internship": return INTERNSHIP_NAV_GROUPS;
+    case "concurseiro": return CONCURSEIRO_NAV_GROUPS;
+    case "oab": return OAB_NAV_GROUPS;
+    default: return NAV_GROUPS;
+  }
+}
+
 const ADMIN_NAV_ITEM: NavItem = { href: "/admin", label: "Admin", icon: ShieldCheck };
 const INFLUENCER_NAV_ITEM: NavItem = { href: "/influencer", label: "Influencer", icon: TrendingUp };
 
 export function SidebarNav({
   isAdmin = false,
   isInfluencer = false,
+  segment = null,
 }: {
   isAdmin?: boolean;
   isInfluencer?: boolean;
+  segment?: CareerSegment | null;
 }) {
   const pathname = usePathname();
   const { openNews, openTour } = useUiPanels();
@@ -111,7 +263,7 @@ export function SidebarNav({
       </div>
 
       <nav className="flex-1 min-h-0 overflow-y-auto px-3 py-4 space-y-5">
-        {NAV_GROUPS.map((group) => (
+        {navGroupsForSegment(segment).map((group) => (
           <div key={group.title} className="space-y-1">
             <h3 className="px-3 text-[11px] font-semibold tracking-wider text-slate-400 uppercase">
               {group.title}

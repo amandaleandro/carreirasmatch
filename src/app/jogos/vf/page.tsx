@@ -89,7 +89,7 @@ export default function VfPage() {
   useEffect(() => {
     if (!started) return;
     if (timeLeft <= 0) {
-      finish();
+      queueMicrotask(() => finish());
       return;
     }
     const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);

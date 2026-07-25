@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+import * as cheerio from "cheerio";
 
 async function inspectCDL() {
   const url = "https://cdludi.org.br/";

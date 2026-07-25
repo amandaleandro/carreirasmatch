@@ -1,7 +1,7 @@
 import { requirePartnerPage } from "@/lib/partner-auth";
 import { prisma } from "@/lib/prisma";
 import { PartnerShell } from "@/components/partner-shell";
-import { BookOpen, Sparkles, MapPin, Link as LinkIcon, Check, Trash2, ArrowUpRight } from "lucide-react";
+import { BookOpen, Sparkles, MapPin, Check, Trash2, ArrowUpRight } from "lucide-react";
 import { revalidatePath } from "next/cache";
 import { PartnerCourseForm } from "./PartnerCourseForm";
 

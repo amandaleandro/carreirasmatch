@@ -5,6 +5,7 @@ const textArray = z.array(text);
 const score = z.number().int().min(0).max(100);
 
 export const resumeAnalysisSchema = z.object({
+  inferredJobTitle: z.string().optional(),
   overallScore: score, technicalScore: score, experienceScore: score,
   seniorityScore: score, atsScore: score,
   applicationStatus: z.enum(["apply_now", "adjust_first", "deprioritize"]),

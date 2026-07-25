@@ -532,36 +532,36 @@ const FIRST_JOB_PATH_OPTIONS: { key: FirstJobPath; label: string }[] = [
 const NICHE_ORDER = Object.keys(NICHES) as NicheSlug[];
 const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: string }> = {
   estagiarios: {
-    headline: "Encontrou um estágio? Veja como aproximar seu currículo dessa vaga.",
-    subheadline: "Compare a oportunidade com seus projetos, cursos e atividades e descubra o que já conta a seu favor e o que precisa ficar mais claro antes de se candidatar.",
+    headline: "Seu primeiro estágio pode começar com o que você já sabe.",
+    subheadline: "Transforme projetos, cursos e atividades em evidências que uma empresa consegue enxergar — e descubra o ajuste que falta antes de aplicar.",
   },
   "primeiro-emprego": {
-    headline: "Encontrou sua primeira vaga? Mostre o que você já sabe fazer.",
-    subheadline: "Compare seu currículo com a oportunidade e transforme cursos, projetos e atividades em evidências reais, sem inventar experiência profissional.",
+    headline: "Seu primeiro emprego não precisa parecer impossível.",
+    subheadline: "Mostre cursos, projetos e responsabilidades do jeito certo para a vaga — sem inventar experiência e sem se diminuir.",
   },
   "transicao-de-carreira": {
-    headline: "Encontrou uma vaga na nova área? Conecte sua experiência à mudança.",
-    subheadline: "Descubra quais habilidades são transferíveis, o que a vaga ainda exige e como explicar sua transição com clareza antes de se candidatar.",
+    headline: "Mudar de área não apaga a experiência que você construiu.",
+    subheadline: "Encontre as habilidades transferíveis que já aproximam você da nova carreira e aprenda a contar essa mudança com segurança.",
   },
   recolocacao: {
-    headline: "Encontrou a vaga para voltar ao mercado? Ajuste sua apresentação primeiro.",
-    subheadline: "Compare a oportunidade com sua trajetória, destaque resultados atuais e prepare uma explicação segura para pausas ou mudanças no currículo.",
+    headline: "Volte ao mercado com uma história que faz sentido.",
+    subheadline: "Organize sua experiência, explique pausas com segurança e ajuste sua apresentação para a vaga que você quer agora.",
   },
   "menor-aprendiz": {
-    headline: "Encontrou uma vaga de Jovem Aprendiz? Prepare seu currículo para ela.",
-    subheadline: "Mostre escola, cursos, atividades e responsabilidade de um jeito profissional, mesmo que esta seja sua primeira oportunidade.",
+    headline: "Você já tem mais para mostrar do que imagina.",
+    subheadline: "Monte um currículo claro para Jovem Aprendiz usando escola, cursos, atividades e responsabilidade — mesmo sem experiência.",
   },
   estudante: {
-    headline: "Faculdade, técnico ou outro caminho? Compare antes de decidir.",
-    subheadline: "Organize interesses, rotina e objetivos para entender quais formações combinam com o futuro profissional que você quer construir.",
+    headline: "Pare de escolher seu futuro no achismo.",
+    subheadline: "Entenda qual caminho combina com seus interesses, rotina e objetivos — enquanto recebe ajuda para estudar melhor todos os dias.",
   },
   concurseiro: {
-    headline: "Escolheu um concurso? Transforme o edital em prioridades de estudo.",
-    subheadline: "Organize matérias, pesos, simulados e revisões para saber o que estudar primeiro e acompanhar sua evolução até a prova.",
+    headline: "Pare de estudar tudo e continuar sem saber se está avançando.",
+    subheadline: "Transforme o edital em prioridades, treine com simulados e acompanhe o que realmente aproxima você da aprovação.",
   },
   oab: {
-    headline: "Vai fazer a OAB? Prepare cada fase pelo padrão da FGV.",
-    subheadline: "Pratique questões, peças e discursivas com um plano organizado para a fase do exame em que você está.",
+    headline: "Na OAB, estudar mais não basta. Você precisa estudar certo.",
+    subheadline: "Treine no padrão da FGV, corrija seus erros e siga um plano claro para a fase em que você está.",
   },
 };
 const RESOURCE_TABS = [

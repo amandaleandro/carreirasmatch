@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, CheckCircle2, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { Sparkles, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react";
 
 export function SubscriptionUpsell({
   segment,

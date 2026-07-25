@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Download, TrendingUp } from "lucide-react";
+import { Download } from "lucide-react";
 
 type CouponSignupUser = {
   id: string;

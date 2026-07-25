@@ -36,6 +36,15 @@ type GameItem = {
   isNew?: boolean;
 };
 
+export type GamesProfile = {
+  name: string | null;
+  segment: string | null;
+  area: string | null;
+  areaSlug: string | null;
+  currentArea: string | null;
+  studyCourse: string | null;
+};
+
 const ALL_GAMES: GameItem[] = [
   {
     id: "dilemas",
@@ -174,8 +183,32 @@ const ALL_GAMES: GameItem[] = [
   },
 ];
 
-export function GamesCatalog() {
-  const [selectedCategory, setSelectedCategory] = useState<string>("todos");
+const DAILY_ROUTE = [
+  { game: "quiz", label: "Aquecimento", title: "Teste seus conhecimentos", href: "/jogos/quiz" },
+  { game: "memory", label: "Prática", title: "Fixe os termos importantes", href: "/jogos/memoria" },
+  { game: "dilemas", label: "Desafio", title: "Tome uma decisão de carreira", href: "/jogos/dilemas" },
+] as const;
+
+export function GamesCatalog({
+  profile,
+  playedToday = [],
+  recentGames = [],
+}: {
+  profile: GamesProfile;
+  playedToday?: string[];
+  recentGames?: string[];
+}) {
+  const profileStage = profile.segment === "student"
+    ? "ensino-medio"
+    : profile.segment === "internship" || profile.segment === "apprentice" || profile.segment === "first_job"
+    ? "primeiro-emprego"
+    : profile.segment === "career_change" || profile.segment === "career_pro"
+    ? "profissional"
+    : "todos";
+  const [selectedCategory, setSelectedCategory] = useState<string>(profile.areaSlug ?? profileStage);
+  const completedToday = DAILY_ROUTE.filter((step) => playedToday.includes(step.game)).length;
+  const nextStep = DAILY_ROUTE.find((step) => !playedToday.includes(step.game)) ?? DAILY_ROUTE[0];
+  const nextHref = profile.areaSlug ? `${nextStep.href}?area=${profile.areaSlug}` : nextStep.href;
 
   // Determine active area label if an area slug is selected
   const activeArea = VOCATION_AREAS.find((a) => a.slug === selectedCategory);
@@ -192,7 +225,57 @@ export function GamesCatalog() {
 
   return (
     <div className="space-y-8">
+      {profile.segment && (profile.area || profile.studyCourse) ? (
+        <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 dark:border-blue-900/60 dark:from-blue-950/40 dark:to-indigo-950/30">
+          <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-300">Jogos recomendados para você</p>
+          <h2 className="mt-1 text-lg font-extrabold text-blue-950 dark:text-white">{profile.area ?? profile.studyCourse}</h2>
+          <p className="mt-1 text-xs leading-relaxed text-blue-800/80 dark:text-blue-200/80">
+            {profile.segment === "career_change" && profile.currentArea
+              ? `Desafios para fazer a transição de ${profile.currentArea} para ${profile.area}.`
+              : profile.studyCourse
+              ? `Conteúdo adaptado ao seu curso de ${profile.studyCourse}.`
+              : "Desafios, termos e situações alinhados ao seu objetivo profissional."}
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-neutral-300 bg-white p-4 text-sm text-neutral-600 dark:border-neutral-700 dark:bg-neutral-900/40 dark:text-neutral-300">
+          Informe sua área e objetivo no <Link href="/settings" className="font-bold text-blue-600 hover:underline">perfil</Link> para receber jogos personalizados.
+        </div>
+      )}
       {/* Banner de Nível, XP, Streak & Missões Diárias */}
+      <section className="rounded-3xl border border-indigo-200 bg-white p-5 shadow-sm dark:border-indigo-900/60 dark:bg-neutral-900/60">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Sua trilha de hoje</p>
+            <h2 className="mt-1 text-lg font-extrabold text-neutral-900 dark:text-white">3 jogos, 10 minutos e uma habilidade a mais</h2>
+            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
+              {completedToday === 3 ? "Trilha concluída. Volte amanhã para um novo desafio." : `${completedToday}/3 etapas concluídas · próximo: ${nextStep.title}.`}
+            </p>
+          </div>
+          {completedToday < 3 && (
+            <Link href={nextHref} className="inline-flex shrink-0 items-center justify-center rounded-xl bg-indigo-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-indigo-700 active:scale-95">
+              Continuar trilha
+            </Link>
+          )}
+        </div>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {DAILY_ROUTE.map((step, index) => {
+            const done = playedToday.includes(step.game);
+            return (
+              <div key={step.game} className={`rounded-2xl border p-3 ${done ? "border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/30" : "border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950/40"}`}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-neutral-400">0{index + 1}</span>
+                  <span className={`text-[10px] font-bold ${done ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-400"}`}>{done ? "Concluído" : step.label}</span>
+                </div>
+                <p className="mt-2 text-[11px] font-bold text-neutral-800 dark:text-neutral-200">{step.title}</p>
+              </div>
+            );
+          })}
+        </div>
+        {recentGames.length > 0 && completedToday === 0 && (
+          <p className="mt-3 text-[11px] text-neutral-500 dark:text-neutral-400">Você já jogou {recentGames.length} tipo(s) de jogo. Continue sua evolução hoje.</p>
+        )}
+      </section>
       <DailyQuestsCard />
 
       {/* Seletor de Categorias & Áreas */}

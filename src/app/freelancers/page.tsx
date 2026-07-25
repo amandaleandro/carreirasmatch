@@ -14,12 +14,9 @@ import {
 } from "@/lib/freelance";
 import {
   Sparkles,
-  Briefcase,
-  UserCheck,
   PlusCircle,
   Star,
   MapPin,
-  Users,
   CheckCircle2,
   Filter,
   Search,
@@ -30,6 +27,7 @@ import {
   TrendingUp,
   HelpCircle,
   Award,
+  UserCheck,
 } from "lucide-react";
 
 export const dynamic = "force-dynamic";

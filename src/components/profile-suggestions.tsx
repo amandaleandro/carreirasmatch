@@ -6,7 +6,6 @@ import {
   GraduationCap,
   Award,
   BookOpen,
-  Filter,
   ExternalLink,
   MapPin,
   Globe,

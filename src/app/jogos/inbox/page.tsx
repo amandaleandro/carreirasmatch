@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import {
   Inbox,
   Clock,
-  CheckCircle2,
   AlertOctagon,
   RotateCcw,
   ArrowLeft,
   Flame,
-  Sparkles,
   Trophy,
   Zap,
   Mail,
@@ -104,6 +102,13 @@ export default function InboxZeroGamePage() {
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const currentEmail = SAMPLE_EMAILS[currentIdx % SAMPLE_EMAILS.length];
 
+  const endGame = useCallback(() => {
+    setIsPlaying(false);
+    setFinished(true);
+    const xpEarned = Math.max(50, Math.round(score * 1.5));
+    addXp(xpEarned);
+  }, [score]);
+
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (isPlaying && timeLeft > 0) {
@@ -111,10 +116,10 @@ export default function InboxZeroGamePage() {
         setTimeLeft((prev) => prev - 1);
       }, 1000);
     } else if (isPlaying && timeLeft <= 0) {
-      endGame();
+      queueMicrotask(() => endGame());
     }
     return () => clearInterval(timer);
-  }, [isPlaying, timeLeft]);
+  }, [isPlaying, timeLeft, endGame]);
 
   function startGame() {
     setTimeLeft(40);
@@ -124,13 +129,6 @@ export default function InboxZeroGamePage() {
     setCurrentIdx(0);
     setIsPlaying(true);
     setFinished(false);
-  }
-
-  function endGame() {
-    setIsPlaying(false);
-    setFinished(true);
-    const xpEarned = Math.max(50, Math.round(score * 1.5));
-    addXp(xpEarned);
   }
 
   function handleClassify(category: TaskCategory) {

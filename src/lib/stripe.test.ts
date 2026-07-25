@@ -5,7 +5,7 @@ vi.mock("stripe", () => {
     default: class MockStripe {
       checkout = {
         sessions: {
-          create: vi.fn().mockImplementation(async (params: any) => ({
+          create: vi.fn().mockImplementation(async (params: Record<string, unknown>) => ({
             id: "cs_test_12345",
             url: "https://checkout.stripe.com/pay/cs_test_12345",
             ...params,

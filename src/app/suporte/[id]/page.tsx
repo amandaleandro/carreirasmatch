@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ArrowLeft, CheckCircle2, ShieldCheck, User, LifeBuoy } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ShieldCheck, User } from "lucide-react";
 import { auth } from "@/auth";
 import { ConfirmResolveButton, SupportReplyForm } from "@/components/support-forms";
 import { prisma } from "@/lib/prisma";

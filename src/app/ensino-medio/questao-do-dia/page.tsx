@@ -6,7 +6,6 @@ import { SiteFooter } from "@/components/site-footer";
 import { EnsinoMedioToolsNav } from "@/components/ensino-medio-tools-nav";
 import { DailyQuestion } from "@/lib/ensino-medio-tools";
 import {
-  HelpCircle,
   Sparkles,
   CheckCircle2,
   XCircle,
@@ -46,7 +45,9 @@ export default function DailyQuestionPage() {
   };
 
   useEffect(() => {
-    fetchQuestion();
+    queueMicrotask(() => {
+      void fetchQuestion();
+    });
   }, []);
 
   const handleSelect = (idx: number) => {

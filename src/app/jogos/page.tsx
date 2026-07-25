@@ -1,9 +1,12 @@
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import Link from "next/link";
-import { Sparkles, Keyboard, Trophy, Brain, Flame, Calendar, CalendarDays, Type, Skull, Scale, ListOrdered, Search, FileText } from "lucide-react";
+import { Trophy, Flame, Calendar, CalendarDays } from "lucide-react";
+import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { GamesCatalog } from "@/components/games-catalog";
+import { matchAreaSlug } from "@/lib/vocation-areas";
+import { normalizeCareerSegment } from "@/lib/career-segments";
 
 export const dynamic = "force-dynamic";
 
@@ -29,12 +32,42 @@ export default async function GamesHubPage({
   searchParams: Promise<{ game?: string }>;
 }) {
   const { game: gameParam } = await searchParams;
+  const session = await auth();
+  const profile = session?.user?.id
+    ? await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: {
+          name: true,
+          careerSegment: true,
+          professionalArea: true,
+          currentProfessionalArea: true,
+          targetProfessionalArea: true,
+          studyCourse: true,
+        },
+      })
+    : null;
+  const profileAreaText = profile?.targetProfessionalArea || profile?.professionalArea || profile?.studyCourse;
+  const profileAreaSlug = matchAreaSlug(profileAreaText);
+  const profileSegment = normalizeCareerSegment(profile?.careerSegment);
   const selectedGame = RANKING_OPTIONS.some((g) => g.id === gameParam) ? gameParam! : RANKING_OPTIONS[0].id;
 
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+  const recentGameScores = session?.user?.id
+    ? await prisma.gameScore.findMany({
+        where: { userId: session.user.id },
+        orderBy: { createdAt: "desc" },
+        take: 30,
+        select: { game: true, createdAt: true },
+      })
+    : [];
+  const playedToday = Array.from(
+    new Set(recentGameScores.filter((score) => score.createdAt >= startOfDay).map((score) => score.game))
+  );
+  const recentGames = Array.from(new Set(recentGameScores.map((score) => score.game)));
 
   async function topScoresByUser(since: Date) {
     const isGlobal = selectedGame === "global";
@@ -111,31 +144,19 @@ export default async function GamesHubPage({
           </p>
         </header>
 
-        {/* Banner Ensino Médio & Faculdade vs Técnico */}
-        <section className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white rounded-3xl p-6 md:p-8 shadow-md flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-200">
-              <Brain className="h-3.5 w-3.5" />
-              Novo Módulo de Estudo
-            </div>
-            <h2 className="text-xl md:text-2xl font-extrabold">
-              Ensino Médio, ENEM & Escolha de Faculdade vs Técnico
-            </h2>
-            <p className="text-xs md:text-sm text-blue-100 leading-relaxed">
-              Estude todas as matérias com resumos, quizzes e flashcards gerados por IA Gemini, e conecte seus pontos fortes com cursos técnicos e faculdades.
-            </p>
-          </div>
-
-          <Link
-            href="/ensino-medio"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-blue-50 text-blue-950 font-black text-xs md:text-sm shadow-md transition-all shrink-0 active:scale-95"
-          >
-            Acessar Ensino Médio
-          </Link>
-        </section>
-
         {/* Catálogo de Jogos Segmentado por Trilha & Área */}
-        <GamesCatalog />
+        <GamesCatalog
+          profile={{
+            name: profile?.name ?? null,
+            segment: profileSegment,
+            area: profileAreaText ?? null,
+            areaSlug: profileAreaSlug ?? null,
+            currentArea: profile?.currentProfessionalArea ?? null,
+            studyCourse: profile?.studyCourse ?? null,
+          }}
+          playedToday={playedToday}
+          recentGames={recentGames}
+        />
 
         {/* Seção de Rankings */}
         <section className="space-y-6 pt-8 border-t border-[#E2E8F0] dark:border-neutral-800">

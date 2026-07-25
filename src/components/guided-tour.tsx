@@ -163,6 +163,7 @@ type SegmentConfig = {
 /** Per-niche roteiro: reordered/trimmed steps + copy that speaks to each moment. */
 const SEGMENT_TOURS: Record<string, SegmentConfig> = {
   apprentice: {
+    order: ["welcome", "tools", "feed", "todas_vagas", "applications", "mentorias", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como usar a plataforma para conquistar sua vaga de Jovem Aprendiz. Pode usar a tela normalmente.",
@@ -180,6 +181,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
     },
   },
   first_job: {
+    order: ["welcome", "feed", "todas_vagas", "applications", "mentorias", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como usar a plataforma para conquistar seu primeiro emprego. Pode usar a tela normalmente.",
@@ -194,6 +196,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
     },
   },
   internship: {
+    order: ["welcome", "analise", "feed", "applications", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como usar a plataforma para conquistar seu estágio. Pode usar a tela normalmente.",
@@ -209,7 +212,7 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
   },
   student: {
     // Estudante escolhendo faculdade/técnico: foco em ferramentas e radar de vestibulares.
-    order: ["welcome", "desafio", "tools", "vestibulares", "mentorias", "analise", "resume", "overview", "closing"],
+    order: ["welcome", "tools", "vestibulares", "mentorias", "jogos", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como escolher sua faculdade ou curso técnico com segurança. Pode usar a tela normalmente.",
@@ -227,8 +230,8 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
     },
   },
   concurseiro: {
+    order: ["welcome", "concursos", "tools", "mentorias", "overview", "closing"],
     // Concurseiro: radar de concursos e ferramentas de preparação no centro; vagas são plano B.
-    order: ["welcome", "desafio", "concursos", "tools", "mentorias", "analise", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como a plataforma turbina a sua preparação para concursos. Pode usar a tela normalmente.",
@@ -246,8 +249,8 @@ const SEGMENT_TOURS: Record<string, SegmentConfig> = {
     },
   },
   oab: {
+    order: ["welcome", "tools", "mentorias", "overview", "closing"],
     // Estudante de OAB: ferramentas do exame e conteúdo de estudo no centro.
-    order: ["welcome", "desafio", "tools", "mentorias", "analise", "resume", "overview", "closing"],
     overrides: {
       welcome: {
         body: "Em 1 minuto eu te mostro como a plataforma apoia a sua preparação para o Exame da OAB. Pode usar a tela normalmente.",
@@ -311,7 +314,7 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
   const [rect, setRect] = useState<DOMRect | null>(null);
   const [cardPos, setCardPos] = useState<{ top: number; left: number } | null>(null);
   const waitingForTarget = useRef(false);
-  const { registerTourStart } = useUiPanels();
+  const { registerTourStart, registerTourClose, setTourOpen } = useUiPanels();
 
   const steps = useMemo(() => buildSteps(segment), [segment]);
   const step = steps[index];
@@ -321,13 +324,17 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
     if (typeof window === "undefined") return;
     const done = window.localStorage.getItem(STORAGE_KEY);
     if (!done && pathname === "/dashboard") {
-      const t = window.setTimeout(() => setActive(true), 700);
+      const t = window.setTimeout(() => {
+        setTourOpen(true);
+        setActive(true);
+      }, 700);
       return () => window.clearTimeout(t);
     }
-  }, [pathname]);
+  }, [pathname, setTourOpen]);
 
   const finish = useCallback(() => {
     setActive(false);
+    setTourOpen(false);
     setIndex(0);
     setRect(null);
     setCardPos(null);
@@ -336,7 +343,7 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [setTourOpen]);
 
   const measure = useCallback(() => {
     if (!step?.target) {
@@ -458,13 +465,15 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
   const start = useCallback(() => {
     setIndex(0);
     setActive(true);
-  }, []);
+    setTourOpen(true);
+  }, [setTourOpen]);
 
   // O gatilho do tour mora na sidebar / menu mobile. Registramos `start` no
   // contexto para eles chamarem direto - sem effect disparando setState.
   useEffect(() => {
     registerTourStart(start);
-  }, [registerTourStart, start]);
+    registerTourClose(finish);
+  }, [registerTourStart, registerTourClose, start, finish]);
 
   // Steps without a target render as a centered welcome/closing card.
   // Targeted steps stay hidden (offscreen) until their rect is measured.
@@ -500,11 +509,11 @@ export function GuidedTour({ segment }: { segment?: string | null }) {
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    width: CARD_WIDTH,
+                    width: "min(340px, calc(100vw - 28px))",
                   }
                 : cardPos
-                ? { top: cardPos.top, left: cardPos.left, width: CARD_WIDTH }
-                : { top: -9999, left: -9999, width: CARD_WIDTH }
+                ? { top: cardPos.top, left: cardPos.left, width: "min(340px, calc(100vw - 28px))" }
+                : { top: -9999, left: -9999, width: "min(340px, calc(100vw - 28px))" }
             }
           >
             <div className="flex items-start justify-between gap-3 mb-2">

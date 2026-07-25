@@ -299,7 +299,7 @@ export function FeedFilters({
           <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-wider mr-1">Filtros ativos:</span>
           {current.q && (
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 shadow-2xs">
-              Busca: "{current.q}"
+              Busca: &ldquo;{current.q}&rdquo;
               <button type="button" onClick={() => setParam("q", "all")} className="hover:text-blue-900 dark:hover:text-white cursor-pointer ml-0.5">✕</button>
             </span>
           )}

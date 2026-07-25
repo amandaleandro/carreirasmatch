@@ -5,9 +5,7 @@ import {
   Send,
   Search,
   FolderKanban,
-  Sparkles,
   ArrowRight,
-  UserCheck,
   AlertCircle,
 } from "lucide-react";
 import { auth } from "@/auth";

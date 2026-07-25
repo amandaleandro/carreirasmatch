@@ -10,7 +10,6 @@ type PlanId = "card_recurring" | "monthly_oneoff" | "annual";
 
 export function BillingSection({
   monthlyPrice,
-  monthlyName,
   subscriptionStatus,
   currentPeriodEnd,
   payerEmail,

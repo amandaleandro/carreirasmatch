@@ -1,8 +1,6 @@
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import {
   YearId,
-  HighSchoolYearInfo,
-  HIGH_SCHOOL_YEARS,
   SubjectMetadata,
   HIGH_SCHOOL_SUBJECTS,
 } from "./ensino-medio-types";

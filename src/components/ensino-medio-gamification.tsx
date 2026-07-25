@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Trophy, Flame, Zap, Award, Sparkles, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { Trophy, Flame, Zap, Award, Sparkles } from "lucide-react";
 
 export function EnsinoMedioGamification() {
-  const [xp, setXp] = useState(350);
-  const [streak, setStreak] = useState(3);
+  const [xp] = useState(350);
+  const [streak] = useState(3);
 
   // Calcula nível baseado em XP (100 XP por nível)
   const level = Math.floor(xp / 100) + 1;

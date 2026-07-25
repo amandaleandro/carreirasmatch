@@ -10,6 +10,7 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState } fro
  */
 type UiPanels = {
   newsOpen: boolean;
+  tourOpen: boolean;
   openNews: () => void;
   closeNews: () => void;
   /**
@@ -19,24 +20,37 @@ type UiPanels = {
    */
   openTour: () => void;
   registerTourStart: (fn: () => void) => void;
+  registerTourClose: (fn: () => void) => void;
+  setTourOpen: (open: boolean) => void;
 };
 
 const UiPanelsContext = createContext<UiPanels | null>(null);
 
 export function UiPanelsProvider({ children }: { children: React.ReactNode }) {
   const [newsOpen, setNewsOpen] = useState(false);
+  const [tourOpen, setTourOpen] = useState(false);
   const tourStartRef = useRef<(() => void) | null>(null);
+  const tourCloseRef = useRef<(() => void) | null>(null);
 
-  const openNews = useCallback(() => setNewsOpen(true), []);
+  const openNews = useCallback(() => {
+    tourCloseRef.current?.();
+    setNewsOpen(true);
+  }, []);
   const closeNews = useCallback(() => setNewsOpen(false), []);
   const registerTourStart = useCallback((fn: () => void) => {
     tourStartRef.current = fn;
   }, []);
-  const openTour = useCallback(() => tourStartRef.current?.(), []);
+  const registerTourClose = useCallback((fn: () => void) => {
+    tourCloseRef.current = fn;
+  }, []);
+  const openTour = useCallback(() => {
+    setNewsOpen(false);
+    tourStartRef.current?.();
+  }, []);
 
   const value = useMemo(
-    () => ({ newsOpen, openNews, closeNews, openTour, registerTourStart }),
-    [newsOpen, openNews, closeNews, openTour, registerTourStart]
+    () => ({ newsOpen, tourOpen, openNews, closeNews, openTour, registerTourStart, registerTourClose, setTourOpen }),
+    [newsOpen, tourOpen, openNews, closeNews, openTour, registerTourStart, registerTourClose]
   );
 
   return <UiPanelsContext.Provider value={value}>{children}</UiPanelsContext.Provider>;

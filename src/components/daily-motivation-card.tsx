@@ -8,8 +8,6 @@ import {
   Zap,
   CheckCircle2,
   ChevronDown,
-  RefreshCw,
-  Share2,
   ThumbsUp,
 } from "lucide-react";
 import {
@@ -17,14 +15,17 @@ import {
   EmploymentStatusKey,
   getDailyMotivation,
 } from "@/lib/daily-motivation";
+import type { DailyMotivationProfile } from "@/lib/daily-motivation";
 
 interface DailyMotivationCardProps {
   initialStatus?: string | null;
+  profile?: DailyMotivationProfile;
   onStatusChange?: (newStatus: string) => Promise<void>;
 }
 
 export function DailyMotivationCard({
   initialStatus,
+  profile,
   onStatusChange,
 }: DailyMotivationCardProps) {
   const [currentStatus, setCurrentStatus] = useState<EmploymentStatusKey>(
@@ -35,7 +36,7 @@ export function DailyMotivationCard({
   const [isUpdating, setIsUpdating] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  const motivation = getDailyMotivation(currentStatus);
+  const motivation = getDailyMotivation(currentStatus, profile);
   const config = EMPLOYMENT_STATUS_CONFIG[currentStatus] || EMPLOYMENT_STATUS_CONFIG.unemployed_active;
 
   async function handleSelectStatus(statusKey: EmploymentStatusKey) {
@@ -119,7 +120,7 @@ export function DailyMotivationCard({
       <div className="rounded-2xl border border-blue-500/10 bg-blue-500/5 dark:bg-blue-500/10 p-4 space-y-2 relative">
         <Quote className="w-6 h-6 text-blue-500/30 absolute top-3 right-3" />
         <p className="text-sm font-medium italic text-slate-800 dark:text-slate-200 leading-relaxed pr-6">
-          "{motivation.quote}"
+          &ldquo;{motivation.quote}&rdquo;
         </p>
         <p className="text-xs font-bold text-blue-600 dark:text-blue-400">
           — {motivation.author}

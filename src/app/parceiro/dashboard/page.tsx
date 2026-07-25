@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PartnerShell } from "@/components/partner-shell";
 import Link from "next/link";
-import { BookOpen, Sparkles, Plus, MousePointerClick, Users, Handshake, ArrowRight } from "lucide-react";
+import { BookOpen, Sparkles, Plus, MousePointerClick, Users, Handshake } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

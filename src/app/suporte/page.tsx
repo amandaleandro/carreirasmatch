@@ -6,10 +6,6 @@ import {
   MessageSquare,
   Plus,
   LifeBuoy,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Sparkles,
 } from "lucide-react";
 import { auth } from "@/auth";
 import { NewSupportTicketForm } from "@/components/support-forms";

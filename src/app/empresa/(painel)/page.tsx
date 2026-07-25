@@ -8,7 +8,6 @@ import {
   CreditCard,
   Building2,
   ArrowRight,
-  CheckCircle2,
   Clock,
   UserCheck,
 } from "lucide-react";

@@ -9,14 +9,14 @@ export type CareerSegment =
   | "oab";
 
 export const CAREER_SEGMENT_OPTIONS: { value: CareerSegment; label: string }[] = [
-  { value: "apprentice", label: "Busco Jovem Aprendiz" },
-  { value: "first_job", label: "Busco Primeiro Emprego" },
-  { value: "internship", label: "Busco Estágio" },
-  { value: "student", label: "Quero escolher faculdade ou técnico" },
-  { value: "career_change", label: "Quero mudar de carreira" },
-  { value: "career_pro", label: "Quero recolocação ou vaga melhor" },
-  { value: "concurseiro", label: "Estudo para concurso público" },
-  { value: "oab", label: "Estudo para a OAB" },
+  { value: "apprentice", label: "Quero ser Jovem Aprendiz" },
+  { value: "first_job", label: "Quero meu primeiro emprego" },
+  { value: "internship", label: "Quero conseguir um estágio" },
+  { value: "student", label: "Estou no Ensino Médio e quero me preparar para meu próximo passo" },
+  { value: "career_change", label: "Quero mudar de área profissional" },
+  { value: "career_pro", label: "Quero uma vaga melhor ou recolocação" },
+  { value: "concurseiro", label: "Quero estudar para concurso público" },
+  { value: "oab", label: "Quero estudar para a OAB" },
 ];
 
 export const CAREER_SEGMENT_LABELS: Record<CareerSegment, string> = Object.fromEntries(

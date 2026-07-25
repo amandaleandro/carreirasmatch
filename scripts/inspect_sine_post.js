@@ -1,4 +1,4 @@
-const cheerio = require('cheerio');
+import * as cheerio from "cheerio";
 
 async function inspectArticle() {
   const url = "https://www.uberlandia.mg.gov.br/2026/07/23/confira-as-vagas-cadastradas-no-sine-uberlandia-nesta-quinta-feira-23-11/";

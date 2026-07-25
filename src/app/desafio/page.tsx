@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { DesafioForm } from "./DesafioForm";
 import { Sparkles, Trophy } from "lucide-react";
 import { getUserReferralStats, registerUserReferral } from "@/lib/referrals";

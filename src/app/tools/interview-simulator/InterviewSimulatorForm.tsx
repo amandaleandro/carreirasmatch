@@ -16,6 +16,30 @@ type Turn = { question: string; answer: string; feedback: Feedback };
 
 type AnswerResponse = Feedback & { nextQuestion: string | null };
 
+type SpeechRecognitionEventLike = {
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+};
+
+type SpeechRecognitionErrorEventLike = { error: string };
+
+interface SpeechRecognitionLike {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onstart: (() => void) | null;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+  start(): void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
 const INPUT_CLASS =
   "w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors";
 
@@ -42,7 +66,9 @@ export function InterviewSimulatorForm() {
 
   function startSpeechRecognition() {
     if (typeof window === "undefined") return;
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const speechWindow = window as SpeechRecognitionWindow;
+    const SpeechRecognition =
+      speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Seu navegador não suporta reconhecimento de fala. Por favor, use o Google Chrome ou Edge.");
       return;
@@ -56,12 +82,12 @@ export function InterviewSimulatorForm() {
       setIsRecording(true);
     };
 
-    recognition.onresult = (event: any) => {
+    recognition.onresult = (event: SpeechRecognitionEventLike) => {
       const transcript = event.results[0][0].transcript;
       setAnswer((prev) => (prev ? prev + " " + transcript : transcript));
     };
 
-    recognition.onerror = (event: any) => {
+    recognition.onerror = (event: SpeechRecognitionErrorEventLike) => {
       console.error("Speech recognition error:", event.error);
       setIsRecording(false);
     };

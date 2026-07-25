@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Sparkles, Trophy, RotateCcw, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { gameAreaFromSlug } from "@/lib/game-area";
 
 type Question = {
   q: string;
@@ -118,7 +120,8 @@ const QUIZZES: Record<string, Question[]> = {
 };
 
 export default function QuizPage() {
-  const [area, setArea] = useState<string>("tecnologia");
+  const searchParams = useSearchParams();
+  const [area, setArea] = useState<string>(() => gameAreaFromSlug(searchParams.get("area")));
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);

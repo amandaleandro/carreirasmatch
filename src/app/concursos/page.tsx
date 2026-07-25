@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { Prisma } from "@/generated/prisma/client";
 import Link from "next/link";
-import { Search, Filter, Compass, Award } from "lucide-react";
+import { Search, Filter, Compass } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { RadarList } from "@/components/radar-list";

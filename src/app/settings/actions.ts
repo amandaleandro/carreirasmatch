@@ -70,7 +70,7 @@ export async function addUserCourse(formData: FormData) {
             data: { actionPlanProgress: JSON.stringify(uniqueProgress) },
           });
         }
-      } catch (e) {
+      } catch {
         // Ignora erros de parse silenciosamente
       }
     }

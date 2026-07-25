@@ -64,8 +64,10 @@ export function ReanalysisModal({
       if (onReanalysisComplete) {
         onReanalysisComplete(data.overallScore);
       }
-    } catch (err: any) {
-      setError(err.message || "Ocorreu um erro ao comparar seu currículo.");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Ocorreu um erro ao comparar seu currículo.";
+      setError(message);
     } finally {
       setIsAnalyzing(false);
     }

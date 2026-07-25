@@ -10,10 +10,8 @@ import {
   Trophy,
   RotateCcw,
   ArrowLeft,
-  Flame,
   CheckCircle,
   XCircle,
-  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";

@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import Link from "next/link";
 import {
   CalendarDays,
   Building2,
-  ArrowRight,
   ChevronRight,
   ExternalLink,
 } from "lucide-react";

@@ -112,8 +112,10 @@ export function AuthShell({
   const [currentScore, setCurrentScore] = useState(0);
 
   useEffect(() => {
-    setScanState("scanning");
-    setCurrentScore(0);
+    queueMicrotask(() => {
+      setScanState("scanning");
+      setCurrentScore(0);
+    });
     
     let start = 0;
     const target = AREAS[selectedArea].score;

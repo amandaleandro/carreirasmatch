@@ -48,11 +48,11 @@ export function AllJobsFilterForm({
 
   useEffect(() => {
     if (!selectedState) {
-      setCities([]);
+      queueMicrotask(() => setCities([]));
       return;
     }
 
-    setLoadingCities(true);
+    queueMicrotask(() => setLoadingCities(true));
     fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedState}/municipios`)
       .then((res) => res.json())
       .then((data: Array<{ nome: string }>) => {

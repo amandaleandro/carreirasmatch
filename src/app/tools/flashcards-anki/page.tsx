@@ -39,7 +39,7 @@ export default function FlashcardsAnkiPage() {
       } else {
         setFlashcards(data.flashcards);
       }
-    } catch (e) {
+    } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);

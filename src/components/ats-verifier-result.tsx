@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { AtsStandaloneAnalysis } from "@/lib/ats-checker";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface AtsVerifierResultProps {
@@ -243,7 +242,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
                 </div>
                 <p className="text-slate-600 dark:text-slate-300"><strong>Ação:</strong> {fix.action}</p>
                 <div className="p-2 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-lg text-emerald-800 dark:text-emerald-300">
-                  <strong>Exemplo Prático:</strong> "{fix.example}"
+                  <strong>Exemplo Prático:</strong> &ldquo;{fix.example}&rdquo;
                 </div>
               </div>
             ))}

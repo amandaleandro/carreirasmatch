@@ -4,7 +4,6 @@ import {
   ShoppingBag,
   Users,
   DollarSign,
-  Percent,
   TrendingUp,
   Award,
   ArrowLeft,

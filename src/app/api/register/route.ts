@@ -22,7 +22,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { name, email, phone, password, careerSegment, professionalArea, coupon } = await req.json();
+    const {
+      name,
+      email,
+      phone,
+      password,
+      careerSegment,
+      professionalArea,
+      currentProfessionalArea,
+      targetProfessionalArea,
+      studyCourse,
+      coupon,
+    } = await req.json();
     const normalizedName = normalizePersonName(name);
     const normalizedEmail = normalizeEmail(email);
     const normalizedPhone = normalizeBrazilPhone(phone);
@@ -60,6 +71,9 @@ export async function POST(req: NextRequest) {
           name: normalizedName,
           passwordHash,
           ...(normalizedPhone ? { phone: normalizedPhone } : {}),
+          ...(typeof currentProfessionalArea === "string" ? { currentProfessionalArea: currentProfessionalArea.trim() || null } : {}),
+          ...(typeof targetProfessionalArea === "string" ? { targetProfessionalArea: targetProfessionalArea.trim() || null } : {}),
+          ...(typeof studyCourse === "string" ? { studyCourse: studyCourse.trim() || null } : {}),
         },
       });
       void claimLeadResumesForUser(normalizedEmail, existing.id);
@@ -92,6 +106,13 @@ export async function POST(req: NextRequest) {
       professionalArea: typeof professionalArea === "string" && professionalArea.trim()
         ? professionalArea.trim()
         : null,
+      currentProfessionalArea: typeof currentProfessionalArea === "string" && currentProfessionalArea.trim()
+        ? currentProfessionalArea.trim()
+        : null,
+      targetProfessionalArea: typeof targetProfessionalArea === "string" && targetProfessionalArea.trim()
+        ? targetProfessionalArea.trim()
+        : null,
+      studyCourse: typeof studyCourse === "string" && studyCourse.trim() ? studyCourse.trim() : null,
       ...(signupCouponId ? { signupCouponId } : {}),
     };
 

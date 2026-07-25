@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Video, Sparkles, Filter, PlayCircle, BookOpen } from "lucide-react";
+import { Video, Filter, PlayCircle, BookOpen } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { VideoCard } from "@/components/video-card";

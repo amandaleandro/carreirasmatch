@@ -73,7 +73,7 @@ export function CandidateInterviewModal({
                         className="p-3.5 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-950/50 space-y-1.5"
                       >
                         <p className="font-bold text-neutral-900 dark:text-neutral-100">
-                          {idx + 1}. "{q.question}"
+                          {idx + 1}. &ldquo;{q.question}&rdquo;
                         </p>
                         <p className="text-xs text-neutral-600 dark:text-neutral-400">
                           <strong className="text-purple-600 dark:text-purple-400">Objetivo:</strong> {q.objective}

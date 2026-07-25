@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
-import { Search, CheckCircle2, ArrowRight, ShieldCheck, Target, Sparkles } from "lucide-react";
+import { Search, CheckCircle2, ArrowRight, Target, Sparkles } from "lucide-react";
 import { triggerConfetti } from "@/lib/confetti";
 
 export function HeroInstantScanner() {
@@ -150,4 +150,3 @@ export function HeroInstantScanner() {
     </div>
   );
 }
-

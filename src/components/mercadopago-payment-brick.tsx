@@ -40,7 +40,10 @@ export function MercadoPagoPaymentBrick({
   // nas deps do onSubmit: o SDK do MP reinicializa o Brick inteiro quando essas
   // referências mudam, apagando os dados do cartão em digitação.
   const latest = useRef({ analysisId, couponCode, segment });
-  latest.current = { analysisId, couponCode, segment };
+
+  useEffect(() => {
+    latest.current = { analysisId, couponCode, segment };
+  }, [analysisId, couponCode, segment]);
 
   useEffect(() => {
     ensureInitialized();
@@ -119,7 +122,7 @@ export function MercadoPagoPaymentBrick({
     return (
       <div className="space-y-3 text-sm">
         <p>Escaneie o QR Code ou copie o código para pagar via PIX:</p>
-        <img
+        <Image
           src={`data:image/png;base64,${pix.qrCodeBase64}`}
           alt="QR Code PIX"
           className="w-48 h-48 border border-neutral-200 dark:border-neutral-800 rounded-md"

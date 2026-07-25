@@ -1,5 +1,3 @@
-const { execSync } = require('child_process');
-
 console.log("Testing Node fetch...");
 async function testFetch() {
   const url = "https://www.uberlandia.mg.gov.br/prefeitura/secretarias/desenvolvimento-social-e-trabalho/";

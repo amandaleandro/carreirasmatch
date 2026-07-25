@@ -66,6 +66,13 @@ export interface DailyMotivation {
   memeTag: string;
 }
 
+export interface DailyMotivationProfile {
+  careerSegment?: string | null;
+  area?: string | null;
+  currentArea?: string | null;
+  studyCourse?: string | null;
+}
+
 const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
   unemployed_active: [
     {
@@ -213,7 +220,60 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
   ],
 };
 
-export function getDailyMotivation(status?: string | null): DailyMotivation {
+function personalizeMotivation(motivation: DailyMotivation, profile?: DailyMotivationProfile): DailyMotivation {
+  const area = profile?.area?.trim() || profile?.studyCourse?.trim();
+  if (!area) return motivation;
+
+  const normalized = area.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const currentArea = profile?.currentArea?.trim();
+  const isTransition = profile?.careerSegment === "career_change" && currentArea;
+  const areaLabel = isTransition ? `${currentArea} → ${area}` : area;
+
+  let tip = `Separe 15 minutos hoje para praticar uma habilidade de ${area} e registre o que aprendeu no seu portfólio.`;
+  let memeTitle = `Quando você escolhe ${area}`;
+  let memeSetup = "Pessoa: 'Vou só pesquisar um pouco sobre a área.'";
+  let memePunchline = `Duas horas depois: 14 abas abertas, um curso salvo e vontade de começar um projeto de ${area}.`;
+  let memeTag = "Vida na Área";
+
+  if (/(tecnologia|program|dados|software|dev|ti)/.test(normalized)) {
+    tip = `Escolha um pequeno problema de ${area} e transforme-o em um projeto prático. Portfólio vence promessa.`;
+    memeTitle = "Só mais um tutorial";
+    memeSetup = "Eu: 'Depois deste tutorial eu começo o projeto.'";
+    memePunchline = "O tutorial: parte 47 de 48. O projeto: ainda na pasta Downloads.";
+    memeTag = "Rotina Tech";
+  } else if (/(direito|jurid|administr|negoc|financ|contab)/.test(normalized)) {
+    tip = `Leia um caso real de ${area}, resuma o problema em cinco linhas e explique qual seria sua decisão.`;
+    memeTitle = "O documento era simples";
+    memeSetup = "Alguém: 'É só dar uma olhadinha rápida neste documento.'";
+    memePunchline = "O documento: 37 páginas, 12 anexos e uma reunião marcada para ontem.";
+    memeTag = "Vida Corporativa";
+  } else if (/(saude|medicina|enferm|psico|fisi|odonto)/.test(normalized)) {
+    tip = `Revise um conceito essencial de ${area} e transforme-o em uma explicação simples, como se estivesse ensinando alguém.`;
+    memeTitle = "Plantão do conhecimento";
+    memeSetup = "Eu: 'Hoje vou estudar só um tópico.'";
+    memePunchline = "O tópico: tem 18 capítulos, 4 protocolos e uma prova surpresa.";
+    memeTag = "Rotina da Saúde";
+  } else if (/(marketing|comunic|design|criativ|audiovisual)/.test(normalized)) {
+    tip = `Analise uma campanha ou peça de ${area} que você viu hoje e anote o que funcionou — e o que você faria diferente.`;
+    memeTitle = "Briefing do cliente";
+    memeSetup = "Cliente: 'Quero algo simples, mas impactante, moderno e diferente.'";
+    memePunchline = "Eu: 'Perfeito. Só preciso de mais 12 referências e três cafés.'";
+    memeTag = "Briefing Real";
+  }
+
+  return {
+    ...motivation,
+    tip: isTransition
+      ? `Na transição ${areaLabel}, escolha uma habilidade transferível da sua experiência anterior e mostre como ela gera valor na nova área.`
+      : tip,
+    memeTitle: isTransition ? `Transição: ${areaLabel}` : memeTitle,
+    memeSetup,
+    memePunchline,
+    memeTag: isTransition ? "Mudança de Carreira" : memeTag,
+  };
+}
+
+export function getDailyMotivation(status?: string | null, profile?: DailyMotivationProfile): DailyMotivation {
   const validStatus: EmploymentStatusKey =
     status && status in MOTIVATION_CATALOG
       ? (status as EmploymentStatusKey)
@@ -228,5 +288,5 @@ export function getDailyMotivation(status?: string | null): DailyMotivation {
   );
 
   const index = dayOfYear % catalog.length;
-  return catalog[index];
+  return personalizeMotivation(catalog[index], profile);
 }

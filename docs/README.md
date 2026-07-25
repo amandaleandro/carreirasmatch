@@ -17,6 +17,7 @@ executável; a divergência deve ser corrigida aqui.
 | Necessidade | Documento |
 | --- | --- |
 | Entender o produto, públicos e modelo de negócio | [PRODUCT_OVERVIEW.md](PRODUCT_OVERVIEW.md) |
+| Alinhar conhecimento do produto e mensagem principal de marketing | [PRODUCT_AND_MARKETING_BRIEF.md](PRODUCT_AND_MARKETING_BRIEF.md) |
 | Conhecer todas as funcionalidades existentes | [FEATURES.md](FEATURES.md) |
 | Entender as jornadas principais do usuário | [USER_FLOWS.md](USER_FLOWS.md) |
 | Ver o que está planejado mas ainda não existe | [ROADMAP_FEATURES.md](ROADMAP_FEATURES.md) |

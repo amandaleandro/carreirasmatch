@@ -4,7 +4,7 @@ import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } fro
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { title, summary, experienceSuggestions, keywordsFound, fixes } = body;
+    const { title, summary, experienceSuggestions, keywordsFound } = body;
 
     const doc = new Document({
       sections: [

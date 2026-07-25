@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { AtsVerifierResult } from "@/components/ats-verifier-result";
 import { AtsStandaloneAnalysis } from "@/lib/ats-checker";
-import Link from "next/link";
 
 export default function VerificadorAtsPage() {
   const [file, setFile] = useState<File | null>(null);

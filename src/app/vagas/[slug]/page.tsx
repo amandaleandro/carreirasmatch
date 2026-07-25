@@ -113,7 +113,7 @@ export default async function PublicJobCategoryPage({
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // Busca cursos patrocinados para os candidatos que visualizam esta categoria de vagas
-  let recommendedCourses: any[] = [];
+  let recommendedCourses: Awaited<ReturnType<typeof prisma.externalCourse.findMany>> = [];
   if (page === 1) {
     recommendedCourses = await prisma.externalCourse.findMany({
       where: {

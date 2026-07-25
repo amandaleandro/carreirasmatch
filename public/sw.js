@@ -14,7 +14,7 @@ self.addEventListener("push", (event) => {
   let data = {};
   try {
     data = event.data ? event.data.json() : {};
-  } catch (_e) {
+  } catch {
     data = { title: "CarreirasMatch", body: event.data ? event.data.text() : "" };
   }
 

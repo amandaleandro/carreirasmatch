@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { UserCheck, ArrowLeft, ExternalLink, Sparkles } from "lucide-react";
+import { UserCheck, ArrowLeft, ExternalLink } from "lucide-react";
 import { requireAuthPage } from "@/lib/require-auth-page";
 import { prisma } from "@/lib/prisma";
 import { parseSkills, parsePortfolio } from "@/lib/freelance";

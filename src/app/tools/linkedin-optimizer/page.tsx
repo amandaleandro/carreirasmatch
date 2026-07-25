@@ -3,13 +3,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
+type LinkedInOptimization = {
+  headlineOptions: string[];
+  aboutSection: string;
+  experienceBullets: string[];
+  authorityPostSample: { title: string; content: string };
+};
+
 export default function LinkedinOptimizerPage() {
   const [currentRole, setCurrentRole] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [keySkills, setKeySkills] = useState("");
-  const [bioSummary, setBioSummary] = useState("");
+  const bioSummary = "";
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<LinkedInOptimization | null>(null);
   const [error, setError] = useState("");
 
   const handleOptimize = async () => {
@@ -31,7 +38,7 @@ export default function LinkedinOptimizerPage() {
       } else {
         setResult(data.linkedin);
       }
-    } catch (e) {
+    } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);
@@ -52,7 +59,7 @@ export default function LinkedinOptimizerPage() {
           LinkedIn Profile & Post Optimizer por IA
         </h1>
         <p className="text-sm text-neutral-600 dark:text-neutral-400">
-          Gere um título irresistível, uma seção "Sobre" de alta conversão e posts autorais para se destacar para recrutadores.
+          Gere um título irresistível, uma seção &ldquo;Sobre&rdquo; de alta conversão e posts autorais para se destacar para recrutadores.
         </p>
       </header>
 
@@ -128,7 +135,7 @@ export default function LinkedinOptimizerPage() {
           {result.aboutSection && (
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                Seção "Sobre" (Resumo Campeão)
+                Seção &ldquo;Sobre&rdquo; (Resumo Campeão)
               </h3>
               <div className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-xs text-neutral-800 dark:text-neutral-200 leading-relaxed whitespace-pre-wrap">
                 {result.aboutSection}

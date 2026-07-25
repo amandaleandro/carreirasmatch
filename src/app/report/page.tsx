@@ -10,7 +10,6 @@ import {
   Target,
   CheckCircle2,
   AlertCircle,
-  FileText,
   Sparkles,
   ArrowRight,
   PlusCircle,

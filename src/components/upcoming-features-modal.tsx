@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useId, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useUiPanels } from "@/components/ui-panels";
 import {
@@ -161,8 +161,10 @@ const UPCOMING = [
 
 export function UpcomingFeaturesModal() {
   const titleId = useId();
-  const { newsOpen: open, openNews, closeNews } = useUiPanels();
+  const { newsOpen: open, tourOpen, openNews, closeNews } = useUiPanels();
   const [activeTab, setActiveTab] = useState<FeatureTab>("shipped");
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     try {
@@ -171,9 +173,10 @@ export function UpcomingFeaturesModal() {
       return;
     }
 
-    const timer = window.setTimeout(() => openNews(), 1200);
+    if (tourOpen) return;
+    const timer = window.setTimeout(() => openNews(), 700);
     return () => window.clearTimeout(timer);
-  }, [openNews]);
+  }, [openNews, tourOpen]);
 
   const close = useCallback(() => {
     closeNews();
@@ -187,12 +190,38 @@ export function UpcomingFeaturesModal() {
   useEffect(() => {
     if (!open) return;
 
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") close();
+      if (event.key === "Tab") {
+        const dialog = document.querySelector<HTMLElement>("[data-news-dialog]");
+        if (!dialog) return;
+        const focusable = Array.from(dialog.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+        ));
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
     };
 
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previousFocusRef.current?.focus();
+    };
   }, [close, open]);
 
   return (
@@ -209,6 +238,7 @@ export function UpcomingFeaturesModal() {
 
           {/* Modal Container */}
           <section
+            data-news-dialog
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
@@ -231,6 +261,7 @@ export function UpcomingFeaturesModal() {
                 </div>
                 <button
                   type="button"
+                  ref={closeButtonRef}
                   onClick={close}
                   className="rounded-xl border border-neutral-200/60 bg-white/80 p-2 text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-900 dark:border-neutral-800 dark:bg-neutral-900/80 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
                   aria-label="Fechar modal de novidades"
@@ -418,4 +449,3 @@ export function UpcomingFeaturesModal() {
     </>
   );
 }
-

@@ -3,11 +3,18 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
+type SoftSkillsResult = {
+  projectTitle: string;
+  softSkillsIdentified: string[];
+  resumeExperienceBlock: { roleTitle: string; bullets: string[] };
+  interviewTalkingPoints: string[];
+};
+
 export default function ExtratorSoftSkillsPage() {
   const [targetRole, setTargetRole] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<SoftSkillsResult | null>(null);
   const [error, setError] = useState("");
 
   const handleExtract = async () => {
@@ -29,7 +36,7 @@ export default function ExtratorSoftSkillsPage() {
       } else {
         setResult(data.extracted);
       }
-    } catch (e) {
+    } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);

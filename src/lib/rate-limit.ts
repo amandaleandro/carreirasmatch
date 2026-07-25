@@ -33,7 +33,7 @@ export function checkRateLimit(
 
 export function recordFailedAttempt(
   key: string,
-  { limit, windowMs }: { limit: number; windowMs: number }
+  { windowMs }: { limit: number; windowMs: number }
 ) {
   const now = Date.now();
   const bucket = buckets.get(key);

@@ -21,10 +21,6 @@ import { BulletPointMakeover } from "@/components/BulletPointMakeover";
 import { ScoreBeforeAfter } from "@/components/score-before-after";
 import { ShareMatchCard } from "@/components/share-match-card";
 import { Download, FileText } from "lucide-react";
-import {
-  SOFT_SKILL_LABELS,
-  type SoftSkillDimension,
-} from "@/lib/behavioral-test";
 
 export type ApplicationStatus = "apply_now" | "adjust_first" | "deprioritize";
 
@@ -1370,10 +1366,10 @@ export function AnalysisResult({
             {/* Análise Gramatical, Dados Faltantes & Estrutura */}
             {(() => {
               const parsedGrammarErrors = typeof result.grammarErrors === "string" 
-                ? (() => { try { return JSON.parse(result.grammarErrors); } catch(e) { return []; } })()
+                ? (() => { try { return JSON.parse(result.grammarErrors); } catch { return []; } })()
                 : result.grammarErrors || [];
               const parsedMissingBasicInfo = typeof result.missingBasicInfo === "string"
-                ? (() => { try { return JSON.parse(result.missingBasicInfo); } catch(e) { return []; } })()
+                ? (() => { try { return JSON.parse(result.missingBasicInfo); } catch { return []; } })()
                 : result.missingBasicInfo || [];
               
               if (parsedGrammarErrors.length === 0 && parsedMissingBasicInfo.length === 0 && !result.structureFeedback) {
@@ -1701,7 +1697,7 @@ export function BehavioralFitCard({
   let skills: Record<string, number> = {};
   try {
     skills = JSON.parse(behavioralResult.skillScores);
-  } catch (e) {
+  } catch {
     return null;
   }
 

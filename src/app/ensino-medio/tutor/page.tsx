@@ -11,7 +11,6 @@ import {
   Send,
   User,
   RotateCcw,
-  BookOpen,
 } from "lucide-react";
 
 export default function VirtualTutorPage() {

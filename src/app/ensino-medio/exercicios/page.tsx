@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { EnsinoMedioToolsNav } from "@/components/ensino-medio-tools-nav";
 import { HIGH_SCHOOL_SUBJECTS, HIGH_SCHOOL_YEARS, YearId } from "@/lib/ensino-medio-types";
-import { getTopicsByYear } from "@/lib/ensino-medio";
 import { GeneratedSimulado } from "@/app/api/ensino-medio/simulado/gerar/route";
 import {
   FileText,
@@ -15,9 +13,7 @@ import {
   GraduationCap,
   Brain,
   Printer,
-  Download,
   RotateCcw,
-  Check,
 } from "lucide-react";
 
 export default function GeradorExerciciosPage() {
@@ -275,7 +271,7 @@ export default function GeradorExerciciosPage() {
               {!showAnswers && (
                 <div className="pt-6 border-t border-neutral-100 dark:border-neutral-800 text-center print:block">
                   <p className="text-xs text-neutral-400 italic">
-                    (Gabarito oculto. Clique em "Mostrar Gabarito Comentado" no topo para ver as respostas).
+                    (Gabarito oculto. Clique em &ldquo;Mostrar Gabarito Comentado&rdquo; no topo para ver as respostas).
                   </p>
                 </div>
               )}

@@ -5,7 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { EnsinoMedioToolsNav } from "@/components/ensino-medio-tools-nav";
 import { HIGH_SCHOOL_SUBJECTS, HIGH_SCHOOL_YEARS, YearId } from "@/lib/ensino-medio-types";
-import { GeneratedMindMap, GeneratedMindMapNode } from "@/app/api/ensino-medio/mapa-mental/gerar/route";
+import { GeneratedMindMap } from "@/app/api/ensino-medio/mapa-mental/gerar/route";
 import {
   Brain,
   Sparkles,

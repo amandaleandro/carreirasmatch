@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import Link from "next/link";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { EnsinoMedioToolsNav } from "@/components/ensino-medio-tools-nav";

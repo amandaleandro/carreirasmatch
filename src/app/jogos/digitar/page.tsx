@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Keyboard, RotateCcw, AlertTriangle, Flame, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { gameAreaFromSlug } from "@/lib/game-area";
 
 const SNIPPETS: Record<string, { label: string; text: string }[]> = {
   tecnologia: [
@@ -51,7 +53,8 @@ const SNIPPETS: Record<string, { label: string; text: string }[]> = {
 };
 
 export default function SpeedTyperPage() {
-  const [area, setArea] = useState<string>("tecnologia");
+  const searchParams = useSearchParams();
+  const [area, setArea] = useState<string>(() => gameAreaFromSlug(searchParams.get("area")));
   const [snippetIndex, setSnippetIndex] = useState<number>(0);
   const [inputVal, setInputVal] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -77,7 +80,7 @@ export default function SpeedTyperPage() {
     setTimerActive(false);
   }
 
-  async function saveScore(finalWpm: number) {
+  const saveScore = useCallback(async (finalWpm: number) => {
     try {
       await fetch("/api/jogos/scores", {
         method: "POST",
@@ -87,7 +90,7 @@ export default function SpeedTyperPage() {
     } catch (err) {
       console.error(err);
     }
-  }
+  }, [area]);
 
   // Timer
   useEffect(() => {
@@ -97,14 +100,16 @@ export default function SpeedTyperPage() {
         setSeconds((prev) => prev - 1);
       }, 1000);
     } else if (seconds === 0) {
-      setFinished(true);
-      setTimerActive(false);
-      void saveScore(wpm);
+      queueMicrotask(() => {
+        setFinished(true);
+        setTimerActive(false);
+        void saveScore(wpm);
+      });
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [timerActive, seconds, finished]);
+  }, [timerActive, seconds, finished, saveScore, wpm]);
 
   // Capturar digitação
   function handleInputChange(val: string) {

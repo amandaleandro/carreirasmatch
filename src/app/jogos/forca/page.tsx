@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Skull, Trophy, RotateCcw, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { gameAreaFromSlug } from "@/lib/game-area";
 
 // Termos (sem acento) + dica, por área. Espaços são revelados automaticamente.
 const TERMS: Record<string, { word: string; hint: string }[]> = {
@@ -38,7 +40,8 @@ const ROUND = 5;
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZÇ";
 
 export default function ForcaPage() {
-  const [area, setArea] = useState("tecnologia");
+  const searchParams = useSearchParams();
+  const [area, setArea] = useState(() => gameAreaFromSlug(searchParams.get("area")));
   const [pool, setPool] = useState<{ word: string; hint: string }[]>([]);
   const [idx, setIdx] = useState(0);
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
@@ -57,7 +60,7 @@ export default function ForcaPage() {
   }, []);
 
   useEffect(() => {
-    startRound(area);
+    queueMicrotask(() => startRound(area));
   }, [area, startRound]);
 
   async function saveScore(score: number) {

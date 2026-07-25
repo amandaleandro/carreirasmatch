@@ -49,8 +49,8 @@ export function PartnerCourseActions({
       }
       setSuccess(true);
       trackClick();
-    } catch (err: any) {
-      setError(err.message ?? "Erro inesperado.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
       setLoading(false);
     }

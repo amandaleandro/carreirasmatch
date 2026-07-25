@@ -336,7 +336,7 @@ export async function POST(req: NextRequest) {
         ) {
           missing.push("Resumo profissional");
         }
-        (analysis as unknown as { missingBasicInfo: string[] }).missingBasicInfo = missing;
+        analysis.missingBasicInfo = missing;
       }
 
       // Camada determinística de keywords (estilo Jobscan): confere cada termo da IA
@@ -368,8 +368,8 @@ export async function POST(req: NextRequest) {
       data: {
         resumeId: resume.id,
         careerTrack: effectiveCareerTrack,
-        jobTitle: (!jobTitle || jobTitle === "Vaga analisada") && (analysis as any).inferredJobTitle
-          ? (analysis as any).inferredJobTitle
+        jobTitle: (!jobTitle || jobTitle === "Vaga analisada") && analysis.inferredJobTitle
+          ? analysis.inferredJobTitle
           : jobTitle,
         jobText,
         overallScore: analysis.overallScore,
@@ -407,10 +407,10 @@ export async function POST(req: NextRequest) {
           : null,
         pastFeedback: pastFeedback.trim() || null,
         feedbackAnalysis: analysis.feedbackAnalysis ?? null,
-        grammarErrors: (analysis as any).grammarErrors ? JSON.stringify((analysis as any).grammarErrors) : null,
-        structureRating: (analysis as any).structureRating ?? null,
-        structureFeedback: (analysis as any).structureFeedback ?? null,
-        missingBasicInfo: (analysis as any).missingBasicInfo ? JSON.stringify((analysis as any).missingBasicInfo) : null,
+        grammarErrors: analysis.grammarErrors ? JSON.stringify(analysis.grammarErrors) : null,
+        structureRating: analysis.structureRating ?? null,
+        structureFeedback: analysis.structureFeedback ?? null,
+        missingBasicInfo: analysis.missingBasicInfo ? JSON.stringify(analysis.missingBasicInfo) : null,
         jobDecoded: analysis.jobDecoded ? JSON.stringify(analysis.jobDecoded) : null,
         jobRedFlags: analysis.jobRedFlags ? JSON.stringify(analysis.jobRedFlags) : null,
         clarifyingQuestions: analysis.clarifyingQuestions ? JSON.stringify(analysis.clarifyingQuestions) : null,

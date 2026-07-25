@@ -48,7 +48,7 @@ export async function syncUberHubData() {
 
       const keywordsCurso = ["curso", "bootcamp", "oficina", "bolsas", "treinamento", "formação"];
 
-      const promises: Promise<any>[] = [];
+      const promises: Promise<unknown>[] = [];
 
       $vagas("p").each((_, elem) => {
         const text = $vagas(elem).text().trim();
@@ -137,7 +137,7 @@ export async function syncUberHubData() {
       const htmlEventos = await fetchHtml(UBERHUB_EVENTOS);
       const $eventos = cheerio.load(htmlEventos);
 
-      const promises: Promise<any>[] = [];
+      const promises: Promise<unknown>[] = [];
 
       $eventos("p").each((_, elem) => {
         const text = $eventos(elem).text().trim();

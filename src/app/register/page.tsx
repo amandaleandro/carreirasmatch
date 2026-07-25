@@ -6,19 +6,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AuthShell } from "@/components/auth-shell";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
-import { COMMON_PROFESSIONAL_AREAS } from "@/lib/course-catalog";
+import { COMMON_PROFESSIONAL_AREAS, COMMON_STUDY_AREAS } from "@/lib/course-catalog";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { formatBrazilPhone } from "@/lib/contact-validation";
 
-const AREA_PROMPT_SEGMENTS: CareerSegment[] = ["internship", "student"];
+const AREA_PROMPT_SEGMENTS: CareerSegment[] = ["apprentice", "first_job", "internship", "student", "career_change", "career_pro"];
 
 const MOMENT_TIPS: Record<string, string> = {
-  first_job: "✨ Focaremos em destacar seu potencial, projetos pessoais/escolares e soft skills para abrir as primeiras portas.",
-  internship: "✨ Vamos conectar seu curso técnico ou superior com vagas de estágio alinhadas à sua grade acadêmica.",
-  student: "✨ Encontre oportunidades flexíveis e projetos adequados para conciliar com seus horários de estudo.",
-  transition: "✨ Mapearemos suas habilidades transferíveis para valorizar sua bagagem profissional na nova área.",
-  freelancer: "✨ Destaque seus cases de sucesso e encontre projetos autônomos que valorizem sua flexibilidade.",
-  clt: "✨ Alinhamento total com cargos efetivos, planos de desenvolvimento e evolução contínua na sua área.",
+  apprentice: "✨ Encontre vagas de aprendizagem, prepare seu primeiro currículo e descubra áreas para começar.",
+  first_job: "✨ Destaque projetos, cursos e habilidades para conquistar sua primeira oportunidade.",
+  internship: "✨ Encontre estágios alinhados ao seu curso e organize sua preparação para as seleções.",
+  student: "✨ Prepare-se para o próximo passo — mesmo que você já tenha uma profissão em mente ou ainda esteja explorando opções.",
+  career_change: "✨ Aproveite sua experiência anterior e construa uma ponte para a nova área.",
+  career_pro: "✨ Melhore seu posicionamento, currículo e estratégia para conquistar uma vaga melhor.",
+  concurseiro: "✨ Organize seus estudos, acompanhe concursos e prepare-se para as provas.",
+  oab: "✨ Monte sua preparação para as duas fases do Exame da OAB.",
 };
 
 export default function RegisterPage() {
@@ -31,11 +33,16 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [careerSegment, setCareerSegment] = useState<CareerSegment | "">("");
   const [professionalArea, setProfessionalArea] = useState("");
+  const [currentArea, setCurrentArea] = useState("");
+  const [studyCourse, setStudyCourse] = useState("");
   const [coupon, setCoupon] = useState((searchParams.get("cupom") ?? "").toUpperCase());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const showAreaField = careerSegment !== "" && AREA_PROMPT_SEGMENTS.includes(careerSegment);
+  const isTransition = careerSegment === "career_change";
+  const needsCurrentArea = careerSegment === "career_change" || careerSegment === "career_pro";
+  const needsCourse = careerSegment === "internship";
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -53,6 +60,9 @@ export default function RegisterPage() {
           password,
           careerSegment: careerSegment || null,
           professionalArea: showAreaField && professionalArea ? professionalArea : null,
+          currentProfessionalArea: needsCurrentArea && currentArea ? currentArea : null,
+          targetProfessionalArea: showAreaField && professionalArea ? professionalArea : null,
+          studyCourse: needsCourse && studyCourse ? studyCourse : null,
           coupon: coupon.trim() || null,
         }),
       });
@@ -216,10 +226,10 @@ export default function RegisterPage() {
             <p className="text-[9px] text-neutral-500">Mínimo de 8 caracteres.</p>
           </div>
 
-          {/* Momento */}
+          {/* Objetivo principal */}
           <div className="space-y-1 relative group">
             <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
-              Qual é o seu momento?
+              O que você quer alcançar agora?
             </label>
             <div className="relative flex items-center">
               <span className="absolute left-3.5 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
@@ -234,7 +244,7 @@ export default function RegisterPage() {
                 className="w-full rounded-xl border border-[#E2E8F0] bg-white text-[#071827] pl-9.5 pr-4 py-2.5 text-xs outline-none transition-all focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 dark:border-white/10 dark:bg-white/[0.03] dark:text-neutral-100"
               >
                 <option value="" disabled>
-                  Selecione uma opção
+                  Escolha seu objetivo principal
                 </option>
                 {CAREER_SEGMENT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -243,6 +253,9 @@ export default function RegisterPage() {
                 ))}
               </select>
             </div>
+            <p className="text-[10px] leading-relaxed text-neutral-500">
+              Usaremos essa resposta para personalizar seu menu, suas vagas e suas recomendações.
+            </p>
 
             {/* Dica do momento */}
             {careerSegment && MOMENT_TIPS[careerSegment] && (
@@ -253,9 +266,31 @@ export default function RegisterPage() {
           </div>
 
           {showAreaField && (
+            <>
+            {needsCurrentArea && (
+              <div className="space-y-1 relative group animate-in fade-in slide-in-from-top-2 duration-300">
+                <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
+                  {isTransition ? "De qual área você está saindo?" : "Em qual área você trabalha hoje?"}
+                </label>
+                <input
+                  type="text"
+                  list="register-current-areas"
+                  value={currentArea}
+                  onChange={(e) => setCurrentArea(e.target.value)}
+                  required
+                  placeholder="Ex: Vendas, Administração, Atendimento..."
+                  className="w-full rounded-xl border border-[#E2E8F0] bg-white px-4 py-2.5 text-xs text-[#071827] outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+                />
+                <datalist id="register-current-areas">
+                  {COMMON_PROFESSIONAL_AREAS.map((option) => <option key={option} value={option} />)}
+                </datalist>
+              </div>
+            )}
             <div className="space-y-1 relative group animate-in fade-in slide-in-from-top-2 duration-300">
               <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
-                Qual curso ou área você está cursando?
+                {careerSegment === "student"
+                  ? "Qual profissão ou área interessa a você?"
+                  : "Qual curso ou área você está cursando?"}
               </label>
               <div className="relative flex items-center">
                 <span className="absolute left-3.5 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
@@ -268,16 +303,41 @@ export default function RegisterPage() {
                   list="register-professional-areas"
                   value={professionalArea}
                   onChange={(e) => setProfessionalArea(e.target.value)}
-                  placeholder="Ex: Administração, Logística, Marketing..."
+                  placeholder={careerSegment === "student"
+                    ? "Ex: Medicina, Tecnologia, Direito..."
+                    : "Ex: Administração, Logística, Marketing..."}
                   className="w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-4 py-2.5 text-xs text-[#071827] outline-none transition-all placeholder:text-neutral-400 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
                 />
               </div>
               <datalist id="register-professional-areas">
-                {COMMON_PROFESSIONAL_AREAS.map((option) => (
+                {(careerSegment === "student" || careerSegment === "internship"
+                  ? COMMON_STUDY_AREAS
+                  : COMMON_PROFESSIONAL_AREAS
+                ).map((option) => (
                   <option key={option} value={option} />
                 ))}
               </datalist>
             </div>
+            {needsCourse && (
+              <div className="space-y-1 relative group animate-in fade-in slide-in-from-top-2 duration-300">
+                <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
+                  Qual curso você faz?
+                </label>
+                <input
+                  type="text"
+                  list="register-study-courses"
+                  value={studyCourse}
+                  onChange={(e) => setStudyCourse(e.target.value)}
+                  required
+                  placeholder="Ex: Administração, Enfermagem, Sistemas de Informação..."
+                  className="w-full rounded-xl border border-[#E2E8F0] bg-white px-4 py-2.5 text-xs text-[#071827] outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
+                />
+                <datalist id="register-study-courses">
+                  {COMMON_STUDY_AREAS.map((option) => <option key={option} value={option} />)}
+                </datalist>
+              </div>
+            )}
+            </>
           )}
 
           {/* Cupom */}

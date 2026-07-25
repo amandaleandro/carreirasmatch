@@ -38,11 +38,11 @@ export function PartnerCourseForm({
 
   useEffect(() => {
     if (!selectedState || modality === "online") {
-      setCities([]);
+      queueMicrotask(() => setCities([]));
       return;
     }
 
-    setLoadingCities(true);
+    queueMicrotask(() => setLoadingCities(true));
     fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${selectedState}/municipios`)
       .then((res) => res.json())
       .then((data: Array<{ nome: string }>) => {
@@ -64,7 +64,7 @@ export function PartnerCourseForm({
   const selectClass =
     "w-full rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3.5 py-2.5 text-sm font-semibold text-neutral-800 dark:text-neutral-100 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all cursor-pointer";
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit() {
     setSubmitting(true);
   }
 

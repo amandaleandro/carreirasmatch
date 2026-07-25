@@ -129,7 +129,7 @@ export default async function InsightsPage() {
         <p className="text-[10px] text-[#64748B] text-center leading-relaxed max-w-xl mx-auto">
           Metodologia: dados 100% agregados e anônimos das análises de currículo × vaga realizadas na
           plataforma. Nenhum currículo, vaga ou dado pessoal individual é exposto. Ao citar estes
-          dados, referencie "CarreirasMatch — Termômetro do Currículo" com link para esta página.
+          dados, referencie &ldquo;CarreirasMatch — Termômetro do Currículo&rdquo; com link para esta página.
         </p>
       </div>
     </main>

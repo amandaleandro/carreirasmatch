@@ -35,6 +35,9 @@ export default async function SettingsPage({
         image: true,
         careerSegment: true,
         professionalArea: true,
+        currentProfessionalArea: true,
+        targetProfessionalArea: true,
+        studyCourse: true,
         city: true,
         state: true,
         hasFormalEducation: true,
@@ -125,6 +128,9 @@ export default async function SettingsPage({
         <SettingsForm
           initialSegment={normalizeCareerSegment(user?.careerSegment)}
           initialArea={user?.professionalArea ?? null}
+          initialCurrentArea={user?.currentProfessionalArea ?? null}
+          initialTargetArea={user?.targetProfessionalArea ?? null}
+          initialStudyCourse={user?.studyCourse ?? null}
           initialHasFormalEducation={user?.hasFormalEducation ?? null}
           initialCity={user?.city ?? null}
           initialState={user?.state ?? null}

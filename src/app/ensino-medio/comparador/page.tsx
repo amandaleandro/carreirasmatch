@@ -12,10 +12,6 @@ import {
   Briefcase,
   Search,
   CheckCircle2,
-  XCircle,
-  Clock,
-  DollarSign,
-  ArrowRight,
 } from "lucide-react";
 
 const SUGGESTED_AREAS = [

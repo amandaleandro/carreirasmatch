@@ -6,7 +6,6 @@ import { Download, Share2, Check, Sparkles } from "lucide-react";
 interface ShareMatchCardProps {
   jobTitle: string;
   overallScore: number;
-  userName?: string | null;
   userId?: string;
   /** Percentil do score na trilha ("fiquei à frente de X% dos candidatos") — o gancho social do card. */
   betterThanPercent?: number | null;
@@ -70,7 +69,7 @@ function copyTextFallback(value: string): boolean {
   return succeeded;
 }
 
-export function ShareMatchCard({ jobTitle, overallScore, userName, userId, betterThanPercent }: ShareMatchCardProps) {
+export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPercent }: ShareMatchCardProps) {
   const hasPercentile = typeof betterThanPercent === "number" && betterThanPercent >= 50;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -422,7 +421,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userName, userId, bette
             )}
 
             <div className="bg-slate-950/70 border border-white/10 p-2.5 rounded-xl text-[11px] font-bold text-white leading-snug">
-              "Meu Match foi de {overallScore}%! E o seu? 🚀"
+              &ldquo;Meu Match foi de {overallScore}%! E o seu? 🚀&rdquo;
             </div>
           </div>
 

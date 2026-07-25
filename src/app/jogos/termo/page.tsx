@@ -64,7 +64,7 @@ export default function TermoPage() {
   }, []);
 
   useEffect(() => {
-    newGame(area);
+    queueMicrotask(() => newGame(area));
   }, [area, newGame]);
 
   async function saveScore(score: number) {

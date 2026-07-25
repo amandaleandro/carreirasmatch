@@ -1,11 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Search, Trophy, RotateCcw, ArrowLeft, Timer } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { gameAreaFromSlug } from "@/lib/game-area";
 
 const WORDS: Record<string, string[]> = {
   tecnologia: ["REACT", "PYTHON", "DOCKER", "GITHUB", "SERVIDOR", "DEBUG", "NUVEM", "CODIGO"],
@@ -93,7 +95,8 @@ function cellsToLine(a: Cell, b: Cell): Cell[] | null {
 }
 
 export default function CacaPalavrasPage() {
-  const [area, setArea] = useState("tecnologia");
+  const searchParams = useSearchParams();
+  const [area, setArea] = useState(() => gameAreaFromSlug(searchParams.get("area")));
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [grid, setGrid] = useState<string[][]>([]);
@@ -119,7 +122,7 @@ export default function CacaPalavrasPage() {
     return new Set(line.map((c) => `${c.r}-${c.c}`));
   }, [anchor, hover]);
 
-  async function saveScore(s: number) {
+  const saveScore = useCallback(async (s: number) => {
     try {
       await fetch("/api/jogos/scores", {
         method: "POST",
@@ -129,7 +132,7 @@ export default function CacaPalavrasPage() {
     } catch {
       /* deslogado */
     }
-  }
+  }, [area]);
 
   const finish = useCallback(
     (finalScore: number) => {
@@ -137,7 +140,7 @@ export default function CacaPalavrasPage() {
       setStarted(false);
       void saveScore(finalScore);
     },
-    [area]
+    [saveScore]
   );
 
   function start() {
@@ -157,7 +160,7 @@ export default function CacaPalavrasPage() {
   useEffect(() => {
     if (!started) return;
     if (timeLeft <= 0) {
-      finish(score);
+      queueMicrotask(() => finish(score));
       return;
     }
     const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);

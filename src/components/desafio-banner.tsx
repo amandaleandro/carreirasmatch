@@ -12,11 +12,13 @@ export function DesafioBanner() {
   const [dismissed, setDismissed] = useState(true);
 
   useEffect(() => {
-    try {
-      setDismissed(Boolean(window.localStorage.getItem(STORAGE_KEY)));
-    } catch {
-      setDismissed(false);
-    }
+    queueMicrotask(() => {
+      try {
+        setDismissed(Boolean(window.localStorage.getItem(STORAGE_KEY)));
+      } catch {
+        setDismissed(false);
+      }
+    });
   }, []);
 
   // Exibir em todas as telas, exceto na própria página do desafio (/desafio)

@@ -43,6 +43,7 @@ export default async function InterviewsPage() {
     <InterviewPrep
       analysisId={latest.id}
       jobTitle={latest.jobTitle}
+      jobText={latest.jobText}
       questions={questions}
       initialProgress={progress}
     />

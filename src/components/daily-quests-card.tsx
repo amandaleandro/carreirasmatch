@@ -16,11 +16,13 @@ export function DailyQuestsCard() {
   const [quests, setQuests] = useState<DailyQuest[]>([]);
 
   useEffect(() => {
-    setMounted(true);
-    const state = getGamificationState();
-    setTotalXp(state.totalXp);
-    setStreakDays(state.streakDays);
-    setQuests(state.quests);
+    queueMicrotask(() => {
+      const state = getGamificationState();
+      setTotalXp(state.totalXp);
+      setStreakDays(state.streakDays);
+      setQuests(state.quests);
+      setMounted(true);
+    });
   }, []);
 
   if (!mounted) return null;

@@ -12,7 +12,6 @@ import {
   ChevronRight,
   Globe,
   Layers,
-  CheckCircle2,
   Building2,
   ArrowRight,
 } from "lucide-react";

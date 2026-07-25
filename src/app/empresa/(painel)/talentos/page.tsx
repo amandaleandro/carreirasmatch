@@ -1,4 +1,4 @@
-import { Users, Sparkles } from "lucide-react";
+import { Users } from "lucide-react";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { TalentSearch } from "@/components/talent-search";
 

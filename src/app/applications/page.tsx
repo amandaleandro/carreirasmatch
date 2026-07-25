@@ -8,8 +8,6 @@ import {
 } from "@/lib/applications";
 import {
   createApplication,
-  scheduleInterview,
-  updateApplicationStatus,
   updateWeeklyGoal,
 } from "./actions";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
@@ -25,15 +23,9 @@ function percent(done: number, target: number) {
   return Math.min(100, Math.round((done / target) * 100));
 }
 
-function daysUntil(date: Date) {
-  const ms = date.getTime() - Date.now();
+function daysUntil(date: Date, referenceDate: Date) {
+  const ms = date.getTime() - referenceDate.getTime();
   return Math.ceil(ms / (1000 * 60 * 60 * 24));
-}
-
-function toDatetimeLocalValue(date: Date) {
-  const offset = date.getTimezoneOffset();
-  const local = new Date(date.getTime() - offset * 60 * 1000);
-  return local.toISOString().slice(0, 16);
 }
 
 function deadlineBadgeClass(days: number) {
@@ -76,9 +68,9 @@ export default async function ApplicationsPage() {
     ["interview", "technical_test", "offer"].includes(item.status)
   ).length;
 
-  const now = Date.now();
+  const now = new Date();
   const upcomingDeadlines = applications
-    .filter((item) => item.deadline && item.deadline.getTime() >= now)
+    .filter((item) => item.deadline && item.deadline >= now)
     .sort((a, b) => a.deadline!.getTime() - b.deadline!.getTime())
     .slice(0, 3);
 
@@ -197,7 +189,7 @@ export default async function ApplicationsPage() {
           <h2 className="text-sm font-bold text-[#071827] dark:text-white">Prazos próximos</h2>
           <div className="mt-3 space-y-2">
             {upcomingDeadlines.map((item) => {
-              const days = daysUntil(item.deadline!);
+              const days = daysUntil(item.deadline!, now);
               return (
                 <div key={item.id} className="flex items-center justify-between gap-3 text-xs p-2 rounded-xl bg-[#F8FAFC]/50 dark:bg-white/[0.01]">
                   <div className="min-w-0">

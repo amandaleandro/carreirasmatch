@@ -45,7 +45,6 @@ export class UberlandiaPrefeituraScraper implements CityScraper {
         try {
           const postHtml = await fetchPage(postUrl);
           const $post = cheerio.load(postHtml);
-          const postTitle = $post("h1").text().trim() || $post("title").text().trim();
 
           $post("p").each((_, p) => {
             const text = $post(p).text().trim();

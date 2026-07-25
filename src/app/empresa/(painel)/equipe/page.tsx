@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { UsersRound, ShieldCheck } from "lucide-react";
+import { UsersRound } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { TeamManager } from "@/components/team-manager";

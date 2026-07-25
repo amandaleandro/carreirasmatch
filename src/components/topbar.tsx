@@ -8,15 +8,56 @@ import { BrandLogo } from "@/components/brand-logo";
 import Link from "next/link";
 import { Menu, X, Search, Sparkles, HelpCircle } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
+import type { CareerSegment } from "@/lib/career-segments";
+
+const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; label: string }[]>> = {
+  student: [
+    { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" }, { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico" },
+    { href: "/cursos-gratuitos", label: "Cursos gratuitos" }, { href: "/vestibulares", label: "Radar de vestibulares" },
+    { href: "/mentorias", label: "Mentorias" }, { href: "/jogos", label: "Jogos" },
+  ],
+  apprentice: [
+    { href: "/jovem-aprendiz", label: "Jovem Aprendiz" }, { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" },
+    { href: "/tools/apprentice-areas", label: "Áreas de atuação" }, { href: "/tools/apprentice-companies", label: "Empresas" },
+    { href: "/tools/apprentice-guide", label: "Guia do Aprendiz" }, { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
+    { href: "/feed", label: "Feed de Vagas" }, { href: "/radar", label: "Radar de Oportunidades" },
+    { href: "/todas-as-vagas", label: "Todas as Vagas" }, { href: "/applications", label: "Candidaturas" },
+  ],
+  first_job: [
+    { href: "/primeiro-emprego", label: "Primeiro emprego" }, { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência" },
+    { href: "/tools/first-job-guide", label: "Guia do primeiro emprego" }, { href: "/vagas-de-hoje", label: "Vagas de hoje" },
+    { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
+    { href: "/feed", label: "Feed de Vagas" }, { href: "/radar", label: "Radar de Oportunidades" },
+    { href: "/todas-as-vagas", label: "Todas as Vagas" }, { href: "/applications", label: "Candidaturas" },
+  ],
+  internship: [
+    { href: "/estagio", label: "Estágios" }, { href: "/feed", label: "Feed de estágios" }, { href: "/analise", label: "Análise de Vaga" },
+    { href: "/tools/internship-guide", label: "Guia de estágio" }, { href: "/tools/internship-checklist", label: "Checklist de estágio" },
+    { href: "/tools/internship-calculator", label: "Calculadora de bolsa" }, { href: "/resume", label: "Meu Currículo" },
+    { href: "/radar", label: "Radar de Oportunidades" }, { href: "/todas-as-vagas", label: "Todas as Vagas" },
+    { href: "/applications", label: "Candidaturas" },
+  ],
+  concurseiro: [
+    { href: "/concursos", label: "Radar de Concursos" }, { href: "/concurso", label: "Preparação para concurso" },
+    { href: "/tools/concurso", label: "Plano e simulados" }, { href: "/tools/leitor-edital", label: "Leitor de edital" },
+    { href: "/tools/essay-grader", label: "Corretor de redação" },
+  ],
+  oab: [
+    { href: "/oab", label: "Preparação para OAB" }, { href: "/tools/oab", label: "Simulados OAB" },
+    { href: "/tools/oab/segunda-fase", label: "Segunda fase" },
+  ],
+};
 
 export function Topbar({
   userName,
   userEmail,
   userImage,
+  segment = null,
 }: {
   userName: string;
   userEmail: string;
   userImage?: string | null;
+  segment?: CareerSegment | null;
 }) {
   const router = useRouter();
   const { openNews, openTour } = useUiPanels();
@@ -129,6 +170,21 @@ export function Topbar({
 
               <div className="space-y-1.5">
                 <Link href="/dashboard" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Dashboard</Link>
+                {segment ? MOBILE_LINKS_BY_SEGMENT[segment]?.map((link) => (
+                  <Link key={link.href} href={link.href} onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">{link.label}</Link>
+                )) : null}
+                {false ? (
+                  <>
+                    <Link href="/ensino-medio" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Ensino Médio &amp; ENEM 🎓</Link>
+                    <Link href="/faculdade-ou-tecnico" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Faculdade ou Técnico</Link>
+                    <Link href="/cursos-gratuitos" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Cursos gratuitos</Link>
+                    <Link href="/vestibulares" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de vestibulares</Link>
+                    <Link href="/mentorias" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Mentorias</Link>
+                    <Link href="/jogos" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Jogos</Link>
+                  </>
+                ) : null}
+                {(!segment || segment === "career_change" || segment === "career_pro") && (
+                  <>
                 <Link href="/analise" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Análise de Vaga</Link>
                 <Link href="/feed" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Feed de Vagas</Link>
                 <Link href="/todas-as-vagas" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Todas as Vagas</Link>
@@ -142,6 +198,8 @@ export function Topbar({
                 <Link href="/mentorias" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Mentorias</Link>
                 <Link href="/concursos" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de concursos</Link>
                 <Link href="/vestibulares" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de vestibulares</Link>
+                  </>
+                )}
                 <Link href="/suporte" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Suporte</Link>
                 <Link href="/settings" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Perfil</Link>
                 <div className="mt-2 pt-2 border-t border-white/5">

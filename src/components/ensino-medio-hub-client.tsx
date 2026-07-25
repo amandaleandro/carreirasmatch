@@ -21,7 +21,6 @@ import {
   Calendar,
   Scale,
   Bot,
-  HelpCircle,
   Award,
   FileText,
   Timer,

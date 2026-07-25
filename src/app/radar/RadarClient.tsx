@@ -14,9 +14,7 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
-  Filter,
   Layers,
-  Building2,
   MapPin,
   TrendingUp,
 } from "lucide-react";
@@ -109,7 +107,7 @@ export function RadarClient() {
 
   // Reset to page 1 when filters change
   useEffect(() => {
-    setCurrentPage(1);
+    queueMicrotask(() => setCurrentPage(1));
   }, [searchTerm, onlyHighMatch, pageSize]);
 
   // Pagination calculations

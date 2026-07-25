@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -59,7 +59,7 @@ export async function GET(req: Request) {
     );
 
     // Extrai palavras-chave do currículo e da análise
-    let candidateKeywordsSet = new Set<string>();
+    const candidateKeywordsSet = new Set<string>();
     if (latestAnalysis?.keywordsFound) {
       try {
         const parsed = JSON.parse(latestAnalysis.keywordsFound);
@@ -114,7 +114,7 @@ export async function GET(req: Request) {
 
       let matchScore = hasProfileContext ? 40 : 70; // Pontuação base
       let matchedRole: string | null = null;
-      let matchedSkills: string[] = [];
+      const matchedSkills: string[] = [];
 
       // A) Verificação de alinhamento com título/cargo almejado
       for (const role of candidateTargetRoles) {
@@ -191,4 +191,3 @@ export async function GET(req: Request) {
     );
   }
 }
-

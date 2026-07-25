@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segments";
+import { CAREER_SEGMENT_LABELS, normalizeCareerSegment, type CareerSegment } from "@/lib/career-segments";
 import { toolsForSegment, type ToolCatalogEntry, type ToolIcon, type ToolColor } from "@/lib/tools-catalog";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import {
@@ -13,7 +13,6 @@ import {
   Wrench,
   Star,
   Award,
-  SlidersHorizontal,
   Compass,
   Mic,
   FilePlus,
@@ -48,7 +47,7 @@ export default async function ToolsPage() {
   const { recommended, others } = toolsForSegment(segment, userAreaSlug);
 
   // Se o usuário já definiu o momento de carreira, exibimos exclusivamente as ferramentas do momento dele.
-  const displayTools = segment ? recommended : [...recommended, ...others];
+  const displayTools = [...recommended, ...others];
 
   return (
     <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 w-full space-y-10">
@@ -162,7 +161,13 @@ export default async function ToolsPage() {
               : `Todas as ferramentas disponíveis (${displayTools.length})`}
           </h2>
         </div>
-        <ToolGrid tools={displayTools} highlight isLoggedIn={Boolean(session?.user?.id)} />
+        <ToolGrid
+          tools={displayTools}
+          highlight
+          segment={segment}
+          isPaidUser={isPaidUser}
+          isLoggedIn={Boolean(session?.user?.id)}
+        />
       </section>
     </main>
   );
@@ -172,20 +177,31 @@ function ToolGrid({
   tools,
   highlight,
   locked,
+  segment,
+  isPaidUser = false,
   isLoggedIn = false,
 }: {
   tools: ToolCatalogEntry[];
   highlight?: boolean;
   locked?: boolean;
+  segment?: CareerSegment | null;
+  isPaidUser?: boolean;
   isLoggedIn?: boolean;
 }) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => {
-        const isLocked = Boolean(locked) && !tool.free && !tool.accountFree;
+        const belongsToSegment = !segment || tool.segments.includes(segment);
+        const isLocked = Boolean(locked) || (!tool.free && (!belongsToSegment || (!tool.accountFree && !isPaidUser)));
+        const lockLabel = !belongsToSegment ? "Disponível para outro perfil" : "Disponível no plano";
 
         const badge = isLoggedIn ? (
-          highlight ? (
+          isLocked ? (
+            <span className="rounded-md bg-slate-200 dark:bg-slate-800 text-slate-500 px-2.5 py-0.5 text-xs font-semibold inline-flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              {lockLabel}
+            </span>
+          ) : highlight ? (
             <span className="rounded-md bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1">
               <Star className="w-3 h-3 fill-amber-500" />
               Recomendada
@@ -236,7 +252,7 @@ function ToolGrid({
               </div>
 
               <div className="mt-5 pt-3 border-t border-slate-200/60 dark:border-slate-800/60 text-xs text-slate-400">
-                Não disponível para o perfil atual
+                {lockLabel}. Assine para desbloquear os recursos completos.
               </div>
             </div>
           );

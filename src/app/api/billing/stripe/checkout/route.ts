@@ -36,10 +36,12 @@ export async function POST(req: NextRequest) {
       url: checkoutSession.url,
       sessionId: checkoutSession.id,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : "Não foi possível criar o checkout no Stripe.";
     console.error("Erro ao criar sessão de Checkout no Stripe:", error);
     return NextResponse.json(
-      { error: error?.message || "Não foi possível criar o checkout no Stripe." },
+      { error: message },
       { status: 500 }
     );
   }

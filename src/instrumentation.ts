@@ -34,6 +34,11 @@ export async function register() {
     startWhatsappScheduler();
   }
 
+  if (process.env.AUTO_APPLY_ENABLED !== "false") {
+    const { startAutoApplyScheduler } = await import("@/lib/auto-apply-scheduler");
+    startAutoApplyScheduler();
+  }
+
   // One-time backfill for jobs ingested before the job-tags migration.
   // Self-disabling: once every active job is tagged this becomes a no-op.
   try {

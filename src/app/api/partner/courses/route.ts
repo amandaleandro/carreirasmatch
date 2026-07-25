@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { requirePartnerApi } from "@/lib/partner-auth";
 import { prisma } from "@/lib/prisma";
 
+function hasErrorCode(error: unknown): error is { code: string } {
+  return typeof error === "object" && error !== null && "code" in error;
+}
+
 export async function POST(req: Request) {
   const { partner, response } = await requirePartnerApi();
   if (!partner) return response;
@@ -55,8 +59,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ id: course.id });
-  } catch (err: any) {
-    if (err.code === "P2002") {
+  } catch (err: unknown) {
+    if (hasErrorCode(err) && err.code === "P2002") {
       return NextResponse.json({ error: "Já existe um curso cadastrado com este link." }, { status: 400 });
     }
     console.error("Erro ao cadastrar curso:", err);

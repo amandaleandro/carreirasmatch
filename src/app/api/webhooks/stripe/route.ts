@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import type Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import { prisma } from "@/lib/prisma";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { grantSubscriptionPeriod, isPeriodPlanKind, PERIOD_PLAN_DAYS } from "@/lib/billing-plans";
 import { registerCouponUsage } from "@/lib/coupons";
 import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail, notifyAdminPurchase } from "@/lib/resend";
-import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 export const dynamic = "force-dynamic";
 
@@ -21,23 +21,24 @@ export async function POST(req: NextRequest) {
   }
 
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  let event: any;
+  let event: Stripe.Event;
 
   try {
     const rawBody = await req.text();
     if (webhookSecret) {
       event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
     } else {
-      event = JSON.parse(rawBody);
+      event = JSON.parse(rawBody) as Stripe.Event;
     }
-  } catch (err: any) {
-    console.error("Erro na verificação do webhook do Stripe:", err.message);
-    return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Evento inválido.";
+    console.error("Erro na verificação do webhook do Stripe:", message);
+    return NextResponse.json({ error: `Webhook Error: ${message}` }, { status: 400 });
   }
 
   // Tratamento do evento checkout.session.completed (blueprint: handle-checkout-completed)
   if (event.type === "checkout.session.completed") {
-    const session = event.data.object;
+    const session = event.data.object as Stripe.Checkout.Session;
     const metadata = session.metadata || {};
     const { userId, analysisId, kind = "diagnostic", segment, couponCode } = metadata;
 
@@ -115,7 +116,7 @@ export async function POST(req: NextRequest) {
           data: {
             name: "payment_confirmed",
             userId: effectiveUserId,
-            metadata: JSON.stringify({ provider: "stripe", kind, amountTotal, segment: normalizedSegment }),
+            properties: JSON.stringify({ provider: "stripe", kind, amountTotal, segment: normalizedSegment }),
           },
         });
       }

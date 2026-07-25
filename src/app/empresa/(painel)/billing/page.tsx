@@ -1,4 +1,4 @@
-import { CreditCard, Sparkles, CheckCircle2, Infinity as InfinityIcon } from "lucide-react";
+import { CreditCard, CheckCircle2, Infinity as InfinityIcon } from "lucide-react";
 import { requireCompanyPage, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
 import { SCREENING_PACKS, COMPANY_PLAN, hasActiveCompanyPlan } from "@/lib/company-billing";
 import { CompanyBillingCheckout } from "@/components/company-billing-checkout";

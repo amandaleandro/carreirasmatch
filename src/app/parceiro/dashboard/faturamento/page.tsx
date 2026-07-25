@@ -1,7 +1,7 @@
 import { requirePartnerPage } from "@/lib/partner-auth";
 import { prisma } from "@/lib/prisma";
 import { PartnerShell } from "@/components/partner-shell";
-import { CreditCard, Calendar, ShieldCheck, HelpCircle } from "lucide-react";
+import { CreditCard, Calendar } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 

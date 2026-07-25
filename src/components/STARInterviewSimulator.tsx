@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, CheckCircle2, AlertCircle, Award, RefreshCw, Send } from "lucide-react";
+import { Sparkles, CheckCircle2, Award, RefreshCw, Send } from "lucide-react";
 
 interface STARFeedback {
   situationScore: number;

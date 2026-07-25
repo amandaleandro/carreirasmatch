@@ -51,9 +51,10 @@ export function StripeCheckoutButton({
       } else {
         throw new Error("URL de checkout inválida retornada pelo Stripe.");
       }
-    } catch (err: any) {
-      setError(err.message || "Erro de conexão com o Stripe.");
-      track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { provider: "stripe", reason: err.message });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Erro de conexão com o Stripe.";
+      setError(message);
+      track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { provider: "stripe", reason: message });
     } finally {
       setLoading(false);
     }

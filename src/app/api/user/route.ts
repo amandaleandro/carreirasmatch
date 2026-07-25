@@ -14,6 +14,9 @@ export async function PATCH(req: NextRequest) {
     image?: string | null;
     careerSegment?: string | null;
     professionalArea?: string | null;
+    currentProfessionalArea?: string | null;
+    targetProfessionalArea?: string | null;
+    studyCourse?: string | null;
     hasFormalEducation?: boolean | null;
     interestedRoles?: string;
     themePreference?: string;
@@ -64,6 +67,19 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Área profissional inválida." }, { status: 400 });
     }
     data.professionalArea = professionalArea?.trim() || null;
+  }
+
+  for (const field of ["currentProfessionalArea", "targetProfessionalArea", "studyCourse"] as const) {
+    if (field in body) {
+      const value = body[field];
+      if (value !== null && typeof value !== "string") {
+        return NextResponse.json({ error: "Dados de carreira inválidos." }, { status: 400 });
+      }
+      if (typeof value === "string" && value.trim().length > 160) {
+        return NextResponse.json({ error: "Dados de carreira muito longos." }, { status: 400 });
+      }
+      data[field] = typeof value === "string" ? value.trim() || null : null;
+    }
   }
 
   if ("hasFormalEducation" in body) {

@@ -594,6 +594,65 @@ ${transcript}`;
   };
 }
 
+export type InterviewAnswerDraftResult = {
+  answerDraft: string;
+  keyPoints: string[];
+  cautionNotes: string[];
+};
+
+export async function generateInterviewAnswerDraft(
+  input: InterviewSimulatorInput & { question: string; mode?: "curta" | "star" | "tecnica" }
+): Promise<InterviewAnswerDraftResult> {
+  const mode = input.mode ?? "curta";
+  const modeInstructions =
+    mode === "star"
+      ? "Estruture a resposta no modelo STAR, deixando situaÁ„o, aÁ„o e resultado bem claros, sem soar engessado."
+      : mode === "tecnica"
+        ? "DÍ mais peso ao vocabul·rio tÈcnico da ·rea, aos conceitos usados e aos trade-offs, sem exagerar a experiÍncia."
+        : "Prefira respostas curtas a mÈdias, claras e naturais, como alguÈm falaria numa entrevista real quando o tempo È curto.";
+
+  const systemPrompt = `${INTERVIEWER_ROLE}
+${BASE_RULES}
+Sua tarefa √© redigir um RASCUNHO de resposta para uma pergunta t√©cnica ou comportamental de entrevista, usando somente o contexto fornecido pelo candidato e pela vaga.
+Regras:
+- N√£o invente experi√™ncia, emprego, certifica√ß√£o, ferramenta ou resultado que n√£o esteja no contexto.
+- Se o contexto n√£o trouxer base suficiente, escreva uma resposta honesta, gen√©rica e segura, indicando onde o candidato deve personalizar.
+- Quando a pergunta pedir detalhes t√©cnicos, inclua os conceitos corretos, mas sem overclaim.
+${modeInstructions}
+Formato de resposta:
+{
+  "answerDraft": string,
+  "keyPoints": string[] (2 a 5 pontos que a pessoa deve manter ou adaptar),
+  "cautionNotes": string[] (1 a 4 cuidados sobre o que n√£o afirmar ou onde personalizar)
+}`;
+
+  const userMessage = `${interviewContext(input)}
+
+PERGUNTA:
+${input.question}
+
+MODO DE RESPOSTA:
+${mode}
+
+HIST√ìRICO RECENTE:
+${input.history
+  .map((turn, index) => `PERGUNTA ${index + 1}: ${turn.question}\nRESPOSTA ${index + 1}: ${turn.answer}`)
+  .join("\n\n") || "(sem hist√≥rico)"}`;
+
+  const result = await runToolJsonPrompt<InterviewAnswerDraftResult>(
+    "interview_answer_draft",
+    systemPrompt,
+    userMessage,
+    0.5
+  );
+
+  return {
+    answerDraft: asText(result?.answerDraft),
+    keyPoints: asStringArray(result?.keyPoints, 5),
+    cautionNotes: asStringArray(result?.cautionNotes, 4),
+  };
+}
+
 export type GithubReviewResult = {
   overallImpression: string;
   strongestRepos: string[];

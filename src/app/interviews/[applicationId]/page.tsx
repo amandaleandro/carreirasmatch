@@ -99,6 +99,7 @@ export default async function ApplicationInterviewPage({
     <InterviewPrep
       analysisId={application.analysis.id}
       jobTitle={application.analysis.jobTitle}
+      jobText={application.analysis.jobText}
       questions={questions}
       initialProgress={progress}
     />

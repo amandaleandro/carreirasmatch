@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 
 describe("Mercado Pago Billing Webhook Unit Tests", () => {
   it("deve rejeitar requisição sem assinatura HMAC válida quando WEBHOOK_SECRET está ativo", () => {

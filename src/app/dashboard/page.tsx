@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { CircularScore } from "@/components/circular-score";
 import { TRACK_LABELS, CareerTrack } from "@/components/analysis-display";
-import { CAREER_SEGMENT_LABELS, normalizeCareerSegment } from "@/lib/career-segments";
+import { normalizeCareerSegment } from "@/lib/career-segments";
 import { toolsForSegment } from "@/lib/tools-catalog";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { computeJourneyMetrics } from "@/lib/applications";
@@ -38,7 +38,15 @@ export default async function DashboardPage() {
     }),
     prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { careerSegment: true, professionalArea: true, name: true, employmentStatus: true },
+      select: {
+        careerSegment: true,
+        professionalArea: true,
+        currentProfessionalArea: true,
+        targetProfessionalArea: true,
+        studyCourse: true,
+        name: true,
+        employmentStatus: true,
+      },
     }),
     prisma.softSkillTestResult.findFirst({
       where: { userId: session.user.id },
@@ -58,14 +66,13 @@ export default async function DashboardPage() {
     topMonthlyScores.some((s) => s.userId === session.user.id) &&
     (await hasActiveSubscriptionAccess(session.user.id));
 
-  let topVagas: any[] = [];
-  if (isTopPlayer) {
-    topVagas = await prisma.companyVaga.findMany({
-      where: { status: "open", publishedToFeed: true },
-      take: 3,
-      include: { company: { select: { name: true } } },
-    });
-  }
+  const topVagas = isTopPlayer
+    ? await prisma.companyVaga.findMany({
+        where: { status: "open", publishedToFeed: true },
+        take: 3,
+        include: { company: { select: { name: true } } },
+      })
+    : [];
 
   const applications = await prisma.application.findMany({
     where: { userId: session.user.id },
@@ -73,12 +80,12 @@ export default async function DashboardPage() {
     take: 5,
   });
   const upcomingDeadlines = await prisma.application.findMany({
-    where: { userId: session.user.id, deadline: { gte: new Date() } },
+    where: { userId: session.user.id, deadline: { gte: now } },
     orderBy: { deadline: "asc" },
     take: 3,
   });
   const upcomingInterviews = await prisma.application.findMany({
-    where: { userId: session.user.id, interviewAt: { gte: new Date() } },
+    where: { userId: session.user.id, interviewAt: { gte: now } },
     orderBy: { interviewAt: "asc" },
     take: 3,
   });
@@ -88,7 +95,13 @@ export default async function DashboardPage() {
   });
   const journey = computeJourneyMetrics(allApplicationsForMetrics);
   const segment = normalizeCareerSegment(user?.careerSegment);
-  const userAreaSlug = matchAreaSlug(user?.professionalArea);
+  const userAreaSlug = matchAreaSlug(user?.targetProfessionalArea || user?.professionalArea || user?.studyCourse);
+  const motivationProfile = {
+    careerSegment: user?.careerSegment,
+    area: user?.targetProfessionalArea || user?.professionalArea,
+    currentArea: user?.currentProfessionalArea,
+    studyCourse: user?.studyCourse,
+  };
   const { recommended: recommendedTools } = toolsForSegment(segment, userAreaSlug);
   const topRecommendedTool = recommendedTools[0];
 
@@ -109,6 +122,7 @@ export default async function DashboardPage() {
         <div className="text-left">
           <DailyMotivationCard
             initialStatus={user?.employmentStatus}
+            profile={motivationProfile}
             onStatusChange={async (newStatus) => {
               "use server";
               await updateEmploymentStatusAction(newStatus);
@@ -194,6 +208,7 @@ export default async function DashboardPage() {
       {/* Card da Dose Diária de Motivação & Meme */}
       <DailyMotivationCard
         initialStatus={user?.employmentStatus}
+        profile={motivationProfile}
         onStatusChange={async (newStatus) => {
           "use server";
           await updateEmploymentStatusAction(newStatus);
@@ -407,7 +422,7 @@ export default async function DashboardPage() {
                 let skills: Record<string, number> = {};
                 try {
                   skills = JSON.parse(behavioralResult.skillScores);
-                } catch(e){}
+                } catch {}
                 const labels: Record<string, string> = {
                   comunicacao: "Comunicação",
                   trabalho_em_equipe: "Trabalho em equipe",
@@ -447,7 +462,7 @@ export default async function DashboardPage() {
               <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Prazos próximos</p>
               <div className="space-y-2">
                 {upcomingDeadlines.map((item) => {
-                  const days = Math.ceil((item.deadline!.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                  const days = Math.ceil((item.deadline!.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
                   return (
                     <Link
                       href="/applications"

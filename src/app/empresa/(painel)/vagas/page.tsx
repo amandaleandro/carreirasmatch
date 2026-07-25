@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Briefcase, Plus, MapPin, Clock, ArrowRight, Users, Sparkles, CheckCircle2, Search } from "lucide-react";
+import { Briefcase, Plus, MapPin, Clock, ArrowRight, Users, Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
 import { parseStoredMatches } from "@/lib/company-vaga";

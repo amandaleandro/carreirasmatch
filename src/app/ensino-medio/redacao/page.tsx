@@ -7,13 +7,10 @@ import { SiteFooter } from "@/components/site-footer";
 import { EnsinoMedioToolsNav } from "@/components/ensino-medio-tools-nav";
 import { EnemEssayEvaluation } from "@/lib/ensino-medio-tools";
 import {
-  FileEdit,
   Sparkles,
   Award,
   CheckCircle2,
-  AlertTriangle,
   Lightbulb,
-  BookOpen,
   RotateCcw,
   ArrowRight,
 } from "lucide-react";

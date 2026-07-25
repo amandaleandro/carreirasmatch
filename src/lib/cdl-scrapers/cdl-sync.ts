@@ -61,7 +61,7 @@ async function saveCDLItems(
     },
   });
 
-  const promises: Promise<any>[] = [];
+  const promises: Promise<unknown>[] = [];
 
   for (const item of items) {
     if (item.type === "curso") {

@@ -257,7 +257,7 @@ export function AnalyzeVagaPage({
     ? CAREER_TRACK_OPTIONS.filter((o) => allowedTracks.includes(o.value))
     : CAREER_TRACK_OPTIONS;
   const curiosityIndex = useRotatingIndex(CURIOSITIES.length, 7000);
-  const loadingMessageIndex = useRotatingIndex(LOADING_MESSAGES.length, 3000);
+  useRotatingIndex(LOADING_MESSAGES.length, 3000);
   const [jobTitle, setJobTitle] = useState(initialDraft.jobTitle ?? "");
   const [jobText, setJobText] = useState(initialDraft.jobText ?? "");
   const [jobLink, setJobLink] = useState(initialDraft.jobLink ?? "");

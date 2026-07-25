@@ -107,7 +107,8 @@ function formatStat(value: number) {
 }
 
 export default async function ParceiroLandingPage() {
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const [userCount, courseCount, areaCount, clickCount] = await Promise.all([
     prisma.user.count(),
     prisma.externalCourse.count({ where: { active: true } }),

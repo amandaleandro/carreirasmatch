@@ -8,11 +8,8 @@ import { EnemAnalysisResult } from "@/lib/ensino-medio-tools";
 import {
   Calculator,
   Sparkles,
-  Award,
-  CheckCircle2,
   Briefcase,
   RotateCcw,
-  GraduationCap,
 } from "lucide-react";
 
 export default function EnemCalculatorPage() {

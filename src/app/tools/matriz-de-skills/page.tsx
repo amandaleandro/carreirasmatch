@@ -3,12 +3,25 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
+type SkillEquivalency = {
+  previousSkill: string;
+  targetEquivalent: string;
+  howToDescribeInResume: string;
+};
+
+type SkillMatrixResult = {
+  transitionalNarrative: string;
+  skillEquivalencies: SkillEquivalency[];
+  bridgeRoles: string[];
+  quickWinCertifications: string[];
+};
+
 export default function MatrizDeSkillsPage() {
   const [previousRole, setPreviousRole] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [previousSkills, setPreviousSkills] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<SkillMatrixResult | null>(null);
   const [error, setError] = useState("");
 
   const handleGenerate = async () => {
@@ -30,7 +43,7 @@ export default function MatrizDeSkillsPage() {
       } else {
         setResult(data.matrix);
       }
-    } catch (e) {
+    } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);
@@ -115,7 +128,7 @@ export default function MatrizDeSkillsPage() {
                 Narrativa de Transição Recomendada
               </h3>
               <p className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed">
-                "{result.transitionalNarrative}"
+                &ldquo;{result.transitionalNarrative}&rdquo;
               </p>
             </div>
           )}
@@ -126,7 +139,7 @@ export default function MatrizDeSkillsPage() {
                 Tradução de Competências (Experiência Passada ➔ Nova Área)
               </h3>
               <div className="space-y-3">
-                {result.skillEquivalencies.map((eq: any, idx: number) => (
+                {result.skillEquivalencies.map((eq, idx) => (
                   <div key={idx} className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-bold">
                       <span className="text-neutral-500">De: {eq.previousSkill}</span>

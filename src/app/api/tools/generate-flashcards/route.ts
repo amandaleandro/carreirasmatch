@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
 
+type GeneratedFlashcard = {
+  front: string;
+  back: string;
+  mnemonicTip: string;
+};
+
 export async function POST(req: NextRequest) {
   try {
     const session = await auth();
@@ -27,7 +33,11 @@ Retorne um JSON com a seguinte estrutura estrita:
 TÓPICO/ASSUNTO: ${topic || "Geral da disciplina"}
 QUANTIDADE DE FLASHCARDS: ${quantity || 5}`;
 
-    const data = await runJsonPrompt<{ flashcards: any[] }>(systemPrompt, userPrompt, 0.3);
+    const data = await runJsonPrompt<{ flashcards: GeneratedFlashcard[] }>(
+      systemPrompt,
+      userPrompt,
+      0.3
+    );
 
     return NextResponse.json({ success: true, flashcards: data.flashcards || [] });
   } catch (error) {

@@ -3,7 +3,14 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-type CandidateStatus = "none" | "favorite" | "approved" | "rejected";
+export type CandidateStatus =
+  | "none"
+  | "favorite"
+  | "screening"
+  | "interview"
+  | "test"
+  | "approved"
+  | "rejected";
 
 export type ScreeningCandidate = {
   id: string;
@@ -26,6 +33,9 @@ function scoreColor(score: number): string {
 
 const STATUS_META: Record<Exclude<CandidateStatus, "none">, { label: string; badge: string }> = {
   favorite: { label: "Favorito", badge: "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300" },
+  screening: { label: "Em triagem", badge: "bg-blue-100 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300" },
+  interview: { label: "Entrevista", badge: "bg-purple-100 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300" },
+  test: { label: "Teste técnico", badge: "bg-orange-100 text-orange-700 dark:bg-orange-950/50 dark:text-orange-300" },
   approved: { label: "Aprovado", badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300" },
   rejected: { label: "Reprovado", badge: "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-300" },
 };
@@ -130,7 +140,12 @@ export function ScreeningResults({
     URL.revokeObjectURL(url);
   }
 
-  const actionBtn = (id: string, kind: Exclude<CandidateStatus, "none">, current: CandidateStatus, label: string) => {
+  const actionBtn = (
+    id: string,
+    kind: "favorite" | "approved" | "rejected",
+    current: CandidateStatus,
+    label: string
+  ) => {
     const on = current === kind;
     const tone =
       kind === "favorite"

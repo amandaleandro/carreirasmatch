@@ -5,28 +5,16 @@ import Link from "next/link";
 import { HeroInstantScanner } from "@/components/hero-instant-scanner";
 import {
   ArrowRight,
-  BookOpenCheck,
-  BriefcaseBusiness,
   Check,
   FileCheck2,
   FileSearch,
-  GraduationCap,
-  LockKeyhole,
-  Landmark,
-  RefreshCw,
-  Scale,
   ShieldCheck,
-  Sparkles,
-  Target,
-  UserRoundSearch,
-  X,
   CheckCircle2,
-  Zap,
+  Target,
   TrendingUp,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
-import { CAREER_OFFERS } from "@/lib/career-offers";
 
 const steps = [
   ["01", "Envie seu currículo", "Use seu PDF atual. A análise parte apenas das informações que você já tem."],
@@ -43,37 +31,6 @@ const deliverables = [
   "Plano de ação estratégico com ajustes prioritários",
 ];
 
-const journeys = [
-  ["/estagio", "Estágio", "Mostre projetos, cursos e atividades como evidências relevantes.", GraduationCap],
-  ["/primeiro-emprego", "Primeiro Emprego", "Apresente potencial real sem precisar inventar experiência profissional.", UserRoundSearch],
-  ["/recolocacao", "Recolocação", "Traduza sua bagagem para a linguagem e exigências da vaga atual.", BriefcaseBusiness],
-  ["/transicao", "Transição de Carreira", "Destaque habilidades transferíveis e construa uma narrativa coerente.", RefreshCw],
-] as const;
-
-const studyJourneys = [
-  {
-    href: "/faculdade-ou-tecnico",
-    title: "Vestibular e escolha de curso",
-    description: "Compare áreas, cursos e caminhos de formação antes de decidir seu próximo passo.",
-    linkLabel: "Explorar orientação",
-    Icon: BookOpenCheck,
-  },
-  {
-    href: "/concurso",
-    title: "Concursos públicos",
-    description: "Transforme o edital em prioridades, plano de estudo e preparação para a prova.",
-    linkLabel: "Preparar para concurso",
-    Icon: Landmark,
-  },
-  {
-    href: "/oab",
-    title: "Exame da OAB",
-    description: "Organize a preparação para a 1ª e a 2ª fase com foco no padrão da FGV.",
-    linkLabel: "Preparar para a OAB",
-    Icon: Scale,
-  },
-] as const;
-
 const faqs = [
   ["A análise gratuita já mostra o resultado?", "Sim. Você recebe o resultado inicial de aderência. O Kit Candidatura reúne a versão otimizada em PDF, a análise de palavras-chave e a preparação para entrevista."],
   ["A plataforma inventa qualificações no meu currículo?", "Não. As sugestões reorganizam e tornam mais claras apenas as informações fornecidas por você. Nada deve ser incluído sem corresponder à sua trajetória real."],
@@ -89,6 +46,13 @@ const founderWeek = [
   ["QUA", "Entrevista: Analista de Sistemas", "10:00"],
   ["QUI", "Entrevista: Analista", "14:00"],
   ["QUI", "1ª impressão com o time", "16:00"],
+] as const;
+
+const audienceCards = [
+  ["Estágio", "Pare de parecer sem experiência.", "Descubra como seus projetos e cursos já podem provar seu potencial.", "/estagio", "bg-emerald-50 text-emerald-700 border-emerald-200"],
+  ["Primeiro emprego", "Transforme o que você já sabe em oportunidade.", "Monte uma candidatura que faz sentido mesmo sem carteira assinada.", "/primeiro-emprego", "bg-blue-50 text-blue-700 border-blue-200"],
+  ["Transição", "Sua experiência não começa do zero.", "Encontre as habilidades transferíveis que aproximam você da nova área.", "/transicao", "bg-amber-50 text-amber-700 border-amber-200"],
+  ["Recolocação", "Volte ao mercado com uma história forte.", "Ajuste currículo, LinkedIn e entrevista para a vaga que você quer.", "/recolocacao", "bg-violet-50 text-violet-700 border-violet-200"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -190,15 +154,15 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-white">
-              Encontrou uma vaga? O CarreirasMatch prepara tudo para você disputar o processo.
+              Pare de mandar currículo no escuro.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-white/80 max-w-2xl">
-              Não entregamos apenas uma pontuação. Analisamos o match com a vaga, mostramos a evolução de score, sugerimos ajustes sem inventar experiência e entregamos seu kit completo em PDF e Word (.docx).
+              Descubra em minutos por que seu currículo não está avançando — e o que mudar para aumentar suas chances na vaga que você realmente quer.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Testar meu currículo grátis" />
+              <PrimaryCta label="Descobrir meu próximo ajuste" />
               <Link href="/verificador-ats" className="inline-flex items-center justify-center rounded-xl border border-blue-400/40 bg-blue-500/10 px-5 py-3.5 text-sm font-bold text-blue-200 hover:bg-blue-500/20 transition-all">
                 ✨ Verificador ATS Rápido (Sem Vaga)
               </Link>
@@ -219,6 +183,25 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
       </section>
 
       <main>
+        {/* MOMENTO PROFISSIONAL */}
+        <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+          <div className="max-w-2xl">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Um caminho para cada momento</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">O que você precisa agora?</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Escolha seu momento e veja um plano feito para o problema que você está tentando resolver.</p>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {audienceCards.map(([label, title, description, href, color]) => (
+              <Link key={href} href={href} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900">
+                <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider ${color}`}>{label}</span>
+                <h3 className="mt-4 text-base font-extrabold leading-snug text-slate-900 dark:text-white">{title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-xs font-bold text-blue-600 transition-transform group-hover:translate-x-1">Ver meu caminho <ArrowRight className="h-3.5 w-3.5" /></span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* PROVA SOCIAL */}
         <SocialProof analysisCount={analysisCount} />
 
@@ -226,8 +209,8 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <section id="exemplo" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-20 md:px-8">
           <div className="mx-auto max-w-3xl text-center space-y-3">
             <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Demonstração Prática</p>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">A nota é apenas o início do diagnóstico.</h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">O CarreirasMatch aponta a justificativa exata das lacunas e sugere alterações reais para você revisar antes de aplicar.</p>
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">Você não recebe só uma nota. Recebe clareza.</h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">Entenda o que já convence, o que está faltando e qual ajuste vale a pena fazer primeiro.</p>
           </div>
 
           <div className="mt-12 grid gap-6 lg:grid-cols-3">

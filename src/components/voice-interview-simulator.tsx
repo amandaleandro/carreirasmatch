@@ -7,24 +7,47 @@ interface VoiceInterviewSimulatorProps {
   onAnswerComplete: (spokenText: string) => void;
 }
 
-export function VoiceInterviewSimulator({ question, onAnswerComplete }: VoiceInterviewSimulatorProps) {
+interface SpeechRecognitionResultEventLike {
+  resultIndex: number;
+  results: ArrayLike<ArrayLike<{ transcript: string }>>;
+}
+
+interface SpeechRecognitionLike {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  onresult: ((event: SpeechRecognitionResultEventLike) => void) | null;
+  onerror: ((event: unknown) => void) | null;
+  start(): void;
+  stop(): void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+type SpeechRecognitionWindow = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
+export function VoiceInterviewSimulator({ onAnswerComplete }: VoiceInterviewSimulatorProps) {
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState("");
   const [speechSupported, setSpeechSupported] = useState(false);
-  const [recognition, setRecognition] = useState<any>(null);
+  const [recognition, setRecognition] = useState<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
+      const speechWindow = window as SpeechRecognitionWindow;
       const SpeechRecognition =
-        (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
       if (SpeechRecognition) {
-        setSpeechSupported(true);
+        queueMicrotask(() => setSpeechSupported(true));
         const rec = new SpeechRecognition();
         rec.continuous = true;
         rec.interimResults = true;
         rec.lang = "pt-BR";
 
-        rec.onresult = (event: any) => {
+        rec.onresult = (event: SpeechRecognitionResultEventLike) => {
           let currentTranscript = "";
           for (let i = event.resultIndex; i < event.results.length; i++) {
             currentTranscript += event.results[i][0].transcript;
@@ -32,12 +55,12 @@ export function VoiceInterviewSimulator({ question, onAnswerComplete }: VoiceInt
           setTranscript(currentTranscript);
         };
 
-        rec.onerror = (err: any) => {
+        rec.onerror = (err: unknown) => {
           console.error("Erro no reconhecimento de voz:", err);
           setIsListening(false);
         };
 
-        setRecognition(rec);
+        queueMicrotask(() => setRecognition(rec));
       }
     }
   }, []);
@@ -92,7 +115,8 @@ export function VoiceInterviewSimulator({ question, onAnswerComplete }: VoiceInt
 
       {transcript && (
         <div className="p-3 rounded-lg bg-white dark:bg-neutral-900 border border-purple-100 dark:border-purple-900 text-xs text-neutral-800 dark:text-neutral-200">
-          <strong className="text-purple-600 dark:text-purple-400">Transcrição em tempo real:</strong> "{transcript}"
+          <strong className="text-purple-600 dark:text-purple-400">Transcrição em tempo real:</strong>{" "}
+          &ldquo;{transcript}&rdquo;
         </div>
       )}
     </div>

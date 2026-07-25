@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Sparkles, Scissors, CheckCircle2, BookmarkCheck, ExternalLink, ArrowRight } from "lucide-react";
+import { ArrowLeft, Sparkles, Scissors, CheckCircle2, BookmarkCheck, ArrowRight } from "lucide-react";
 
 export function ClipperClient() {
   const [url, setUrl] = useState("");

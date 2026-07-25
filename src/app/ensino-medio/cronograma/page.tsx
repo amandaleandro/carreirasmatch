@@ -8,11 +8,7 @@ import { GeneratedStudySchedule } from "@/lib/ensino-medio-tools";
 import {
   Calendar,
   Sparkles,
-  Clock,
-  Check,
   RotateCcw,
-  BookOpen,
-  CheckCircle2,
 } from "lucide-react";
 
 const DAYS_LIST = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"];

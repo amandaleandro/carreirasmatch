@@ -3,11 +3,34 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
+type EditalSubject = {
+  name: string;
+  weight: "Alta" | "Média" | "Baixa";
+  estimatedHoursWeek: number;
+  keyTopics: string[];
+};
+
+type StudyPlanDay = {
+  day: string;
+  focusSubject: string;
+  activity: string;
+};
+
+type EditalAnalysisResult = {
+  concursoTitle: string;
+  banca: string;
+  totalVagas: string;
+  salaryLabel: string;
+  subjects: EditalSubject[];
+  studyPlanCycle: StudyPlanDay[];
+  criticalDates: string[];
+};
+
 export default function LeitorEditalPage() {
   const [editalText, setEditalText] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<EditalAnalysisResult | null>(null);
   const [error, setError] = useState("");
 
   const handleAnalyze = async () => {
@@ -29,7 +52,7 @@ export default function LeitorEditalPage() {
       } else {
         setResult(data.parsedData);
       }
-    } catch (e) {
+    } catch {
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);
@@ -111,7 +134,7 @@ export default function LeitorEditalPage() {
                 Disciplinas e Pesos de Estudo
               </h3>
               <div className="grid gap-3 sm:grid-cols-2">
-                {result.subjects.map((sub: any, i: number) => (
+                {result.subjects.map((sub, i) => (
                   <div key={i} className="p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 space-y-1.5">
                     <div className="flex items-center justify-between">
                       <span className="font-bold text-sm text-neutral-900 dark:text-white">{sub.name}</span>
@@ -141,7 +164,7 @@ export default function LeitorEditalPage() {
                 Ciclo de Estudos Sugerido
               </h3>
               <div className="space-y-2">
-                {result.studyPlanCycle.map((item: any, idx: number) => (
+                {result.studyPlanCycle.map((item, idx) => (
                   <div key={idx} className="p-3 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 flex items-center justify-between text-xs">
                     <span className="font-bold text-amber-700 dark:text-amber-400 w-16">{item.day}</span>
                     <span className="font-semibold text-neutral-900 dark:text-white flex-1">{item.focusSubject}</span>

@@ -8,7 +8,7 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { parseBRLToCents, formatCentsToBRL } from "@/lib/pricing";
 import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
-import { Check, RefreshCw, Target, TrendingUp, Sparkles, ShieldCheck, Zap, HelpCircle } from "lucide-react";
+import { Check, RefreshCw, Target, TrendingUp, Sparkles, ShieldCheck, Zap } from "lucide-react";
 
 type PlanId = "card_recurring" | "monthly_oneoff" | "annual";
 

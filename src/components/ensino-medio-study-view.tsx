@@ -17,7 +17,6 @@ import {
   Sparkles,
   CheckCircle2,
   XCircle,
-  HelpCircle,
   ArrowRight,
   RotateCcw,
   Briefcase,
@@ -607,7 +606,7 @@ export function EnsinoMedioStudyView({ subject }: Props) {
                         Afirmação {idx + 1}
                       </span>
                       <p className="text-xs md:text-sm font-bold text-neutral-900 dark:text-white">
-                        "{item.statement}"
+                        &ldquo;{item.statement}&rdquo;
                       </p>
 
                       <div className="flex items-center gap-3 pt-1">

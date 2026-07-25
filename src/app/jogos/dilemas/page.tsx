@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import {
   Sparkles,
-  Trophy,
   RotateCcw,
   ArrowLeft,
   Flame,
@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
-import { VOCATION_AREAS } from "@/lib/vocation-areas";
 
 type Effect = {
   reputation?: number;
@@ -215,7 +214,8 @@ const GENERIC_SCENARIOS: Scenario[] = [
 ];
 
 export default function DilemasGamePage() {
-  const [area, setArea] = useState<string>("ti");
+  const searchParams = useSearchParams();
+  const [area, setArea] = useState<string>(() => searchParams.get("area") ?? "ti");
   const [weeks, setWeeks] = useState<number>(1);
 
   // Indicators (0 - 100)

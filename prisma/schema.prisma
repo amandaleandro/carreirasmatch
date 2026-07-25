@@ -24,6 +24,9 @@ model User {
   careerSegment               String?
   employmentStatus            String?
   professionalArea            String?
+  currentProfessionalArea     String?
+  targetProfessionalArea      String?
+  studyCourse                 String?
   city                        String?
   state                       String?
   hasFormalEducation          Boolean?
@@ -228,7 +231,6 @@ model Job {
   matches       JobMatch[]
   applications            Application[]
   autoApplicationQueue    AutoApplicationQueue[]
-
 
   @@index([active, createdAt])
   @@index([active, entryLevel, createdAt])
@@ -1314,17 +1316,22 @@ model GameScore {
 }
 
 model AutoApplicationSettings {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  enabled             Boolean  @default(false)
-  minMatchScore       Int      @default(75)
-  autoTailorResume    Boolean  @default(true)
-  preferredPlatforms  String   @default("[\"linkedin\", \"gupy\", \"indeed\"]")
-  dailyLimit          Int      @default(10)
-  notifyOnApplication Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                  String    @id @default(cuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enabled             Boolean   @default(false)
+  minMatchScore       Int       @default(75)
+  autoTailorResume    Boolean   @default(true)
+  externalAutomationEnabled Boolean @default(false)
+  applicationProfile String    @default("{}")
+  preferredPlatforms  String    @default("[\"linkedin\", \"gupy\", \"indeed\"]")
+  dailyLimit          Int       @default(10)
+  notifyOnApplication Boolean   @default(true)
+  consentedAt         DateTime?
+  externalConsentedAt DateTime?
+  lastRunAt           DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }
 
 model AutoApplicationQueue {
@@ -1337,13 +1344,13 @@ model AutoApplicationQueue {
   company          String
   jobUrl           String
   fitScore         Int
-  status           String    @default("queued") // queued | processing | applied | failed | user_approval_required
+  status           String    @default("queued") // queued | processing | applied | failed | unsupported_external | blocked_external
   tailoredResumeId String?
   failureReason    String?
   appliedAt        DateTime?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 
+  @@unique([userId, jobId])
   @@index([userId, status])
 }
-

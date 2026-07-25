@@ -188,6 +188,7 @@ export type StructuredResume = {
 };
 
 export type ResumeAnalysis = {
+  inferredJobTitle?: string;
   overallScore: number;
   technicalScore: number;
   experienceScore: number;
@@ -221,6 +222,10 @@ export type ResumeAnalysis = {
   weeklyApplicationPlan?: string[];
   // Presente apenas quando pastFeedback é informado
   feedbackAnalysis?: string;
+  grammarErrors?: string[];
+  structureRating?: "excellent" | "good" | "needs_improvement";
+  structureFeedback?: string;
+  missingBasicInfo?: string[];
   // Tradução da vaga: termos de "corporativês" decodificados + red flags do anúncio.
   jobDecoded?: JobDecodedTerm[];
   jobRedFlags?: string[];
