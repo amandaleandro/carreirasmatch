@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
 import { ANALYTICS_EVENTS, getStoredAttribution, track } from "@/lib/analytics";
 
