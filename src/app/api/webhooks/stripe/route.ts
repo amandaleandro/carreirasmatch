@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
             void sendSubscriptionConfirmationEmail(customerEmail, { currentPeriodEnd });
           }
         } else if (customerEmail) {
-          void sendPaymentConfirmationEmail(customerEmail, { kind: kind || "diagnostic" });
+          void sendPaymentConfirmationEmail(customerEmail, { kind: kind || "diagnostic", amountCents: amountTotal });
         }
 
         // 3. Registra utilização de cupom se houver
