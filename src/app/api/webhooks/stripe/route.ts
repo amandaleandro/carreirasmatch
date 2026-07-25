@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
             kind: kind || "diagnostic",
             segment: normalizedSegment,
             status: "paid",
+            mpPaymentId: `stripe_${session.id}`,
             paidAt: new Date(),
           },
         });
