@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 };
 
 const EXTRAS = [
+  { href: "/verificador-ats", title: "Verificador ATS Gratuito", description: "Descubra se o robô do recrutador consegue ler seu currículo sem erros." },
   { href: "/curriculo-gratis", title: "Criador de currículo grátis", description: "Monte e baixe um currículo profissional." },
   { href: "/analise", title: "Análise simples de vaga", description: "Descubra sua aderência antes de se candidatar." },
   { href: "/tools/vocation-test", title: "Teste vocacional gratuito", description: "Descubra áreas e caminhos de formação compatíveis com você." },

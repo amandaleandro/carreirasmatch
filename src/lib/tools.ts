@@ -829,7 +829,11 @@ Formato de resposta:
 // --- Simulado de entrevista (feedback por resposta) ---
 
 export type InterviewFeedbackResult = {
+  verdict?: "excelente" | "bom" | "precisa_melhorar";
+  verdictTitle?: string;
   feedback: string;
+  actionStep?: string;
+  keywordsToUse?: string[];
   strongPoints: string[];
   improvementTips: string[];
   suggestedAnswer?: string;
@@ -856,27 +860,37 @@ export async function getInterviewFeedbackBatch(
   qas: { question: string; answer: string }[],
   jobTitle: string
 ): Promise<InterviewFeedbackResult[]> {
-  const systemPrompt = `Você é um mentor especialista em preparação para entrevistas de emprego altamente educativo, detalhista e prático. Sua missão é transformar o retorno da simulação em um aprendizado de altíssimo nível para candidatos de qualquer área profissional.
+  const systemPrompt = `Você é um mentor executivo de carreira e recrutador especialista na área da vaga informada. Seu papel não é apenas avaliar, mas ACELERAR O CRESCIMENTO E A EVOLUÇÃO PROFISSIONAL do candidato, ensinando-o exatamente como pensar, estruturar e se posicionar em entrevistas reais.
 
-Você vai avaliar várias respostas de uma mesma simulação de entrevista, calibrando a exigência e a linguagem técnica/profissional ao cargo informado.
+Para CADA pergunta e resposta avaliada para a vaga "${jobTitle || "cargo geral"}", você deve gerar um diagnóstico riquíssimo, claro, pedagógico e altamente aplicável:
 
-Para CADA pergunta e resposta enviada, você deve gerar:
-1. "feedback": Uma análise diagnóstica honesta e pedagógica (2-4 frases) sobre como a resposta foi percebida pelo recrutador.
-2. "strongPoints": 1-3 pontos fortes concretos identificados na resposta (se houver).
-3. "improvementTips": 2-4 dicas práticas indicando exatamente o que faltou (ex: termos técnicos específicos da área, métricas, etapas de processo, justificativas ou posturas).
-4. "suggestedAnswer": Uma resposta modelo "Nota 10" reescrita de forma realista, profissional e articulada para aquela pergunta e vaga específica. Essa resposta serve para o candidato ler e aprender como se comunicar no dia da entrevista.
-5. "starBreakdown": O roteiro no método STAR específico para responder a ESTA pergunta com excelência:
-   - "situation": Como contextualizar o problema/desafio nesta pergunta.
-   - "action": Que ferramentas, passos práticos e comportamentos citar na ação.
-   - "result": Como fechar com impacto, aprendizados ou métricas.
-6. Notas (0 a 100): "clarity" (clareza e articulação), "technicalDepth" (profundidade técnica/prática da área), "confidence" (assertividade da escrita).
+1. "verdict": Classificação direta da resposta:
+   - "excelente": Resposta completa, estruturada e convincente para a vaga.
+   - "bom": Resposta satisfatória, mas com espaço para subir de nível.
+   - "precisa_melhorar": Resposta superficial, genérica ou com lacunas técnicas importantes.
+2. "verdictTitle": Um título direto e instrutivo para o veredito (ex: "Ótima contextualização, mas faltaram métricas de resultado", "Resposta muito genérica - inclua metodologias da área").
+3. "feedback": Análise diagnóstica honesta do recrutador (2-3 frases) explicando como a resposta impacta a decisão de contratação.
+4. "actionStep": 1 Ação Prática de Crescimento imediata ("Dica de Ouro") indicando o que o candidato deve fazer para evoluir nessa resposta em entrevistas futuras.
+5. "keywordsToUse": 3 a 5 palavras-chave, ferramentas, metodologias ou termos técnicos cruciais da área que deveriam constar na resposta.
+6. "strongPoints": 2-3 pontos fortes concretos identificados.
+7. "improvementTips": 2-3 lacunas e orientações corretivas pontuais.
+8. "suggestedAnswer": Uma resposta modelo "Nota 10" extremamente bem escrita, realista e articulada, que o candidato possa ler e usar de referência.
+9. "starBreakdown": Roteiro no método STAR aplicado a esta pergunta:
+   - "situation": O contexto a apresentar.
+   - "action": As ações e ferramentas a destacar.
+   - "result": O impacto e métricas a apresentar.
+10. Notas (0 a 100): "clarity" (clareza), "technicalDepth" (profundidade técnica do cargo), "confidence" (assertividade).
 
 ${BASE_RULES}
 Formato JSON de resposta:
 {
   "results": [
     {
+      "verdict": "excelente" | "bom" | "precisa_melhorar",
+      "verdictTitle": string,
       "feedback": string,
+      "actionStep": string,
+      "keywordsToUse": string[],
       "strongPoints": string[],
       "improvementTips": string[],
       "suggestedAnswer": string,

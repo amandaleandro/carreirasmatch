@@ -17,7 +17,7 @@ describe("hasToolAccess", () => {
 
   it("normalizes legacy segment values before checking access", () => {
     // "reemployment" normalizes to "career_pro", which has access to compare-jobs
-    expect(hasToolAccess("reemployment", "/tools/comparador-vagas")).toBe(true);
+    expect(hasToolAccess("reemployment", "/tools/compare-jobs")).toBe(true);
   });
 
   it("grants concurso and oab access to their study tools", () => {

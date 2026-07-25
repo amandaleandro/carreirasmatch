@@ -11,7 +11,7 @@ import {
 const RELATED_LINKS: Partial<Record<CareerChangeGuideSection, { href: string; label: string }[]>> = {
   cargos_ponte: [{ href: "/analise", label: "Ver meus cargos-ponte na análise de vaga →" }],
   narrativa_entrevista: [
-    { href: "/tools/linkedin-review", label: "Análise de LinkedIn →" },
+    { href: "/tools/linkedin-optimizer", label: "Otimizador de LinkedIn →" },
     { href: "/tools/interview-guide", label: "Guia de entrevista →" },
   ],
   habilidades_transferiveis: [{ href: "/tools/github-review", label: "Análise de GitHub →" }],

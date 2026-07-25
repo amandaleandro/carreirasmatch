@@ -199,9 +199,9 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
               <PrimaryCta />
-              <a href="#exemplo" className="inline-flex items-center justify-center rounded-xl border border-white/25 px-6 py-3.5 text-sm font-bold hover:bg-white/10 transition-all">
-                Ver exemplo do diagnóstico
-              </a>
+              <Link href="/verificador-ats" className="inline-flex items-center justify-center rounded-xl border border-blue-400/40 bg-blue-500/10 px-5 py-3.5 text-sm font-bold text-blue-200 hover:bg-blue-500/20 transition-all">
+                ✨ Verificador ATS Gratuito (Sem Vaga)
+              </Link>
             </div>
 
             <div className="grid gap-2.5 text-xs font-semibold text-white/80 sm:grid-cols-2 pt-2">

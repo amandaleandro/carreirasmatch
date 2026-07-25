@@ -15,7 +15,7 @@ const RELATED_LINKS: Partial<Record<CareerGrowthGuideSection, { href: string; la
   ],
   caso_para_promocao: [{ href: "/action-plan", label: "Ver meu plano de ação →" }],
   negociacao: [{ href: "/tools/interview-guide", label: "Guia de entrevista →" }],
-  senioridade_real: [{ href: "/tools/linkedin-review", label: "Análise de LinkedIn →" }],
+  senioridade_real: [{ href: "/tools/linkedin-optimizer", label: "Otimizador de LinkedIn →" }],
 };
 
 export function CareerGrowthGuide() {

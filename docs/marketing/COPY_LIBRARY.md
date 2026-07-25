@@ -22,6 +22,15 @@ depende de uma variável (nome, valor, data), isso é indicado.
 - `<title>` da home (via `title.absolute`, `src/app/page.tsx`): "Compare seu
   currículo com a vaga | CarreirasMatch".
 
+## `/verificador-ats` (`src/app/verificador-ats/page.tsx`)
+
+- Eyebrow: "Verificador ATS 100% Gratuito"
+- H1: "Seu currículo consegue ser lido pelo robô do ATS?"
+- Subtítulo: "Envie seu arquivo e descubra instantaneamente problemas de formatação, extração de texto, contatos e qualidade de conteúdo antes de se candidatar."
+- CTA primário: "Verificar Meu Currículo Grátis"
+- Bloco de ponte para o produto pago: "Seu currículo está lido pelo ATS. Agora ele está preparado para a Vaga dos Seus Sonhos? Passar pela leitura técnica do robô é só a primeira metade do caminho. O Score de Aderência compara suas palavras-chave e experiências diretamente contra a oportunidade que você quer."
+- CTA da ponte: "Calcular Aderência com uma Vaga Real Gratuitamente"
+
 ## `/comece` (`src/app/comece/page.tsx`)
 
 - `<title>`: "Análise de currículo com IA para o seu momento"

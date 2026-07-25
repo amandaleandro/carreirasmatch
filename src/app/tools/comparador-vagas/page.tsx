@@ -1,5 +1,6 @@
-import { ComparadorVagasClient } from "./ComparadorVagasClient";
+import { redirect } from "next/navigation";
 
 export default function ComparadorVagasPage() {
-  return <ComparadorVagasClient />;
+  redirect("/tools/compare-jobs");
 }
+

@@ -15,7 +15,7 @@ const RELATED_LINKS: Partial<Record<InternshipGuideSection, { href: string; labe
   ],
   linkedin: [
     { href: "/tools/profile-from-scratch", label: "Monte seu perfil do zero →" },
-    { href: "/tools/linkedin-review", label: "Análise de LinkedIn →" },
+    { href: "/tools/linkedin-optimizer", label: "Otimizador de LinkedIn →" },
   ],
   financeiro: [{ href: "/tools/internship-calculator", label: "Calculadora de bolsa-auxílio →" }],
 };

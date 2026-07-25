@@ -35,21 +35,23 @@ todos: "Estágio, primeiro emprego, transição de carreira, recolocação, jove
 aprendiz ou estágio na faculdade: compare seu currículo com a vaga e veja
 exatamente o que ajustar antes de aplicar."
 
-## Diferencial funcional
+## Diferencial funcional e Modelo dos 3 Scores
 
 `/sobre` nega a categoria genérica de propósito: "Não somos só um analisador
 de currículo, somos um copiloto para as decisões que mais pesam na sua
-trajetória profissional." Na prática (motor usado em `/analise` e no Desafio
-do Match, `src/app/desafio/DesafioForm.tsx`), a entrega por vaga é:
+trajetória profissional."
 
-- score de aderência (%);
-- pontos fortes / lacunas prioritárias;
-- palavras-chave que faltam;
-- perguntas prováveis de entrevista;
-- plano de ação.
+Diferente de concorrentes globais (como Kickresume ou Jobscan) que analisam apenas se o robô lê o arquivo ou entregam notas genéricas sem contexto, o **CarreirasMatch** organiza a entrega no **Modelo dos 3 Scores**:
+
+1. **Score 1: Leitura ATS (0-100)** (`/verificador-ats` - Grátis) — Avalia a capacidade de extração técnica do arquivo por sistemas automáticos (Gupy, Sólides, Workday), identificando colunas, fontes, datas, contatos e legibilidade sem exigir uma vaga.
+2. **Score 2: Qualidade do Currículo (0-100)** (`/verificador-ats` - Grátis) — Diagnostica a força narrativa do documento (verbos de ação, conquistas mensuráveis, repetições, clareza e estrutura).
+3. **Score 3: Aderência à Vaga (0-100)** (`/analise` & `/desafio`) — O grande diferencial competitivo: compara o currículo com a vaga desejada (por texto ou link), mapeia lacunas reais, palavras-chave ausentes, perguntas de entrevista e gera o plano de ação.
+
+### Tese Central de Marca vs Concorrentes
+> **"Passar pelo robô do ATS não significa ter perfil para a vaga. O CarreirasMatch mostra as duas coisas."**
 
 A vaga pode ser informada por texto colado **ou por link** (LinkedIn, Gupy
-etc.) — campo `jobLink` adicionado ao formulário do Desafio.
+etc.) — campo `jobLink` disponível no formulário.
 
 ## Prova de dado real, não copy
 

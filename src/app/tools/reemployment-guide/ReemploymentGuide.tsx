@@ -9,7 +9,7 @@ import {
 } from "@/lib/reemployment-guide";
 
 const RELATED_LINKS: Partial<Record<ReemploymentGuideSection, { href: string; label: string }[]>> = {
-  rede_de_contatos: [{ href: "/tools/linkedin-review", label: "Análise de LinkedIn →" }],
+  rede_de_contatos: [{ href: "/tools/linkedin-optimizer", label: "Otimizador de LinkedIn →" }],
   estrategia_de_candidatura: [{ href: "/applications", label: "Ver meu kanban de candidaturas →" }],
   objecoes_na_entrevista: [
     { href: "/tools/interview-guide", label: "Guia de entrevista →" },

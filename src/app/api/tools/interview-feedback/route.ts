@@ -7,11 +7,20 @@ export async function POST(req: NextRequest) {
     const { session, response } = await requireAuth();
     if (!session) return response!;
 
-    const { qas, jobTitle } = await req.json();
+    const body = await req.json();
+    const { jobTitle, unifiedAnswer } = body;
+    let qas = body.qas;
+
+    if (unifiedAnswer && typeof unifiedAnswer === "string" && unifiedAnswer.trim() && Array.isArray(qas)) {
+      qas = qas.map((item: { question: string }) => ({
+        question: item.question,
+        answer: unifiedAnswer.trim(),
+      }));
+    }
 
     if (!Array.isArray(qas) || qas.length === 0 || qas.some((qa) => !qa?.question?.trim() || !qa?.answer?.trim())) {
       return NextResponse.json(
-        { error: "Responda todas as perguntas antes de finalizar a simulação." },
+        { error: "Preencha a(s) resposta(s) antes de finalizar a simulação." },
         { status: 400 }
       );
     }
