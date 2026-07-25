@@ -1,9 +1,11 @@
 import type { Instrumentation } from "next";
 import * as Sentry from "@sentry/nextjs";
 import { initSentry } from "@/lib/sentry-init";
+import { validateEnv } from "@/lib/env";
 
 export async function register() {
   initSentry("server");
+  validateEnv();
 
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
 

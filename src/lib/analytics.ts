@@ -9,6 +9,8 @@
  */
 
 export const ANALYTICS_EVENTS = {
+  LANDING_CTA_CLICKED: "landing_cta_clicked",
+  RESUME_UPLOADED: "resume_uploaded",
   ANALYSIS_STARTED: "analysis_started",
   ANALYSIS_COMPLETED: "analysis_completed",
   ANALYSIS_FAILED: "analysis_failed",
@@ -29,7 +31,10 @@ export const ANALYTICS_EVENTS = {
   PIX_GENERATED: "pix_generated",
   SUBSCRIPTION_CONFIRMED: "subscription_confirmed",
   INTERVIEW_SIMULATOR_STARTED: "interview_simulator_started",
+  INTERVIEW_PRACTICED: "interview_practiced",
   BEHAVIORAL_TEST_COMPLETED: "behavioral_test_completed",
+  RESUME_SAVED: "resume_saved",
+  APPLICATION_CREATED: "application_created",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

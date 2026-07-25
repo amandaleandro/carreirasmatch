@@ -645,107 +645,146 @@ export function AnalysisTeaserView({
     track(ANALYTICS_EVENTS.PAYWALL_PREVIEW_CLICKED, { feature });
   };
 
+  const topStrengths = result.strengths.slice(0, 2);
+  const mainWeakness = result.weaknesses[0] || "Ajuste de formatação e ordenação de termos técnicos.";
+  const mainMissingKeyword = result.keywordsMissing[0] || "Termos específicos da área";
+
   return (
-    <section className="space-y-5 font-sans">
-      <div className={`rounded-2xl border p-4 ${STATUS_CONFIG[result.applicationStatus].chipClass}`}>
-        <p className="font-title font-bold text-sm">
-          {STATUS_CONFIG[result.applicationStatus].label}
+    <section className="space-y-6 font-sans">
+      {/* 1. SEU MATCH COM ESTA VAGA */}
+      <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-6 shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-3 border-b border-[#E2E8F0] dark:border-neutral-800">
+          <div className="space-y-1 text-center sm:text-left">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2563EB] bg-blue-50 dark:bg-blue-950/40 px-2.5 py-1 rounded-full">
+              Seu Match com Esta Vaga
+            </span>
+            <h2 className="text-xl font-title font-bold text-[#071827] dark:text-white mt-1">
+              Aderência Inicial Mapeada
+            </h2>
+          </div>
+          <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#F8FAFC] dark:bg-neutral-950 border border-[#E2E8F0] dark:border-neutral-800">
+            <span className="text-3xl font-black text-[#2563EB]">{result.overallScore}%</span>
+            <span className="text-[10px] font-bold text-[#64748B] uppercase">score</span>
+          </div>
+        </div>
+
+        <p className="text-xs text-[#64748B] dark:text-neutral-300 leading-relaxed font-medium">
+          {result.applicationStatusReason}
         </p>
-        <p className="text-xs mt-1 leading-relaxed opacity-90">{result.applicationStatusReason}</p>
+
+        <div className="rounded-xl bg-[#F8FAFC] dark:bg-neutral-950 p-3 border border-[#E2E8F0] dark:border-neutral-800 flex items-start gap-2">
+          <span className="text-xs shrink-0 mt-0.5">💡</span>
+          <p className="text-[11px] text-[#64748B] dark:text-neutral-400 font-medium">
+            <strong>Nota:</strong> Este score é uma orientação com base nos requisitos informados da vaga, não uma sentença definitiva ou impedimento de candidatura.
+          </p>
+        </div>
       </div>
 
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-5 shadow-sm space-y-4">
-        <h2 className="font-title font-bold text-sm text-[#071827] dark:text-white">Análise preliminar</h2>
-        <ScoreBar label="Aderência geral" value={result.overallScore} />
-        <ScoreBar label="Currículo / ATS" value={result.atsScore} />
+      {/* 2. O QUE JÁ ESTÁ AJUDANDO (MICROVITÓRIA REAL) */}
+      <div className="rounded-3xl border border-emerald-200 dark:border-emerald-950 bg-emerald-50/30 dark:bg-emerald-950/20 p-6 shadow-sm space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300">
+            💪
+          </span>
+          <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">
+            O que já está ajudando (Pontos Fortes)
+          </h3>
+        </div>
+        <ul className="space-y-2 text-xs text-neutral-700 dark:text-neutral-300">
+          {topStrengths.length > 0 ? (
+            topStrengths.map((strength, i) => (
+              <li key={i} className="flex items-start gap-2 font-medium">
+                <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+                <span>{strength}</span>
+              </li>
+            ))
+          ) : (
+            <li className="flex items-start gap-2 font-medium">
+              <span className="text-emerald-600 font-bold mt-0.5">✓</span>
+              <span>Estrutura inicial de apresentação compatível com o formato padrão.</span>
+            </li>
+          )}
+        </ul>
       </div>
 
-      <KeywordCard
-        title="Palavras-chave encontradas"
-        items={result.keywordsFound}
-        variant="found"
-      />
-      <KeywordCard
-        title="Palavras-chave ausentes"
-        items={result.keywordsMissing}
-        variant="missing"
-      />
+      {/* 3. O QUE PODE ESTAR ATRAPALHANDO (LACUNA + PALAVRA-CHAVE + MELHORIA) */}
+      <div className="rounded-3xl border border-amber-200 dark:border-amber-950 bg-amber-50/30 dark:bg-amber-950/20 p-6 shadow-sm space-y-4">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-900 text-amber-700 dark:text-amber-300">
+            ⚠️
+          </span>
+          <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">
+            O que pode estar atrapalhando
+          </h3>
+        </div>
 
-      <div className="grid gap-5 md:grid-cols-2">
-        <ListCard
-          icon="💪"
-          tone="success"
-          marker="check"
-          title="Pontos fortes"
-          items={result.strengths}
-        />
-        <ListCard
-          icon="⚠️"
-          tone="warning"
-          marker="alert"
-          title="Pontos fracos"
-          items={result.weaknesses}
-        />
+        <div className="grid gap-3 md:grid-cols-3 text-xs">
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-4 border border-amber-200/60 dark:border-amber-900/40 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Lacuna Relevante</span>
+            <p className="font-medium text-[#071827] dark:text-white leading-relaxed">{mainWeakness}</p>
+          </div>
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-4 border border-amber-200/60 dark:border-amber-900/40 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Palavra-Chave Ausente</span>
+            <p className="font-medium text-[#071827] dark:text-white leading-relaxed">&ldquo;{mainMissingKeyword}&rdquo;</p>
+          </div>
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-4 border border-amber-200/60 dark:border-amber-900/40 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600">Exemplo de Melhoria</span>
+            <p className="font-medium text-[#071827] dark:text-white leading-relaxed">
+              Substituir frases genéricas por resultados concretos e métricas mensuráveis.
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Previews Borrados de Alto Valor com Cadeado (Efeito FOMO) */}
+      {/* 4. SUA RECOMENDAÇÃO EXECUTIVA */}
+      <div className={`rounded-2xl border p-5 ${STATUS_CONFIG[result.applicationStatus].chipClass}`}>
+        <p className="font-title font-bold text-sm flex items-center gap-2">
+          <span>🎯</span>
+          <span>Sua Recomendação: {STATUS_CONFIG[result.applicationStatus].label}</span>
+        </p>
+        <p className="text-xs mt-1.5 leading-relaxed opacity-90 font-medium">
+          {result.applicationStatus === "apply_now" && "Seu perfil possui forte alinhamento inicial. Aplique agora e use o diagnóstico para se preparar para as perguntas da entrevista."}
+          {result.applicationStatus === "adjust_first" && "Ajustar seu currículo primeiro para incluir os termos faltantes aumentará drasticamente suas chances de passar no filtro do RH."}
+          {result.applicationStatus === "deprioritize" && "Esta vaga exige pré-requisitos ainda não indicados no seu perfil. Considere fechar essas lacunas ou focar em vagas mais aderentes."}
+        </p>
+      </div>
+
+      {/* 5. O QUE O DIAGNÓSTICO COMPLETO LIBERA */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
           <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white flex items-center gap-2">
             <span>🔒</span>
-            <span>Entregáveis exclusivos desta vaga (Bloqueados)</span>
+            <span>O que o diagnóstico completo libera para esta vaga:</span>
           </h3>
-          <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-600 dark:text-amber-400 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-            Liberação Imediata
-          </span>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          {/* Card Blur 1: Resumo Profissional Otimizado */}
-          <div
-            onClick={() => handlePreviewClick("suggested_summary")}
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/30 dark:bg-blue-950/20 p-5 transition-all hover:border-blue-400"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
-                <span>📝</span> Resumo Profissional Sugerido
-              </span>
-              <span className="text-xs">🔒</span>
+        <div className="grid gap-3 sm:grid-cols-2">
+          {[
+            ["📄", "Currículo Reescrito & Ajustado", "Alinhado palavra por palavra com as exatas exigências da vaga."],
+            ["🔑", "Palavras-chave ATS Estratégicas", "Termos exatos para garantir aprovação nos filtros automáticos de RH."],
+            ["🎤", "Perguntas de Entrevista + Respostas STAR", "Perguntas reais previstas para o seu perfil e o roteiro de resposta."],
+            ["🗓️", "Plano de Ação Semanal", "Passo a passo organizado do que fazer antes e depois de aplicar."],
+            ["✉️", "Mensagem Personalizada ao Recrutador", "Texto pronto para enviar no LinkedIn ou e-mail de acompanhamento."],
+            ["🧐", "Antecipação de Objeções", "Como contornar possíveis hesitações do entrevistador durante a conversa."],
+          ].map(([emoji, title, desc]) => (
+            <div
+              key={title}
+              onClick={() => handlePreviewClick(title)}
+              className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-4 transition-all hover:border-[#2563EB]"
+            >
+              <div className="flex items-start gap-3">
+                <span className="text-lg">{emoji}</span>
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-[#071827] dark:text-white leading-snug">{title}</p>
+                  <p className="text-[11px] text-[#64748B] dark:text-neutral-400 leading-relaxed font-medium">{desc}</p>
+                </div>
+              </div>
             </div>
-            <div className="select-none blur-[4px] opacity-60 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-mono">
-              Profissional orientado a resultados com vasta experiência em otimização de processos, liderança de projetos e entrega contínua de alto valor...
-            </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-neutral-900/70 backdrop-blur-[2px] opacity-90 group-hover:opacity-100 transition-opacity">
-              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-white dark:bg-neutral-800 px-3 py-1.5 rounded-xl shadow-md border border-blue-100 dark:border-blue-800 flex items-center gap-1.5">
-                <span>🔑</span> Clique para desbloquear este resumo
-              </span>
-            </div>
-          </div>
-
-          {/* Card Blur 2: Pergunta de Entrevista Customizada */}
-          <div
-            onClick={() => handlePreviewClick("interview_questions")}
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/20 p-5 transition-all hover:border-indigo-400"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-                <span>🎤</span> Perguntas Prováveis de Entrevista
-              </span>
-              <span className="text-xs">🔒</span>
-            </div>
-            <div className="select-none blur-[4px] opacity-60 text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed font-mono">
-              1. Como você lidou com o desafio de integração técnica citado na vaga?...
-              2. Explique sua metodologia ao priorizar entregas sob pressão...
-            </div>
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/60 dark:bg-neutral-900/70 backdrop-blur-[2px] opacity-90 group-hover:opacity-100 transition-opacity">
-              <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-white dark:bg-neutral-800 px-3 py-1.5 rounded-xl shadow-md border border-indigo-100 dark:border-indigo-800 flex items-center gap-1.5">
-                <span>🔑</span> Clique para desbloquear o simulador
-              </span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
+      {/* 6. CTA PRINCIPAL */}
       {children}
     </section>
   );

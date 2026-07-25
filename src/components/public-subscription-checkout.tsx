@@ -52,6 +52,54 @@ export function PublicSubscriptionCheckout({
 
   const amountCents = plan === "annual" ? annualCents : monthlyCents;
 
+  const SEGMENT_MESSAGES: Record<
+    CareerSegment,
+    { headline: string; subtitle: string; pillarQuote: string }
+  > = {
+    internship: {
+      headline: "Aprenda a transformar projetos, cursos e atividades em experiência relevante.",
+      subtitle: "Não deixe a falta de registro em carteira travar sua contratação. Mostre potencial com a linguagem da vaga.",
+      pillarQuote: "Transforme matérias, projetos acadêmicos e trabalhos voluntários em experiência que o recrutador valoriza.",
+    },
+    first_job: {
+      headline: "Aprenda a transformar projetos, trabalhos e atividades no seu primeiro emprego.",
+      subtitle: "Substitua a falta de experiência prévia por habilidades de entrada alinhadas exatamente aos requisitos.",
+      pillarQuote: "Destaque vontade de aprender, postura e conhecimentos básicos formatados do jeito que a triagem aceita.",
+    },
+    apprentice: {
+      headline: "Sua vaga de Jovem Aprendiz começa com um currículo limpo e estratégico.",
+      subtitle: "Aprenda a organizar seu histórico escolar e atividades preliminares para se destacar nos programas de aprendizagem.",
+      pillarQuote: "Modelos e orientações focadas em programas de aprendizagem de grandes empresas e instituições parceiras.",
+    },
+    career_change: {
+      headline: "Encontre suas habilidades transferíveis e construa sua narrativa de mudança.",
+      subtitle: "Conecte sua bagagem profissional à nova área e elimine a objeção de falta de experiência específica.",
+      pillarQuote: "Apresente suas experiências passadas como pontes de valor para a nova função com a ajuda da IA.",
+    },
+    career_pro: {
+      headline: "Faça sua experiência aparecer na linguagem exata da vaga.",
+      subtitle: "Chega de enviar o mesmo currículo e ser ignorado. Alinhe termos técnicos e conquistas aos filtros automáticos.",
+      pillarQuote: "Otimize conquistas anteriores e passe nas palavras-chave mais exigidas pelos softwares de triagem dos RHs.",
+    },
+    student: {
+      headline: "Escolha seu caminho profissional com clareza e segurança.",
+      subtitle: "Explore áreas vocacionais, testes de afinidade e construa seu plano de entrada no mercado.",
+      pillarQuote: "Mapeamento vocacional e direcionamento de estudos para faculdades ou cursos técnicos.",
+    },
+    concurseiro: {
+      headline: "Direcionamento estratégico para concursos e provas públicas.",
+      subtitle: "Acompanhe disciplinas, resolva questões e organize seu plano de aprovação.",
+      pillarQuote: "Planejamento focado nos editais e bancas examinadoras mais importantes do país.",
+    },
+    oab: {
+      headline: "Preparação estruturada para passar no Exame da Ordem.",
+      subtitle: "Cronograma por disciplinas, simulação de peças e treino para as duas fases da OAB.",
+      pillarQuote: "Roteiro de estudos atualizado para garantir sua aprovação na Ordem dos Advogados.",
+    },
+  };
+
+  const segmentMsg = SEGMENT_MESSAGES[segment] ?? SEGMENT_MESSAGES.career_pro;
+
   function handleStart(e: FormEvent) {
     e.preventDefault();
     track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind: plan, segment });
@@ -67,10 +115,10 @@ export function PublicSubscriptionCheckout({
           Aceleração Profissional CarreirasMatch
         </span>
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-          Por que assinar por R$ 24,90/mês é a sua melhor decisão?
+          {segmentMsg.headline}
         </h1>
         <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
-          Disparar o mesmo currículo genérico garante apenas rejeições automáticas. Por menos de R$ 0,83 ao dia (o preço de um café), você otimiza seu perfil para cada vaga e conquista sua contratação.
+          {segmentMsg.subtitle}
         </p>
       </header>
 
@@ -84,8 +132,8 @@ export function PublicSubscriptionCheckout({
           ],
           [
             Target,
-            "Filtros de Triagem Técnica (ATS)",
-            "Descubra as palavras-chave faltantes que o software de triagem do RH exige antes que um humano leia seu currículo.",
+            "Alinhamento para Triagem (ATS)",
+            segmentMsg.pillarQuote,
           ],
           [
             TrendingUp,
