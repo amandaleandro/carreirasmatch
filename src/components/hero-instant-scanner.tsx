@@ -72,7 +72,7 @@ export function HeroInstantScanner() {
       <div className="space-y-1.5">
         <h3 className="text-xl font-bold text-white">Teste seu perfil para a vaga agora</h3>
         <p className="text-xs text-white/80 leading-relaxed">
-          Digite o cargo desejado para verificar os requisitos técnicos e o índice de compatibilidade.
+          Digite o cargo que você procura e veja o que costuma pesar nessa oportunidade.
         </p>
       </div>
 
@@ -97,7 +97,7 @@ export function HeroInstantScanner() {
           {scanning ? (
             <span className="inline-flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              Calculando aderência do perfil...
+              Lendo os requisitos da vaga...
             </span>
           ) : (
             <span className="inline-flex items-center gap-2">
@@ -141,7 +141,7 @@ export function HeroInstantScanner() {
               href={`/analise?role=${encodeURIComponent(result.role)}`}
               className="w-full btn-shine-glow inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3 text-xs shadow-md transition-all"
             >
-              <span>Ver diagnóstico completo do seu currículo</span>
+              <span>Ver o que posso melhorar no meu currículo</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

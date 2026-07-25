@@ -53,6 +53,9 @@ const audienceCards = [
   ["Primeiro emprego", "Transforme o que você já sabe em oportunidade.", "Monte uma candidatura que faz sentido mesmo sem carteira assinada.", "/primeiro-emprego", "bg-blue-50 text-blue-700 border-blue-200"],
   ["Transição", "Sua experiência não começa do zero.", "Encontre as habilidades transferíveis que aproximam você da nova área.", "/transicao", "bg-amber-50 text-amber-700 border-amber-200"],
   ["Recolocação", "Volte ao mercado com uma história forte.", "Ajuste currículo, LinkedIn e entrevista para a vaga que você quer.", "/recolocacao", "bg-violet-50 text-violet-700 border-violet-200"],
+  ["Ensino Médio", "Estude melhor e escolha seu próximo passo.", "Tire dúvidas, pratique redação e compare faculdade com curso técnico.", "/faculdade-ou-tecnico", "bg-indigo-50 text-indigo-700 border-indigo-200"],
+  ["Concurso público", "Estude com prioridade até a prova.", "Organize o edital, monte seu plano e treine com simulados.", "/concurso", "bg-orange-50 text-orange-700 border-orange-200"],
+  ["Exame da OAB", "Prepare cada fase com mais segurança.", "Pratique no estilo da FGV e acompanhe o que ainda precisa melhorar.", "/oab", "bg-cyan-50 text-cyan-700 border-cyan-200"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -150,7 +153,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-10 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-16">
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-300 bg-blue-500/20 border border-blue-400/30 px-3.5 py-1.5 rounded-full">
-              <Target className="h-4 w-4 text-blue-400" /> Seu Copiloto de Candidatura Profissional
+              <Target className="h-4 w-4 text-blue-400" /> Uma ajuda prática para conseguir sua próxima vaga
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-white">
@@ -158,7 +161,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-white/80 max-w-2xl">
-              Descubra em minutos por que seu currículo não está avançando — e o que mudar para aumentar suas chances na vaga que você realmente quer.
+              Descubra em minutos por que seu currículo não está avançando e o que mudar para aumentar suas chances na vaga que você realmente quer.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
@@ -187,8 +190,8 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
           <div className="max-w-2xl">
             <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Um caminho para cada momento</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">O que você precisa agora?</h2>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Escolha seu momento e veja um plano feito para o problema que você está tentando resolver.</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">Trabalho, estudos e próximos passos</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Escolha o que você está vivendo agora e encontre ferramentas para avançar com mais clareza.</p>
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {audienceCards.map(([label, title, description, href, color]) => (
@@ -309,7 +312,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Score inicial de aderência</span>
+                      <span>Uma primeira leitura do seu currículo</span>
                     </div>
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -348,7 +351,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Score de aderência de 0 a 100%</span>
+                      <span>Nota de compatibilidade de 0 a 100%</span>
                     </div>
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />

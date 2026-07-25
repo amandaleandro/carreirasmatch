@@ -159,8 +159,8 @@ export const NICHES = {
       "Não saber quais perguntas o recrutador vai fazer numa primeira entrevista",
     ],
     benefits: [
-      { title: "Score de aderência", description: "Um número de 0 a 100 que mostra se vale a pena aplicar, antes de você perder a vaga esperando resposta." },
-      { title: "Gaps de palavras-chave", description: "As palavras exatas que faltam no currículo para passar pelo filtro automático do RH." },
+      { title: "Saiba se vale aplicar", description: "Uma leitura simples para você entender se essa vaga combina com o que já sabe fazer." },
+      { title: "Descubra o que falta", description: "Veja quais palavras e experiências precisam aparecer melhor no seu currículo." },
       { title: "Resposta pronta para \"fale sobre você\"", description: "Um roteiro natural, sem decoreba, para você não travar na frente do recrutador." },
       { title: "Perguntas de entrevista prováveis", description: "As perguntas que esse tipo de vaga mais faz, chegue treinado mesmo na sua primeira entrevista." },
     ],
@@ -172,7 +172,7 @@ export const NICHES = {
     socialProof: "Se você sente que todo mundo parece mais pronto que você, aqui a ideia é te mostrar o que já conta a seu favor.",
     samplePreview: {
       score: 78,
-      scoreLabel: "Aderência à vaga de Estágio em Marketing",
+      scoreLabel: "Como seu currículo conversa com uma vaga de Marketing",
       strengths: [
         "Projeto acadêmico de campanha digital aparece como diferencial claro",
         "Inglês intermediário bate com o requisito da vaga",
@@ -192,27 +192,27 @@ export const NICHES = {
     eyebrow: "Para quem busca o primeiro emprego",
     headline: "Primeira vaga formal? Não aplique no escuro.",
     subheadline:
-      "Sem experiência de carteira assinada, é fácil se sentir perdido sobre o que destacar. Envie seu currículo e a vaga desejada e receba um diagnóstico honesto do que já está bom e do que precisa mudar.",
+      "Sem experiência de carteira assinada, é fácil se sentir perdido sobre o que destacar. Envie seu currículo e a vaga desejada para entender o que já está bom e o que precisa mudar.",
     painPoints: [
       "Não saber se o currículo está \"bom o suficiente\" para aplicar",
       "Medo de ser descartado por falta de experiência formal",
       "Nervosismo com a primeira entrevista de emprego",
     ],
     benefits: [
-      { title: "Score de aderência", description: "Descubra se você tem chance real nessa vaga antes de gastar tempo aplicando no escuro." },
+      { title: "Uma leitura honesta", description: "Entenda se o seu currículo conversa com a vaga antes de gastar tempo aplicando no escuro." },
       { title: "Plano de evolução", description: "O que estudar primeiro para fechar as lacunas que mais pesam contra você." },
       { title: "Checklist de currículo", description: "Cada erro de formatação e cada palavra-chave que falta, revisados um por um." },
       { title: "Perguntas de entrevista", description: "Treine as perguntas reais antes de sentar na frente do recrutador de verdade." },
     ],
-    ctaLabel: "Ver meu diagnóstico de primeiro emprego →",
+    ctaLabel: "Ver como melhorar meu currículo →",
     themeAccent: "blue",
     heroIcon: "💼",
     heroImage: "/niche-hero/primeiro-emprego.png",
-    quickFeatures: ["Currículo profissional com IA", "Vagas que combinam com seu perfil", "Simulados e testes online", "Dicas de entrevista"],
+    quickFeatures: ["Currículo profissional", "Vagas que combinam com seu perfil", "Simulados e testes online", "Dicas de entrevista"],
     socialProof: "Se você nunca teve carteira assinada, isso não te deixa para trás, só pede um currículo contado do jeito certo.",
     samplePreview: {
       score: 64,
-      scoreLabel: "Aderência à vaga de Assistente Administrativo",
+      scoreLabel: "Como seu currículo conversa com uma vaga administrativa",
       strengths: [
         "Organização e Excel básico aparecem alinhados com a vaga",
         "Disponibilidade de horário compatível com o anunciado",
@@ -252,7 +252,7 @@ export const NICHES = {
     socialProof: "Trocar de área não apaga o que você já viveu; a gente ajuda a traduzir isso para a vaga nova.",
     samplePreview: {
       score: 71,
-      scoreLabel: "Aderência à vaga de Analista de Dados Jr (vindo de Marketing)",
+      scoreLabel: "Como sua experiência se conecta com uma vaga de Dados Jr",
       strengths: [
         "Experiência com relatórios e métricas de Marketing conta como base analítica",
         "Curso recente de SQL aparece como sinal de movimento real",
@@ -292,7 +292,7 @@ export const NICHES = {
     socialProof: "Depois de uma pausa, o que mais ajuda é clareza: o que dizer, o que mostrar e por onde voltar.",
     samplePreview: {
       score: 82,
-      scoreLabel: "Aderência à vaga de Coordenador Comercial",
+      scoreLabel: "Como sua experiência se conecta com uma vaga comercial",
       strengths: [
         "Histórico de gestão de equipe bate com o nível pedido na vaga",
         "Resultados numéricos (crescimento de carteira) aparecem bem destacados",
@@ -332,7 +332,7 @@ export const NICHES = {
     socialProof: "Ninguém espera experiência de trabalho aqui; o importante é mostrar vontade, rotina e responsabilidade.",
     samplePreview: {
       score: 70,
-      scoreLabel: "Aderência ao Programa de Aprendizagem",
+      scoreLabel: "O que seu perfil já mostra para um programa de aprendizagem",
       strengths: [
         "Disponibilidade de horário compatível com o programa",
         "Atividade extracurricular (grêmio estudantil) mostra iniciativa",
@@ -352,14 +352,14 @@ export const NICHES = {
     eyebrow: "Orientação de carreira & Ajuda nos estudos do Ensino Médio",
     headline: "Escolha seu caminho profissional e receba ajuda nos estudos do dia a dia.",
     subheadline:
-      "Precisa passar nas matérias e decidir o futuro? Tire dúvidas com nosso Tutor IA 24h, gere resumos escolares, corrija suas redações do ENEM e compare faculdade x curso técnico em um só lugar.",
+      "Precisa passar nas matérias e decidir o futuro? Tire dúvidas, faça resumos, corrija suas redações do ENEM e compare faculdade x curso técnico em um só lugar.",
     painPoints: [
       "Dificuldade de tirar dúvidas em matérias difíceis da escola fora do horário de aula",
       "Insegurança ao escrever a Redação do ENEM sem saber a nota real por competência",
       "Indecisão sobre fazer faculdade, curso técnico ou entrar direto no mercado",
     ],
     benefits: [
-      { title: "Ajuda nos Estudos & Tutor IA 24h 📖", description: "Tire dúvidas de qualquer matéria e receba resumos automáticos explicados passo a passo." },
+      { title: "Ajuda para estudar 📖", description: "Tire dúvidas de qualquer matéria e receba explicações passo a passo." },
       { title: "Corretor Oficial de Redação ENEM ✍️", description: "Avaliação instantânea de 0 a 1000 dividida pelas 5 competências oficiais do ENEM." },
       { title: "Comparador Faculdade x Técnico ⚖️", description: "Veja duração, investimento, salários e mercado de trabalho antes de tomar sua decisão." },
       { title: "Teste Vocacional & Cronograma 📅", description: "Descubra a área que combina com você e monte seu plano de estudos semanal personalizado." },
@@ -369,9 +369,9 @@ export const NICHES = {
     themeAccent: "indigo",
     heroIcon: "🎓",
     heroImage: "/niche-hero/estudante.png",
-    quickFeatures: ["Tutor IA 24h & Monitoria", "Resumos de Matérias com IA", "Corretor de Redação ENEM 0-1000", "Comparador Faculdade vs Técnico"],
+    quickFeatures: ["Ajuda para estudar 24h", "Resumos de matérias", "Corretor de redação ENEM", "Comparador faculdade x técnico"],
     heroSecondaryCtaLabel: "Fazer teste vocacional",
-    socialProof: "Tirar dúvidas da escola e decidir seu futuro fica muito mais fácil quando você tem IA como parceira de estudos.",
+    socialProof: "Tirar dúvidas da escola e decidir seu futuro fica muito mais fácil quando você tem um próximo passo claro.",
     samplePreview: {
       score: 85,
       scoreLabel: "Afinidade com a área de Tecnologia",
@@ -391,7 +391,7 @@ export const NICHES = {
     completeTierDescription: "Compare faculdade x técnico, veja o mercado de cada área e saia com um caminho real para seguir.",
     completeTierCta: "Fazer teste vocacional",
     howItWorks: [
-      { title: "Peça ajuda nas matérias", description: "Tire dúvidas 24h com o Tutor IA e gere resumos automáticos de qualquer matéria do Ensino Médio." },
+      { title: "Peça ajuda nas matérias", description: "Tire dúvidas 24h e gere resumos de qualquer matéria do Ensino Médio." },
       { title: "Pratique a Redação ENEM", description: "Envie sua redação e receba avaliação detalhada de 0 a 1000 com dicas de melhoria." },
       { title: "Decida seu caminho", description: "Compare faculdade x técnico, veja o mercado de trabalho e escolha seu futuro com segurança." },
     ],
@@ -533,11 +533,11 @@ const NICHE_ORDER = Object.keys(NICHES) as NicheSlug[];
 const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: string }> = {
   estagiarios: {
     headline: "Seu primeiro estágio pode começar com o que você já sabe.",
-    subheadline: "Transforme projetos, cursos e atividades em evidências que uma empresa consegue enxergar — e descubra o ajuste que falta antes de aplicar.",
+    subheadline: "Transforme projetos, cursos e atividades em evidências que uma empresa consegue enxergar. Descubra o ajuste que falta antes de aplicar.",
   },
   "primeiro-emprego": {
     headline: "Seu primeiro emprego não precisa parecer impossível.",
-    subheadline: "Mostre cursos, projetos e responsabilidades do jeito certo para a vaga — sem inventar experiência e sem se diminuir.",
+    subheadline: "Mostre cursos, projetos e responsabilidades do jeito certo para a vaga. Sem inventar experiência e sem se diminuir.",
   },
   "transicao-de-carreira": {
     headline: "Mudar de área não apaga a experiência que você construiu.",
@@ -549,11 +549,11 @@ const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: st
   },
   "menor-aprendiz": {
     headline: "Você já tem mais para mostrar do que imagina.",
-    subheadline: "Monte um currículo claro para Jovem Aprendiz usando escola, cursos, atividades e responsabilidade — mesmo sem experiência.",
+    subheadline: "Monte um currículo claro para Jovem Aprendiz usando escola, cursos, atividades e responsabilidade, mesmo sem experiência.",
   },
   estudante: {
     headline: "Pare de escolher seu futuro no achismo.",
-    subheadline: "Entenda qual caminho combina com seus interesses, rotina e objetivos — enquanto recebe ajuda para estudar melhor todos os dias.",
+    subheadline: "Entenda qual caminho combina com seus interesses, rotina e objetivos, enquanto recebe ajuda para estudar melhor todos os dias.",
   },
   concurseiro: {
     headline: "Pare de estudar tudo e continuar sem saber se está avançando.",
@@ -825,7 +825,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
   const attentionCards = [
     {
       label: isStudyNiche ? "Onde você está" : "Antes de aplicar",
-      title: isStudyNiche ? `${niche.samplePreview.score}% de aproveitamento` : `${niche.samplePreview.score} de aderência`,
+      title: isStudyNiche ? `${niche.samplePreview.score}% de aproveitamento` : `${niche.samplePreview.score}% de compatibilidade`,
       description: niche.samplePreview.scoreLabel,
     },
     {
@@ -933,15 +933,15 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
 
               <div className="animate-rise mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl" style={{ animationDelay: "320ms" }}>
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
-                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 1</p>
-                  <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Plano por peso das matérias" : "Score claro de aderência"}</p>
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Primeiro</p>
+                  <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Plano por peso das matérias" : "Entenda suas chances"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
-                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 2</p>
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Depois</p>
                   <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Simulados no estilo da banca" : "Lacunas e palavras-chave"}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/8 px-4 py-3 backdrop-blur-sm">
-                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Entrega 3</p>
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-white/45 font-semibold">Por fim</p>
                   <p className="mt-1 text-sm font-semibold text-white">{isStudyNiche ? "Estimativa de nota de corte" : "Pergunta provável de entrevista"}</p>
                 </div>
               </div>
@@ -1101,7 +1101,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           <div className="text-center max-w-2xl mx-auto">
             <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>Exemplo demonstrativo</p>
             <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">
-              Veja o que a análise te devolve
+              Veja o que você descobre
             </h2>
             <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
               Uma demonstração do formato da entrega. O seu resultado será calculado com os dados que você informar.
@@ -1118,7 +1118,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               </div>
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">
-                  {isStudyNiche ? "Aproveitamento (exemplo)" : "Score de aderência (exemplo)"}
+                  {isStudyNiche ? "Aproveitamento (exemplo)" : "Compatibilidade (exemplo)"}
                 </p>
                 <p className="text-sm md:text-base font-bold mt-0.5">{niche.samplePreview.scoreLabel}</p>
               </div>
@@ -1245,14 +1245,14 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             </h2>
           </div>
 
-          <div className={`mt-8 grid grid-cols-1 gap-6 items-stretch ${isStudyNiche ? "lg:grid-cols-3" : "lg:grid-cols-2 max-w-4xl mx-auto"}`}>
+          <div className="mt-8 grid grid-cols-1 gap-6 items-stretch lg:grid-cols-3">
             {/* Tier 1: grátis */}
             <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-6 flex flex-col">
               <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Para começar</p>
               <p className="text-lg font-bold mt-1">{niche.simpleTierLabel ?? "Análise Simples"}</p>
               <p className={`mt-2 text-3xl font-extrabold ${theme.accentText}`}>Grátis</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2 flex-1">
-                {niche.simpleTierDescription ?? "Score básico, pontos fortes e de atenção, e as palavras-chave que faltam no currículo."}
+                {niche.simpleTierDescription ?? "Uma leitura inicial, os pontos fortes e o que ainda precisa aparecer melhor no currículo."}
               </p>
               <Link
                 href={primaryActionHref}
@@ -1289,7 +1289,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             </div>
 
             {/* Tier 3: assinatura mensal, valor por nicho */}
-            {isStudyNiche && <div className={`animate-soft-glow relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
+            <div className={`animate-soft-glow relative rounded-2xl border-2 ${theme.cardBorder} bg-white dark:bg-neutral-950 p-6 flex flex-col shadow-lg lg:-my-2 lg:py-8`}>
               <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full text-white text-[10px] font-bold uppercase tracking-wide px-3 py-1 shadow-sm whitespace-nowrap ${theme.numberBg}`}>
                 Melhor custo-benefício
               </span>
@@ -1318,14 +1318,14 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               >
                 Assinar {offer.monthlyName}
               </Link>
-            </div>}
+            </div>
           </div>
 
           <p className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
             {niche.socialProof}
           </p>
           <p className="mt-2 max-w-2xl mx-auto text-center text-xs text-neutral-400">
-            <strong className="text-neutral-600 dark:text-neutral-300">Próxima melhor ação:</strong> {offer.nextBestAction}
+            <strong className="text-neutral-600 dark:text-neutral-300">Seu próximo passo:</strong> {offer.nextBestAction}
           </p>
         </section>
 
@@ -1406,10 +1406,10 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
                   🎓 Módulo Completo do Estudante
                 </div>
                 <h3 className="text-xl sm:text-2xl font-extrabold">
-                  Estude para o Ensino Médio & ENEM com Inteligência Artificial
+                  Estude para o Ensino Médio e o ENEM com mais segurança
                 </h3>
                 <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
-                  Resumos de matérias escolares com IA, corretor oficial de redação ENEM (nota 0-1000), calculadora de notas por peso, cronograma de estudos e tutor escolar 24h.
+                  Resumos de matérias escolares, corretor oficial de redação ENEM (nota 0-1000), calculadora de notas por peso, cronograma de estudos e tutor escolar 24h.
                 </p>
               </div>
               <Link
