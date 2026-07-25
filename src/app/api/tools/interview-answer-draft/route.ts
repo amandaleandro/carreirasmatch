@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
     if (!session) return response!;
     if (!subscriber) freeStartUserId = session.user.id;
 
-    const input: InterviewSimulatorInput & { question: string } = {
+    const input: InterviewSimulatorInput & { question: string; mode?: "curta" | "star" | "tecnica" } = {
       targetRole: targetRole.slice(0, MAX_FIELD_LENGTH),
       area: String(body.area ?? "").trim().slice(0, MAX_FIELD_LENGTH),
       seniority: String(body.seniority ?? "").trim().slice(0, MAX_FIELD_LENGTH),
