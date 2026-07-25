@@ -24,6 +24,7 @@ import { VerifiedBadgeBox } from "@/components/verified-badge-box";
 import type { StructuredResume } from "@/lib/groq";
 import { getRecommendedPartnerCourses } from "@/lib/analysis-recommendations";
 import { PartnerCoursesRecommendation } from "@/components/partner-courses-recommendation";
+import { ReanalysisTrigger } from "@/components/analysis/reanalysis-trigger";
 
 export const dynamic = "force-dynamic";
 
@@ -186,6 +187,14 @@ export default async function ReportPage({
             </Link>
           </div>
         )}
+        <div className="mt-3">
+          <ReanalysisTrigger
+            analysisId={id}
+            jobTitle={record.jobTitle}
+            currentScore={record.overallScore}
+            resumeText={record.resume.rawText}
+          />
+        </div>
       </header>
 
       {previousAnalysis && scoreDelta !== null && scoreDelta !== 0 && (

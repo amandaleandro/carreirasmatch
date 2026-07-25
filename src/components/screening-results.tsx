@@ -152,6 +152,19 @@ export function ScreeningResults({
 
   return (
     <div className="space-y-4">
+      {/* Banner de Decisão Humana & Governança B2B */}
+      <div className="rounded-2xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-950/20 p-3.5 flex items-start gap-3">
+        <span className="text-base shrink-0">🤝</span>
+        <div className="space-y-0.5">
+          <p className="text-xs font-bold text-slate-900 dark:text-white">
+            Suporte à Triagem com Governança Humana
+          </p>
+          <p className="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+            O CarreirasMatch organiza evidências de aderência técnica aos requisitos da vaga. A decisão de convite ou aprovação final é <strong>exclusivamente humana</strong> e registrada pelo recrutador.
+          </p>
+        </div>
+      </div>
+
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex items-center gap-1.5 flex-wrap">
           {([

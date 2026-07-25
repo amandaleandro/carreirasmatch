@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
+import { StripeCheckoutButton } from "@/components/stripe-checkout-button";
 import { CouponCodeInput } from "@/components/coupon-code-input";
 import { parseBRLToCents } from "@/lib/pricing";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
@@ -41,18 +42,36 @@ export function UnlockDiagnosticButton({
           </button>
         </div>
         <CouponCodeInput value={couponCode} onChange={setCouponCode} />
-        <MercadoPagoPaymentBrick
-          amount={amount}
-          kind="diagnostic"
-          analysisId={analysisId}
-          couponCode={couponCode}
-          payerEmail={payerEmail}
-          segment={segment}
-          onSuccess={() => {
-            track(ANALYTICS_EVENTS.PAYMENT_CONFIRMED, { kind: "diagnostic" });
-            window.location.reload();
-          }}
-        />
+
+        <div className="grid gap-3 pt-1">
+          <StripeCheckoutButton
+            analysisId={analysisId}
+            kind="diagnostic"
+            segment={segment}
+            couponCode={couponCode}
+            payerEmail={payerEmail}
+            label={`Pagar via Stripe / Cartão (${price})`}
+          />
+
+          <div className="relative flex py-1 items-center">
+            <div className="flex-grow border-t border-slate-200 dark:border-neutral-800"></div>
+            <span className="flex-shrink mx-3 text-[10px] text-slate-400 font-bold uppercase">ou Pix / Mercado Pago</span>
+            <div className="flex-grow border-t border-slate-200 dark:border-neutral-800"></div>
+          </div>
+
+          <MercadoPagoPaymentBrick
+            amount={amount}
+            kind="diagnostic"
+            analysisId={analysisId}
+            couponCode={couponCode}
+            payerEmail={payerEmail}
+            segment={segment}
+            onSuccess={() => {
+              track(ANALYTICS_EVENTS.PAYMENT_CONFIRMED, { kind: "diagnostic" });
+              window.location.reload();
+            }}
+          />
+        </div>
       </div>
     );
   }

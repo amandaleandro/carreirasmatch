@@ -249,6 +249,64 @@ export const postgresStats = getOrCreate(
     })
 );
 
+// --- Métricas de Observabilidade Massiva ---
+
+export const httpRequestsTotal = getOrCreate(
+  "carreiras_http_requests_total",
+  () =>
+    new Counter({
+      name: "carreiras_http_requests_total",
+      help: "Total de requisições HTTP processadas por rota, método e status code",
+      labelNames: ["route", "method", "status_code"] as const,
+      registers: [registry],
+    })
+);
+
+export const httpRequestDurationSeconds = getOrCreate(
+  "carreiras_http_request_duration_seconds",
+  () =>
+    new Histogram({
+      name: "carreiras_http_request_duration_seconds",
+      help: "Latência das requisições HTTP por rota, método e status code",
+      labelNames: ["route", "method", "status_code"] as const,
+      buckets: [0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+      registers: [registry],
+    })
+);
+
+export const reanalysisEventsTotal = getOrCreate(
+  "carreiras_reanalysis_events_total",
+  () =>
+    new Counter({
+      name: "carreiras_reanalysis_events_total",
+      help: "Total de reanálises pós-edição de currículo efetuadas",
+      labelNames: ["outcome", "score_improved"] as const,
+      registers: [registry],
+    })
+);
+
+export const securityRateLimitHits = getOrCreate(
+  "carreiras_security_rate_limit_hits_total",
+  () =>
+    new Counter({
+      name: "carreiras_security_rate_limit_hits_total",
+      help: "Bloqueios de rate-limit e segurança acionados",
+      labelNames: ["route", "reason"] as const,
+      registers: [registry],
+    })
+);
+
+export const segmentedActiveUsers = getOrCreate(
+  "carreiras_segmented_active_users",
+  () =>
+    new Gauge({
+      name: "carreiras_segmented_active_users",
+      help: "Usuários ativos agregados por segmento de carreira",
+      labelNames: ["segment"] as const,
+      registers: [registry],
+    })
+);
+
 export const sourceSyncSecondsSinceSuccess = getOrCreate(
   "carreiras_source_sync_seconds_since_success",
   () =>
