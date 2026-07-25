@@ -6,6 +6,7 @@ import { Download, Share2, Check, Sparkles } from "lucide-react";
 interface ShareMatchCardProps {
   jobTitle: string;
   overallScore: number;
+  userName?: string | null;
   userId?: string;
   /** Percentil do score na trilha ("fiquei à frente de X% dos candidatos") — o gancho social do card. */
   betterThanPercent?: number | null;
