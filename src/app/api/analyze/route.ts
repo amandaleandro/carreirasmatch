@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "Envie o currículo (PDF), o texto da vaga e seu momento profissional.",
+            "Envie o currículo (PDF ou DOCX), o texto da vaga e seu momento profissional.",
         },
         { status: 400 }
       );
@@ -233,15 +233,23 @@ export async function POST(req: NextRequest) {
       }
     } else {
       pdfBuffer = Buffer.from(await file!.arrayBuffer());
-      const parser = new PDFParse({ data: pdfBuffer });
-      const parsed = await parser.getText();
-      await parser.destroy();
-      resumeText = parsed.text.trim();
+      const fileNameLower = (file!.name || "").toLowerCase();
+
+      if (fileNameLower.endsWith(".docx") || file!.type.includes("wordprocessingml") || file!.type.includes("msword")) {
+        const mammoth = await import("mammoth");
+        const docxResult = await mammoth.extractRawText({ buffer: pdfBuffer });
+        resumeText = docxResult.value.trim();
+      } else {
+        const parser = new PDFParse({ data: pdfBuffer });
+        const parsed = await parser.getText();
+        await parser.destroy();
+        resumeText = parsed.text.trim();
+      }
     }
 
     if (!resumeText) {
       return NextResponse.json(
-        { error: "Não foi possível extrair texto do PDF enviado." },
+        { error: "Não foi possível extrair texto do arquivo (PDF ou DOCX) enviado." },
         { status: 422 }
       );
     }

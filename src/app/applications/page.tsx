@@ -15,6 +15,8 @@ import {
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
 
 import { ApplicationsKanban } from "@/components/applications-kanban";
+import { AutoApplySettingsCard } from "@/components/auto-apply-card";
+
 
 export const dynamic = "force-dynamic";
 
@@ -142,7 +144,11 @@ export default async function ApplicationsPage() {
         </Link>
       </div>
 
+      {/* Piloto Automático de Candidatura Inteligente */}
+      <AutoApplySettingsCard />
+
       {/* Kanban Board Visual */}
+
       <section className="space-y-4">
         <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Quadro Kanban de Processos</h2>
         <ApplicationsKanban items={applications} />

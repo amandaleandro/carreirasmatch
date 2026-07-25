@@ -5,7 +5,10 @@ import Link from "next/link";
 import {
   SubjectMetadata,
   EnsinoMedioGeneratedContent,
-} from "@/lib/ensino-medio";
+  YearId,
+  getTopicsByYear,
+} from "@/lib/ensino-medio-types";
+import { EnsinoMedioYearSelector } from "@/components/ensino-medio-year-selector";
 import {
   BookOpen,
   GraduationCap,
@@ -28,7 +31,10 @@ interface Props {
 }
 
 export function EnsinoMedioStudyView({ subject }: Props) {
-  const [selectedTopic, setSelectedTopic] = useState(subject.topics[0] || "");
+  const [selectedYear, setSelectedYear] = useState<YearId>("all");
+  const yearTopics = getTopicsByYear(subject, selectedYear);
+
+  const [selectedTopic, setSelectedTopic] = useState(yearTopics[0]?.topic || subject.topics[0] || "");
   const [customTopic, setCustomTopic] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -112,7 +118,18 @@ export function EnsinoMedioStudyView({ subject }: Props) {
     <div className="space-y-8">
       {/* Box de Seleção de Tópico */}
       <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-3xl p-6 md:p-8 shadow-sm space-y-6">
-        <div>
+        <EnsinoMedioYearSelector
+          selectedYear={selectedYear}
+          onSelectYear={(yearId) => {
+            setSelectedYear(yearId);
+            const topicsForYear = getTopicsByYear(subject, yearId);
+            if (topicsForYear.length > 0) {
+              setSelectedTopic(topicsForYear[0].topic);
+            }
+          }}
+        />
+
+        <div className="pt-4 border-t border-neutral-100 dark:border-neutral-800">
           <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 px-3 py-1 text-xs font-bold uppercase tracking-wider mb-2">
             <Sparkles className="h-3.5 w-3.5" />
             Alimentado por Gemini AI
@@ -121,29 +138,43 @@ export function EnsinoMedioStudyView({ subject }: Props) {
             Escolha o tópico de {subject.name} para estudar
           </h2>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm mt-1">
-            Selecione um dos temas mais cobrados no ENEM ou digite o assunto que deseja praticar hoje.
+            Selecione um dos temas do programa ou digite o assunto que deseja praticar hoje.
           </p>
         </div>
 
-        {/* Chips de tópicos pré-definidos */}
+        {/* Chips de tópicos com badge por ano */}
         <div className="flex flex-wrap gap-2">
-          {subject.topics.map((t) => (
-            <button
-              key={t}
-              onClick={() => {
-                setSelectedTopic(t);
-                setCustomTopic("");
-                handleGenerate(t);
-              }}
-              className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-                selectedTopic === t && !customTopic
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
-              }`}
-            >
-              {t}
-            </button>
-          ))}
+          {yearTopics.map((item) => {
+            const isSelected = selectedTopic === item.topic && !customTopic;
+            return (
+              <button
+                key={item.topic}
+                onClick={() => {
+                  setSelectedTopic(item.topic);
+                  setCustomTopic("");
+                  handleGenerate(item.topic);
+                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+                  isSelected
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-700"
+                }`}
+              >
+                <span>{item.topic}</span>
+                {selectedYear === "all" && (
+                  <span
+                    className={`text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded ${
+                      isSelected
+                        ? "bg-white/20 text-white"
+                        : "bg-neutral-200 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400"
+                    }`}
+                  >
+                    {item.yearLabel}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* Input customizado */}

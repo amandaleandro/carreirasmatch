@@ -745,9 +745,9 @@ export function AnalyzeVagaPage({
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-5">
-                {/* Upload PDF */}
+                {/* Upload PDF/DOCX */}
                 <div className="space-y-1.5">
-                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Seu currículo (PDF)</label>
+                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Seu currículo (PDF ou DOCX)</label>
                   <div
                     onDragOver={(e) => {
                       e.preventDefault();
@@ -766,13 +766,13 @@ export function AnalyzeVagaPage({
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
                     </svg>
                     <p className="text-xs text-[#071827] dark:text-neutral-300 font-bold">
-                      Arraste o PDF aqui ou clique
+                      Arraste seu arquivo PDF ou Word (.docx) aqui ou clique
                     </p>
-                    <p className="text-[10px] text-[#64748B] mt-0.5">Apenas PDF (máx. 10MB)</p>
+                    <p className="text-[10px] text-[#64748B] mt-0.5">PDF ou Word .docx (máx. 10MB)</p>
                     <input
                       ref={fileInputRef}
                       type="file"
-                      accept="application/pdf"
+                      accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                       onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                       className="hidden"
                     />

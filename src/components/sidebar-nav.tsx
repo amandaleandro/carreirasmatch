@@ -26,6 +26,7 @@ import {
   Handshake,
   Gamepad2,
   Flame,
+  BookOpen,
   type LucideIcon,
 } from "lucide-react";
 import { useUiPanels } from "@/components/ui-panels";
@@ -48,6 +49,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
+      { href: "/evidencias", label: "Banco de Evidências 🛡️", icon: ShieldCheck },
       { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
     ],
   },
@@ -78,6 +80,7 @@ const NAV_GROUPS: NavGroup[] = [
     title: "Recursos & Suporte",
     items: [
       { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
+      { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
       { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
       { href: "/concursos", label: "Radar Concursos", icon: Landmark, tour: "nav-concursos" },
       { href: "/vestibulares", label: "Radar Vestibulares", icon: ScrollText, tour: "nav-vestibulares" },

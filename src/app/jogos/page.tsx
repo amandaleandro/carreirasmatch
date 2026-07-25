@@ -3,10 +3,15 @@ import { SiteFooter } from "@/components/site-footer";
 import Link from "next/link";
 import { Sparkles, Keyboard, Trophy, Brain, Flame, Calendar, CalendarDays, Type, Skull, Scale, ListOrdered, Search, FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { GamesCatalog } from "@/components/games-catalog";
 
 export const dynamic = "force-dynamic";
 
-const GAMES = [
+const RANKING_OPTIONS = [
+  { id: "global", label: "🌟 Rank Global (XP Total)" },
+  { id: "dilemas", label: "🎭 Simulador de Dilemas" },
+  { id: "inbox", label: "⚡ Inbox Zero" },
+  { id: "duelo", label: "⚔️ Batalha 1v1" },
   { id: "typer", label: "Speed Typer" },
   { id: "quiz", label: "Show do Match" },
   { id: "memory", label: "Termos Pareados" },
@@ -24,7 +29,7 @@ export default async function GamesHubPage({
   searchParams: Promise<{ game?: string }>;
 }) {
   const { game: gameParam } = await searchParams;
-  const selectedGame = GAMES.some((g) => g.id === gameParam) ? gameParam! : GAMES[0].id;
+  const selectedGame = RANKING_OPTIONS.some((g) => g.id === gameParam) ? gameParam! : RANKING_OPTIONS[0].id;
 
   const now = new Date();
   const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -32,9 +37,37 @@ export default async function GamesHubPage({
   const startOfYear = new Date(now.getFullYear(), 0, 1);
 
   async function topScoresByUser(since: Date) {
+    const isGlobal = selectedGame === "global";
+    const whereCondition = {
+      createdAt: { gte: since },
+      ...(isGlobal ? {} : { game: selectedGame }),
+    };
+
+    if (isGlobal) {
+      const grouped = await prisma.gameScore.groupBy({
+        by: ["userId"],
+        where: whereCondition,
+        _sum: { score: true },
+        orderBy: { _sum: { score: "desc" } },
+        take: 10,
+      });
+
+      const users = await prisma.user.findMany({
+        where: { id: { in: grouped.map((g) => g.userId) } },
+        select: { id: true, name: true },
+      });
+      const nameById = new Map(users.map((u) => [u.id, u.name]));
+
+      return grouped.map((g) => ({
+        id: g.userId,
+        score: g._sum.score ?? 0,
+        user: { name: nameById.get(g.userId) ?? null },
+      }));
+    }
+
     const grouped = await prisma.gameScore.groupBy({
       by: ["userId"],
-      where: { createdAt: { gte: since }, game: selectedGame },
+      where: whereCondition,
       _max: { score: true },
       orderBy: { _max: { score: "desc" } },
       take: 10,
@@ -101,167 +134,8 @@ export default async function GamesHubPage({
           </Link>
         </section>
 
-        {/* Grid de Seleção de Jogos */}
-        <section className="grid gap-4 md:grid-cols-3">
-          {/* Card Jogo 1: Speed Typer */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 p-3.5 w-fit">
-                <Keyboard className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">
-                Speed Typer
-              </h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Treine sua velocidade de digitação! Escreva snippets de código, e-mails corporativos, termos técnicos ou textos publicitários contra o relógio e meça seu WPM.
-              </p>
-            </div>
-            <Link
-              href="/jogos/digitar"
-              className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]"
-            >
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 2: Show do Match */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 p-3.5 w-fit">
-                <Sparkles className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">
-                Show do Match (Quiz)
-              </h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                O quiz definitivo de carreira e conhecimentos específicos de mercado. Responda perguntas rápidas sobre Tecnologia, Gestão, Marketing, Design ou Saúde!
-              </p>
-            </div>
-            <Link
-              href="/jogos/quiz"
-              className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]"
-            >
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 3: Jogo da Memória */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 p-3.5 w-fit">
-                <Brain className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">
-                Termos Pareados (Memória)
-              </h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Aprimore seu vocabulário corporativo pareando siglas, conceitos e ferramentas técnicas do seu campo profissional no menor tempo possível.
-              </p>
-            </div>
-            <Link
-              href="/jogos/memoria"
-              className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]"
-            >
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 4: Termo */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 p-3.5 w-fit">
-                <Type className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">Termo</h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Adivinhe a palavra profissional de 5 letras em até 6 tentativas, com pistas de cores. Quanto menos tentativas, mais pontos você acumula no ranking.
-              </p>
-            </div>
-            <Link href="/jogos/termo" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 5: Forca */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 p-3.5 w-fit">
-                <Skull className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">Forca Profissional</h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Descubra termos de carreira e tecnologia letra por letra, guiado por dicas. Erre pouco para pontuar mais em cada palavra de sua trilha.
-              </p>
-            </div>
-            <Link href="/jogos/forca" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 6: Verdadeiro ou Falso */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 p-3.5 w-fit">
-                <Scale className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">Verdadeiro ou Falso</h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Enxurrada de afirmações sobre carreira e mercado contra o relógio. Acerte em sequência para multiplicar sua pontuação máxima.
-              </p>
-            </div>
-            <Link href="/jogos/vf" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 7: Ordene o Processo */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-teal-500/10 text-teal-600 dark:text-teal-400 p-3.5 w-fit">
-                <ListOrdered className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">Ordene o Processo</h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Receba as etapas embaralhadas de um processo real (projeto, contratação, funil de vendas) e as coloque na ordem correta o mais rápido possível.
-              </p>
-            </div>
-            <Link href="/jogos/ordenar" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 8: Caça-Palavras */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-orange-500/10 text-orange-600 dark:text-orange-400 p-3.5 w-fit">
-                <Search className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">Caça-Palavras Profissional</h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Encontre termos de carreira, tecnologia e negócios escondidos na grade de letras antes que o tempo acabe.
-              </p>
-            </div>
-            <Link href="/jogos/cacapalavras" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
-              Jogar Agora
-            </Link>
-          </div>
-
-          {/* Card Jogo 9: Monte o Currículo */}
-          <div className="group rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all relative overflow-hidden">
-            <div className="space-y-4">
-              <div className="rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 p-3.5 w-fit">
-                <FileText className="h-6 w-6" />
-              </div>
-              <h3 className="text-base font-bold text-[#071827] dark:text-white">Monte o Currículo</h3>
-              <p className="text-[#64748B] text-xs leading-relaxed">
-                Reordene as seções de diferentes perfis de currículo até chegar na estrutura ideal para cada situação.
-              </p>
-            </div>
-            <Link href="/jogos/curriculo" className="mt-6 w-full inline-flex items-center justify-center gap-1.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 text-xs font-bold shadow-sm transition-all text-center active:scale-[0.98]">
-              Jogar Agora
-            </Link>
-          </div>
-        </section>
+        {/* Catálogo de Jogos Segmentado por Trilha & Área */}
+        <GamesCatalog />
 
         {/* Seção de Rankings */}
         <section className="space-y-6 pt-8 border-t border-[#E2E8F0] dark:border-neutral-800">
@@ -276,13 +150,13 @@ export default async function GamesHubPage({
           </header>
 
           <div className="flex flex-wrap justify-center gap-2">
-            {GAMES.map((g) => (
+            {RANKING_OPTIONS.map((g) => (
               <Link
                 key={g.id}
                 href={`/jogos?game=${g.id}#rankings`}
                 className={`rounded-full px-3.5 py-1.5 text-[11px] font-bold border transition-all ${
                   selectedGame === g.id
-                    ? "bg-[#2563EB] border-[#2563EB] text-white"
+                    ? "bg-[#2563EB] border-[#2563EB] text-white shadow-sm"
                     : "bg-white dark:bg-neutral-900/40 border-[#E2E8F0] dark:border-neutral-800 text-[#64748B] hover:border-[#2563EB]/50"
                 }`}
               >

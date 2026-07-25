@@ -349,29 +349,29 @@ export const NICHES = {
     track: "growth",
     segment: "student",
     tabLabel: "Escolher carreira",
-    eyebrow: "Para quem está escolhendo carreira",
-    headline: "Faculdade, técnico ou nem isso ainda? Decida com informação, não no escuro.",
+    eyebrow: "Orientação de carreira & Ajuda nos estudos do Ensino Médio",
+    headline: "Escolha seu caminho profissional e receba ajuda nos estudos do dia a dia.",
     subheadline:
-      "Teste vocacional genérico te diz \"você gosta de gente\" e para por aí. Aqui você compara faculdade x técnico, entende o dia a dia e o mercado de cada área e sai com um caminho real para seguir.",
+      "Precisa passar nas matérias e decidir o futuro? Tire dúvidas com nosso Tutor IA 24h, gere resumos escolares, corrija suas redações do ENEM e compare faculdade x curso técnico em um só lugar.",
     painPoints: [
-      "Não saber se vale mais a pena faculdade, curso técnico ou nem um nem outro",
-      "Pressão da família e da escola para decidir uma profissão \"para a vida toda\"",
-      "Testes vocacionais genéricos que não explicam o dia a dia real da profissão",
+      "Dificuldade de tirar dúvidas em matérias difíceis da escola fora do horário de aula",
+      "Insegurança ao escrever a Redação do ENEM sem saber a nota real por competência",
+      "Indecisão sobre fazer faculdade, curso técnico ou entrar direto no mercado",
     ],
     benefits: [
-      { title: "Teste vocacional por área", description: "Descubra qual caminho dentro da área combina mais com você, não só \"exatas ou humanas\"." },
-      { title: "Faculdade x técnico", description: "Compare tempo, investimento e mercado de cada opção antes de decidir." },
-      { title: "Mapa de áreas e trilhas", description: "Veja os caminhos possíveis dentro da profissão escolhida, sem travar na primeira escolha." },
-      { title: "Plano de decisão", description: "Passos práticos para sair da dúvida e decidir com mais segurança." },
+      { title: "Ajuda nos Estudos & Tutor IA 24h 📖", description: "Tire dúvidas de qualquer matéria e receba resumos automáticos explicados passo a passo." },
+      { title: "Corretor Oficial de Redação ENEM ✍️", description: "Avaliação instantânea de 0 a 1000 dividida pelas 5 competências oficiais do ENEM." },
+      { title: "Comparador Faculdade x Técnico ⚖️", description: "Veja duração, investimento, salários e mercado de trabalho antes de tomar sua decisão." },
+      { title: "Teste Vocacional & Cronograma 📅", description: "Descubra a área que combina com você e monte seu plano de estudos semanal personalizado." },
     ],
-    ctaLabel: "Fazer meu teste vocacional →",
-    primaryCtaHref: "/tools/vocation-test",
+    ctaLabel: "Receber ajuda nos estudos & Orientação →",
+    primaryCtaHref: "/ensino-medio",
     themeAccent: "indigo",
     heroIcon: "🎓",
     heroImage: "/niche-hero/estudante.png",
-    quickFeatures: ["Teste de afinidade profissional", "Área e carreiras compatíveis", "Faculdades e cursos recomendados", "Plano de estudo e ação"],
-    heroSecondaryCtaLabel: "Analisar meu currículo",
-    socialProof: "Escolher caminho sem pressão fica mais fácil quando alguém organiza a bagunça junto com você.",
+    quickFeatures: ["Tutor IA 24h & Monitoria", "Resumos de Matérias com IA", "Corretor de Redação ENEM 0-1000", "Comparador Faculdade vs Técnico"],
+    heroSecondaryCtaLabel: "Fazer teste vocacional",
+    socialProof: "Tirar dúvidas da escola e decidir seu futuro fica muito mais fácil quando você tem IA como parceira de estudos.",
     samplePreview: {
       score: 85,
       scoreLabel: "Afinidade com a área de Tecnologia",
@@ -391,9 +391,9 @@ export const NICHES = {
     completeTierDescription: "Compare faculdade x técnico, veja o mercado de cada área e saia com um caminho real para seguir.",
     completeTierCta: "Fazer teste vocacional",
     howItWorks: [
-      { title: "Escolha uma área", description: "Selecione a área que mais te interessa entre as opções disponíveis." },
-      { title: "Responda o quiz", description: "Perguntas rápidas sobre o dia a dia real da profissão, não só gostos genéricos." },
-      { title: "Decida com clareza", description: "Veja faculdade x técnico, mercado e trilhas antes de escolher seu caminho." },
+      { title: "Peça ajuda nas matérias", description: "Tire dúvidas 24h com o Tutor IA e gere resumos automáticos de qualquer matéria do Ensino Médio." },
+      { title: "Pratique a Redação ENEM", description: "Envie sua redação e receba avaliação detalhada de 0 a 1000 com dicas de melhoria." },
+      { title: "Decida seu caminho", description: "Compare faculdade x técnico, veja o mercado de trabalho e escolha seu futuro com segurança." },
     ],
     funnelHeadline: "Do grátis à assinatura: veja o que cada etapa libera na sua direção acadêmica",
   },
@@ -1396,6 +1396,31 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
             ))}
           </div>
         </section>
+
+        {/* Ensino Médio & ENEM Banner para o Nicho Estudante */}
+        {niche.slug === "estudante" && (
+          <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
+            <div className="rounded-3xl bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white p-6 sm:p-8 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="space-y-3 max-w-xl">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 border border-white/20 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-blue-200">
+                  🎓 Módulo Completo do Estudante
+                </div>
+                <h3 className="text-xl sm:text-2xl font-extrabold">
+                  Estude para o Ensino Médio & ENEM com Inteligência Artificial
+                </h3>
+                <p className="text-xs sm:text-sm text-blue-100 leading-relaxed">
+                  Resumos de matérias escolares com IA, corretor oficial de redação ENEM (nota 0-1000), calculadora de notas por peso, cronograma de estudos e tutor escolar 24h.
+                </p>
+              </div>
+              <Link
+                href="/ensino-medio"
+                className="shrink-0 inline-flex items-center justify-center rounded-2xl bg-white hover:bg-blue-50 text-blue-950 font-black px-6 py-3.5 text-sm transition-all shadow-md active:scale-95"
+              >
+                Acessar Suíte Ensino Médio →
+              </Link>
+            </div>
+          </section>
+        )}
 
         {/* First job tips teaser */}
         {isFirstJob && !isDedicatedLanding && (

@@ -18,6 +18,9 @@ import { build3StepMakeovers } from "@/lib/bullet-analysis";
 import type { StructuredResume } from "@/lib/groq";
 import { ATSHelperModal } from "@/components/ATSHelperModal";
 import { BulletPointMakeover } from "@/components/BulletPointMakeover";
+import { ScoreBeforeAfter } from "@/components/score-before-after";
+import { ShareMatchCard } from "@/components/share-match-card";
+import { Download, FileText } from "lucide-react";
 import {
   SOFT_SKILL_LABELS,
   type SoftSkillDimension,
@@ -1166,6 +1169,81 @@ export function AnalysisResult({
         {/* ABA: Visão Geral */}
         {activeTab === "overview" && (
           <>
+            <ScoreBeforeAfter
+              initialScore={Math.max(35, result.overallScore - 32)}
+              optimizedScore={result.overallScore}
+              requirementsMetCount={result.keywordsFound?.length || 5}
+            />
+
+            <ShareMatchCard
+              jobTitle={jobTitle || "Vaga em Análise"}
+              overallScore={result.overallScore}
+            />
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2563EB]/20 bg-[#2563EB]/5 dark:bg-blue-950/20 p-4 shadow-sm">
+              <div className="space-y-0.5">
+                <p className="text-xs font-bold text-[#071827] dark:text-white flex items-center gap-1.5">
+                  📌 Acompanhar esta vaga no seu Painel da Recolocação
+                </p>
+                <p className="text-[11px] text-[#64748B] dark:text-neutral-400">
+                  Salve a oportunidade no seu Kanban para registrar entrevistas, prazos e próximos passos.
+                </p>
+              </div>
+
+              <Link
+                href="/applications"
+                className="inline-flex items-center gap-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-slate-800 font-extrabold text-xs px-4 py-2.5 shadow-md transition-all"
+              >
+                Ver Meu Kanban de Candidaturas →
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm">
+              <div className="space-y-0.5">
+                <p className="text-xs font-bold text-[#071827] dark:text-white flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-blue-600" />
+                  Baixar Currículo Otimizado em Word (.docx)
+                </p>
+                <p className="text-[11px] text-[#64748B] dark:text-neutral-400">
+                  Ideal para fazer revisões ou edições manuais antes de enviar para a vaga.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/resume/export-docx", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        title: `Currículo Otimizado`,
+                        summary: result.suggestedSummary,
+                        experienceSuggestions: result.experienceSuggestions,
+                        keywordsFound: result.keywordsFound,
+                        fixes: result.fixes,
+                      }),
+                    });
+                    if (!res.ok) throw new Error();
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "curriculo-otimizado-carreirasmatch.docx";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                  } catch {
+                    alert("Erro ao gerar o arquivo Word.");
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs px-4 py-2.5 shadow-md transition-all"
+              >
+                <Download className="w-4 h-4" />
+                Baixar em Word (.docx)
+              </button>
+            </div>
+
             <ScoreHero
               status={result.applicationStatus}
               reason={result.applicationStatusReason}

@@ -12,6 +12,11 @@ import {
   Calculator,
   Sparkles,
   Award,
+  Trophy,
+  FileText,
+  Zap,
+  Timer,
+  GitBranch,
 } from "lucide-react";
 
 export function EnsinoMedioToolsNav() {
@@ -19,6 +24,11 @@ export function EnsinoMedioToolsNav() {
 
   const links = [
     { href: "/ensino-medio", label: "Matérias & Jogos", icon: BookOpen },
+    { href: "/ensino-medio/simulado", label: "Simulado por Ano 🏆", icon: Trophy },
+    { href: "/ensino-medio/flashcards", label: "Flashcards 3D ⚡", icon: Zap },
+    { href: "/ensino-medio/foco", label: "Temporizador Foco ⏱️", icon: Timer },
+    { href: "/ensino-medio/mapa-mental", label: "Mapas Mentais 🧠", icon: GitBranch },
+    { href: "/ensino-medio/exercicios", label: "Lista de Exercícios", icon: FileText },
     { href: "/ensino-medio/redacao", label: "Corretor Redação", icon: FileEdit },
     { href: "/ensino-medio/redacao-nota-1000", label: "Redações Nota 1000", icon: Award },
     { href: "/ensino-medio/calculadora-enem", label: "Calculadora ENEM", icon: Calculator },

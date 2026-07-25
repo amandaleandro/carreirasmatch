@@ -56,6 +56,9 @@ model User {
   companyJobApplications      CompanyJobApplication[]
   gameScores                  GameScore[]
 
+  autoApplicationSettings     AutoApplicationSettings?
+  autoApplicationQueue        AutoApplicationQueue[]
+
   // Marketplace freelancer. Um mesmo User pode ser freelancer (freelancerProfile,
   // propostas) e/ou contratante (projetos que publicou).
   freelancerProfile            FreelancerProfile?
@@ -223,7 +226,9 @@ model Job {
   active        Boolean       @default(true)
   createdAt     DateTime      @default(now())
   matches       JobMatch[]
-  applications  Application[]
+  applications            Application[]
+  autoApplicationQueue    AutoApplicationQueue[]
+
 
   @@index([active, createdAt])
   @@index([active, entryLevel, createdAt])
@@ -1307,3 +1312,38 @@ model GameScore {
   @@index([game, createdAt, score])
   @@index([userId])
 }
+
+model AutoApplicationSettings {
+  id                  String   @id @default(cuid())
+  userId              String   @unique
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enabled             Boolean  @default(false)
+  minMatchScore       Int      @default(75)
+  autoTailorResume    Boolean  @default(true)
+  preferredPlatforms  String   @default("[\"linkedin\", \"gupy\", \"indeed\"]")
+  dailyLimit          Int      @default(10)
+  notifyOnApplication Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model AutoApplicationQueue {
+  id               String    @id @default(cuid())
+  userId           String
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId            String?
+  job              Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  jobTitle         String
+  company          String
+  jobUrl           String
+  fitScore         Int
+  status           String    @default("queued") // queued | processing | applied | failed | user_approval_required
+  tailoredResumeId String?
+  failureReason    String?
+  appliedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  @@index([userId, status])
+}
+

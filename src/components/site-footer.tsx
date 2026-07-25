@@ -28,6 +28,7 @@ export function SiteFooter({ maxWidth = "max-w-7xl" }: { maxWidth?: string }) {
           <p className="text-[11px] font-bold uppercase tracking-wide text-neutral-500 mb-3">Radar e Recursos</p>
           <ul className="space-y-2 text-xs text-neutral-500 dark:text-neutral-400">
             <li><Link href="/vagas-publicas" className="hover:text-neutral-800 dark:hover:text-white transition-colors">SINE e prefeituras</Link></li>
+            <li><Link href="/ensino-medio" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Ensino Médio & ENEM</Link></li>
             <li><Link href="/cursos-gratuitos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Cursos gratuitos</Link></li>
             <li><Link href="/concursos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Concursos</Link></li>
             <li><Link href="/vestibulares" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Vestibulares</Link></li>

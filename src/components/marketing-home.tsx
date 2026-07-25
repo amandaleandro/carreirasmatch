@@ -186,29 +186,29 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-10 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-16">
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-300 bg-blue-500/20 border border-blue-400/30 px-3.5 py-1.5 rounded-full">
-              <Target className="h-4 w-4 text-blue-400" /> Comparativo de Perfil x Vaga Real
+              <Target className="h-4 w-4 text-blue-400" /> Seu Copiloto de Candidatura Profissional
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-white">
-              Se candidata e ninguém responde? O problema pode ser o filtro, não você.
+              Encontrou uma vaga? O CarreirasMatch prepara tudo para você disputar o processo.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-white/80 max-w-2xl">
-              A maioria dos currículos é descartada pelo filtro automático (ATS) antes de um recrutador ler. Compare o seu com a vaga real, descubra o que está te eliminando e envie a versão otimizada em PDF.
+              Não entregamos apenas uma pontuação. Analisamos o match com a vaga, mostramos a evolução de score, sugerimos ajustes sem inventar experiência e entregamos seu kit completo em PDF e Word (.docx).
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta />
+              <PrimaryCta label="Testar meu currículo grátis" />
               <Link href="/verificador-ats" className="inline-flex items-center justify-center rounded-xl border border-blue-400/40 bg-blue-500/10 px-5 py-3.5 text-sm font-bold text-blue-200 hover:bg-blue-500/20 transition-all">
-                ✨ Verificador ATS Gratuito (Sem Vaga)
+                ✨ Verificador ATS Rápido (Sem Vaga)
               </Link>
             </div>
 
             <div className="grid gap-2.5 text-xs font-semibold text-white/80 sm:grid-cols-2 pt-2">
-              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400" /> Resultado inicial gratuito</span>
-              <span className="inline-flex items-center gap-2"><FileCheck2 className="h-4 w-4 text-emerald-400" /> Currículo em formato PDF</span>
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400" /> Resultado inicial 100% gratuito</span>
+              <span className="inline-flex items-center gap-2"><FileCheck2 className="h-4 w-4 text-emerald-400" /> Download em PDF e Word (.docx)</span>
               <span className="inline-flex items-center gap-2"><FileSearch className="h-4 w-4 text-emerald-400" /> Palavras-chave do filtro ATS</span>
-              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Dados 100% seguros</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Garantia de zero alucinação</span>
             </div>
           </div>
 
