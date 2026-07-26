@@ -12,12 +12,11 @@ import {
   SlidersHorizontal,
   RefreshCw,
   Search,
-  ChevronLeft,
-  ChevronRight,
   Layers,
   MapPin,
   TrendingUp,
 } from "lucide-react";
+import { PaginationControls } from "@/components/pagination-controls";
 
 interface RadarItem {
   id: string;
@@ -136,9 +135,9 @@ export function RadarClient() {
   };
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8 font-sans">
+    <main className="px-4 md:px-8 py-6 max-w-5xl mx-auto w-full space-y-5 font-sans">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 dark:border-neutral-800 pb-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <Link
@@ -154,10 +153,10 @@ export function RadarClient() {
             </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white flex items-center gap-2">
             Radar de Oportunidades
           </h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
+          <p className="text-xs text-[#64748B] mt-0.5 max-w-2xl">
             Vagas recentes coletadas e analisadas automaticamente com base no seu perfil de carreira e preferências.
           </p>
         </div>
@@ -175,8 +174,8 @@ export function RadarClient() {
       </div>
 
       {/* KPI Stats Overview */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-neutral-900/60 shadow-sm flex items-center gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950 shadow-sm flex items-center gap-4">
           <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
             <Layers className="w-5 h-5" />
           </div>
@@ -190,7 +189,7 @@ export function RadarClient() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-neutral-900/60 shadow-sm flex items-center gap-4">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950 shadow-sm flex items-center gap-4">
           <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
             <TrendingUp className="w-5 h-5" />
           </div>
@@ -204,7 +203,7 @@ export function RadarClient() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 p-4 bg-white dark:bg-neutral-900/60 shadow-sm flex items-center gap-4">
+        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 p-4 bg-white dark:bg-neutral-950 shadow-sm flex items-center gap-4">
           <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
             <SlidersHorizontal className="w-5 h-5" />
           </div>
@@ -221,7 +220,7 @@ export function RadarClient() {
 
       {/* Roles Banner */}
       {roles.length > 0 && (
-        <div className="p-4 rounded-2xl bg-purple-50/60 dark:bg-purple-950/20 border border-purple-200/80 dark:border-purple-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
           <div className="flex items-center gap-2.5">
             <SlidersHorizontal className="w-4 h-4 text-purple-600 dark:text-purple-400 shrink-0" />
             <span className="text-slate-700 dark:text-slate-300 font-medium">
@@ -241,8 +240,8 @@ export function RadarClient() {
       )}
 
       {/* Toolbar: Search and Filters */}
-      <div id="radar-feed-header" className="scroll-mt-6 space-y-4">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/60 shadow-sm">
+      <div id="radar-feed-header" className="scroll-mt-6 space-y-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
           {/* Search Input */}
           <div className="relative flex-1">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -447,72 +446,13 @@ export function RadarClient() {
         </div>
       )}
 
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-xs text-slate-500 dark:text-slate-400">
-            Página <strong className="text-slate-900 dark:text-white">{safePage}</strong> de{" "}
-            <strong className="text-slate-900 dark:text-white">{totalPages}</strong>
-          </div>
-
-          <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => handlePageChange(safePage - 1)}
-              disabled={safePage <= 1}
-              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center gap-1 cursor-pointer"
-            >
-              <ChevronLeft className="w-4 h-4" />
-              <span>Anterior</span>
-            </button>
-
-            <div className="flex items-center gap-1 px-1">
-              {Array.from({ length: totalPages }, (_, index) => {
-                const pageNumber = index + 1;
-                // Show pages near current page
-                if (
-                  totalPages <= 7 ||
-                  pageNumber === 1 ||
-                  pageNumber === totalPages ||
-                  Math.abs(pageNumber - safePage) <= 1
-                ) {
-                  return (
-                    <button
-                      key={pageNumber}
-                      onClick={() => handlePageChange(pageNumber)}
-                      className={`w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                        safePage === pageNumber
-                          ? "bg-purple-600 text-white shadow-sm"
-                          : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      }`}
-                    >
-                      {pageNumber}
-                    </button>
-                  );
-                } else if (
-                  (pageNumber === 2 && safePage > 3) ||
-                  (pageNumber === totalPages - 1 && safePage < totalPages - 2)
-                ) {
-                  return (
-                    <span key={pageNumber} className="text-xs text-slate-400 px-1">
-                      ...
-                    </span>
-                  );
-                }
-                return null;
-              })}
-            </div>
-
-            <button
-              onClick={() => handlePageChange(safePage + 1)}
-              disabled={safePage >= totalPages}
-              className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-40 disabled:pointer-events-none transition-all flex items-center gap-1 cursor-pointer"
-            >
-              <span>Próxima</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      )}
+      <PaginationControls
+        page={safePage}
+        totalPages={totalPages}
+        totalItems={totalItems}
+        pageSize={pageSize}
+        onPageChange={handlePageChange}
+      />
     </main>
   );
 }

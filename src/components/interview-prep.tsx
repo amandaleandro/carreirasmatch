@@ -1,6 +1,36 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+function repairMojibake(value: string): string {
+  if (!/[ÃÂâð�]/.test(value)) return value;
+  try {
+    return decodeURIComponent(escape(value));
+  } catch {
+    return value;
+  }
+}
+
+function repairInterviewDom(root: HTMLElement) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let node: Node | null;
+  while ((node = walker.nextNode())) {
+    if (node.nodeValue) node.nodeValue = repairMojibake(node.nodeValue);
+  }
+  root.querySelectorAll<HTMLElement>("*").forEach((element) => {
+    ["placeholder", "title", "aria-label"].forEach((attribute) => {
+      const value = element.getAttribute(attribute);
+      if (value) element.setAttribute(attribute, repairMojibake(value));
+    });
+  });
+}
+
+export function InterviewEncodingFix() {
+  useEffect(() => {
+    repairInterviewDom(document.body);
+  }, []);
+  return null;
+}
 
 type QuestionProgress = {
   answer: string;
@@ -370,6 +400,11 @@ export function InterviewPrep({
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const root = document.querySelector<HTMLElement>("[data-interview-prep]");
+    if (root) repairInterviewDom(root);
+  });
+
   const finalized = Object.keys(progress).length > 0;
 
   const draftAnsweredCount = questions.filter((_, i) => (drafts[i] ?? progress[i]?.answer ?? "").trim()).length;
@@ -377,7 +412,7 @@ export function InterviewPrep({
 
   async function finalizeSimulation() {
     if (!allAnswered) {
-      setError("Responda todas as perguntas antes de finalizar a simulaÃ§Ã£o.");
+      setError("Responda todas as perguntas antes de finalizar a simulação.");
       return;
     }
     setError(null);
@@ -469,9 +504,9 @@ export function InterviewPrep({
     }
   }
 
-  // Copiar relatÃ³rio completo para a Ã¡rea de transferÃªncia
+  // Copiar relatório completo para a área de transferência
   function copyReportToClipboard() {
-    let reportText = `RELATÃ“RIO DE SIMULAÃ‡ÃƒO DE ENTREVISTA - ${jobTitle.toUpperCase()}\n`;
+    let reportText = `RELATÓRIO DE SIMULAÇÃO DE ENTREVISTA - ${jobTitle.toUpperCase()}\n`;
     reportText += `Data: ${new Date().toLocaleDateString("pt-BR")}\n`;
     reportText += `Nota Geral: ${overallScore}/100\n`;
     reportText += `===========================================\n\n`;
@@ -480,10 +515,10 @@ export function InterviewPrep({
       const item = progress[i];
       if (!item) return;
       reportText += `PERGUNTA #${i + 1}: ${q}\n`;
-      reportText += `SUA RESPOSTA: ${item.answer || "(nÃ£o respondida)"}\n\n`;
-      reportText += `ANÃLISE DO RECRUTADOR: ${item.feedback}\n`;
+      reportText += `SUA RESPOSTA: ${item.answer || "(não respondida)"}\n\n`;
+      reportText += `ANÁLISE DO RECRUTADOR: ${item.feedback}\n`;
       if (item.actionStep) {
-        reportText += `PLANO DE AÃ‡ÃƒO: ${item.actionStep}\n`;
+        reportText += `PLANO DE AÇÃO: ${item.actionStep}\n`;
       }
       if (item.suggestedAnswer) {
         reportText += `RESPOSTA MODELO (NOTA 10): ${item.suggestedAnswer}\n`;
@@ -491,7 +526,7 @@ export function InterviewPrep({
       reportText += `-------------------------------------------\n\n`;
     });
 
-    navigator.clipboard.writeText(reportText);
+    navigator.clipboard.writeText(repairMojibake(reportText));
     setCopied(true);
     setTimeout(() => setCopied(false), 3000);
   }
@@ -501,7 +536,7 @@ export function InterviewPrep({
     window.print();
   }
 
-  // MÃ©tricas gerais da entrevista
+  // Métricas gerais da entrevista
   const feedbackList = Object.values(progress);
   const avgClarity = feedbackList.length
     ? Math.round(feedbackList.reduce((acc, curr) => acc + (curr.clarity || 0), 0) / feedbackList.length)
@@ -516,17 +551,17 @@ export function InterviewPrep({
 
   if (questions.length === 0) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center">
+      <div data-interview-prep className="max-w-3xl mx-auto px-4 py-16 w-full text-center">
         <h1 className="text-2xl font-bold tracking-tight">Prepare-se para a entrevista</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Sua Ãºltima anÃ¡lise nÃ£o gerou perguntas de entrevista. FaÃ§a uma nova anÃ¡lise para treinar aqui.
+          Sua última análise não gerou perguntas de entrevista. Faça uma nova análise para treinar aqui.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
+    <div data-interview-prep className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
       {/* Header Banner */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 via-indigo-950 to-slate-900 p-6 md:p-8 text-white shadow-xl shadow-indigo-950/10 border border-white/10">
         <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
@@ -538,7 +573,7 @@ export function InterviewPrep({
             Prepare-se para a entrevista
           </h1>
           <p className="text-neutral-300 max-w-2xl text-sm md:text-base leading-relaxed">
-            Treine para a vaga de **{jobTitle}**. Veja a sua resposta e o feedback da IA **lado a lado**, salve seu resultado no histÃ³rico e exporte seu relatÃ³rio em PDF.
+            Treine para a vaga de **{jobTitle}**. Veja a sua resposta e o feedback da IA **lado a lado**, salve seu resultado no histórico e exporte seu relatório em PDF.
           </p>
         </div>
       </div>
@@ -547,7 +582,7 @@ export function InterviewPrep({
       <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md p-5 shadow-sm flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950/50 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg border border-blue-100 dark:border-blue-900/50">
-            ðŸ’¼
+            💼
           </div>
           <div>
             <p className="text-xs uppercase font-semibold text-neutral-400">Vaga selecionada</p>
@@ -563,17 +598,17 @@ export function InterviewPrep({
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </span>
-                Salvo no seu HistÃ³rico
+                Salvo no seu Histórico
               </span>
 
-              {/* BotÃµes de AÃ§Ã£o para Salvar/Exportar */}
+              {/* Botões de Ação para Salvar/Exportar */}
               <button
                 type="button"
                 onClick={copyReportToClipboard}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-neutral-300/80 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-xs font-bold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-all shadow-sm"
               >
                 <CopyIcon className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
-                <span>{copied ? "âœ“ Copiado!" : "Copiar RelatÃ³rio"}</span>
+                <span>{copied ? "✓ Copiado!" : "Copiar Relatório"}</span>
               </button>
 
               <button
@@ -597,7 +632,7 @@ export function InterviewPrep({
         </div>
       </div>
 
-      {/* FORMULÃRIO DE PREENCHIMENTO DAS RESPOSTAS */}
+      {/* FORMULÁRIO DE PREENCHIMENTO DAS RESPOSTAS */}
       {!finalized && (
         <div className="rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 md:p-8 shadow-sm space-y-6">
           <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-4">
@@ -606,7 +641,7 @@ export function InterviewPrep({
                 Perguntas da Entrevista <InfoIcon className="h-4 w-4 text-neutral-400" />
               </h2>
               <p className="text-xs md:text-sm text-neutral-500 mt-1">
-                Responda com o mÃ¡ximo de detalhes possÃ­vel (ferramentas, tarefas executadas e resultados).
+                Responda com o máximo de detalhes possível (ferramentas, tarefas executadas e resultados).
               </p>
             </div>
             <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-950 dark:text-blue-400 border border-blue-200/60 dark:border-blue-900/50">
@@ -680,7 +715,7 @@ export function InterviewPrep({
                           : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 group-hover:bg-neutral-200 dark:group-hover:bg-neutral-700"
                       }`}
                     >
-                      {draftText ? "âœ“" : i + 1}
+                      {draftText ? "✓" : i + 1}
                     </span>
                     <span className="flex-1 text-sm md:text-base font-semibold text-neutral-800 dark:text-neutral-200 leading-snug">
                       {q}
@@ -695,7 +730,7 @@ export function InterviewPrep({
                         onChange={(e) => setDrafts((prev) => ({ ...prev, [i]: e.target.value }))}
                         rows={5}
                         maxLength={1500}
-                        placeholder="Escreva sua resposta detalhada (situaÃ§Ã£o, aÃ§Ã£o e resultados alcanÃ§ados)..."
+                        placeholder="Escreva sua resposta detalhada (situação, ação e resultados alcançados)..."
                         className="w-full rounded-xl border border-neutral-200 dark:border-neutral-700/80 bg-white dark:bg-neutral-900 px-4 py-3 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all leading-relaxed"
                       />
                       <button
@@ -726,8 +761,8 @@ export function InterviewPrep({
                             onClick={() => setExpanded(next)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-xs font-bold text-blue-600 dark:text-blue-400 hover:bg-blue-100 transition-all"
                           >
-                            <span>PrÃ³xima pergunta</span>
-                            <span>â†’</span>
+                            <span>Próxima pergunta</span>
+                            <span>→</span>
                           </button>
                         )}
                       </div>
@@ -743,15 +778,15 @@ export function InterviewPrep({
       {/* FEEDBACK COMPLETO CLARO E DE ALTO CRESCIMENTO */}
       {finalized && (
         <div className="space-y-8 animate-fadeIn">
-          {/* Painel de PontuaÃ§Ã£o Geral */}
+          {/* Painel de Pontuação Geral */}
           <div className="rounded-3xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 md:p-8 shadow-sm space-y-6">
             <div className="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-4 flex-wrap gap-3">
               <div>
                 <h2 className="font-bold text-xl text-neutral-900 dark:text-white flex items-center gap-2">
-                  Desempenho Geral da SimulaÃ§Ã£o <SparklesIcon className="h-5 w-5 text-blue-500" />
+                  Desempenho Geral da Simulação <SparklesIcon className="h-5 w-5 text-blue-500" />
                 </h2>
                 <p className="text-xs md:text-sm text-neutral-500 mt-0.5">
-                  DiagnÃ³stico consolidado das suas competÃªncias para o cargo
+                  Diagnóstico consolidado das suas competências para o cargo
                 </p>
               </div>
 
@@ -765,29 +800,29 @@ export function InterviewPrep({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <ScoreGauge
                 icon={ChatIcon}
-                label="Clareza da ComunicaÃ§Ã£o"
+                label="Clareza da Comunicação"
                 value={avgClarity}
                 gradient="bg-gradient-to-r from-blue-500 to-indigo-600"
               />
               <ScoreGauge
                 icon={BulbIcon}
-                label="DomÃ­nio TÃ©cnico"
+                label="Domínio Técnico"
                 value={avgTech}
                 gradient="bg-gradient-to-r from-emerald-500 to-teal-600"
               />
               <ScoreGauge
                 icon={ShieldIcon}
-                label="ConfianÃ§a e Postura"
+                label="Confiança e Postura"
                 value={avgConfidence}
                 gradient="bg-gradient-to-r from-violet-500 to-purple-600"
               />
             </div>
           </div>
 
-          {/* LISTA DE PERGUNTAS: SUA RESPOSTA LADO A LADO COM O FEEDBACK E PLANO DE AÃ‡ÃƒO DE CRESCIMENTO */}
+          {/* LISTA DE PERGUNTAS: SUA RESPOSTA LADO A LADO COM O FEEDBACK E PLANO DE AÇÃO DE CRESCIMENTO */}
           <div className="space-y-8">
             <h2 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-              AnÃ¡lise Detalhada & Plano de Crescimento por Pergunta
+              Análise Detalhada & Plano de Crescimento por Pergunta
             </h2>
 
             {questions.map((questionText, i) => {
@@ -802,7 +837,7 @@ export function InterviewPrep({
                   key={i}
                   className="rounded-3xl border border-neutral-200/90 dark:border-neutral-800 bg-white dark:bg-neutral-950 overflow-hidden shadow-sm hover:shadow-md transition-shadow space-y-0"
                 >
-                  {/* CabeÃ§alho da Pergunta com Veredito */}
+                  {/* Cabeçalho da Pergunta com Veredito */}
                   <div className="p-5 md:p-6 bg-gradient-to-r from-neutral-50 via-blue-50/20 to-neutral-50 dark:from-neutral-900 dark:via-blue-950/20 dark:to-neutral-900 border-b border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between flex-wrap gap-4">
                     <div className="flex items-start gap-3.5">
                       <span className="h-8 w-8 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center text-sm shrink-0 shadow-sm shadow-blue-500/20">
@@ -822,21 +857,21 @@ export function InterviewPrep({
                     <div>
                       {isExcellent ? (
                         <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/50">
-                          ðŸŸ¢ Resposta Excelente
+                          🟢 Resposta Excelente
                         </span>
                       ) : isGood ? (
                         <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200/60 dark:border-amber-900/50">
-                          ðŸŸ¡ Boa Resposta (Ajustes Recomendados)
+                          🟡 Boa Resposta (Ajustes Recomendados)
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300 border border-red-200/60 dark:border-red-900/50">
-                          ðŸ”´ Precisa de ReforÃ§o TÃ©cnico
+                          🔴 Precisa de Reforço Técnico
                         </span>
                       )}
                     </div>
                   </div>
 
-                  {/* GRID LADO A LADO: SUA RESPOSTA (ESQUERDA) VS. AVALIAÃ‡ÃƒO DA IA (DIREITA) */}
+                  {/* GRID LADO A LADO: SUA RESPOSTA (ESQUERDA) VS. AVALIAÇÃO DA IA (DIREITA) */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-neutral-200/80 dark:divide-neutral-800">
                     {/* COLUNA ESQUERDA: SUA RESPOSTA DIGITADA */}
                     <div className="lg:col-span-5 p-5 md:p-6 space-y-4 bg-neutral-50/50 dark:bg-neutral-900/30">
@@ -862,13 +897,13 @@ export function InterviewPrep({
                         />
                         <ScoreGauge
                           icon={BulbIcon}
-                          label="DomÃ­nio TÃ©cnico"
+                          label="Domínio Técnico"
                           value={item.technicalDepth}
                           gradient="bg-gradient-to-r from-emerald-500 to-teal-600"
                         />
                         <ScoreGauge
                           icon={ShieldIcon}
-                          label="ConfianÃ§a"
+                          label="Confiança"
                           value={item.confidence}
                           gradient="bg-gradient-to-r from-violet-500 to-purple-600"
                         />
@@ -877,7 +912,7 @@ export function InterviewPrep({
 
                     {/* COLUNA DIREITA: FEEDBACK DE CRESCIMENTO DA IA */}
                     <div className="lg:col-span-7 p-5 md:p-6 space-y-5">
-                      {/* TÃ­tulo do Veredito & DiagnÃ³stico do Recrutador */}
+                      {/* Título do Veredito & Diagnóstico do Recrutador */}
                       <div className="p-4.5 rounded-2xl bg-gradient-to-br from-blue-50/80 via-indigo-50/40 to-white dark:from-blue-950/40 dark:via-indigo-950/20 dark:to-neutral-900 border border-blue-100 dark:border-blue-900/50 space-y-2">
                         {item.verdictTitle && (
                           <h4 className="font-bold text-sm text-blue-950 dark:text-blue-200">
@@ -889,12 +924,12 @@ export function InterviewPrep({
                         </p>
                       </div>
 
-                      {/* AÃ‡ÃƒO PRÃTICA DE CRESCIMENTO (DICA DE OURO PARA O CLIENTE) */}
+                      {/* AÇÃO PRÁTICA DE CRESCIMENTO (DICA DE OURO PARA O CLIENTE) */}
                       {item.actionStep && (
                         <div className="p-4 rounded-2xl bg-gradient-to-br from-indigo-900 to-slate-900 text-white shadow-sm space-y-2 border border-indigo-500/20">
                           <p className="text-xs font-bold uppercase tracking-wider text-indigo-300 flex items-center gap-2">
                             <RocketIcon className="h-4 w-4 text-indigo-400 shrink-0" />
-                            AÃ§Ã£o PrÃ¡tica de Crescimento (Dica de Ouro)
+                            Ação Prática de Crescimento (Dica de Ouro)
                           </p>
                           <p className="text-xs md:text-sm leading-relaxed text-indigo-100 font-medium">
                             {item.actionStep}
@@ -902,11 +937,11 @@ export function InterviewPrep({
                         </div>
                       )}
 
-                      {/* PALAVRAS-CHAVE E TERMOS TÃ‰CNICOS RECOMENDADOS */}
+                      {/* PALAVRAS-CHAVE E TERMOS TÉCNICOS RECOMENDADOS */}
                       {item.keywordsToUse && item.keywordsToUse.length > 0 && (
                         <div className="space-y-2">
                           <p className="text-xs font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
-                            <BulbIcon className="h-3.5 w-3.5 text-blue-500" /> Termos TÃ©cnicos que valorizam esta resposta:
+                            <BulbIcon className="h-3.5 w-3.5 text-blue-500" /> Termos Técnicos que valorizam esta resposta:
                           </p>
                           <div className="flex flex-wrap gap-1.5">
                             {item.keywordsToUse.map((kw, idx) => (
@@ -973,15 +1008,15 @@ export function InterviewPrep({
                       {item.starBreakdown && (
                         <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 space-y-3">
                           <p className="font-bold text-xs uppercase tracking-wider text-neutral-700 dark:text-neutral-300 flex items-center gap-2">
-                            Roteiro Sugerido (MÃ©todo STAR)
+                            Roteiro Sugerido (Método STAR)
                           </p>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs">
                             <div className="p-2.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border-l-3 border-blue-600 space-y-0.5">
-                              <p className="font-bold text-[10px] text-blue-700 dark:text-blue-300 uppercase">1. SituaÃ§Ã£o</p>
+                              <p className="font-bold text-[10px] text-blue-700 dark:text-blue-300 uppercase">1. Situação</p>
                               <p className="text-neutral-600 dark:text-neutral-300 text-[11px]">{item.starBreakdown.situation}</p>
                             </div>
                             <div className="p-2.5 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border-l-3 border-emerald-600 space-y-0.5">
-                              <p className="font-bold text-[10px] text-emerald-700 dark:text-emerald-300 uppercase">2. AÃ§Ã£o</p>
+                              <p className="font-bold text-[10px] text-emerald-700 dark:text-emerald-300 uppercase">2. Ação</p>
                               <p className="text-neutral-600 dark:text-neutral-300 text-[11px]">{item.starBreakdown.action}</p>
                             </div>
                             <div className="p-2.5 rounded-xl bg-purple-50/60 dark:bg-purple-950/20 border-l-3 border-purple-600 space-y-0.5">
@@ -1007,10 +1042,10 @@ export function InterviewPrep({
         <p className="text-xs font-semibold text-neutral-500 flex items-center gap-1.5">
           {finalized ? (
             <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-bold">
-              âœ“ Resultado salvo no seu perfil!
+              ✓ Resultado salvo no seu perfil!
             </span>
           ) : (
-            <span>Preencha todas as perguntas acima para gerar o diagnÃ³stico completo.</span>
+            <span>Preencha todas as perguntas acima para gerar o diagnóstico completo.</span>
           )}
         </p>
 
@@ -1023,7 +1058,7 @@ export function InterviewPrep({
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-neutral-300/80 dark:border-neutral-700 bg-white dark:bg-neutral-900 font-bold text-xs md:text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all shadow-sm"
               >
                 <CopyIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                <span>{copied ? "âœ“ RelatÃ³rio Copiado!" : "Copiar RelatÃ³rio"}</span>
+                <span>{copied ? "✓ Relatório Copiado!" : "Copiar Relatório"}</span>
               </button>
 
               <button
@@ -1055,7 +1090,7 @@ export function InterviewPrep({
               className="relative overflow-hidden group rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white font-bold text-xs md:text-sm px-6 py-2.5 shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none flex items-center gap-2"
             >
               <SparklesIcon className="h-4 w-4" />
-              <span>{finalizing ? "Avaliando..." : "Finalizar simulaÃ§Ã£o e ver feedback"}</span>
+              <span>{finalizing ? "Avaliando..." : "Finalizar simulação e ver feedback"}</span>
             </button>
           )}
         </div>

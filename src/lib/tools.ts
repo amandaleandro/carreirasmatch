@@ -606,10 +606,10 @@ export async function generateInterviewAnswerDraft(
   const mode = input.mode ?? "curta";
   const modeInstructions =
     mode === "star"
-      ? "Estruture a resposta no modelo STAR, deixando situa��o, a��o e resultado bem claros, sem soar engessado."
+      ? "Estruture a resposta no modelo STAR, deixando situação, ação e resultado bem claros, sem soar engessado."
       : mode === "tecnica"
-        ? "D� mais peso ao vocabul�rio t�cnico da �rea, aos conceitos usados e aos trade-offs, sem exagerar a experi�ncia."
-        : "Prefira respostas curtas a m�dias, claras e naturais, como algu�m falaria numa entrevista real quando o tempo � curto.";
+      ? "Dê mais peso ao vocabulário técnico da área, aos conceitos usados e aos trade-offs, sem exagerar a experiência."
+        : "Prefira respostas curtas a médias, claras e naturais, como alguém falaria numa entrevista real quando o tempo é curto.";
 
   const systemPrompt = `${INTERVIEWER_ROLE}
 ${BASE_RULES}

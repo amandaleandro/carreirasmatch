@@ -5,7 +5,7 @@ import { VOCATION_AREAS } from "@/lib/vocation-areas";
 import { Filter, Search, Check } from "lucide-react";
 
 export const CAREER_STAGES = [
-  { id: "profissional", label: "Profissional & TransiÃ§Ã£o", description: "DecisÃµes, ferramentas e desafios da carreira" },
+  { id: "profissional", label: "Profissional & Transição", description: "Decisões, ferramentas e desafios da carreira" },
   { id: "todos", label: "Todos os Jogos", description: "Ver catálogo completo" },
   { id: "ensino-medio", label: "Ensino Médio & ENEM", description: "Matérias escolares, orientação e vestibulares" },
   { id: "primeiro-emprego", label: "Primeiro Emprego & Estágio", description: "Currículo, entrevista e etiqueta corporativa" },

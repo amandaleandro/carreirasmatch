@@ -59,14 +59,17 @@ export async function getOrCreateFeedMatches(userId: string, resumeId: string, r
     return prisma.jobMatch.findMany({
       where: { resume: { userId }, status: { not: "discarded" } },
       orderBy: { createdAt: "desc" },
+      take: 200,
       include: { job: true },
     });
   }
 
-  let matches = await findMatches();
+  const matches = await findMatches();
   if (matches.length === 0) {
-    await scoreUnscoredJobs(resumeId, resumeText);
-    matches = await findMatches();
+    // A análise de IA não deve bloquear a abertura do Feed.
+    void scoreUnscoredJobs(resumeId, resumeText).catch((error) => {
+      console.error("Falha ao pontuar vagas no feed:", error);
+    });
   } else {
     scoreUnscoredJobs(resumeId, resumeText).catch((error) => {
       console.error("Falha ao pontuar vagas no feed:", error);

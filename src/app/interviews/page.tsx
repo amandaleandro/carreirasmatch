@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { InterviewPrep } from "@/components/interview-prep";
+import { InterviewEncodingFix, InterviewPrep } from "@/components/interview-prep";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +15,9 @@ export default async function InterviewsPage() {
 
   if (!latest) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center">
+      <>
+        <InterviewEncodingFix />
+        <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center">
         <h1 className="text-2xl font-bold tracking-tight">Prepare-se para a entrevista</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
           Faça sua primeira análise de vaga para treinar com perguntas
@@ -27,7 +29,8 @@ export default async function InterviewsPage() {
         >
           Fazer minha primeira análise
         </Link>
-      </div>
+        </div>
+      </>
     );
   }
 
