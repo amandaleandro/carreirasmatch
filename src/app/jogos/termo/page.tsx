@@ -1,11 +1,14 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Type, Trophy, RotateCcw, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 // Palavras de 5 letras, sem acento (o teclado do jogo é A-Z). Por área.
 const WORDS: Record<string, string[]> = {
@@ -45,7 +48,9 @@ function evaluate(guess: string, target: string): LetterState[] {
 const KEYS = ["QWERTYUIOP", "ASDFGHJKLÇ", "ZXCVBNM"];
 
 export default function TermoPage() {
-  const [area, setArea] = useState("tecnologia");
+  const searchParams = useSearchParams();
+  const [area] = useState(() => gameAreaFromSlug(searchParams.get("area")));
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [target, setTarget] = useState("");
   const [guesses, setGuesses] = useState<string[]>([]);
   const [current, setCurrent] = useState("");
@@ -54,14 +59,15 @@ export default function TermoPage() {
   const [msg, setMsg] = useState("");
 
   const newGame = useCallback((a: string) => {
-    const list = WORDS[a] ?? WORDS.tecnologia;
+    const fullList = WORDS[a] ?? WORDS.tecnologia;
+    const list = fullList.slice(0, phase === 1 ? 5 : phase === 2 ? 8 : fullList.length);
     setTarget(list[Math.floor(Math.random() * list.length)]);
     setGuesses([]);
     setCurrent("");
     setFinished(false);
     setWon(false);
     setMsg("");
-  }, []);
+  }, [phase]);
 
   useEffect(() => {
     queueMicrotask(() => newGame(area));
@@ -165,17 +171,9 @@ export default function TermoPage() {
           </div>
         </header>
 
-        <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
-          {Object.keys(WORDS).map((k) => (
-            <button
-              key={k}
-              onClick={() => setArea(k)}
-              className={`rounded-xl px-4 py-2 text-xs font-bold transition-all uppercase tracking-wider ${area === k ? "bg-emerald-500 text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}
-            >
-              {k}
-            </button>
-          ))}
-        </section>
+        <div className="mx-auto inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-300">
+          Trilha personalizada · {area} · Fase {phase}
+        </div>
 
         {/* Grade */}
         <div className="grid grid-rows-6 gap-1.5 justify-center">

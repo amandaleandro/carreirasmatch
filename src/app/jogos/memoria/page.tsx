@@ -8,6 +8,7 @@ import { Trophy, RotateCcw, ArrowLeft, Timer, Brain, Code2, BriefcaseBusiness, M
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 type Card = {
   id: number;
@@ -70,6 +71,7 @@ const AREA_VISUALS: Record<string, { icon: LucideIcon; label: string; color: str
 export default function MemoryGamePage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState<string>(() => gameAreaFromSlug(searchParams.get("area")));
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [cards, setCards] = useState<Card[]>([]);
   const [flippedCards, setFlippedCards] = useState<number[]>([]);
   const [seconds, setSeconds] = useState<number>(0);
@@ -84,7 +86,8 @@ export default function MemoryGamePage() {
   const AreaIcon = areaVisual.icon;
 
   function startNewGame(newArea = area) {
-    const rawPairs = TERMS[newArea] ?? TERMS.tecnologia;
+    const allPairs = TERMS[newArea] ?? TERMS.tecnologia;
+    const rawPairs = allPairs.slice(0, phase === 1 ? 4 : phase === 2 ? 6 : allPairs.length);
     const initialCards: Card[] = [];
 
     rawPairs.forEach((pair, idx) => {
@@ -250,7 +253,7 @@ export default function MemoryGamePage() {
 
         {/* Seleção de Área */}
         {!timerActive && !finished && !memorizing && (
-          <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800 animate-in fade-in duration-200">
+          <section className="hidden">
             {Object.keys(TERMS).map((k) => (
               <button
                 key={k}

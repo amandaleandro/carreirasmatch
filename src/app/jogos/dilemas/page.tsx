@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 type Effect = {
   reputation?: number;
@@ -216,6 +217,7 @@ const GENERIC_SCENARIOS: Scenario[] = [
 export default function DilemasGamePage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState<string>(() => searchParams.get("area") ?? "ti");
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [weeks, setWeeks] = useState<number>(1);
 
   // Indicators (0 - 100)
@@ -229,7 +231,8 @@ export default function DilemasGamePage() {
   const [gameOverReason, setGameOverReason] = useState<string>("");
 
   // Get active deck
-  const activeDeck = DILEMMAS_BY_AREA[area] ?? GENERIC_SCENARIOS;
+  const fullDeck = DILEMMAS_BY_AREA[area] ?? GENERIC_SCENARIOS;
+  const activeDeck = fullDeck.slice(0, phase === 1 ? 1 : phase === 2 ? 2 : fullDeck.length);
   const currentScenario = activeDeck[currentScenarioIdx % activeDeck.length];
 
   function restartGame(newArea?: string) {

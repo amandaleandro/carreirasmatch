@@ -8,6 +8,7 @@ import { Keyboard, RotateCcw, AlertTriangle, Flame, ArrowLeft } from "lucide-rea
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 const SNIPPETS: Record<string, { label: string; text: string }[]> = {
   tecnologia: [
@@ -55,7 +56,8 @@ const SNIPPETS: Record<string, { label: string; text: string }[]> = {
 export default function SpeedTyperPage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState<string>(() => gameAreaFromSlug(searchParams.get("area")));
-  const [snippetIndex, setSnippetIndex] = useState<number>(0);
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
+  const [snippetIndex, setSnippetIndex] = useState<number>(() => phase - 1);
   const [inputVal, setInputVal] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpm, setWpm] = useState<number>(0);
@@ -76,7 +78,7 @@ export default function SpeedTyperPage() {
     setWpm(0);
     setAccuracy(100);
     setFinished(false);
-    setSeconds(60);
+    setSeconds(phase === 1 ? 75 : phase === 2 ? 60 : 45);
     setTimerActive(false);
   }
 
@@ -171,7 +173,7 @@ export default function SpeedTyperPage() {
         </header>
 
         {/* Escolha da área */}
-        <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
+        <section className="hidden">
           {Object.keys(SNIPPETS).map((k) => (
             <button
               key={k}

@@ -8,6 +8,7 @@ import { Sparkles, Trophy, RotateCcw, ArrowLeft, CheckCircle, XCircle } from "lu
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 type Question = {
   q: string;
@@ -122,13 +123,14 @@ const QUIZZES: Record<string, Question[]> = {
 export default function QuizPage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState<string>(() => gameAreaFromSlug(searchParams.get("area")));
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
   const [answered, setAnswered] = useState<boolean>(false);
   const [finished, setFinished] = useState<boolean>(false);
 
-  const questions = QUIZZES[area] ?? [];
+  const questions = (QUIZZES[area] ?? []).slice(0, phase === 1 ? 1 : phase === 2 ? 2 : undefined);
   const currentQuestion = questions[currentIdx];
 
   async function saveScore(calculatedScore: number) {
@@ -195,7 +197,7 @@ export default function QuizPage() {
 
         {/* Escolha da área */}
         {!answered && currentIdx === 0 && !finished && (
-          <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
+          <section className="hidden">
             {Object.keys(QUIZZES).map((k) => (
               <button
                 key={k}

@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FileText, Trophy, RotateCcw, ArrowLeft, ChevronUp, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 // Cada perfil tem as seções na ORDEM IDEAL. O jogo embaralha e o jogador reordena.
 const PROFILES: Record<string, { title: string; steps: string[] }[]> = {
@@ -53,7 +55,9 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function CurriculoPage() {
+  const searchParams = useSearchParams();
   const [area, setArea] = useState("recem-formado");
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [pool, setPool] = useState<{ title: string; steps: string[] }[]>([]);
   const [idx, setIdx] = useState(0);
   const [order, setOrder] = useState<string[]>([]);
@@ -63,14 +67,15 @@ export default function CurriculoPage() {
 
   const startRound = useCallback((a: string) => {
     const source = PROFILES[a] ?? PROFILES["recem-formado"];
-    const list = shuffle(source).slice(0, Math.min(ROUND, source.length));
+    const roundSize = phase === 1 ? 1 : phase === 2 ? 2 : ROUND;
+    const list = shuffle(source).slice(0, Math.min(roundSize, source.length));
     setPool(list);
     setIdx(0);
     setOrder(list[0] ? shuffle(list[0].steps) : []);
     setChecked(false);
     setTotal(0);
     setFinished(false);
-  }, []);
+  }, [phase]);
 
   useEffect(() => {
     queueMicrotask(() => startRound(area));
@@ -135,7 +140,7 @@ export default function CurriculoPage() {
           </div>
         </header>
 
-        <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
+        <section className="hidden">
           {Object.keys(PROFILES).map((k) => (
             <button key={k} onClick={() => setArea(k)} className={`rounded-xl px-4 py-2 text-xs font-bold transition-all uppercase tracking-wider ${area === k ? "bg-cyan-500 text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}>
               {k.replace("-", " ")}

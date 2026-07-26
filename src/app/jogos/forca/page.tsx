@@ -8,6 +8,7 @@ import { Skull, Trophy, RotateCcw, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 // Termos (sem acento) + dica, por área. Espaços são revelados automaticamente.
 const TERMS: Record<string, { word: string; hint: string }[]> = {
@@ -42,6 +43,7 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZÇ";
 export default function ForcaPage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState(() => gameAreaFromSlug(searchParams.get("area")));
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [pool, setPool] = useState<{ word: string; hint: string }[]>([]);
   const [idx, setIdx] = useState(0);
   const [guessed, setGuessed] = useState<Set<string>>(new Set());
@@ -50,14 +52,15 @@ export default function ForcaPage() {
   const [finished, setFinished] = useState(false);
 
   const startRound = useCallback((a: string) => {
-    const list = [...(TERMS[a] ?? TERMS.tecnologia)].sort(() => Math.random() - 0.5).slice(0, ROUND);
+    const roundSize = phase === 1 ? 3 : phase === 2 ? 4 : ROUND;
+    const list = [...(TERMS[a] ?? TERMS.tecnologia)].sort(() => Math.random() - 0.5).slice(0, roundSize);
     setPool(list);
     setIdx(0);
     setGuessed(new Set());
     setWrong(0);
     setTotal(0);
     setFinished(false);
-  }, []);
+  }, [phase]);
 
   useEffect(() => {
     queueMicrotask(() => startRound(area));
@@ -119,7 +122,7 @@ export default function ForcaPage() {
           </div>
         </header>
 
-        <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
+        <section className="hidden">
           {Object.keys(TERMS).map((k) => (
             <button key={k} onClick={() => setArea(k)} className={`rounded-xl px-4 py-2 text-xs font-bold transition-all uppercase tracking-wider ${area === k ? "bg-rose-500 text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}>
               {k}

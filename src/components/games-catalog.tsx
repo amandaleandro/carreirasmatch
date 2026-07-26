@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GameCategorySelector } from "@/components/game-category-selector";
 import { DailyQuestsCard } from "@/components/daily-quests-card";
 import { VOCATION_AREAS } from "@/lib/vocation-areas";
+import { GAME_PHASES } from "@/lib/game-progression";
 import {
   Keyboard,
   Sparkles,
@@ -206,6 +206,7 @@ export function GamesCatalog({
     ? "profissional"
     : "todos";
   const [selectedCategory, setSelectedCategory] = useState<string>(profile.areaSlug ?? profileStage);
+  const [selectedPhase, setSelectedPhase] = useState<number>(1);
   const completedToday = DAILY_ROUTE.filter((step) => playedToday.includes(step.game)).length;
   const nextStep = DAILY_ROUTE.find((step) => !playedToday.includes(step.game)) ?? DAILY_ROUTE[0];
   const nextHref = profile.areaSlug ? `${nextStep.href}?area=${profile.areaSlug}` : nextStep.href;
@@ -276,14 +277,29 @@ export function GamesCatalog({
           <p className="mt-3 text-[11px] text-neutral-500 dark:text-neutral-400">Você já jogou {recentGames.length} tipo(s) de jogo. Continue sua evolução hoje.</p>
         )}
       </section>
+      <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Progressão da trilha</p>
+            <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Escolha o nível dos desafios para sua área.</p>
+          </div>
+          <div className="flex gap-2">
+            {GAME_PHASES.map((phase) => (
+              <button
+                key={phase.id}
+                type="button"
+                onClick={() => setSelectedPhase(phase.id)}
+                className={`rounded-xl px-3 py-2 text-[11px] font-bold transition ${selectedPhase === phase.id ? "bg-indigo-600 text-white shadow-sm" : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-300"}`}
+              >
+                Fase {phase.id} · {phase.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
       <DailyQuestsCard />
 
       {/* Seletor de Categorias & Áreas */}
-      <GameCategorySelector
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-      />
-
       {/* Banner de Área Selecionada */}
       {activeArea && (
         <div className="rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -311,11 +327,10 @@ export function GamesCatalog({
       <div className="grid gap-4 md:grid-cols-3">
         {filteredGames.map((game) => {
           const Icon = game.icon;
-          const gameHref = activeArea
-            ? `${game.href}?area=${activeArea.slug}`
-            : selectedCategory !== "todos"
-            ? `${game.href}?categoria=${selectedCategory}`
-            : game.href;
+          const params = new URLSearchParams({ fase: String(selectedPhase) });
+          if (activeArea) params.set("area", activeArea.slug);
+          else if (selectedCategory !== "todos") params.set("categoria", selectedCategory);
+          const gameHref = `${game.href}?${params.toString()}`;
 
           return (
             <div

@@ -8,6 +8,7 @@ import { Search, Trophy, RotateCcw, ArrowLeft, Timer } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 const WORDS: Record<string, string[]> = {
   tecnologia: ["REACT", "PYTHON", "DOCKER", "GITHUB", "SERVIDOR", "DEBUG", "NUVEM", "CODIGO"],
@@ -97,6 +98,7 @@ function cellsToLine(a: Cell, b: Cell): Cell[] | null {
 export default function CacaPalavrasPage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState(() => gameAreaFromSlug(searchParams.get("area")));
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [grid, setGrid] = useState<string[][]>([]);
@@ -144,7 +146,8 @@ export default function CacaPalavrasPage() {
   );
 
   function start() {
-    const wordList = WORDS[area] ?? WORDS.tecnologia;
+    const fullWordList = WORDS[area] ?? WORDS.tecnologia;
+    const wordList = fullWordList.slice(0, phase === 1 ? 4 : phase === 2 ? 6 : fullWordList.length);
     const { grid: g, placements: p } = buildGrid(wordList);
     setGrid(g);
     setPlacements(p);
@@ -216,7 +219,7 @@ export default function CacaPalavrasPage() {
 
         {!started && !finished && (
           <div className="space-y-6">
-            <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
+            <section className="hidden">
               {Object.keys(WORDS).map((k) => (
                 <button key={k} onClick={() => setArea(k)} className={`rounded-xl px-4 py-2 text-xs font-bold transition-all uppercase tracking-wider ${area === k ? "bg-orange-500 text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}>
                   {k}

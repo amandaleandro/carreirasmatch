@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Scale, Trophy, RotateCcw, ArrowLeft, Check, X, Timer } from "lucide-react";
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 type Fact = { s: string; t: boolean; e: string };
 
@@ -36,7 +38,9 @@ const FACTS: Record<string, Fact[]> = {
 const ROUND_SECONDS = 45;
 
 export default function VfPage() {
+  const searchParams = useSearchParams();
   const [area, setArea] = useState("carreira");
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [fact, setFact] = useState<Fact | null>(null);
@@ -44,7 +48,7 @@ export default function VfPage() {
   const [combo, setCombo] = useState(0);
   const [best, setBest] = useState(0);
   const [feedback, setFeedback] = useState<null | { ok: boolean; e: string }>(null);
-  const [timeLeft, setTimeLeft] = useState(ROUND_SECONDS);
+  const [timeLeft, setTimeLeft] = useState(() => phase === 1 ? 30 : phase === 2 ? ROUND_SECONDS : 60);
   const scoreRef = useRef(0);
 
   const pick = useCallback(
@@ -80,7 +84,7 @@ export default function VfPage() {
     setCombo(0);
     setBest(0);
     setFeedback(null);
-    setTimeLeft(ROUND_SECONDS);
+    setTimeLeft(phase === 1 ? 30 : phase === 2 ? ROUND_SECONDS : 60);
     setFinished(false);
     setStarted(true);
     pick(area);
@@ -134,7 +138,7 @@ export default function VfPage() {
 
         {!started && !finished && (
           <div className="space-y-6">
-            <section className="flex flex-wrap gap-2 justify-center bg-neutral-200/40 dark:bg-neutral-900/40 p-1.5 rounded-2xl w-fit mx-auto border border-neutral-200 dark:border-neutral-800">
+            <section className="hidden">
               {Object.keys(FACTS).map((k) => (
                 <button key={k} onClick={() => setArea(k)} className={`rounded-xl px-4 py-2 text-xs font-bold transition-all uppercase tracking-wider ${area === k ? "bg-indigo-500 text-white shadow-sm" : "text-neutral-500 hover:text-neutral-900 dark:hover:text-white"}`}>
                   {k}
