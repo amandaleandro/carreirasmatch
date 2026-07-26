@@ -5,6 +5,7 @@ import { Trophy, Flame, Calendar, CalendarDays } from "lucide-react";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { GamesCatalog } from "@/components/games-catalog";
+import { GamesProgressPanel } from "@/components/games-progress-panel";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 
@@ -61,7 +62,7 @@ export default async function GamesHubPage({
         where: { userId: session.user.id },
         orderBy: { createdAt: "desc" },
         take: 30,
-        select: { game: true, createdAt: true },
+        select: { game: true, area: true, score: true, createdAt: true },
       })
     : [];
   const playedToday = Array.from(
@@ -73,6 +74,7 @@ export default async function GamesHubPage({
     const isGlobal = selectedGame === "global";
     const whereCondition = {
       createdAt: { gte: since },
+      ...(profileAreaSlug ? { area: profileAreaSlug } : {}),
       ...(isGlobal ? {} : { game: selectedGame }),
     };
 
@@ -145,6 +147,8 @@ export default async function GamesHubPage({
         </header>
 
         {/* Catálogo de Jogos Segmentado por Trilha & Área */}
+        <GamesProgressPanel scores={recentGameScores} area={profileAreaText ?? null} />
+
         <GamesCatalog
           profile={{
             name: profile?.name ?? null,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -129,8 +129,28 @@ export default function QuizPage() {
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
   const [answered, setAnswered] = useState<boolean>(false);
   const [finished, setFinished] = useState<boolean>(false);
+  const [personalizedQuestions, setPersonalizedQuestions] = useState<Question[] | null>(null);
+  const [profileContext, setProfileContext] = useState<string | null>(null);
 
-  const questions = (QUIZZES[area] ?? []).slice(0, phase === 1 ? 1 : phase === 2 ? 2 : undefined);
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/jogos/personalizados?game=quiz&fase=${phase}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data: { questions?: Question[]; context?: string } | null) => {
+        if (!active || !data?.questions?.length) return;
+        setPersonalizedQuestions(data.questions);
+        setProfileContext(data.context ?? null);
+        setCurrentIdx(0);
+        setScore(0);
+        setSelectedOpt(null);
+        setAnswered(false);
+        setFinished(false);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [phase]);
+
+  const questions = personalizedQuestions ?? (QUIZZES[area] ?? []).slice(0, phase === 1 ? 1 : phase === 2 ? 2 : undefined);
   const currentQuestion = questions[currentIdx];
 
   async function saveScore(calculatedScore: number) {
@@ -181,6 +201,11 @@ export default function QuizPage() {
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50">
       <PublicSiteHeader />
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-8 space-y-6">
+        {profileContext && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-center text-xs text-amber-900 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-200">
+            Quiz personalizado: {profileContext}
+          </div>
+        )}
         <header className="flex items-center justify-between">
           <Link
             href="/jogos"

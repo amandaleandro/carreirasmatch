@@ -82,11 +82,13 @@ export default function MemoryGamePage() {
   const [errors, setErrors] = useState<number>(0);
   const [score, setScore] = useState<number>(0);
   const [submitting, setSubmitting] = useState<boolean>(false);
+  const [personalizedPairs, setPersonalizedPairs] = useState<{ term: string; definition: string }[] | null>(null);
+  const [profileContext, setProfileContext] = useState<string | null>(null);
   const areaVisual = AREA_VISUALS[area] ?? AREA_VISUALS.tecnologia;
   const AreaIcon = areaVisual.icon;
 
-  function startNewGame(newArea = area) {
-    const allPairs = TERMS[newArea] ?? TERMS.tecnologia;
+  function startNewGame(newArea = area, pairsOverride = personalizedPairs) {
+    const allPairs = pairsOverride ?? TERMS[newArea] ?? TERMS.tecnologia;
     const rawPairs = allPairs.slice(0, phase === 1 ? 4 : phase === 2 ? 6 : allPairs.length);
     const initialCards: Card[] = [];
 
@@ -128,6 +130,22 @@ export default function MemoryGamePage() {
     queueMicrotask(() => startNewGame());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/jogos/personalizados?game=memory&fase=${phase}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data: { pairs?: { term: string; definition: string }[]; context?: string } | null) => {
+        if (!active || !data?.pairs?.length) return;
+        setPersonalizedPairs(data.pairs);
+        setProfileContext(data.context ?? null);
+        startNewGame(area, data.pairs);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+    // The personalized pack is intentionally fetched once per phase.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   useEffect(() => {
     if (!memorizing) return;
@@ -237,6 +255,11 @@ export default function MemoryGamePage() {
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50">
       <PublicSiteHeader />
       <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        {profileContext && (
+          <div className="rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 text-center text-xs text-violet-900 dark:border-violet-900/50 dark:bg-violet-950/30 dark:text-violet-200">
+            Memória personalizada: {profileContext}
+          </div>
+        )}
         <header className="flex items-center justify-between">
           <Link
             href="/jogos"

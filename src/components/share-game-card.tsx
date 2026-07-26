@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { Download, Share2, Check } from "lucide-react";
+import Link from "next/link";
 
 interface ShareGameCardProps {
   gameLabel: string;
@@ -236,6 +237,17 @@ export function ShareGameCard({ gameLabel, score, scoreSuffix = "pts", accentCol
             </>
           )}
         </button>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+        <Link href="/jogos" className="rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-center text-[11px] font-bold text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-300">
+          Continuar trilha
+        </Link>
+        <Link href="/vagas-de-hoje" className="rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-[11px] font-bold text-emerald-700 transition-colors hover:bg-emerald-100 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-300">
+          Ver oportunidades
+        </Link>
+        <Link href="/cursos-gratuitos" className="rounded-xl border border-violet-200 bg-violet-50 px-3 py-2 text-center text-[11px] font-bold text-violet-700 transition-colors hover:bg-violet-100 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-300">
+          Treinar mais
+        </Link>
       </div>
     </div>
   );

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
+import { CareerGameContext } from "@/components/career-game-context";
 import { SiteFooter } from "@/components/site-footer";
 import {
   Sparkles,
@@ -289,6 +290,9 @@ export default function DilemasGamePage() {
   return (
     <div className="min-h-screen flex flex-col bg-neutral-950 text-white font-sans">
       <PublicSiteHeader />
+      <div className="mx-auto w-full max-w-lg px-4 pt-4">
+        <CareerGameContext game="dilemas" />
+      </div>
 
       <main className="flex-1 max-w-3xl w-full mx-auto px-4 py-8 space-y-6">
         {/* Header Superior */}

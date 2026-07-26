@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
+import { CareerGameContext } from "@/components/career-game-context";
 import { SiteFooter } from "@/components/site-footer";
 import { Search, Trophy, RotateCcw, ArrowLeft, Timer } from "lucide-react";
 import Link from "next/link";
@@ -205,6 +206,9 @@ export default function CacaPalavrasPage() {
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50">
       <PublicSiteHeader />
+      <div className="mx-auto w-full max-w-lg px-4 pt-4">
+        <CareerGameContext game="cacapalavras" />
+      </div>
       <main className="flex-1 max-w-2xl w-full mx-auto px-4 py-8 space-y-6">
         <header className="flex items-center justify-between">
           <Link href="/jogos" className="inline-flex items-center gap-1.5 text-sm font-semibold text-neutral-500 hover:text-neutral-900 dark:hover:text-white">
