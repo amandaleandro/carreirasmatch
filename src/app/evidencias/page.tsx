@@ -65,7 +65,7 @@ export default function EvidenciasPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 font-sans">
+    <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-10 py-8 space-y-8 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div className="space-y-1">
           <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white mb-2">

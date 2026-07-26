@@ -170,6 +170,13 @@ export function RadarClient() {
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
             <span>Atualizar Feed</span>
           </button>
+          <Link
+            href="/applications#piloto-automatico"
+            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white transition-all flex items-center gap-2 shadow-sm"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Candidatar automaticamente</span>
+          </Link>
         </div>
       </div>
 

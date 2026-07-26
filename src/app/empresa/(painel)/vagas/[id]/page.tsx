@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyPage } from "@/lib/company-auth";
-import { parseStoredMatches, hydrateMatches } from "@/lib/company-vaga";
+import { parseStoredMatches, hydrateMatches, runVagaMatch } from "@/lib/company-vaga";
 import { VagaMatches } from "@/components/vaga-matches";
 import { VagaActions } from "@/components/vaga-actions";
 import { vagaAttributeChips } from "@/lib/vaga-fields";
@@ -20,7 +20,13 @@ export default async function VagaDetailPage({ params }: { params: Promise<{ id:
   if (!vaga) notFound();
 
   const stored = parseStoredMatches(vaga.matchesJson);
-  const matches = await hydrateMatches(company.id, stored);
+  // Vagas criadas antes do snapshot (ou cujo primeiro processamento falhou)
+  // não devem ficar eternamente sem candidatos: reprocessa uma única vez e
+  // passa a usar o snapshot normalmente nas visitas seguintes.
+  const refreshed = stored.length === 0 && !vaga.lastMatchedAt
+    ? await runVagaMatch(vaga).catch(() => [])
+    : null;
+  const matches = await hydrateMatches(company.id, refreshed ?? stored);
 
   // Candidaturas recebidas pelo feed (quando a vaga está publicada).
   const applications = await prisma.companyJobApplication.findMany({

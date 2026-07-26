@@ -138,7 +138,7 @@ export function AutoApplySettingsCard() {
   }
 
   return (
-    <section className="space-y-6 overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30 p-6 shadow-lg shadow-blue-500/5 dark:from-blue-950/20 dark:via-neutral-900/40 dark:to-indigo-950/10">
+    <section id="piloto-automatico" className="scroll-mt-6 space-y-6 overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30 p-6 shadow-lg shadow-blue-500/5 dark:from-blue-950/20 dark:via-neutral-900/40 dark:to-indigo-950/10">
       <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center dark:border-slate-800">
         <div>
           <span className="mb-1.5 inline-flex rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">

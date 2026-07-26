@@ -20,6 +20,20 @@ export type TalentMatch = {
   isTopPlayer?: boolean;
 };
 
+function fallbackRanking(jobTitle: string, jobText: string, candidates: CandidateInput[]) {
+  const jobTokens = new Set(`${jobTitle} ${jobText}`.toLowerCase().split(/[^a-z0-9+#.]+/).filter((t) => t.length >= 4));
+  return candidates
+    .map((candidate) => {
+      const candidateTokens = candidate.resumeText.toLowerCase().split(/[^a-z0-9+#.]+/).filter((t) => t.length >= 4);
+      const overlap = candidateTokens.filter((token) => jobTokens.has(token));
+      const fitScore = Math.min(98, Math.max(20, 25 + Math.round((new Set(overlap).size / Math.max(1, jobTokens.size)) * 100)));
+      return { candidateId: candidate.id, fitScore, reason: overlap.length
+        ? `Compatibilidade identificada por ${Math.min(3, new Set(overlap).size)} competência(s) em comum com a vaga.`
+        : "Candidato elegível no banco de talentos; confira o currículo para validar a aderência." };
+    })
+    .sort((a, b) => b.fitScore - a.fitScore);
+}
+
 function firstNameOf(name: string | null): string {
   const trimmed = (name ?? "").trim();
   if (!trimmed) return "Candidato";
@@ -44,8 +58,9 @@ export async function searchTalent(
       where: {
         discoverable: true,
         resumes: { some: {} },
-        ...(filters.area ? { professionalArea: { contains: filters.area, mode: "insensitive" } } : {}),
-        ...(filters.state ? { state: filters.state.toUpperCase() } : {}),
+        // Área e UF são sinais de ranking, não filtros eliminatórios. Os perfis
+        // antigos frequentemente guardam a área em outro campo ou deixam UF
+        // vazia (por exemplo, vagas remotas), o que zerava a busca automática.
       },
       orderBy: { createdAt: "desc" },
       take: TALENT_SEARCH_POOL_LIMIT,
@@ -89,7 +104,13 @@ export async function searchTalent(
     resumeText: u.resumes[0].rawText,
   }));
 
-  const ranking = await rankCandidates(jobTitle, jobText, candidates);
+  let ranking: Awaited<ReturnType<typeof rankCandidates>>;
+  try {
+    ranking = await rankCandidates(jobTitle, jobText, candidates);
+  } catch (error) {
+    console.error("Falha no ranking automático; usando fallback local:", error);
+    ranking = { ranking: fallbackRanking(jobTitle, jobText, candidates), recommendation: "" };
+  }
   const scoreById = new Map(ranking.ranking.map((r) => [r.candidateId, r]));
 
   // Pedidos de contato já existentes desta empresa para os candidatos do pool.
