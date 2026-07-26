@@ -7,9 +7,9 @@ import type { CareerTrack } from "@/components/analysis-display";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Compare seu currículo com uma vaga",
+  title: "Calcule seu Match antes de enviar",
   description:
-    "Envie seu currículo e uma vaga real para descobrir aderência, lacunas, palavras-chave e os próximos ajustes antes de se candidatar.",
+    "Envie seu currículo e uma vaga real para descobrir seu Match, as lacunas mais importantes e o que ajustar antes de se candidatar.",
   alternates: { canonical: "/analise" },
 };
 

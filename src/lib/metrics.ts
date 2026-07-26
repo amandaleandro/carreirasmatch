@@ -216,6 +216,28 @@ export const funnelEvents = getOrCreate(
     })
 );
 
+export const businessUnique = getOrCreate(
+  "carreiras_business_unique",
+  () =>
+    new Gauge({
+      name: "carreiras_business_unique",
+      help: "Usuários ou sessões únicas por etapa e janela móvel",
+      labelNames: ["metric", "period"] as const,
+      registers: [registry],
+    })
+);
+
+export const influencerSales = getOrCreate(
+  "carreiras_influencer_sales",
+  () =>
+    new Gauge({
+      name: "carreiras_influencer_sales",
+      help: "Vendas e receita atribuídas a cupons de influenciadores",
+      labelNames: ["influencer", "metric", "period"] as const,
+      registers: [registry],
+    })
+);
+
 export const accessSummary = getOrCreate(
   "carreiras_access_summary",
   () =>
@@ -354,6 +376,30 @@ let businessSnapshotExpiresAt = 0;
 let businessSnapshotInFlight: Promise<void> | null = null;
 const BUSINESS_SNAPSHOT_TTL_MS = 60_000;
 
+async function uniqueActors(where: { name: string; createdAt: { gte: Date } }) {
+  const events = await prisma.funnelEvent.findMany({
+    where,
+    select: { userId: true, sessionId: true },
+  });
+  return new Set(
+    events
+      .map((event) => event.userId ? `u:${event.userId}` : event.sessionId ? `s:${event.sessionId}` : null)
+      .filter((actor): actor is string => actor !== null)
+  ).size;
+}
+
+async function usersWithSecondAnalysis(start: Date) {
+  const analyses = await prisma.analysis.findMany({
+    where: { createdAt: { gte: start }, resume: { userId: { not: null } } },
+    select: { resume: { select: { userId: true } } },
+  });
+  const counts = new Map<string, number>();
+  for (const analysis of analyses) {
+    if (analysis.resume.userId) counts.set(analysis.resume.userId, (counts.get(analysis.resume.userId) ?? 0) + 1);
+  }
+  return Array.from(counts.values()).filter((count) => count >= 2).length;
+}
+
 type GroupCount = { status: string; _count: { _all: number } };
 type DatabaseStatsRow = { database_bytes: bigint; connections: bigint };
 
@@ -475,6 +521,18 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
           where: { createdAt: { gte: start } },
           _count: { _all: true },
         }),
+        uniqueAnalysisStarters: await uniqueActors({ name: "analysis_started", createdAt: { gte: start } }),
+        uniqueAnalysisCompleters: await uniqueActors({ name: "analysis_completed", createdAt: { gte: start } }),
+        uniqueResultViewers: await uniqueActors({ name: "result_viewed", createdAt: { gte: start } }),
+        uniquePaidCustomers: (await prisma.payment.findMany({
+          where: { status: "paid", paidAt: { gte: start } },
+          select: { userId: true },
+          distinct: ["userId"],
+        })).length,
+        usersWithSecondAnalysis: await usersWithSecondAnalysis(start),
+        applicationsFromAnalysis: await prisma.application.count({
+          where: { createdAt: { gte: start }, analysisId: { not: null } },
+        }),
       }))
     ),
     prisma.pageView.groupBy({
@@ -537,6 +595,8 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
   businessFlow.reset();
   accessSummary.reset();
   funnelEvents.reset();
+  businessUnique.reset();
+  influencerSales.reset();
   for (const snapshot of periodSnapshots) {
     for (const [entity, value] of Object.entries({
       users: snapshot.users,
@@ -584,6 +644,36 @@ async function collectBusinessSnapshot(now: Date): Promise<void> {
     );
     for (const group of snapshot.funnelEventGroups) {
       funnelEvents.set({ name: group.name, period: snapshot.label }, group._count._all);
+    }
+    for (const [metric, value] of Object.entries({
+      analysis_started: snapshot.uniqueAnalysisStarters,
+      analysis_completed: snapshot.uniqueAnalysisCompleters,
+      result_viewed: snapshot.uniqueResultViewers,
+      paid_customers: snapshot.uniquePaidCustomers,
+      second_analysis_users: snapshot.usersWithSecondAnalysis,
+      applications_from_analysis: snapshot.applicationsFromAnalysis,
+    })) {
+      businessUnique.set({ metric, period: snapshot.label }, value);
+    }
+  }
+
+  const influencerPayments = await prisma.payment.findMany({
+    where: { status: "paid", paidAt: { gte: periods[2].start }, couponId: { not: null } },
+    select: { amount: true, paidAt: true, coupon: { select: { code: true, influencerName: true } } },
+  });
+  for (const period of periods) {
+    const byInfluencer = new Map<string, { sales: number; revenue: number }>();
+    for (const payment of influencerPayments) {
+      if (!payment.paidAt || payment.paidAt < period.start || !payment.coupon) continue;
+      const key = payment.coupon.influencerName || payment.coupon.code;
+      const current = byInfluencer.get(key) ?? { sales: 0, revenue: 0 };
+      current.sales += 1;
+      current.revenue += payment.amount;
+      byInfluencer.set(key, current);
+    }
+    for (const [influencer, values] of byInfluencer) {
+      influencerSales.set({ influencer, metric: "sales", period: period.label }, values.sales);
+      influencerSales.set({ influencer, metric: "revenue_cents", period: period.label }, values.revenue);
     }
   }
 

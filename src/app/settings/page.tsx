@@ -138,7 +138,7 @@ export default async function SettingsPage({
       </section>
 
       <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-        <InterestedRolesForm initialRoles={interestedRoles} />
+        <InterestedRolesForm initialRoles={interestedRoles} initialArea={user?.professionalArea ?? null} />
       </section>
 
       {offer && (

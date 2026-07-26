@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import { Download, Share2, Check, Sparkles } from "lucide-react";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 interface ShareMatchCardProps {
   jobTitle: string;
@@ -10,6 +11,7 @@ interface ShareMatchCardProps {
   userId?: string;
   /** Percentil do score na trilha ("fiquei à frente de X% dos candidatos") — o gancho social do card. */
   betterThanPercent?: number | null;
+  analysisId?: string;
 }
 
 function wrapTextToLines(
@@ -70,7 +72,7 @@ function copyTextFallback(value: string): boolean {
   return succeeded;
 }
 
-export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPercent }: ShareMatchCardProps) {
+export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPercent, analysisId }: ShareMatchCardProps) {
   const hasPercentile = typeof betterThanPercent === "number" && betterThanPercent >= 50;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -336,6 +338,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
             url: shareUrl,
             files: [file],
           });
+          track(ANALYTICS_EVENTS.CARD_SHARED, { method: "native", analysisId: analysisId ?? "" });
           return;
         }
 
@@ -345,6 +348,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
             text,
             url: shareUrl,
           });
+          track(ANALYTICS_EVENTS.CARD_SHARED, { method: "native", analysisId: analysisId ?? "" });
           return;
         }
       } catch (err) {
@@ -371,6 +375,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
     }
 
     if (copySucceeded) {
+      track(ANALYTICS_EVENTS.CARD_SHARED, { method: "clipboard", analysisId: analysisId ?? "" });
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     } else {

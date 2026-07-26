@@ -82,10 +82,16 @@ export async function GET() {
     const profileArea = resolveFreeText(profileAreaText);
     const profileTokens = new Set(candidateTargetRoles.flatMap(tokens));
 
+    const now = new Date();
     const jobs = await prisma.job.findMany({
       // Vagas antigas/importadas podem não ter recebido o campo active na
       // migração. Elas continuam válidas enquanto não estiverem expiradas.
-      where: { OR: [{ active: true }, { active: false, expiresAt: null }] },
+      where: {
+        OR: [
+          { active: true, OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
+          { active: false, OR: [{ expiresAt: null }, { expiresAt: { gte: now } }] },
+        ],
+      },
       take: 100,
       orderBy: { createdAt: "desc" },
       select: { id: true, jobTitle: true, company: true, location: true, jobText: true, url: true, area: true, createdAt: true },

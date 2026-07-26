@@ -7,9 +7,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   // A home é o mesmo segmento do layout raiz, então o title.template não a
   // alcança; usamos absolute para manter a marca no título.
-  title: { absolute: "Compare seu currículo com a vaga | CarreirasMatch" },
+  title: { absolute: "Você encontrou a vaga. Seu currículo está pronto? | CarreirasMatch" },
   description:
-    "Entenda sua aderência a uma vaga real, veja o que ajustar no currículo e prepare seus próximos passos antes de se candidatar.",
+    "Compare seu currículo com uma vaga real, descubra seu Match e ajuste o que importa antes de enviar a candidatura.",
   alternates: { canonical: "/" },
 };
 

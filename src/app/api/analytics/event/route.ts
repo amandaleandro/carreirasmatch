@@ -9,6 +9,7 @@ const allowedNames = [
   "unlock_clicked", "checkout_started", "checkout_failed", "payment_confirmed",
   "subscription_started", "subscription_confirmed", "signup_completed",
   "lead_captured", "tool_used", "pix_generated",
+  "result_viewed", "card_shared", "resume_saved", "application_created",
 ] as const;
 
 const schema = z.object({

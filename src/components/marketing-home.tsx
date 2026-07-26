@@ -154,29 +154,29 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-10 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-16">
           <div className="space-y-6">
             <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-blue-300 bg-blue-500/20 border border-blue-400/30 px-3.5 py-1.5 rounded-full">
-              <Target className="h-4 w-4 text-blue-400" /> Uma ajuda prática para conseguir sua próxima vaga
+              <Target className="h-4 w-4 text-blue-400" /> ANTES DE ENVIAR
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.1] tracking-tight text-white">
-              Pare de mandar currículo no escuro.
+              Você encontrou a vaga. Agora descubra se o seu currículo está pronto.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-white/80 max-w-2xl">
-              Descubra em minutos por que seu currículo não está avançando e o que mudar para aumentar suas chances na vaga que você realmente quer.
+              Compare seu currículo com uma vaga real, descubra seu Match, veja o que está ajudando ou atrapalhando e ajuste antes de clicar em “candidatar”.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Descobrir meu próximo ajuste" />
+              <PrimaryCta label="Calcular meu Match grátis" />
               <Link href="/verificador-ats" className="inline-flex items-center justify-center rounded-xl border border-blue-400/40 bg-blue-500/10 px-5 py-3.5 text-sm font-bold text-blue-200 hover:bg-blue-500/20 transition-all">
-                ✨ Verificador ATS Rápido (Sem Vaga)
+                Ver como funciona
               </Link>
             </div>
 
             <div className="grid gap-2.5 text-xs font-semibold text-white/80 sm:grid-cols-2 pt-2">
-              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400" /> Resultado inicial 100% gratuito</span>
-              <span className="inline-flex items-center gap-2"><FileCheck2 className="h-4 w-4 text-emerald-400" /> Download em PDF e Word (.docx)</span>
-              <span className="inline-flex items-center gap-2"><FileSearch className="h-4 w-4 text-emerald-400" /> Palavras-chave do filtro ATS</span>
-              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Garantia de zero alucinação</span>
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400" /> Resultado inicial gratuito</span>
+              <span className="inline-flex items-center gap-2"><Target className="h-4 w-4 text-emerald-400" /> Match explicado para esta vaga</span>
+              <span className="inline-flex items-center gap-2"><FileSearch className="h-4 w-4 text-emerald-400" /> Lacunas e palavras-chave</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Ajustes baseados no seu currículo</span>
             </div>
           </div>
 
@@ -190,9 +190,9 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         {/* MOMENTO PROFISSIONAL */}
         <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
           <div className="max-w-2xl">
-            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Um caminho para cada momento</p>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">Trabalho, estudos e próximos passos</h2>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Escolha o que você está vivendo agora e encontre ferramentas para avançar com mais clareza.</p>
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600">A mesma pergunta, em qualquer momento</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">A vaga muda. O próximo passo é o mesmo.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">Seja estágio, primeiro emprego ou recolocação, compare seu currículo com a oportunidade antes de enviar.</p>
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {audienceCards.map(([label, title, description, href, color]) => (
@@ -266,9 +266,9 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
             <span className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 flex items-center justify-center border border-blue-200 dark:border-blue-900">
               <FileCheck2 className="h-6 w-6" />
             </span>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Conteúdo do Kit Candidatura</h2>
+              <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">Kit de Candidatura para esta vaga</h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Tudo o que você precisa para se apresentar com máxima relevância para uma vaga específica e se preparar para as etapas presenciais.
+              O diagnóstico mostra o caminho. O Kit reúne os ajustes e materiais para transformar esta análise em uma candidatura preparada.
             </p>
           </div>
 
@@ -287,10 +287,10 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           <div className="mx-auto max-w-6xl px-4 md:px-8 space-y-12">
             <div className="text-center space-y-3 max-w-2xl mx-auto">
               <span className="text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-900">
-                Planos Transparentes
+                Resolva esta candidatura primeiro
               </span>
               <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 dark:text-white">
-                Escolha o formato ideal para a sua busca
+                Comece com o diagnóstico. Continue quando fizer sentido.
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">
                 Sem contratos longos ou pegadinhas. Cancele ou mude de plano a qualquer momento.
@@ -303,11 +303,11 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                    Degustação
+                    Entrada gratuita
                   </span>
                   <h3 className="text-2xl font-extrabold text-slate-900 dark:text-white">Grátis</h3>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    1ª leitura inicial para testar seu perfil.
+                    Descubra seu Match e uma lacuna importante antes de enviar.
                   </p>
 
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -330,7 +330,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   href="/analise"
                   className="w-full rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-3.5 text-center text-xs transition-all shadow-md shadow-blue-600/20"
                 >
-                  Testar Grátis Agora →
+                    Calcular meu Match grátis →
                 </Link>
               </div>
 
@@ -338,7 +338,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                    Avulso · 1 Vaga
+                    Para esta vaga · 1 análise
                   </span>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">Análise Completa</h3>
                   <div className="flex items-baseline gap-1">
@@ -346,7 +346,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                     <span className="text-[11px] text-slate-500 font-semibold">/ único</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Diagnóstico detalhado para 1 vaga pontual.
+                    Veja o que ajustar nesta oportunidade específica.
                   </p>
 
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -369,7 +369,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   href="/analise"
                   className="w-full rounded-2xl border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold py-3.5 text-center text-xs transition-all"
                 >
-                  Fazer Análise (R$ 9,90) →
+                  Ver diagnóstico completo →
                 </Link>
               </div>
 
@@ -377,7 +377,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
-                    Entrega Completa · 1 Vaga
+                    Melhor próximo passo · 1 vaga
                   </span>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">Kit Candidatura</h3>
                   <div className="flex items-baseline gap-1">
@@ -385,7 +385,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                     <span className="text-[11px] text-slate-500 font-semibold">/ único</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Currículo PDF + carta + preparação entrevista.
+                    Transforme o Match em uma candidatura pronta para enviar.
                   </p>
 
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -408,7 +408,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   href="/analise"
                   className="w-full rounded-2xl border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold py-3.5 text-center text-xs transition-all"
                 >
-                  Gerar Kit (R$ 12,90) →
+                  Preparar minha candidatura →
                 </Link>
               </div>
 
@@ -420,15 +420,15 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
 
                 <div className="space-y-4 pt-2">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-blue-300 block">
-                    Acesso Ilimitado
+                    Para quem está buscando emprego
                   </span>
-                  <h3 className="text-xl font-extrabold text-white leading-tight">Plano Profissional</h3>
+                  <h3 className="text-xl font-extrabold text-white leading-tight">Sua central de candidaturas</h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-extrabold text-white">R$ 24,90</span>
                     <span className="text-[11px] text-slate-300 font-semibold">/mês</span>
                   </div>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    2 kits avulsos já custam R$ 25,80. Quem busca ativamente aplica em 10+ vagas. Aqui é ilimitado.
+                    Analise novas vagas, acompanhe seu histórico de Match e organize sua busca em um só lugar.
                   </p>
 
                   <div className="pt-4 border-t border-white/10 space-y-2.5 text-xs font-semibold text-slate-200">
@@ -486,10 +486,10 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <section className="mx-auto max-w-7xl px-4 pb-20 md:px-8">
           <div className="grid gap-8 rounded-3xl bg-gradient-to-r from-blue-700 to-blue-600 px-6 py-12 text-white md:px-12 lg:grid-cols-[1fr_auto] lg:items-center shadow-xl">
             <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold">Encontrou uma vaga? Não envie o mesmo currículo genérico.</h2>
-              <p className="text-sm text-white/80 max-w-2xl">Compare seu perfil com os requisitos da vaga e envie uma versão preparada em PDF.</p>
+              <h2 className="text-2xl sm:text-3xl font-extrabold">Encontrou uma vaga? Antes de enviar, descubra seu Match.</h2>
+              <p className="text-sm text-white/80 max-w-2xl">Uma análise rápida mostra o que está forte, o que falta e qual ajuste merece sua atenção primeiro.</p>
             </div>
-            <PrimaryCta label="Começar Análise Agora" />
+            <PrimaryCta label="Calcular meu Match grátis" />
           </div>
         </section>
       </main>

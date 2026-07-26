@@ -34,6 +34,7 @@ export function RadarClient() {
   const [items, setItems] = useState<RadarItem[]>([]);
   const [roles, setRoles] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
 
@@ -51,15 +52,19 @@ export function RadarClient() {
 
   async function fetchFeed() {
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/radar/feed");
       const data = await res.json();
       if (res.ok) {
         setItems(data.radarFeed || []);
         setRoles(data.interestedRoles || []);
+      } else {
+        setError(data.error || "Não foi possível carregar as oportunidades.");
       }
     } catch (err) {
       console.error(err);
+      setError("Não foi possível carregar as oportunidades. Tente novamente.");
     } finally {
       setLoading(false);
     }
@@ -247,6 +252,12 @@ export function RadarClient() {
       )}
 
       {/* Toolbar: Search and Filters */}
+      {error && (
+        <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/20 dark:text-red-300">
+          {error}
+        </div>
+      )}
+
       <div id="radar-feed-header" className="scroll-mt-6 space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 shadow-sm shadow-slate-900/5">
           {/* Search Input */}

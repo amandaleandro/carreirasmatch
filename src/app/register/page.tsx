@@ -10,8 +10,6 @@ import { COMMON_PROFESSIONAL_AREAS, COMMON_STUDY_AREAS } from "@/lib/course-cata
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { formatBrazilPhone } from "@/lib/contact-validation";
 
-const AREA_PROMPT_SEGMENTS: CareerSegment[] = ["apprentice", "first_job", "internship", "student", "career_change", "career_pro"];
-
 const MOMENT_TIPS: Record<string, string> = {
   apprentice: "✨ Encontre vagas de aprendizagem, prepare seu primeiro currículo e descubra áreas para começar.",
   first_job: "✨ Destaque projetos, cursos e habilidades para conquistar sua primeira oportunidade.",
@@ -39,7 +37,8 @@ export default function RegisterPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const showAreaField = careerSegment !== "" && AREA_PROMPT_SEGMENTS.includes(careerSegment);
+  const needsTargetArea = ["apprentice", "first_job", "student", "career_change", "career_pro"].includes(careerSegment);
+  const showAreaField = needsTargetArea || careerSegment === "internship";
   const isTransition = careerSegment === "career_change";
   const needsCurrentArea = careerSegment === "career_change" || careerSegment === "career_pro";
   const needsCourse = careerSegment === "internship";
@@ -59,9 +58,9 @@ export default function RegisterPage() {
           phone,
           password,
           careerSegment: careerSegment || null,
-          professionalArea: showAreaField && professionalArea ? professionalArea : null,
+          professionalArea: needsTargetArea && professionalArea ? professionalArea : null,
           currentProfessionalArea: needsCurrentArea && currentArea ? currentArea : null,
-          targetProfessionalArea: showAreaField && professionalArea ? professionalArea : null,
+          targetProfessionalArea: needsTargetArea && professionalArea ? professionalArea : null,
           studyCourse: needsCourse && studyCourse ? studyCourse : null,
           coupon: coupon.trim() || null,
         }),
@@ -286,11 +285,16 @@ export default function RegisterPage() {
                 </datalist>
               </div>
             )}
+            {needsTargetArea && (
             <div className="space-y-1 relative group animate-in fade-in slide-in-from-top-2 duration-300">
               <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">
                 {careerSegment === "student"
                   ? "Qual profissão ou área interessa a você?"
-                  : "Qual curso ou área você está cursando?"}
+                  : careerSegment === "career_change"
+                    ? "Para qual área você quer migrar?"
+                    : careerSegment === "career_pro"
+                      ? "Qual cargo ou área você busca?"
+                      : "Em qual área você gostaria de trabalhar?"}
               </label>
               <div className="relative flex items-center">
                 <span className="absolute left-3.5 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
@@ -318,6 +322,7 @@ export default function RegisterPage() {
                 ))}
               </datalist>
             </div>
+            )}
             {needsCourse && (
               <div className="space-y-1 relative group animate-in fade-in slide-in-from-top-2 duration-300">
                 <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">

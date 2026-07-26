@@ -20,6 +20,9 @@ Tudo roda num `docker-compose.observability.yml` separado, na mesma rede Docker 
     `carreiras_ai_estimated_cost_usd_total`, `carreiras_ai_cache_events_total`,
     `carreiras_ai_provider_duration_seconds` e `carreiras_payment_events_total`
     (ver `src/lib/metrics.ts`).
+  - métricas de produto: pessoas/sessões únicas que iniciaram, concluíram ou
+    visualizaram o resultado, segunda análise, candidaturas associadas a análises,
+    clientes pagos e vendas/receita por influenciador.
 - O Caddy expõe `/metrics` no endpoint admin (porta 2019), com taxa de requests,
   status e latência na borda.
 
@@ -78,6 +81,9 @@ principal (`carreirasmatch.com.br`), reaproveitando o certificado TLS existente.
   ativação, conversões e engajamento, com filtro de 24h, 7d ou 30d.
 - O dashboard **"Carreiras Match - Pagamentos & Receita"** acompanha tentativas,
   aprovações, conversão, ticket médio, receita por canal e status financeiros.
+- O dashboard **"Carreiras Match - Métricas de Produto"** acompanha a jornada da
+  análise, segunda vaga, compartilhamentos, conversões agregadas, receita por
+  cliente, custo de IA por análise e vendas por influenciador.
 - O dashboard **"Carreiras Match - IA Confiabilidade & Roteamento"** mostra
   sucesso, falhas, fallback, latência p95, cache, provedores e modelos usados.
 - O dashboard **"Carreiras Match - Acessos & Aquisição"** mostra visualizações,

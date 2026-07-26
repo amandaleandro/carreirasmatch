@@ -225,6 +225,7 @@ export default async function ReportPage({
         userName={user?.name}
         userId={session.user.id}
         betterThanPercent={betterThanPercent}
+        analysisId={id}
       />
 
       {analysis ? (

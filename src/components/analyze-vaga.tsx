@@ -542,16 +542,16 @@ export function AnalyzeVagaPage({
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
             <span className="inline-flex items-center gap-1.5 rounded-full border border-[#2563EB]/20 bg-[#2563EB]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
-              Antes de se candidatar
+              ANTES DE ENVIAR
             </span>
             <h1 className="text-2xl md:text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
-              Descubra o que ajustar para <span className="text-[#2563EB]">esta vaga</span>
+              Você encontrou a vaga. Seu currículo está pronto?
             </h1>
             <p className="max-w-2xl text-xs leading-relaxed text-[#64748B]">
-              Compare seu currículo com os requisitos reais da oportunidade. Você recebe uma leitura inicial gratuita e decide depois se quer liberar o plano completo.
+              Envie seu currículo e a descrição da oportunidade. Veja seu Match, as lacunas mais importantes e o que ajustar antes de se candidatar.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
-              {["PDF de até 5 MB", "Resultado inicial grátis", "Qualquer profissão"].map((item) => (
+              {["PDF de até 5 MB", "Match inicial grátis", "Qualquer profissão"].map((item) => (
                 <span key={item} className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-800 px-3 py-1.5 text-[10px] font-bold text-[#64748B] shadow-sm">
                   {item}
                 </span>
@@ -852,7 +852,7 @@ export function AnalyzeVagaPage({
                     disabled={loading}
                     className="flex-1 sm:flex-none rounded-xl bg-[#2563EB] px-6 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1D4ED8] transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
                   >
-                    {loading ? "Analisando..." : "Analisar Vaga →"}
+                    {loading ? "Calculando Match..." : "Calcular meu Match grátis →"}
                   </button>
                 </div>
               </div>

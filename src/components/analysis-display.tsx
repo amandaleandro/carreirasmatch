@@ -1169,6 +1169,10 @@ export function AnalysisResult({
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
 
+  useEffect(() => {
+    if (analysisId) track(ANALYTICS_EVENTS.RESULT_VIEWED, { analysisId });
+  }, [analysisId]);
+
   const tabs = [
     { id: "overview", label: "Visão Geral", emoji: "📊" },
     { id: "gaps", label: "Currículo & Gaps", emoji: "📄" },
@@ -1215,6 +1219,7 @@ export function AnalysisResult({
             <ShareMatchCard
               jobTitle={jobTitle || "Vaga em Análise"}
               overallScore={result.overallScore}
+              analysisId={analysisId}
             />
 
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#2563EB]/20 bg-[#2563EB]/5 dark:bg-blue-950/20 p-4 shadow-sm">

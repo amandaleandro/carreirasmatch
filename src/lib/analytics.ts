@@ -35,6 +35,8 @@ export const ANALYTICS_EVENTS = {
   BEHAVIORAL_TEST_COMPLETED: "behavioral_test_completed",
   RESUME_SAVED: "resume_saved",
   APPLICATION_CREATED: "application_created",
+  RESULT_VIEWED: "result_viewed",
+  CARD_SHARED: "card_shared",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

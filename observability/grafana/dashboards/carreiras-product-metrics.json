@@ -1,0 +1,32 @@
+{
+  "uid": "carreiras-product-metrics",
+  "title": "Carreiras Match - Métricas de Produto",
+  "tags": ["business", "growth", "product"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "1m",
+  "templating": { "list": [{ "name": "period", "type": "custom", "query": "24h,7d,30d", "current": { "text": "7d", "value": "7d" } }] },
+  "panels": [
+    { "type": "row", "title": "Jornada da análise — $period", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }, "panels": [] },
+    { "type": "stat", "title": "Pessoas que iniciaram", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 1 }, "targets": [{ "expr": "carreiras_business_unique{metric=\"analysis_started\",period=\"$period\"}" }] },
+    { "type": "stat", "title": "Pessoas que concluíram", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 1 }, "targets": [{ "expr": "carreiras_business_unique{metric=\"analysis_completed\",period=\"$period\"}" }] },
+    { "type": "stat", "title": "Pessoas que viram o resultado", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 1 }, "targets": [{ "expr": "carreiras_business_unique{metric=\"result_viewed\",period=\"$period\"}" }] },
+    { "type": "stat", "title": "Segunda vaga", "description": "Usuários com pelo menos duas análises na janela.", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 1 }, "targets": [{ "expr": "carreiras_business_unique{metric=\"second_analysis_users\",period=\"$period\"}" }] },
+    { "type": "stat", "title": "Candidaturas preparadas", "description": "Candidaturas criadas com analysisId preenchido.", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 1 }, "targets": [{ "expr": "carreiras_business_unique{metric=\"applications_from_analysis\",period=\"$period\"}" }] },
+    { "type": "stat", "title": "Compartilhamentos do card", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 1 }, "targets": [{ "expr": "carreiras_funnel_events{name=\"card_shared\",period=\"$period\"}" }] },
+    { "type": "row", "title": "Conversão e valor", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 6 }, "panels": [] },
+    { "type": "bargauge", "title": "Conversões do resultado ao pagamento", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 7 }, "targets": [
+      { "expr": "carreiras_business_unique{metric=\"result_viewed\",period=\"$period\"}", "legendFormat": "resultado visto" },
+      { "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"$period\"}", "legendFormat": "compra confirmada" },
+      { "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"$period\"}", "legendFormat": "assinatura confirmada" }
+    ] },
+    { "type": "stat", "title": "Resultado → compra", "description": "Proxy agregado; não é uma coorte por usuário.", "gridPos": { "h": 8, "w": 4, "x": 12, "y": 7 }, "targets": [{ "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"$period\"} / clamp_min(carreiras_business_unique{metric=\"result_viewed\",period=\"$period\"}, 1)" }] },
+    { "type": "stat", "title": "Compra avulsa → assinatura", "description": "Proxy agregado entre eventos confirmados.", "gridPos": { "h": 8, "w": 4, "x": 16, "y": 7 }, "targets": [{ "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"$period\"} / clamp_min(carreiras_funnel_events{name=\"payment_confirmed\",period=\"$period\"}, 1)" }] },
+    { "type": "stat", "title": "Receita por cliente pago", "gridPos": { "h": 8, "w": 4, "x": 20, "y": 7 }, "targets": [{ "expr": "(carreiras_business_revenue_cents{channel=\"candidate\",period=\"$period\"} / 100) / clamp_min(carreiras_business_unique{metric=\"paid_customers\",period=\"$period\"}, 1)" }] },
+    { "type": "row", "title": "Eficiência e influência", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 15 }, "panels": [] },
+    { "type": "stat", "title": "Custo de IA por análise iniciada", "description": "Custo estimado do provedor de IA; não inclui mídia.", "gridPos": { "h": 7, "w": 6, "x": 0, "y": 16 }, "targets": [{ "expr": "increase(carreiras_ai_estimated_cost_usd_total[$__range]) / clamp_min(carreiras_business_unique{metric=\"analysis_started\",period=\"$period\"}, 1)" }] },
+    { "type": "table", "title": "Vendas por influenciador", "gridPos": { "h": 9, "w": 18, "x": 6, "y": 16 }, "targets": [{ "expr": "carreiras_influencer_sales{metric=\"sales\",period=\"$period\"}", "legendFormat": "{{influencer}}" }, { "expr": "carreiras_influencer_sales{metric=\"revenue_cents\",period=\"$period\"} / 100", "legendFormat": "{{influencer}} receita" }] },
+    { "type": "text", "title": "Interpretação", "gridPos": { "h": 5, "w": 24, "x": 0, "y": 25 }, "options": { "content": "**Observação:** métricas de conversão são agregadas por janela. Para conversão exata por pessoa/coorte, precisamos de uma análise de coorte usando userId/sessionId e uma janela de atribuição. CAC ainda depende de registrar investimento de mídia por canal; este painel mostra apenas custo estimado de IA por análise iniciada." } }
+  ]
+}
