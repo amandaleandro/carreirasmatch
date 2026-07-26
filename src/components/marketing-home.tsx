@@ -50,6 +50,7 @@ const founderWeek = [
 
 const audienceCards = [
   ["Estágio", "Pare de parecer sem experiência.", "Descubra como seus projetos e cursos já podem provar seu potencial.", "/estagio", "bg-emerald-50 text-emerald-700 border-emerald-200"],
+  ["Jovem Aprendiz", "Sua primeira oportunidade começa aqui.", "Monte um currículo claro e descubra como mostrar escola, cursos e responsabilidade.", "/jovem-aprendiz", "bg-teal-50 text-teal-700 border-teal-200"],
   ["Primeiro emprego", "Transforme o que você já sabe em oportunidade.", "Monte uma candidatura que faz sentido mesmo sem carteira assinada.", "/primeiro-emprego", "bg-blue-50 text-blue-700 border-blue-200"],
   ["Transição", "Sua experiência não começa do zero.", "Encontre as habilidades transferíveis que aproximam você da nova área.", "/transicao", "bg-amber-50 text-amber-700 border-amber-200"],
   ["Recolocação", "Volte ao mercado com uma história forte.", "Ajuste currículo, LinkedIn e entrevista para a vaga que você quer.", "/recolocacao", "bg-violet-50 text-violet-700 border-violet-200"],
