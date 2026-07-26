@@ -18,6 +18,8 @@ RUN npm ci --omit=dev
 
 FROM mcr.microsoft.com/playwright:v1.61.1-noble AS builder
 WORKDIR /app
+# Limita o heap do Next durante o build para caber na memória da VPS e usar a swap.
+ENV NODE_OPTIONS=--max-old-space-size=2048
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Variáveis NEXT_PUBLIC_* são embutidas no bundle do cliente em BUILD time.
