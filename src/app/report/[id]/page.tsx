@@ -236,6 +236,7 @@ export default async function ReportPage({
             behavioralResult={behavioralResult}
             bulletAnalysis={bulletAnalysis}
             resumeStructured={resumeStructured}
+            resumeText={record.resume.rawText}
             betterThanPercent={betterThanPercent}
             analysisId={id}
           />

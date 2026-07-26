@@ -1146,6 +1146,7 @@ export function AnalysisResult({
   behavioralResult,
   bulletAnalysis,
   resumeStructured,
+  resumeText,
   betterThanPercent,
   analysisId,
 }: {
@@ -1160,6 +1161,7 @@ export function AnalysisResult({
   } | null;
   bulletAnalysis?: BulletAnalysisSummary | null;
   resumeStructured?: StructuredResume | null;
+  resumeText?: string;
   betterThanPercent?: number | null;
   analysisId?: string;
 }) {
@@ -1257,6 +1259,8 @@ export function AnalysisResult({
                         experienceSuggestions: result.experienceSuggestions,
                         keywordsFound: result.keywordsFound,
                         fixes: result.fixes,
+                        resumeStructured,
+                        resumeText,
                       }),
                     });
                     if (!res.ok) throw new Error();
@@ -1276,6 +1280,41 @@ export function AnalysisResult({
               >
                 <Download className="w-4 h-4" />
                 Baixar em Word (.docx)
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/resume/export-pdf", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({
+                        title: "Currículo Otimizado",
+                        summary: result.suggestedSummary,
+                        experienceSuggestions: result.experienceSuggestions,
+                        keywordsFound: result.keywordsFound,
+                        resumeStructured,
+                        resumeText,
+                      }),
+                    });
+                    if (!res.ok) throw new Error();
+                    const blob = await res.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.href = url;
+                    a.download = "curriculo-otimizado-carreirasmatch.pdf";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                  } catch {
+                    alert("Erro ao gerar o arquivo PDF.");
+                  }
+                }}
+                className="inline-flex items-center gap-2 rounded-xl border border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/30 font-extrabold text-xs px-4 py-2.5 transition-all"
+              >
+                <FileText className="w-4 h-4" />
+                Baixar em PDF
               </button>
             </div>
 
