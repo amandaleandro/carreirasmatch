@@ -46,10 +46,6 @@ export function RadarClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(8);
 
-  useEffect(() => {
-    fetchFeed();
-  }, []);
-
   async function fetchFeed() {
     setLoading(true);
     setError(null);
@@ -69,6 +65,41 @@ export function RadarClient() {
       setLoading(false);
     }
   }
+
+  async function refreshFeed() {
+    setLoading(true);
+    setError(null);
+    try {
+      const syncRes = await fetch("/api/feed/fetch-jobs", { method: "POST" });
+      const syncData = await syncRes.json();
+
+      if (!syncRes.ok) {
+        throw new Error(syncData.error || "Não foi possível buscar novas vagas.");
+      }
+
+      const feedRes = await fetch("/api/radar/feed", { cache: "no-store" });
+      const feedData = await feedRes.json();
+      if (!feedRes.ok) {
+        throw new Error(feedData.error || "Não foi possível atualizar o radar.");
+      }
+
+      setItems(feedData.radarFeed || []);
+      setRoles(feedData.interestedRoles || []);
+
+      if (syncData.errors?.length && syncData.added === 0) {
+        setError(`Nenhuma vaga nova foi adicionada. ${syncData.errors.join("; ")}`);
+      }
+    } catch (err) {
+      console.error(err);
+      setError(err instanceof Error ? err.message : "Não foi possível atualizar o radar.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    queueMicrotask(() => void fetchFeed());
+  }, []);
 
   async function handleSaveToKanban(job: RadarItem) {
     setSavingId(job.id);
@@ -168,7 +199,7 @@ export function RadarClient() {
 
         <div className="flex items-center gap-3 shrink-0">
           <button
-            onClick={fetchFeed}
+            onClick={refreshFeed}
             disabled={loading}
             className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-neutral-900 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-neutral-800 transition-all flex items-center gap-2 shadow-sm cursor-pointer disabled:opacity-50"
           >
