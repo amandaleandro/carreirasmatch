@@ -52,30 +52,98 @@
       "description": "Cada vez que a linha cai a zero e volta a subir é um reinício do container app (deploy ou crash)."
     },
 
-    { "type": "row", "title": "Indisponibilidade", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 }, "collapsed": false, "panels": [] },
+    { "type": "row", "title": "Deploys por periodo", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 13 }, "collapsed": false, "panels": [] },
     {
-      "type": "stat", "title": "Uptime App (24h)", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 14 },
+      "type": "stat", "title": "Deploys no dia", "gridPos": { "h": 5, "w": 6, "x": 0, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "resets(process_start_time_seconds{job=\"carreiras-app\"}[1d])", "legendFormat": "deploys" }],
+      "description": "Quantidade nas ultimas 24 horas. Proxy baseado em reinicios do processo; pode incluir crash."
+    },
+    {
+      "type": "stat", "title": "Deploys na semana", "gridPos": { "h": 5, "w": 6, "x": 6, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "resets(process_start_time_seconds{job=\"carreiras-app\"}[7d])", "legendFormat": "deploys" }],
+      "description": "Quantidade nos ultimos 7 dias. Proxy baseado em reinicios do processo; pode incluir crash."
+    },
+    {
+      "type": "stat", "title": "Deploys no mes", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "resets(process_start_time_seconds{job=\"carreiras-app\"}[30d])", "legendFormat": "deploys" }],
+      "description": "Quantidade nos ultimos 30 dias. Proxy baseado em reinicios do processo; pode incluir crash."
+    },
+    {
+      "type": "stat", "title": "Deploys no ano", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 14 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "resets(process_start_time_seconds{job=\"carreiras-app\"}[365d])", "legendFormat": "deploys" }],
+      "description": "Quantidade nos ultimos 365 dias. Proxy baseado em reinicios do processo; pode incluir crash."
+    },
+
+    { "type": "row", "title": "Incidentes por periodo", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 20 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Incidentes no dia", "gridPos": { "h": 5, "w": 6, "x": 0, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[1d])) / 2", "legendFormat": "incidentes" }],
+      "description": "Incidentes de indisponibilidade nas ultimas 24 horas, estimados por queda e recuperacao do health check do app."
+    },
+    {
+      "type": "stat", "title": "Incidentes na semana", "gridPos": { "h": 5, "w": 6, "x": 6, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[7d])) / 2", "legendFormat": "incidentes" }],
+      "description": "Incidentes de indisponibilidade nos ultimos 7 dias, estimados por queda e recuperacao do health check do app."
+    },
+    {
+      "type": "stat", "title": "Incidentes no mes", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[30d])) / 2", "legendFormat": "incidentes" }],
+      "description": "Incidentes de indisponibilidade nos ultimos 30 dias, estimados por queda e recuperacao do health check do app."
+    },
+    {
+      "type": "stat", "title": "Incidentes no ano", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 21 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[365d])) / 2", "legendFormat": "incidentes" }],
+      "description": "Incidentes de indisponibilidade nos ultimos 365 dias, estimados por queda e recuperacao do health check do app."
+    },
+
+    { "type": "row", "title": "Indisponibilidade", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 }, "collapsed": false, "panels": [] },
+    {
+      "type": "stat", "title": "Uptime App (24h)", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "avg_over_time(up{job=\"carreiras-app\"}[24h]) * 100" }]
     },
     {
-      "type": "stat", "title": "Uptime App (7d)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 14 },
+      "type": "stat", "title": "Uptime App (7d)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "avg_over_time(up{job=\"carreiras-app\"}[7d]) * 100" }]
     },
     {
-      "type": "stat", "title": "Uptime Caddy (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 14 },
+      "type": "stat", "title": "Uptime Caddy (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percent", "decimals": 2, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 99 }, { "color": "green", "value": 99.9 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "avg_over_time(up{job=\"caddy\"}[24h]) * 100" }]
     },
     {
-      "type": "stat", "title": "Minutos indisponível (24h, estimado)", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 14 },
+      "type": "stat", "title": "Minutos indisponível (24h, estimado)", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "m", "decimals": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 10 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
@@ -83,7 +151,7 @@
       "description": "Estimativa baseada na fração de scrapes com up=0 nas últimas 24h. Precisão limitada pelo intervalo de scrape do Prometheus."
     },
     {
-      "type": "timeseries", "title": "Disponibilidade ao longo do tempo (app x caddy)", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 14 },
+      "type": "timeseries", "title": "Disponibilidade ao longo do tempo (app x caddy)", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 28 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "min": 0, "max": 1, "custom": { "drawStyle": "bars", "fillOpacity": 60 } } },
       "targets": [
@@ -92,44 +160,44 @@
       ]
     },
 
-    { "type": "row", "title": "Erros", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 19 }, "collapsed": false, "panels": [] },
+    { "type": "row", "title": "Erros", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 34 }, "collapsed": false, "panels": [] },
     {
-      "type": "stat", "title": "Taxa de erro 5xx agora", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 20 },
+      "type": "stat", "title": "Taxa de erro 5xx agora", "gridPos": { "h": 5, "w": 4, "x": 0, "y": 35 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 0.01 }, { "color": "red", "value": 0.05 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "sum(rate(caddy_http_request_duration_seconds_count{code=~\"5..\"}[5m])) / clamp_min(sum(rate(caddy_http_request_duration_seconds_count[5m])), 0.000001)" }]
     },
     {
-      "type": "stat", "title": "Erros 5xx (24h, total)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 20 },
+      "type": "stat", "title": "Erros 5xx (24h, total)", "gridPos": { "h": 5, "w": 4, "x": 4, "y": 35 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 20 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "sum(increase(caddy_http_request_duration_seconds_count{code=~\"5..\"}[24h]))" }]
     },
     {
-      "type": "stat", "title": "Falhas de IA (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 20 },
+      "type": "stat", "title": "Falhas de IA (24h)", "gridPos": { "h": 5, "w": 4, "x": 8, "y": 35 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 20 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_ai_provider_calls_total{outcome=\"error\"}[24h]))" }]
     },
     {
-      "type": "stat", "title": "Análises com erro (24h)", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 20 },
+      "type": "stat", "title": "Análises com erro (24h)", "gridPos": { "h": 5, "w": 4, "x": 12, "y": 35 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }, { "color": "red", "value": 10 }] } } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "sum(increase(carreiras_analysis_total{outcome!=\"success\"}[24h]))" }]
     },
     {
-      "type": "stat", "title": "Coleta de negócio falhou?", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 20 },
+      "type": "stat", "title": "Coleta de negócio falhou?", "gridPos": { "h": 5, "w": 4, "x": 16, "y": 35 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "FALHOU", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
       "targets": [{ "refId": "A", "expr": "carreiras_business_snapshot_success" }]
     },
     {
-      "type": "stat", "title": "Loki tem logs agora?", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 20 },
+      "type": "stat", "title": "Loki tem logs agora?", "gridPos": { "h": 5, "w": 4, "x": 20, "y": 35 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "SEM INGESTÃO", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
@@ -137,19 +205,19 @@
       "description": "Só confirma o processo Loki de pé, não a ingestão do promtail. Ver [[observabilidade-stack]] — promtail está com 'context deadline exceeded' desde 16/07/2026."
     },
     {
-      "type": "timeseries", "title": "Requests por segundo e status HTTP", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 25 },
+      "type": "timeseries", "title": "Requests por segundo e status HTTP", "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
       "targets": [{ "refId": "A", "expr": "sum by (code) (rate(caddy_http_request_duration_seconds_count[5m]))", "legendFormat": "{{code}}" }]
     },
     {
-      "type": "timeseries", "title": "Chamadas de IA por resultado", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 25 },
+      "type": "timeseries", "title": "Chamadas de IA por resultado", "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "custom": { "fillOpacity": 20, "stacking": { "mode": "normal" } } } },
       "targets": [{ "refId": "A", "expr": "sum by (outcome) (rate(carreiras_ai_provider_calls_total[15m]))", "legendFormat": "{{outcome}}" }]
     },
     {
-      "type": "logs", "title": "Erros e warnings recentes (Loki)", "gridPos": { "h": 10, "w": 24, "x": 0, "y": 33 },
+      "type": "logs", "title": "Erros e warnings recentes (Loki)", "gridPos": { "h": 10, "w": 24, "x": 0, "y": 48 },
       "datasource": { "type": "loki", "uid": "loki" },
       "options": { "showTime": true, "showLabels": true, "wrapLogMessage": true, "sortOrder": "Descending", "enableLogDetails": true },
       "targets": [{ "refId": "A", "expr": "{container=~\"carreiras-match-.*\"} |~ \"(?i)(error|erro|fatal|panic|warn)\"", "queryType": "range" }]

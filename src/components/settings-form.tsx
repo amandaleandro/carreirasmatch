@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS, COMMON_STUDY_AREAS } from "@/lib/course-catalog";
+import { MONITORED_CAREER_AREAS } from "@/lib/monitored-career-catalog";
+
+const PROFILE_AREA_OPTIONS = Array.from(new Set([
+  ...MONITORED_CAREER_AREAS.map((option) => option.label),
+  ...COMMON_PROFESSIONAL_AREAS,
+]));
+const CAREER_SEGMENT_LABELS = new Set(CAREER_SEGMENT_OPTIONS.map((option) => option.label));
+const cleanAreaValue = (value: string | null | undefined) => {
+  const trimmed = value?.trim() ?? "";
+  return CAREER_SEGMENT_LABELS.has(trimmed) ? "" : trimmed;
+};
 
 export function SettingsForm({
   initialSegment,
@@ -26,9 +37,9 @@ export function SettingsForm({
 }) {
   const router = useRouter();
   const [segment, setSegment] = useState<CareerSegment | "">(initialSegment ?? "");
-  const [area, setArea] = useState(initialArea ?? "");
-  const [currentArea, setCurrentArea] = useState(initialCurrentArea ?? "");
-  const [targetArea, setTargetArea] = useState(initialTargetArea ?? initialArea ?? "");
+  const [area, setArea] = useState(cleanAreaValue(initialArea));
+  const [currentArea, setCurrentArea] = useState(cleanAreaValue(initialCurrentArea));
+  const [targetArea, setTargetArea] = useState(cleanAreaValue(initialTargetArea ?? initialArea));
   const [studyCourse, setStudyCourse] = useState(initialStudyCourse ?? "");
   const [hasFormalEducation, setHasFormalEducation] = useState<boolean | null>(
     initialHasFormalEducation
@@ -113,16 +124,22 @@ export function SettingsForm({
           <label className="block text-sm font-medium mb-1">
             {segment === "career_change" ? "Área de onde você está saindo" : "Área em que trabalha hoje"}
           </label>
-          <input value={currentArea} onChange={(e) => setCurrentArea(e.target.value)} list="settings-current-areas" placeholder="Ex: Vendas, Atendimento, Administração..." className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500" />
-          <datalist id="settings-current-areas">{COMMON_PROFESSIONAL_AREAS.map((option) => <option key={option} value={option} />)}</datalist>
+          <select value={currentArea} onChange={(e) => setCurrentArea(e.target.value)} className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
+            <option value="">Selecione a área</option>
+            {currentArea && !PROFILE_AREA_OPTIONS.includes(currentArea) && <option value={currentArea}>{currentArea}</option>}
+            {PROFILE_AREA_OPTIONS.map((option) => <option key={option} value={option}>{option}</option>)}
+          </select>
         </div>
       )}
 
       {segment === "internship" && (
         <div>
           <label className="block text-sm font-medium mb-1">Curso que você faz</label>
-          <input value={studyCourse} onChange={(e) => setStudyCourse(e.target.value)} list="settings-study-courses" placeholder="Ex: Administração, Enfermagem, Sistemas de Informação..." className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500" />
-          <datalist id="settings-study-courses">{COMMON_STUDY_AREAS.map((option) => <option key={option} value={option} />)}</datalist>
+          <select value={studyCourse} onChange={(e) => setStudyCourse(e.target.value)} className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500">
+            <option value="">Selecione o curso</option>
+            {studyCourse && !COMMON_STUDY_AREAS.includes(studyCourse) && <option value={studyCourse}>{studyCourse}</option>}
+            {COMMON_STUDY_AREAS.map((option) => <option key={option} value={option}>{option}</option>)}
+          </select>
         </div>
       )}
 
@@ -130,22 +147,17 @@ export function SettingsForm({
         <label className="block text-sm font-medium mb-1">
           {segment === "student" ? "Qual profissão ou área interessa a você?" : "Qual é a sua área de atuação?"}
         </label>
-        <input
-          type="text"
-          list="professional-areas"
+        <select
           value={area}
           onChange={(e) => { setArea(e.target.value); setTargetArea(e.target.value); }}
-          placeholder={segment === "student" ? "Ex: Medicina, Tecnologia, Direito..." : "Ex: Eletricista, Cabeleireira, Tecnologia..."}
           className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-        />
-        <datalist id="professional-areas">
-          {(segment === "student" || segment === "internship"
-            ? COMMON_STUDY_AREAS
-            : COMMON_PROFESSIONAL_AREAS
-          ).map((option) => (
-            <option key={option} value={option} />
+        >
+          <option value="">Selecione a área</option>
+          {area && !PROFILE_AREA_OPTIONS.includes(area) && <option value={area}>{area}</option>}
+          {(segment === "student" || segment === "internship" ? COMMON_STUDY_AREAS : PROFILE_AREA_OPTIONS).map((option) => (
+            <option key={option} value={option}>{option}</option>
           ))}
-        </datalist>
+        </select>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-[120px_1fr]">
