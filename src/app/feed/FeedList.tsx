@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { saveFeedMatchAsApplication } from "@/app/applications/actions";
 import { discardFeedMatch } from "./actions";
@@ -256,14 +256,23 @@ export function FeedList({
   matches,
   resumeId,
   defaultCareerTrack,
+  isInitialScoring = false,
 }: {
   matches: FeedMatch[];
   resumeId: string;
   defaultCareerTrack: CareerTrack;
+  isInitialScoring?: boolean;
 }) {
+  const router = useRouter();
   const [viewMode, setViewMode] = useState<"detailed" | "compact">("detailed");
   const [selectedMatchIds, setSelectedMatchIds] = useState<string[]>([]);
   const [copiedBatch, setCopiedBatch] = useState(false);
+
+  useEffect(() => {
+    if (!isInitialScoring) return;
+    const timer = window.setTimeout(() => router.refresh(), 3000);
+    return () => window.clearTimeout(timer);
+  }, [isInitialScoring, router]);
 
   const metrics = useMemo(() => {
     const total = matches.length;
@@ -302,9 +311,15 @@ export function FeedList({
   if (matches.length === 0) {
     return (
       <div className="rounded-3xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-8 text-center shadow-xs">
-        <p className="text-xs font-semibold text-slate-500 dark:text-neutral-400">
-          Nenhuma vaga localizada para os filtros selecionados.
-        </p>
+        {isInitialScoring ? (
+          <>
+            <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
+            <p className="mt-3 text-sm font-semibold text-slate-700 dark:text-neutral-200">Estamos comparando seu currículo com as vagas.</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-neutral-400">O feed será atualizado automaticamente assim que o primeiro lote terminar.</p>
+          </>
+        ) : (
+          <p className="text-xs font-semibold text-slate-500 dark:text-neutral-400">Nenhuma vaga localizada para os filtros selecionados.</p>
+        )}
       </div>
     );
   }

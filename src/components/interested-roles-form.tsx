@@ -61,7 +61,7 @@ export function InterestedRolesForm({
 
   return (
     <div className="space-y-3">
-      <label className="block text-sm font-medium mb-1">Cargo monitorado</label>
+      <label className="block text-sm font-medium mb-1">Cargo ou especialidade (subárea)</label>
       <p className="text-xs text-neutral-500 dark:text-neutral-400">
         Escolha uma área e depois um cargo ou especialidade dentro dela para o radar.
       </p>

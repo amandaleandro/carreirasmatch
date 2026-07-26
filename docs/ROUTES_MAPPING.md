@@ -1,87 +1,47 @@
-# Mapeamento Completo de Rotas e Segurança
+# Mapa resumido de rotas e acesso
 
-Este documento detalha o mapa de rotas da aplicação, as permissões necessárias e o comportamento de controle de acesso (gerenciado via `src/proxy.ts`, `src/auth.config.ts` e handlers de API).
+Revisado em 26/07/2026. O mapa exato é o diretório `src/app`; grupos entre
+parênteses, como `(painel)`, não aparecem na URL pública.
 
----
+## Público
 
-## 1. Rotas Públicas & Lead Generation (Acesso Livre)
+Landing, autenticação, conteúdo SEO, blog, vagas e oportunidades públicas,
+segmentos de carreira, cursos, ferramentas, ensino médio, jogos, radar,
+`/desafio`, `/gratuito`, `/comece`, `/verificador-ats`, `/sobre`, `/ajuda`,
+`/termos` e `/privacidade` são definidos em `src/app` sem sessão obrigatória,
+embora alguns recursos possam aplicar gate de cadastro ou limite gratuito.
 
-| Rota | Descrição | Nível de Acesso |
-|---|---|---|
-| `/` | Landing Page Principal | Público |
-| `/login` | Tela de Login do Candidato | Público |
-| `/register` | Cadastro de Candidato | Público |
-| `/esqueci-senha` | Solicitação de Recuperação de Senha | Público |
-| `/redefinir-senha` | Redefinição de Senha via Token | Público |
-| `/como-fazer-curriculo` | Guia SEO de Formatação de Currículo | Público |
-| `/curriculo-gratis` | Ferramenta Gratuita de Gerador de Currículo | Público |
-| `/curriculo-sem-experiencia` | Guia SEO para Primeiro Emprego/Estágio | Público |
-| `/teste-curriculo-ats` | Scanner Rápido de ATS | Público / Gate |
-| `/nota-do-curriculo` | Calculadora de Pontuação de Currículo | Público |
-| `/vagas-publicas` | Vitrine Aberta de Oportunidades | Público |
-| `/blog` & `/blog/[slug]` | Artigos de Carreira e Mercado | Público |
-| `/termos` & `/privacidade` | Documentação Legal e LGPD | Público |
-| `/tools/*` | Catálogo de Ferramentas Gratuitas | Público / Degradação Graciosa |
+## Candidato autenticado
 
----
+`/dashboard`, `/profile`, `/settings`, `/analise`, `/report`, `/resume`,
+`/applications`, `/interviews`, `/action-plan`, `/history`, `/feed`,
+`/mensagens`, `/projetos` e áreas relacionadas usam sessão conforme o fluxo.
+As páginas de assinatura (`/assinar`) e os endpoints de billing controlam a
+liberação de recursos pagos.
 
-## 2. Portal do Candidato (Requer Sessão Candidate)
+## Empresa
 
-| Rota | Descrição |
-|---|---|
-| `/dashboard` | Painel Principal com Recomendações e Resumo |
-| `/analise` | Otimizador de Currículo com IA (Groq/Llama) |
-| `/resume` | Construtor Interativo de Currículo |
-| `/interviews` | Simulador de Entrevistas Técnicas e Comportamentais |
-| `/action-plan` | Plano de Ação Personalizado para Carreira |
-| `/applications` | Quadro Kanban de Rastreamento de Candidaturas |
-| `/vagas` | Central de Match de Vagas |
-| `/assinar` | Checkout de Planos e Assinatura Mercado Pago |
-| `/profile` | Edição de Perfil e Preferências |
-| `/settings` | Configurações de Conta e Segurança |
+O portal usa `/empresa/login`, `/empresa/cadastro` e o painel em
+`/empresa/(painel)`, que gera URLs como `/empresa`, `/empresa/vagas`,
+`/empresa/triagem`, `/empresa/talentos`, `/empresa/perfil`, `/empresa/equipe`
+e `/empresa/billing`.
 
----
+## Parceiros, freelancers e administração
 
-## 3. Portal da Empresa (Requer Sessão Company)
+- Parceiros: `/parceiro/*` e páginas públicas `/parceiros/*`.
+- Freelancers: `/freelancer/*`, `/freelancers/*` e `/projetos/*`.
+- Administração: `/admin/*`, protegida pelas regras administrativas de
+  `src/auth.config.ts` e pelos handlers de API correspondentes.
 
-| Rota | Descrição |
-|---|---|
-| `/empresa/login` | Login Exclusivo para Recrutadores |
-| `/empresa/cadastro` | Cadastro de Empresa |
-| `/empresa/dashboard` | Painel de Controle de Vagas e Processos |
-| `/empresa/vagas/nova` | Formulário de Publicação de Vaga |
-| `/empresa/vagas/[id]` | Gestão do Funil de Candidatos (Kanban ATS) |
-| `/empresa/banco-de-talentos` | Busca no Banco de Talentos Otimizada |
-| `/empresa/creditos` | Compra de Créditos e Planos Corporativos |
+## API
 
----
+Todos os endpoints estão em `src/app/api`. Os grupos principais são análise e
+IA, autenticação, usuário, candidaturas, vagas/feed, alertas, billing,
+empresas, parceiros, freelancer, ensino médio, ferramentas, suporte,
+analytics, cron e webhooks.
 
-## 4. Portal do Parceiro (Requer Sessão Partner)
+## Proteção
 
-| Rota | Descrição |
-|---|---|
-| `/parceiro/login` | Login de Parceiro Edu/Conteúdo |
-| `/parceiro/dashboard` | Métricas de Cursos e Indicações |
-| `/parceiro/cursos/novo` | Cadastro de Cursos Recomendados |
-
----
-
-## 5. Painel Administrativo (Requer Permissão Admin)
-
-| Rota | Descrição | Proteção |
-|---|---|---|
-| `/admin` | Visão Geral do Sistema e Métricas | Admin Only (`ADMIN_EMAILS`) |
-| `/admin/usuarios` | Consulta e Suporte de Usuários | Admin Only |
-| `/admin/cupons` | Gerenciador de Cupons de Desconto | Admin Only |
-| `/admin/scrapers` | Disparo e Monitoramento de Fontes de Vagas | Admin Only |
-| `/admin/whatsapp` | Campanhas de WhatsApp Marketing | Admin Only |
-| `/admin/modelos-ia` | Configuração de Provedores LLM | Admin Only |
-
----
-
-## 6. Endpoints de API (`/api/*`)
-
-- **Autenticação**: `/api/auth/*`
-- **Análise & IA**: `/api/analyze/route.ts`, `/api/interview/route.ts`
-- **Billing & Webhooks**: `/api/billing/checkout`, `/api/billing/webhook` (Validação `HMAC-SHA256`)
-- **Vagas**: `/api/vagas/*`, `/api/feed/*`
+`src/proxy.ts` aplica a sessão de forma centralizada, enquanto cada página/API
+também pode exigir usuário, assinatura, tipo de conta ou permissão de admin.
+Ao criar ou mover uma rota, conferir o proxy, a página e o handler associado.

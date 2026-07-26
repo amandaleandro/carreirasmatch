@@ -164,5 +164,19 @@ export async function PATCH(req: NextRequest) {
     data,
   });
 
+  const shouldRefreshFeed = [
+    "professionalArea",
+    "targetProfessionalArea",
+    "studyCourse",
+    "interestedRoles",
+  ].some((field) => field in body);
+  if (shouldRefreshFeed) {
+    // Mantém as vagas descartadas pelo usuário, mas força novo matching para
+    // que alterações de área/cargo não continuem usando notas antigas.
+    await prisma.jobMatch.deleteMany({
+      where: { resume: { userId: session.user.id }, status: { not: "discarded" } },
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }

@@ -319,6 +319,7 @@ export default async function FeedPage({
         matches={pageMatches}
         resumeId={resume.id}
         defaultCareerTrack={(latestAnalysis?.careerTrack as CareerTrack) ?? "growth"}
+        isInitialScoring={allMatches.length === 0}
       />
 
       {/* Paginação */}

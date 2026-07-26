@@ -2,7 +2,14 @@
 
 import { useState } from "react";
 
-export function JobAlertForm({ initialQuery = "", initialCity = "", initialState = "" }) {
+type CreatedAlert = { id: string; query: string; city: string; state: string; frequency: string };
+
+export function JobAlertForm({ initialQuery = "", initialCity = "", initialState = "", onCreated }: {
+  initialQuery?: string;
+  initialCity?: string;
+  initialState?: string;
+  onCreated?: (alert: CreatedAlert) => void;
+}) {
   const [query, setQuery] = useState(initialQuery);
   const [city, setCity] = useState(initialCity);
   const [state, setState] = useState(initialState);
@@ -21,6 +28,7 @@ export function JobAlertForm({ initialQuery = "", initialCity = "", initialState
       return;
     }
     const data = await response.json();
+    if (response.ok) onCreated?.(data.alert);
     setMessage(response.ok ? "Alerta criado. Você receberá novas oportunidades por e-mail." : data.error);
   }
 

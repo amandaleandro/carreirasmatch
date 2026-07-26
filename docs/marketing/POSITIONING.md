@@ -63,7 +63,8 @@ coletadas — funciona como prova social baseada em dado e gancho de SEO local.
 ## Outros dois lados do produto (não é só B2C candidato)
 
 Além do candidato, existem três públicos adicionais com landing e painel
-dedicados (detalhado em `PARTNERSHIPS_AND_B2B.md`):
+dedicados (os fluxos atuais estão documentados em `src/app/empresa`,
+`src/app/parceiro` e `src/app/freelancer`):
 
 - **empresas** (`/empresas`) — "Encontre os candidatos certos, ranqueados por
   IA", com triagem automática, ranking por aderência e Kanban de

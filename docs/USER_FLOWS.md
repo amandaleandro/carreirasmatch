@@ -1,8 +1,12 @@
 # Jornadas principais
 
+As telas e regras atuais devem ser conferidas em `src/app` e
+`src/lib`. O inventário funcional mantido está em
+[PRODUCT_AND_MARKETING_BRIEF.md](PRODUCT_AND_MARKETING_BRIEF.md).
+
 Fluxos ponta a ponta do CarreirasMatch, do ponto de vista do usuário. Para o
-que cada tela faz isoladamente, ver [FEATURES.md](FEATURES.md); para regras
-de free vs. pago, ver [PRODUCT_OVERVIEW.md](PRODUCT_OVERVIEW.md).
+que cada tela faz isoladamente, ver o código em `src/app`; para a proposta de
+produto, ver [PRODUCT_AND_MARKETING_BRIEF.md](PRODUCT_AND_MARKETING_BRIEF.md).
 
 ## 1. Cadastro → onboarding → primeira análise de vaga
 

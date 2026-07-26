@@ -15,6 +15,10 @@ type Alert = {
 export function JobAlertManager({ initialAlerts }: { initialAlerts: Alert[] }) {
   const [alerts, setAlerts] = useState(initialAlerts);
 
+  function addAlert(alert: Alert) {
+    setAlerts((current) => [alert, ...current]);
+  }
+
   async function remove(id: string) {
     const response = await fetch(`/api/job-alerts/${id}`, { method: "DELETE" });
     if (response.ok) setAlerts((current) => current.filter((alert) => alert.id !== id));
@@ -24,7 +28,7 @@ export function JobAlertManager({ initialAlerts }: { initialAlerts: Alert[] }) {
     <div>
       <h2 className="text-lg font-semibold">Alertas de vagas</h2>
       <p className="mt-1 text-sm text-neutral-500">Receba oportunidades novas de acordo com seus interesses.</p>
-      <div className="mt-4"><JobAlertForm /></div>
+      <div className="mt-4"><JobAlertForm onCreated={addAlert} /></div>
       <PushOptIn />
       <div className="mt-4 space-y-2">
         {alerts.map((alert) => (

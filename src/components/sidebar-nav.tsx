@@ -58,7 +58,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Oportunidades",
     items: [
-      { href: "/radar", label: "Radar de Oportunidades 📡", icon: Rss, tour: "nav-radar" },
+      { href: "/radar", label: "Alertas de vagas", icon: Rss, tour: "nav-radar" },
       { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
       { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
       { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
@@ -134,7 +134,7 @@ const APPRENTICE_NAV_GROUPS: NavGroup[] = [
   ] },
   { title: "Vagas", items: [
     { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
-    { href: "/radar", label: "Radar de Oportunidades", icon: Target },
+    { href: "/radar", label: "Alertas de vagas", icon: Target },
     { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
     { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   ] },
@@ -158,7 +158,7 @@ const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
   ] },
   { title: "Vagas", items: [
     { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
-    { href: "/radar", label: "Radar de Oportunidades", icon: Target },
+    { href: "/radar", label: "Alertas de vagas", icon: Target },
     { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
     { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   ] },
@@ -184,7 +184,7 @@ const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
   ] },
   { title: "Vagas", items: [
     { href: "/feed", label: "Feed de Vagas", icon: Rss },
-    { href: "/radar", label: "Radar de Oportunidades", icon: Target },
+    { href: "/radar", label: "Alertas de vagas", icon: Target },
     { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
     { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
   ] },

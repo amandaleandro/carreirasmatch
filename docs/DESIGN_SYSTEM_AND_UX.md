@@ -1,6 +1,6 @@
 # Guia de Design System, Telas e Experiência do Usuário (UX/UI)
 
-Este documento estabelece o guia oficial de interface, estados visuais e componentes do **Carreiras Match / ChanceCreate**.
+Este documento estabelece o guia oficial de interface, estados visuais e componentes do **CarreirasMatch**.
 
 ---
 

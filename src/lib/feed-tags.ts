@@ -247,6 +247,8 @@ export function deriveJobTags(job: {
   url: string;
   location?: string | null;
   company?: string | null;
+  area?: string | null;
+  subarea?: string | null;
 }): JobTags {
   const haystack = `${job.jobTitle} ${job.jobText}`;
 
@@ -263,12 +265,14 @@ export function deriveJobTags(job: {
   // independente de AREA_PATTERNS acima: os labels desse array são mais
   // antigos/grosseiros e não batem 1:1 com os slugs de VOCATION_AREAS, mas
   // servem bem como tag adicional de "área geral" já existente na UI/dados.
-  const { subarea } = classifyArea(haystack);
+  const classified = classifyArea(haystack, job.area);
+  const area = job.area?.trim() || matchFirst(haystack, AREA_PATTERNS) || classified.area;
+  const subarea = job.subarea?.trim() || classified.subarea;
 
   return {
     seniority: matchFirst(haystack, SENIORITY_PATTERNS),
     workModel,
-    area: matchFirst(haystack, AREA_PATTERNS),
+    area: area || undefined,
     subarea: subarea || undefined,
     location: job.location?.trim() || undefined,
     company,
