@@ -12,6 +12,10 @@ import {
   CheckCircle2,
   Target,
   TrendingUp,
+  Bot,
+  Radar,
+  Briefcase,
+  LayoutGrid,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
@@ -46,6 +50,13 @@ const founderWeek = [
   ["QUA", "Entrevista: Analista de Sistemas", "10:00"],
   ["QUI", "Entrevista: Analista", "14:00"],
   ["QUI", "1ª impressão com o time", "16:00"],
+] as const;
+
+const ecosystemCards = [
+  [Bot, "Candidatura automática", "Depois do Match, deixe o CarreirasMatch aplicar sozinho nas vagas mais compatíveis com o seu perfil.", "/applications"],
+  [Radar, "Radar de concurso e vestibular", "Editais e provas monitorados por você, com alertas assim que saem.", "/concursos"],
+  [Briefcase, "Marketplace freelancer", "Contrate ou seja contratado para projetos, com um perfil já validado pela plataforma.", "/freelancers"],
+  [LayoutGrid, "Central de candidaturas", "Histórico de Match, currículos e kits organizados por vaga, sem planilha.", "/applications"],
 ] as const;
 
 const audienceCards = [
@@ -167,6 +178,10 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               Compare seu currículo com uma vaga real, descubra seu Match, veja o que está ajudando ou atrapalhando e ajuste antes de clicar em “candidatar”.
             </p>
 
+            <p className="text-sm font-semibold text-blue-200">
+              E essa é só a primeira vaga. Depois disso tem candidatura automática, radar de concurso e vestibular, e uma central pra organizar tudo.
+            </p>
+
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
               <PrimaryCta label="Calcular meu Match grátis" />
               <Link href="/verificador-ats" className="inline-flex items-center justify-center rounded-xl border border-blue-400/40 bg-blue-500/10 px-5 py-3.5 text-sm font-bold text-blue-200 hover:bg-blue-500/20 transition-all">
@@ -281,6 +296,34 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                 <span>{item}</span>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ECOSSISTEMA - ISSO É SÓ O COMEÇO */}
+        <section className="border-y border-slate-200 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
+          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-wider text-blue-600">Depois desta vaga</p>
+              <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+                Isso é só o começo.
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                O Match resolve a candidatura de hoje. Mas a busca por oportunidade não para em uma vaga só, e o CarreirasMatch também não.
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {ecosystemCards.map(([Icon, title, description, href]) => (
+                <Link key={href + title} href={href} className="group rounded-3xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-4 text-base font-extrabold leading-snug text-slate-900 dark:text-white">{title}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
+                  <span className="mt-5 inline-flex items-center gap-1 text-xs font-bold text-blue-600 transition-transform group-hover:translate-x-1">Conhecer <ArrowRight className="h-3.5 w-3.5" /></span>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
 
