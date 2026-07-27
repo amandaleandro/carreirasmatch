@@ -59,7 +59,7 @@ ${jobs.map((j: { title: string; description: string }, idx: number) => `--- VAGA
       systemPrompt,
       userMessage,
       0.2,
-      3000,
+      6000,
       undefined,
       compareJobsSchema,
       "compare_jobs"
