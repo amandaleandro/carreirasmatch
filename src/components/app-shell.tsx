@@ -1,16 +1,23 @@
+import dynamic from "next/dynamic";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { isAdminEmail } from "@/lib/admin";
 import { isInfluencerUser } from "@/lib/influencer";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
-import { SidebarNav } from "@/components/sidebar-nav";
-import { Topbar } from "@/components/topbar";
 import { DesafioBanner } from "@/components/desafio-banner";
-import { GuidedTour } from "@/components/guided-tour";
-import { UpcomingFeaturesModal } from "@/components/upcoming-features-modal";
-import { UiPanelsProvider } from "@/components/ui-panels";
 import { SubscriptionNudgeProvider } from "@/components/subscription-nudge";
 import { normalizeCareerSegment } from "@/lib/career-segments";
+
+// Code-splitting: essas telas só renderizam para quem está logado como candidato, mas
+// como AppShell é um único componente com branches, sem dynamic() o Next empacotava o JS
+// delas no bundle compartilhado de toda página (inclusive a home para visitante anônimo).
+const SidebarNav = dynamic(() => import("@/components/sidebar-nav").then((m) => m.SidebarNav));
+const Topbar = dynamic(() => import("@/components/topbar").then((m) => m.Topbar));
+const GuidedTour = dynamic(() => import("@/components/guided-tour").then((m) => m.GuidedTour));
+const UpcomingFeaturesModal = dynamic(() =>
+  import("@/components/upcoming-features-modal").then((m) => m.UpcomingFeaturesModal)
+);
+const UiPanelsProvider = dynamic(() => import("@/components/ui-panels").then((m) => m.UiPanelsProvider));
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const session = await auth();
