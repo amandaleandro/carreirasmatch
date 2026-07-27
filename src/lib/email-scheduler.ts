@@ -19,7 +19,10 @@ import {
   sendWeeklyDigestEmail,
   sendCompanyNewTalentEmail,
   sendWhatsappOptinInviteEmail,
+  sendWeeklyGoalCheckinEmail,
+  sendNpsSurveyEmail,
 } from "@/lib/resend";
+import { getWeekStart } from "@/lib/applications";
 import { createUrgencyCoupon } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/push";
 
@@ -429,6 +432,45 @@ async function sendFirstAnalysisMilestones(now: Date): Promise<void> {
   }
 }
 
+/**
+ * Pesquisa de NPS, 3 dias após a primeira análise do usuário: tempo suficiente
+ * pra ele ter sentido o valor (ou a falta dele) sem esfriar a lembrança.
+ * Mesma lógica de "é a primeira análise" do marco de gamificação, só que a
+ * janela de busca fica deslocada NPS_DELAY_DAYS pra trás.
+ */
+const NPS_DELAY_DAYS = 3;
+async function sendNpsSurveys(now: Date): Promise<void> {
+  const windowEnd = new Date(now.getTime() - NPS_DELAY_DAYS * DAY_MS);
+  const windowStart = new Date(windowEnd.getTime() - 2 * DAY_MS);
+  const from = windowStart > MILESTONE_START ? windowStart : MILESTONE_START;
+  if (from > windowEnd) return;
+
+  const analyses = await prisma.analysis.findMany({
+    where: { createdAt: { gte: from, lte: windowEnd } },
+    select: { createdAt: true, resume: { select: { userId: true } } },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const seen = new Set<string>();
+  for (const analysis of analyses) {
+    const userId = analysis.resume.userId;
+    if (!userId || seen.has(userId)) continue;
+    seen.add(userId);
+
+    const priorCount = await prisma.analysis.count({
+      where: { resume: { userId }, createdAt: { lt: analysis.createdAt } },
+    });
+    if (priorCount > 0) continue; // não é a primeira análise do usuário
+
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true, name: true } });
+    if (!user?.email) continue;
+
+    await sendOnce("nps_survey", userId, user.email, () =>
+      sendNpsSurveyEmail(user.email!, { userId, name: user.name })
+    );
+  }
+}
+
 /** Comemora quando uma análise supera a anterior do mesmo usuário por uma margem relevante. */
 async function sendScoreImprovedMilestones(now: Date): Promise<void> {
   const windowStart = new Date(now.getTime() - 2 * DAY_MS);
@@ -682,6 +724,51 @@ async function sendWeeklyDigests(now: Date): Promise<void> {
 }
 
 /**
+ * Check-in semanal do Kanban de candidaturas: quem definiu uma meta semanal
+ * (WeeklyGoal) recebe, na segunda seguinte, o comparativo meta vs. realizado
+ * da semana que passou.
+ */
+async function sendWeeklyGoalCheckins(now: Date): Promise<void> {
+  if (now.getDay() !== 1) return; // segunda-feira
+  const lastWeekStart = getWeekStart(new Date(now.getTime() - 7 * DAY_MS));
+  const lastWeekEnd = new Date(lastWeekStart.getTime() + 7 * DAY_MS);
+
+  const goals = await prisma.weeklyGoal.findMany({
+    where: { weekStart: lastWeekStart },
+    include: { user: { select: { name: true, email: true } } },
+  });
+
+  for (const goal of goals) {
+    const email = goal.user.email;
+    if (!email) continue;
+
+    const [actualApplications, actualInterviews, actualResumeTweaks] = await Promise.all([
+      prisma.application.count({
+        where: { userId: goal.userId, appliedAt: { gte: lastWeekStart, lt: lastWeekEnd } },
+      }),
+      prisma.application.count({
+        where: { userId: goal.userId, interviewAt: { gte: lastWeekStart, lt: lastWeekEnd } },
+      }),
+      prisma.analysis.count({
+        where: { createdAt: { gte: lastWeekStart, lt: lastWeekEnd }, resume: { userId: goal.userId } },
+      }),
+    ]);
+
+    await sendOnce("weekly_goal_checkin", `${goal.userId}:${weekKey(now)}`, email, () =>
+      sendWeeklyGoalCheckinEmail(email, {
+        name: goal.user.name,
+        targetApplications: goal.targetApplications,
+        actualApplications,
+        targetInterviews: goal.targetInterviews,
+        actualInterviews,
+        targetResumeTweaks: goal.targetResumeTweaks,
+        actualResumeTweaks,
+      })
+    );
+  }
+}
+
+/**
  * Alerta B2B semanal: empresas com vaga aberta recebem quantos candidatos novos
  * (opt-in no banco de talentos) entraram na semana. Determinístico, sem IA — o
  * matching fino a empresa roda ao clicar.
@@ -734,9 +821,11 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["checkout_recovery", () => sendCheckoutRecoveryEmails(now)],
     ["job_alerts", () => sendJobAlerts(now)],
     ["milestone_first_analysis", () => sendFirstAnalysisMilestones(now)],
+    ["nps_survey", () => sendNpsSurveys(now)],
     ["milestone_score_improved", () => sendScoreImprovedMilestones(now)],
     ["milestone_analysis_count", () => sendAnalysisCountMilestones(now)],
     ["weekly_digest", () => sendWeeklyDigests(now)],
+    ["weekly_goal_checkin", () => sendWeeklyGoalCheckins(now)],
     ["company_new_talent", () => sendCompanyNewTalentAlerts(now)],
   ];
   for (const [name, step] of steps) {

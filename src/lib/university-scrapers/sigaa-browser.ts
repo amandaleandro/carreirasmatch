@@ -51,7 +51,11 @@ export function createSigaaBrowserCourseScraper(config: SigaaBrowserCourseConfig
     website: config.website,
     async scrape(): Promise<ScrapedUniversityCourse[]> {
       const browser = await getSharedBrowser();
-      const page = await browser.newPage();
+      // Contexto novo por curso: o SIGAA amarra a navegação ao jsessionid do
+      // cookie, e reaproveitar a mesma aba/contexto entre cursos do mesmo
+      // domínio deixava a sessão de um curso vazar pro próximo.
+      const context = await browser.newContext();
+      const page = await context.newPage();
       try {
         const url = `https://${config.domain}/sigaa/public/curso/curriculo.jsf?lc=pt_BR&id=${config.courseId}`;
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
@@ -78,7 +82,7 @@ export function createSigaaBrowserCourseScraper(config: SigaaBrowserCourseConfig
           },
         ];
       } finally {
-        await page.close();
+        await context.close();
       }
     },
   };

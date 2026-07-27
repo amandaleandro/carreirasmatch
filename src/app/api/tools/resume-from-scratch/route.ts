@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireToolAccess } from "@/lib/require-auth";
-import { generateResumeFromScratch } from "@/lib/tools";
+import { generateResumeFromScratch, serializeResumeFromScratch } from "@/lib/tools";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(req: NextRequest) {
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: session.user.id,
         fileName: "Currículo gerado do zero",
-        rawText: result.summary,
+        rawText: serializeResumeFromScratch(result),
       },
     });
 

@@ -58,6 +58,7 @@ model User {
   contactRequests             TalentContactRequest[]
   companyJobApplications      CompanyJobApplication[]
   gameScores                  GameScore[]
+  npsResponses                NpsResponse[]
 
   autoApplicationSettings     AutoApplicationSettings?
   autoApplicationQueue        AutoApplicationQueue[]
@@ -528,6 +529,20 @@ model SoftSkillTestResult {
 /// Registro de e-mails de ciclo de vida já enviados, para garantir idempotência
 /// (o scheduler roda várias vezes ao dia e os transacionais disparam em caminho
 /// síncrono + webhook). `dedupeKey` identifica unicamente o evento por tipo.
+/// Resposta de NPS (0-10) capturada pelo clique no e-mail de pesquisa, sem
+/// exigir login: o token na URL identifica o usuário com segurança.
+model NpsResponse {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  score     Int
+  source    String   @default("post_first_analysis")
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([score, createdAt])
+}
+
 model EmailLog {
   id        String   @id @default(cuid())
   type      String // "payment_failed" | "subscription_cancelled" | "renewal_reminder" | "subscription_expired" | "onboarding_nudge" | "lead_followup"

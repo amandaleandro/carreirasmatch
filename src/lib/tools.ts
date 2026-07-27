@@ -446,6 +446,44 @@ ${input.skills}`;
   return runToolJsonPrompt<ResumeFromScratchResult>("resume_from_scratch", systemPrompt, userMessage);
 }
 
+// Serializa o currículo estruturado gerado do zero em texto corrido, para
+// salvar como Resume.rawText — sem isso, o rawText ficava só com o resumo de
+// 3-4 frases e qualquer reuso (reanálise contra vaga, exportação PDF/DOCX)
+// perdia formação, projetos e habilidades.
+export function serializeResumeFromScratch(result: ResumeFromScratchResult): string {
+  const { contact, education, experiences, skills, languages, certifications } = result.resumeStructured;
+  const lines: string[] = [];
+
+  if (contact?.name) lines.push(contact.name);
+  const contactLine = [contact?.email, contact?.phone, contact?.location, contact?.linkedin, contact?.github, contact?.portfolio]
+    .filter(Boolean)
+    .join(" | ");
+  if (contactLine) lines.push(contactLine);
+
+  lines.push("", "RESUMO PROFISSIONAL", result.summary);
+
+  if (experiences?.length) {
+    lines.push("", "EXPERIÊNCIA / PROJETOS");
+    for (const experience of experiences) {
+      lines.push(`${experience.role || "Atividade"} — ${experience.company || ""}${experience.period ? ` (${experience.period})` : ""}`.trim());
+      if (experience.description) lines.push(experience.description);
+    }
+  }
+
+  if (education?.length) {
+    lines.push("", "FORMAÇÃO");
+    for (const item of education) {
+      lines.push(`${item.degree || ""} — ${item.institution || ""}${item.period ? ` (${item.period})` : ""}`.trim());
+    }
+  }
+
+  if (skills?.length) lines.push("", "HABILIDADES", skills.join(", "));
+  if (languages?.length) lines.push("", "IDIOMAS", languages.map((item) => `${item.language} (${item.level})`).join(", "));
+  if (certifications?.length) lines.push("", "CERTIFICAÇÕES", certifications.join(", "));
+
+  return lines.join("\n");
+}
+
 // --- Análise de LinkedIn ---
 
 export type LinkedInReviewResult = {

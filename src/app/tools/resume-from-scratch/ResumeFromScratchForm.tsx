@@ -31,6 +31,11 @@ const EXAMPLES = [
   },
 ];
 
+const STEPS = ["Sobre você", "Experiências", "Habilidades"];
+
+const inputClass =
+  "w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors";
+
 export function ResumeFromScratchForm({
   initialTargetRole = "",
   initialProjects = "",
@@ -39,6 +44,7 @@ export function ResumeFromScratchForm({
   initialProjects?: string;
 }) {
   const router = useRouter();
+  const [step, setStep] = useState(0);
   const [fullName, setFullName] = useState("");
   const [targetRole, setTargetRole] = useState(initialTargetRole);
   const [education, setEducation] = useState("");
@@ -58,12 +64,30 @@ export function ResumeFromScratchForm({
     setError(null);
   }
 
+  function goNext() {
+    setError(null);
+    if (step === 0 && !education.trim()) {
+      setError("Preencha ao menos a formação para continuar.");
+      return;
+    }
+    if (step === 1 && !projects.trim()) {
+      setError("Conte pelo menos uma experiência, curso ou atividade.");
+      return;
+    }
+    setStep((s) => Math.min(s + 1, STEPS.length - 1));
+  }
+
+  function goBack() {
+    setError(null);
+    setStep((s) => Math.max(s - 1, 0));
+  }
+
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
     if (!education.trim() || !projects.trim() || !skills.trim()) {
-      setError("Preencha formação, projetos/atividades e habilidades.");
+      setError("Preencha formação, experiências e habilidades antes de gerar.");
       return;
     }
 
@@ -99,16 +123,36 @@ export function ResumeFromScratchForm({
       <Link href="/tools" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
         ← Voltar para ferramentas
       </Link>
-      <header className="mt-4 mb-8">
+      <header className="mt-4 mb-6">
         <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
           Currículo
         </span>
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Currículo do zero</h1>
         <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Ainda não tem currículo? Preencha as informações abaixo e a IA monta um
-          currículo completo pra você, já pronto para editar e baixar em PDF.
+          Responda 3 passos rápidos e a IA monta um currículo completo pra você,
+          já pronto para editar e baixar em PDF.
         </p>
       </header>
+
+      {/* Progress */}
+      <div className="flex items-center gap-2 mb-8">
+        {STEPS.map((label, i) => (
+          <div key={label} className="flex-1">
+            <div
+              className={`h-1.5 rounded-full transition-colors ${
+                i <= step ? "bg-blue-600" : "bg-neutral-200 dark:bg-neutral-800"
+              }`}
+            />
+            <p
+              className={`mt-1.5 text-xs font-medium ${
+                i === step ? "text-blue-600 dark:text-blue-400" : "text-neutral-400"
+              }`}
+            >
+              {i + 1}. {label}
+            </p>
+          </div>
+        ))}
+      </div>
 
       <div className="mb-8">
         <p className="text-sm font-medium mb-2">Não sabe por onde começar? Use um exemplo:</p>
@@ -125,122 +169,159 @@ export function ResumeFromScratchForm({
           ))}
         </div>
         <p className="text-xs text-neutral-500 mt-2">
-          Isso preenche o formulário com um exemplo pronto, edite os campos com suas
+          Isso preenche os 3 passos com um exemplo pronto, edite os campos com suas
           informações reais antes de gerar.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div>
-          <label className="block text-sm font-medium mb-1">Nome (opcional)</label>
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Cargo-alvo</label>
-          <input
-            type="text"
-            value={targetRole}
-            onChange={(e) => setTargetRole(e.target.value)}
-            placeholder="Ex: Estágio em Suporte Técnico"
-            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Formação</label>
-          <textarea
-            value={education}
-            onChange={(e) => setEducation(e.target.value)}
-            rows={2}
-            placeholder="Ex: Cursando Análise e Desenvolvimento de Sistemas, previsão de conclusão 2027"
-            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Projetos, cursos, voluntariado, trabalhos informais
-          </label>
-          <textarea
-            value={projects}
-            onChange={(e) => setProjects(e.target.value)}
-            rows={6}
-            placeholder="Descreva cada atividade relevante, mesmo que informal"
-            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Habilidades e tecnologias que você conhece
-          </label>
-          <textarea
-            value={skills}
-            onChange={(e) => setSkills(e.target.value)}
-            rows={3}
-            placeholder="Ex: Linux, Git, Excel, Python básico, inglês intermediário"
-            className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-          />
-        </div>
-
-        <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-          {!showJobFields ? (
-            <button
-              type="button"
-              onClick={() => setShowJobFields(true)}
-              className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
-            >
-              + Já tem uma vaga em mente? Cole aqui para a IA priorizar o que ela pede
-            </button>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-medium">Vaga-alvo (opcional)</p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowJobFields(false);
-                    setJobTitle("");
-                    setJobText("");
-                  }}
-                  className="text-xs text-neutral-500 hover:underline"
-                >
-                  Remover
-                </button>
-              </div>
+        {step === 0 && (
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-1">Nome (opcional)</label>
               <input
                 type="text"
-                value={jobTitle}
-                onChange={(e) => setJobTitle(e.target.value)}
-                placeholder="Cargo da vaga, ex: Estágio em Suporte Técnico na empresa X"
-                className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
-              />
-              <textarea
-                value={jobText}
-                onChange={(e) => setJobText(e.target.value)}
-                rows={5}
-                placeholder="Cole aqui a descrição da vaga"
-                className="w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className={inputClass}
               />
             </div>
-          )}
-        </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Cargo-alvo</label>
+              <input
+                type="text"
+                value={targetRole}
+                onChange={(e) => setTargetRole(e.target.value)}
+                placeholder="Ex: Estágio em Suporte Técnico"
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1">Formação</label>
+              <textarea
+                value={education}
+                onChange={(e) => setEducation(e.target.value)}
+                rows={2}
+                placeholder="Ex: Cursando Análise e Desenvolvimento de Sistemas, previsão de conclusão 2027"
+                className={inputClass}
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Projetos, cursos, voluntariado, trabalhos informais
+              </label>
+              <p className="text-xs text-neutral-500 mb-2">
+                Descreva cada atividade relevante, mesmo que informal — uma por linha.
+              </p>
+              <textarea
+                value={projects}
+                onChange={(e) => setProjects(e.target.value)}
+                rows={8}
+                placeholder="Descreva cada atividade relevante, mesmo que informal"
+                className={inputClass}
+              />
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium mb-1">
+                Habilidades e tecnologias que você conhece
+              </label>
+              <textarea
+                value={skills}
+                onChange={(e) => setSkills(e.target.value)}
+                rows={3}
+                placeholder="Ex: Linux, Git, Excel, Python básico, inglês intermediário"
+                className={inputClass}
+              />
+            </div>
+
+            <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+              {!showJobFields ? (
+                <button
+                  type="button"
+                  onClick={() => setShowJobFields(true)}
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  + Já tem uma vaga em mente? Cole aqui para a IA priorizar o que ela pede
+                </button>
+              ) : (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Vaga-alvo (opcional)</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowJobFields(false);
+                        setJobTitle("");
+                        setJobText("");
+                      }}
+                      className="text-xs text-neutral-500 hover:underline"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                  <input
+                    type="text"
+                    value={jobTitle}
+                    onChange={(e) => setJobTitle(e.target.value)}
+                    placeholder="Cargo da vaga, ex: Estágio em Suporte Técnico na empresa X"
+                    className={inputClass}
+                  />
+                  <textarea
+                    value={jobText}
+                    onChange={(e) => setJobText(e.target.value)}
+                    rows={5}
+                    placeholder="Cole aqui a descrição da vaga"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
-        >
-          {loading ? "Gerando..." : "Gerar currículo"}
-        </button>
+        <div className="flex items-center gap-3 pt-2">
+          {step > 0 && (
+            <button
+              type="button"
+              onClick={goBack}
+              className="rounded-xl border border-neutral-200 dark:border-white/10 px-5 py-2.5 text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-white/5 transition-colors"
+            >
+              Voltar
+            </button>
+          )}
+
+          {step < STEPS.length - 1 ? (
+            <button
+              type="button"
+              onClick={goNext}
+              className="flex-1 rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all"
+            >
+              Próximo
+            </button>
+          ) : (
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 rounded-xl bg-blue-600 text-white font-semibold px-5 py-2.5 shadow-sm shadow-blue-600/20 hover:bg-blue-700 transition-all disabled:opacity-50"
+            >
+              {loading ? "Gerando..." : "Gerar currículo"}
+            </button>
+          )}
+        </div>
       </form>
 
       {loading && (

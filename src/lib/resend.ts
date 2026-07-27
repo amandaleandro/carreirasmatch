@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { formatCentsToBRL } from "@/lib/pricing";
 import { prisma } from "@/lib/prisma";
 import { formatBrazilDate } from "@/lib/brazil";
+import { createNpsToken } from "@/lib/nps-token";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -925,6 +926,110 @@ export async function sendFreelanceContractCompletedEmail(
       <p style="color:#64748b;margin:0 0 16px;">${greeting}o contratante confirmou a entrega de <strong>${opts.projectTitle}</strong>. Seu repasse de <strong>${formatCentsToBRL(opts.payoutCents)}</strong> já está na fila de pagamento.</p>
       <p>Aproveite pra avaliar o contratante, isso ajuda outros freelancers a escolherem melhor os projetos ⭐</p>
       ${button(`${APP_URL}/freelancer/meus-projetos`, "Avaliar e ver meus contratos")}
+    `
+  );
+}
+
+/**
+ * Pesquisa de NPS: 0 a 10 clicáveis direto no e-mail, sem precisar logar.
+ * Cada número já é um link para /api/nps que registra o voto e redireciona
+ * pra página de agradecimento.
+ */
+export async function sendNpsSurveyEmail(
+  to: string,
+  opts: { userId: string; name?: string | null; source?: string }
+) {
+  const greeting = opts.name?.trim() ? `${opts.name.trim().split(" ")[0]}, ` : "";
+  const token = createNpsToken(opts.userId);
+  const source = opts.source ?? "post_first_analysis";
+  const scoreLink = (n: number) =>
+    `${APP_URL}/api/nps?t=${encodeURIComponent(token)}&score=${n}&source=${encodeURIComponent(source)}`;
+
+  const scale = Array.from({ length: 11 }, (_, n) => n);
+  const cells = scale
+    .map(
+      (n) => `
+        <td style="padding:2px;">
+          <a href="${scoreLink(n)}" style="display:block;width:30px;height:30px;line-height:30px;text-align:center;border-radius:8px;background:#f1f5f9;color:#0f172a;font-weight:700;font-size:13px;text-decoration:none;border:1px solid #e2e8f0;">${n}</a>
+        </td>
+      `
+    )
+    .join("");
+
+  await send(
+    to,
+    "🙋 Uma pergunta rápida sobre o CarreirasMatch",
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}posso te fazer uma pergunta? 🙋</h2>
+      <p style="color:#64748b;margin:0 0 20px;">Em uma escala de 0 a 10, o quanto você recomendaria o ${BRAND} para um amigo ou colega que está buscando emprego?</p>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 14px;">
+        <tr>${cells}</tr>
+      </table>
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td style="font-size:11px;color:#94a3b8;">Pouco provável</td>
+          <td style="font-size:11px;color:#94a3b8;text-align:right;">Super provável</td>
+        </tr>
+      </table>
+      <p style="margin-top:22px;">É só um clique, sem formulário. Sua resposta é o que mais nos ajuda a decidir o que construir a seguir 💬</p>
+    `
+  );
+}
+
+/** Check-in semanal da meta de busca (Kanban de candidaturas): metas definidas vs. o que de fato aconteceu. */
+export async function sendWeeklyGoalCheckinEmail(
+  to: string,
+  opts: {
+    name: string | null;
+    targetApplications: number;
+    actualApplications: number;
+    targetInterviews: number;
+    actualInterviews: number;
+    targetResumeTweaks: number;
+    actualResumeTweaks: number;
+  }
+) {
+  const greeting = opts.name ? `Olá, ${opts.name.split(" ")[0]}!` : "Olá!";
+  const hit = (actual: number, target: number) => actual >= target;
+  const row = (icon: string, label: string, actual: number, target: number) => {
+    const ok = hit(actual, target);
+    return `
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+        <tr>
+          <td style="background:#f8fafc;border:1px solid #eef2f7;border-radius:12px;padding:14px 16px;">
+            <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+              <tr>
+                <td width="36" style="font-size:20px;vertical-align:top;">${icon}</td>
+                <td style="font-size:14px;color:#334155;line-height:1.6;">
+                  ${label}<br/>
+                  <strong style="font-size:17px;color:#0f172a;">${actual} de ${target}</strong>
+                  ${ok ? ` <span style="color:#16a34a;font-weight:700;">✓ bateu a meta</span>` : ""}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    `;
+  };
+  const allHit =
+    hit(opts.actualApplications, opts.targetApplications) &&
+    hit(opts.actualInterviews, opts.targetInterviews) &&
+    hit(opts.actualResumeTweaks, opts.targetResumeTweaks);
+  const subject = allHit
+    ? "🏆 Você bateu todas as metas da semana"
+    : `📋 Como foi sua semana de busca? ${opts.actualApplications}/${opts.targetApplications} candidaturas`;
+  await send(
+    to,
+    subject,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 20px;">Fecha a semana passada, veja como foi contra as metas que você definiu:</p>
+      ${row("🎯", "Candidaturas enviadas", opts.actualApplications, opts.targetApplications)}
+      ${row("🗣️", "Entrevistas marcadas", opts.actualInterviews, opts.targetInterviews)}
+      ${row("📝", "Ajustes de currículo", opts.actualResumeTweaks, opts.targetResumeTweaks)}
+      <p style="margin-top:22px;">${allHit ? "Semana redonda! Bora manter o ritmo 🚀" : "Toda semana é uma chance nova de bater a meta. Ajuste o plano e siga em frente 💪"}</p>
+      ${button(`${APP_URL}/applications`, "Ver meu painel de candidaturas")}
     `
   );
 }
