@@ -564,6 +564,13 @@ const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: st
     subheadline: "Treine no padrão da FGV, corrija seus erros e siga um plano claro para a fase em que você está.",
   },
 };
+const ECOSYSTEM_CARDS = [
+  { icon: "🤖", title: "Candidatura automática", description: "Depois do diagnóstico, deixe o sistema aplicar sozinho nas vagas mais compatíveis com o seu perfil.", href: "/applications" },
+  { icon: "📡", title: "Radar de concurso e vestibular", description: "Editais e provas monitorados por você, com alertas assim que saem.", href: "/concursos" },
+  { icon: "🧑‍💻", title: "Marketplace freelancer", description: "Contrate ou seja contratado para projetos, com um perfil já validado pela plataforma.", href: "/freelancers" },
+  { icon: "🗂️", title: "Central de candidaturas", description: "Histórico de Match, currículos e kits organizados por vaga, sem planilha.", href: "/applications" },
+] as const;
+
 const RESOURCE_TABS = [
   { key: "curiosities", label: "Curiosidades" },
   { key: "freeCourses", label: "Cursos gratis" },
@@ -1327,6 +1334,35 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           <p className="mt-2 max-w-2xl mx-auto text-center text-xs text-neutral-400">
             <strong className="text-neutral-600 dark:text-neutral-300">Seu próximo passo:</strong> {offer.nextBestAction}
           </p>
+        </section>
+
+        {/* Ecossistema: deixa claro que a plataforma não termina no diagnóstico desta página */}
+        <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
+          <div className="max-w-2xl">
+            <p className={`text-xs font-semibold uppercase tracking-wide ${theme.accentText}`}>Depois deste diagnóstico</p>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight mt-1">Isso é só o começo.</h2>
+            <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">
+              Este diagnóstico resolve o momento de agora. O CarreirasMatch continua com você depois dele.
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {ECOSYSTEM_CARDS.map((card) => (
+              <Link
+                key={card.title}
+                href={card.href}
+                className="group rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white/95 dark:bg-neutral-950/95 p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+              >
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-neutral-100 dark:bg-neutral-900 text-lg">
+                  {card.icon}
+                </span>
+                <h3 className="mt-4 text-sm font-bold leading-snug text-neutral-900 dark:text-white">{card.title}</h3>
+                <p className="mt-2 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">{card.description}</p>
+                <span className={`mt-4 inline-flex items-center gap-1 text-xs font-bold transition-transform group-hover:translate-x-1 ${theme.accentText}`}>
+                  Conhecer →
+                </span>
+              </Link>
+            ))}
+          </div>
         </section>
 
         {/* Learning resources */}
