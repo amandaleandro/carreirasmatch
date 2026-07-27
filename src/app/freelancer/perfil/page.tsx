@@ -23,6 +23,7 @@ export default async function FreelancerProfilePage() {
     portfolio: parsePortfolio(profile?.portfolio),
     available: profile?.available ?? true,
     published: profile?.published ?? false,
+    pixKey: profile?.pixKey ?? "",
   };
 
   return (

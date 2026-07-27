@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { CareerGameContext } from "@/components/career-game-context";
@@ -230,9 +230,12 @@ export default function DilemasGamePage() {
   const [currentScenarioIdx, setCurrentScenarioIdx] = useState<number>(0);
   const [gameOver, setGameOver] = useState<boolean>(false);
   const [gameOverReason, setGameOverReason] = useState<string>("");
+  const [selectedOption, setSelectedOption] = useState<"A" | "B" | null>(null);
+  const [selectedEffect, setSelectedEffect] = useState<Effect | null>(null);
 
   // Get active deck
-  const fullDeck = DILEMMAS_BY_AREA[area] ?? GENERIC_SCENARIOS;
+  const fullDeck = DILEMMAS_BY_AREA[area]
+    ?? (area === "tecnologia" ? DILEMMAS_BY_AREA.ti : area === "saude" ? DILEMMAS_BY_AREA.medicina : GENERIC_SCENARIOS);
   const activeDeck = fullDeck.slice(0, phase === 1 ? 1 : phase === 2 ? 2 : fullDeck.length);
   const currentScenario = activeDeck[currentScenarioIdx % activeDeck.length];
 
@@ -246,9 +249,41 @@ export default function DilemasGamePage() {
     setCurrentScenarioIdx(0);
     setGameOver(false);
     setGameOverReason("");
+    setSelectedOption(null);
+    setSelectedEffect(null);
   }
 
-  function applyChoice(effect: Effect) {
+  async function saveScore(score: number) {
+    try {
+      await fetch("/api/jogos/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ game: "dilemas", area, score: Math.max(0, Math.round(score)) }),
+      });
+    } catch {
+      // O jogo continua mesmo quando o usuário está deslogado.
+    }
+  }
+
+  useEffect(() => {
+    if (!selectedOption) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setWeeks((w) => w + 1);
+      setCurrentScenarioIdx((i) => i + 1);
+      setSelectedOption(null);
+      setSelectedEffect(null);
+    }, 900);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [selectedOption]);
+
+  function applyChoice(option: "A" | "B", effect: Effect) {
+    if (selectedOption) return;
+
+    setSelectedOption(option);
+    setSelectedEffect(effect);
+
     const nextRep = Math.min(100, Math.max(0, reputation + (effect.reputation ?? 0)));
     const nextTeam = Math.min(100, Math.max(0, team + (effect.team ?? 0)));
     const nextBudget = Math.min(100, Math.max(0, budget + (effect.budget ?? 0)));
@@ -262,27 +297,29 @@ export default function DilemasGamePage() {
     // Check Game Over Conditions
     if (nextHealth <= 0) {
       setGameOver(true);
+      void saveScore(weeks * 150 + nextRep * 10 + nextHealth * 5);
       setGameOverReason("Burnout! Sua Saúde Mental chegou a zero por estresse extremo.");
       return;
     }
     if (nextRep <= 0) {
       setGameOver(true);
+      void saveScore(weeks * 150 + nextRep * 10 + nextHealth * 5);
       setGameOverReason("Reputação Arruinada! Sua credibilidade no mercado caiu a zero.");
       return;
     }
     if (nextTeam <= 0) {
       setGameOver(true);
+      void saveScore(weeks * 150 + nextRep * 10 + nextHealth * 5);
       setGameOverReason("Debandada Geral! O time/clientes perderam a confiança e abandonaram o projeto.");
       return;
     }
     if (nextBudget <= 0) {
       setGameOver(true);
+      void saveScore(weeks * 150 + nextRep * 10 + nextHealth * 5);
       setGameOverReason("Falência do Projeto! Os recursos e orçamento esgotaram.");
       return;
     }
 
-    setWeeks((w) => w + 1);
-    setCurrentScenarioIdx((i) => i + 1);
   }
 
   const scorePoints = weeks * 150 + reputation * 10 + health * 5;
@@ -392,10 +429,32 @@ export default function DilemasGamePage() {
 
         {/* Card do Dilema Principal */}
         {!gameOver ? (
-          <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+          <div
+            key={`${currentScenario.id}-${weeks}`}
+            className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden animate-in fade-in slide-in-from-right-4 duration-500"
+          >
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-bold uppercase tracking-wider">
-              Dilema Semanal #{weeks}
+              {selectedOption ? `Decisão ${selectedOption} registrada` : `Dilema Semanal #${weeks}`}
             </div>
+
+            {selectedOption && selectedEffect && (
+              <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <p className="text-xs font-bold text-emerald-300">Impacto da sua escolha</p>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-semibold text-neutral-200">
+                  {Object.entries({
+                    Reputação: selectedEffect.reputation,
+                    Pessoas: selectedEffect.team,
+                    Recursos: selectedEffect.budget,
+                    Saúde: selectedEffect.health,
+                  }).map(([label, value]) => value !== undefined && (
+                    <span key={label} className={value >= 0 ? "text-emerald-300" : "text-rose-300"}>
+                      {label} {value >= 0 ? "+" : ""}{value}%
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-2 text-[11px] text-neutral-400">Preparando o próximo dilema...</p>
+              </div>
+            )}
 
             <div className="space-y-2">
               <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
@@ -409,8 +468,9 @@ export default function DilemasGamePage() {
             {/* Opções A e B */}
             <div className="grid gap-3 pt-4">
               <button
-                onClick={() => applyChoice(currentScenario.optionA.effect)}
-                className="group relative text-left p-5 rounded-2xl bg-neutral-800/80 hover:bg-blue-900/30 border border-neutral-700 hover:border-blue-500 transition-all active:scale-[0.99] cursor-pointer"
+                onClick={() => applyChoice("A", currentScenario.optionA.effect)}
+                disabled={Boolean(selectedOption)}
+                className={`group relative text-left p-5 rounded-2xl border transition-all active:scale-[0.99] ${selectedOption === "A" ? "border-blue-400 bg-blue-900/40 ring-1 ring-blue-400/50" : "bg-neutral-800/80 border-neutral-700 hover:bg-blue-900/30 hover:border-blue-500"} ${selectedOption ? "cursor-default opacity-70" : "cursor-pointer"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -426,8 +486,9 @@ export default function DilemasGamePage() {
               </button>
 
               <button
-                onClick={() => applyChoice(currentScenario.optionB.effect)}
-                className="group relative text-left p-5 rounded-2xl bg-neutral-800/80 hover:bg-purple-900/30 border border-neutral-700 hover:border-purple-500 transition-all active:scale-[0.99] cursor-pointer"
+                onClick={() => applyChoice("B", currentScenario.optionB.effect)}
+                disabled={Boolean(selectedOption)}
+                className={`group relative text-left p-5 rounded-2xl border transition-all active:scale-[0.99] ${selectedOption === "B" ? "border-purple-400 bg-purple-900/40 ring-1 ring-purple-400/50" : "bg-neutral-800/80 border-neutral-700 hover:bg-purple-900/30 hover:border-purple-500"} ${selectedOption ? "cursor-default opacity-70" : "cursor-pointer"}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>

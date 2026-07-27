@@ -57,7 +57,10 @@ function shuffle<T>(arr: T[]): T[] {
 
 export default function CurriculoPage() {
   const searchParams = useSearchParams();
-  const [area, setArea] = useState("recem-formado");
+  const [area, setArea] = useState(() => {
+    const requested = searchParams.get("area");
+    return requested === "primeiro-emprego" || requested === "ensino-medio" ? "recem-formado" : requested ? "experiente" : "recem-formado";
+  });
   const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [pool, setPool] = useState<{ title: string; steps: string[] }[]>([]);
   const [idx, setIdx] = useState(0);
@@ -197,6 +200,7 @@ export default function CurriculoPage() {
             {checked ? (
               <div className="text-center space-y-3">
                 <p className="text-sm font-bold text-cyan-600">{correctCount} de {correctSteps.length} na posição certa</p>
+                <p className="text-xs text-neutral-500">Ordem de referência: {correctSteps.join(" → ")}</p>
                 <button onClick={nextProfile} className="w-full rounded-2xl bg-blue-600 hover:bg-blue-700 text-white py-3 text-sm font-bold transition-colors">
                   {idx + 1 >= pool.length ? "Ver resultado" : "Próximo currículo"}
                 </button>

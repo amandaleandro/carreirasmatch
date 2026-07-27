@@ -40,6 +40,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     area: pack.area,
     context: pack.context,
-    ...(game === "quiz" ? { questions: pack.questions } : game === "memory" ? { pairs: pack.pairs } : { words: pack.words }),
+    ...(game === "quiz" || game === "duelo" ? { questions: pack.questions } : game === "memory" ? { pairs: pack.pairs } : { words: pack.words }),
   });
 }

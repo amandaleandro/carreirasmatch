@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
 
 export interface ContractPanelProps {
   contractId: string;
@@ -10,9 +11,11 @@ export interface ContractPanelProps {
   agreedLabel: string;
   counterpartName: string;
   alreadyReviewed: boolean;
+  agreedCents: number;
+  paymentStatus: string;
 }
 
-export function ContractPanel({ contractId, status, viewerRole, agreedLabel, counterpartName, alreadyReviewed }: ContractPanelProps) {
+export function ContractPanel({ contractId, status, viewerRole, agreedLabel, counterpartName, alreadyReviewed, agreedCents, paymentStatus }: ContractPanelProps) {
   const router = useRouter();
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +64,19 @@ export function ContractPanel({ contractId, status, viewerRole, agreedLabel, cou
       </div>
 
       {error && <p className="text-sm font-semibold text-red-500">{error}</p>}
+
+      {viewerRole === "client" && paymentStatus !== "paid" && paymentStatus !== "cancelled" && status !== "cancelled" && (
+        <div className="rounded-xl border border-blue-200 dark:border-blue-500/20 bg-white dark:bg-neutral-950 p-4">
+          <p className="text-sm font-semibold mb-2">Pague o serviço para iniciar a custódia</p>
+          <p className="text-xs text-neutral-500 mb-3">O valor fica retido pela plataforma e só é liberado após a entrega e a confirmação do contratante.</p>
+          <MercadoPagoPaymentBrick
+            amount={agreedCents / 100}
+            kind="freelance"
+            freelanceContractId={contractId}
+            onSuccess={() => router.refresh()}
+          />
+        </div>
+      )}
 
       {status !== "completed" && status !== "cancelled" && (
         <div className="flex flex-wrap gap-2">

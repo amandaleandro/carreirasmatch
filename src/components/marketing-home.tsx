@@ -297,8 +297,8 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               </p>
             </div>
 
-            {/* 4 CARDS INDEPENDENTES E BEM ESPAÇADOS */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            {/* 3 CARDS INDEPENDENTES E BEM ESPAÇADOS */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {/* Card 1: Grátis */}
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
@@ -334,46 +334,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                 </Link>
               </div>
 
-              {/* Card 2: Análise Avulsa */}
-              <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
-                <div className="space-y-4">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                    Para esta vaga · 1 análise
-                  </span>
-                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">Análise Completa</h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 9,90</span>
-                    <span className="text-[11px] text-slate-500 font-semibold">/ único</span>
-                  </div>
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    Veja o que ajustar nesta oportunidade específica.
-                  </p>
-
-                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Nota de compatibilidade de 0 a 100%</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Palavras-chave do filtro ATS</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Justificativa técnica detalhada</span>
-                    </div>
-                  </div>
-                </div>
-
-                <Link
-                  href="/analise"
-                  className="w-full rounded-2xl border border-blue-200 dark:border-blue-800 hover:bg-blue-50 dark:hover:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-extrabold py-3.5 text-center text-xs transition-all"
-                >
-                  Ver diagnóstico completo →
-                </Link>
-              </div>
-
-              {/* Card 3: Kit Candidatura */}
+              {/* Card 2: Kit Candidatura (avulso, une análise completa + kit) */}
               <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 flex flex-col justify-between shadow-sm space-y-6">
                 <div className="space-y-4">
                   <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
@@ -381,7 +342,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   </span>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white">Kit Candidatura</h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 12,90</span>
+                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 9,90</span>
                     <span className="text-[11px] text-slate-500 font-semibold">/ único</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-relaxed">
@@ -391,7 +352,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                   <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3 text-xs font-semibold text-slate-700 dark:text-slate-300">
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-                      <span>Tudo da Análise Completa</span>
+                      <span>Nota de compatibilidade e justificativa técnica</span>
                     </div>
                     <div className="flex items-center gap-2.5">
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
@@ -412,7 +373,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                 </Link>
               </div>
 
-              {/* Card 4: Assinatura Mensal Profissional (O MAIS ESCOLHIDO) */}
+              {/* Card 3: Assinatura Mensal Profissional (O MAIS ESCOLHIDO) */}
               <div className="rounded-3xl border-2 border-blue-500 bg-[#071827] text-white p-6 flex flex-col justify-between shadow-2xl relative space-y-6 mt-4 sm:mt-0">
                 <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 text-white px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-wider shadow-md whitespace-nowrap z-10">
                   ⭐ O Mais Escolhido

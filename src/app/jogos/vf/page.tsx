@@ -40,7 +40,7 @@ const ROUND_SECONDS = 45;
 
 export default function VfPage() {
   const searchParams = useSearchParams();
-  const [area, setArea] = useState("carreira");
+  const [area, setArea] = useState(() => searchParams.get("area") ?? "carreira");
   const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -51,11 +51,16 @@ export default function VfPage() {
   const [feedback, setFeedback] = useState<null | { ok: boolean; e: string }>(null);
   const [timeLeft, setTimeLeft] = useState(() => phase === 1 ? 30 : phase === 2 ? ROUND_SECONDS : 60);
   const scoreRef = useRef(0);
+  const seenFactsRef = useRef(new Set<string>());
 
   const pick = useCallback(
     (a: string) => {
-      const list = FACTS[a] ?? FACTS.carreira;
-      setFact(list[Math.floor(Math.random() * list.length)]);
+      const list = FACTS[a] ?? FACTS.mercado ?? FACTS.carreira;
+      const available = list.filter((item) => !seenFactsRef.current.has(item.s));
+      const source = available.length > 0 ? available : list;
+      const nextFact = source[Math.floor(Math.random() * source.length)];
+      seenFactsRef.current.add(nextFact.s);
+      setFact(nextFact);
     },
     []
   );
@@ -85,6 +90,7 @@ export default function VfPage() {
     setCombo(0);
     setBest(0);
     setFeedback(null);
+    seenFactsRef.current.clear();
     setTimeLeft(phase === 1 ? 30 : phase === 2 ? ROUND_SECONDS : 60);
     setFinished(false);
     setStarted(true);

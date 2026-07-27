@@ -13,6 +13,7 @@ export interface FreelancerProfileInitial {
   portfolio: PortfolioItem[];
   available: boolean;
   published: boolean;
+  pixKey: string;
 }
 
 const inputClass =
@@ -28,6 +29,7 @@ export function FreelancerProfileForm({ initial }: { initial: FreelancerProfileI
   const [skillInput, setSkillInput] = useState("");
   const [hourlyRate, setHourlyRate] = useState(initial.hourlyRate);
   const [portfolio, setPortfolio] = useState<PortfolioItem[]>(initial.portfolio);
+  const [pixKey, setPixKey] = useState(initial.pixKey);
   const [available, setAvailable] = useState(initial.available);
   const [error, setError] = useState<string | null>(null);
   const [savedMsg, setSavedMsg] = useState<string | null>(null);
@@ -79,6 +81,7 @@ export function FreelancerProfileForm({ initial }: { initial: FreelancerProfileI
           portfolio: portfolio.filter((p) => p.title.trim() || p.url.trim()),
           available,
           published: publish,
+          pixKey,
         }),
       });
       const data = await res.json();
@@ -172,6 +175,19 @@ export function FreelancerProfileForm({ initial }: { initial: FreelancerProfileI
           placeholder="Deixe em branco para 'a combinar'"
           className={inputClass}
         />
+      </div>
+
+      <div>
+        <label className={labelClass}>Chave Pix para receber pagamentos *</label>
+        <input
+          type="text"
+          value={pixKey}
+          onChange={(e) => setPixKey(e.target.value)}
+          placeholder="CPF, e-mail, telefone ou chave aleatória"
+          className={inputClass}
+          maxLength={120}
+        />
+        <p className="mt-1 text-xs text-neutral-500">A chave fica privada e só é usada para liberar o pagamento de serviços concluídos.</p>
       </div>
 
       <div>

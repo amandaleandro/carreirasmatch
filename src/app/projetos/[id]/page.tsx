@@ -137,9 +137,11 @@ export default async function ProjectDetailPage({ params }: Props) {
           contractId={contract.id}
           status={contract.status}
           viewerRole={viewerId === contract.clientUserId ? "client" : "freelancer"}
-          agreedLabel={`Valor acordado: ${formatCents(contract.agreedCents)}`}
+          agreedLabel={`Valor acordado: ${formatCents(contract.agreedCents)} · Comissão: ${formatCents(contract.platformFeeCents)} · Freelancer recebe: ${formatCents(contract.freelancerPayoutCents)}`}
           counterpartName={(viewerId === contract.clientUserId ? contract.freelancer.name : contract.client.name) ?? "Não informado"}
           alreadyReviewed={alreadyReviewed}
+          agreedCents={contract.agreedCents}
+          paymentStatus={contract.paymentStatus}
         />
       )}
 

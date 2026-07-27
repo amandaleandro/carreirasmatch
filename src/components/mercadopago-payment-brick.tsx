@@ -24,9 +24,11 @@ export function MercadoPagoPaymentBrick({
   couponCode,
   segment,
   onSuccess,
+  freelanceContractId,
 }: {
   amount: number;
-  kind: "first_analysis" | "diagnostic" | "subscription_monthly" | "subscription_annual";
+  kind: "first_analysis" | "diagnostic" | "subscription_monthly" | "subscription_annual" | "freelance";
+  freelanceContractId?: string;
   analysisId?: string;
   payerEmail?: string;
   couponCode?: string;
@@ -74,17 +76,14 @@ export function MercadoPagoPaymentBrick({
       setError(null);
       track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind });
       try {
-        const res = await fetch("/api/billing/payment", {
+        const res = await fetch(freelanceContractId ? `/api/freelance/contracts/${freelanceContractId}/checkout` : "/api/billing/payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            kind,
-            analysisId,
-            formData,
-            couponCode,
-            segment,
-            attribution: getStoredAttribution(),
-          }),
+          body: JSON.stringify(
+            freelanceContractId
+              ? { formData }
+              : { kind, analysisId, formData, couponCode, segment, attribution: getStoredAttribution() }
+          ),
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error ?? "Erro ao processar pagamento.");
@@ -111,7 +110,7 @@ export function MercadoPagoPaymentBrick({
         throw err;
       }
     },
-    [kind, onSuccess],
+    [kind, onSuccess, freelanceContractId],
   );
 
   const handleError = useCallback(

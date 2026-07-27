@@ -35,7 +35,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Marketplace de Freelancers | CarreirasMatch",
   description:
-    "Cadastre seu perfil de freelancer 100% grátis ou contrate profissionais qualificados para o seu projeto sem intermediários ou taxas abusivas.",
+    "Cadastre seu perfil de freelancer grátis ou contrate profissionais qualificados para o seu projeto com comissão transparente de 5% por serviço concluído.",
   alternates: { canonical: "/freelancers" },
 };
 
@@ -54,8 +54,8 @@ const HOW_IT_WORKS = [
   },
   {
     step: "03",
-    title: "Feche Negócios sem Taxas Abusivas",
-    description: "Conecte-se com contratantes reais sem perder 20% do seu trabalho em comissões de plataformas tradicionais.",
+    title: "Feche Negócios com Taxa Transparente",
+    description: "Conecte-se com contratantes reais pagando apenas 5% sobre cada serviço concluído.",
     icon: DollarSign,
   },
 ];
@@ -63,9 +63,9 @@ const HOW_IT_WORKS = [
 const DIFFERENTIALS = [
   {
     icon: Zap,
-    title: "Zero Taxa sobre o seu Trabalho",
+    title: "Comissão Transparente de 5%",
     description:
-      "Nas plataformas tradicionais você deixa até 20% das suas propostas. No CarreirasMatch seu perfil é 100% livre de comissões abusivas.",
+      "Seu cadastro e sua vitrine são gratuitos. A plataforma retém apenas 5% do valor bruto quando o serviço é concluído.",
   },
   {
     icon: TrendingUp,
@@ -100,7 +100,7 @@ const FAQ = [
   {
     question: "O CarreirasMatch cobra comissão sobre os projetos fechados?",
     answer:
-      "Não! Ao contrário de outras plataformas que retêm 10% a 20% do valor do freelancer, mantemos a conexão direta entre contratante e profissional sem abocanhar seus ganhos.",
+      "Sim. O cadastro é gratuito e a plataforma retém 5% do valor bruto de cada serviço concluído; os 95% restantes ficam com o freelancer.",
   },
 ];
 
@@ -149,7 +149,7 @@ export default async function FreelancersPage({ searchParams }: Props) {
             </h1>
 
             <p className="text-slate-300 max-w-2xl text-base sm:text-lg leading-relaxed font-normal">
-              Conectamos freelancers qualificados a projetos reais. Monte seu perfil profissional em 2 minutos, exiba seu portfólio na vitrine pública e fique com <strong className="text-white">100% dos seus ganhos</strong>.
+              Conectamos freelancers qualificados a projetos reais. Monte seu perfil profissional em 2 minutos e exiba seu portfólio na vitrine pública. Em cada serviço concluído, você fica com 95% do valor.
             </p>
 
             {/* CTAs */}
@@ -176,7 +176,7 @@ export default async function FreelancersPage({ searchParams }: Props) {
           <div className="relative z-10 mt-10 pt-6 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs sm:text-sm text-slate-300">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span><strong>0% de Taxa</strong> de comissão</span>
+              <span><strong>5% de comissão</strong> por serviço concluído</span>
             </div>
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0" />

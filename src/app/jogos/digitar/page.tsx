@@ -58,7 +58,7 @@ export default function SpeedTyperPage() {
   const searchParams = useSearchParams();
   const [area, setArea] = useState<string>(() => gameAreaFromSlug(searchParams.get("area")));
   const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
-  const [snippetIndex, setSnippetIndex] = useState<number>(() => phase - 1);
+  const [snippetIndex, setSnippetIndex] = useState<number>(() => Math.max(0, phase - 1));
   const [inputVal, setInputVal] = useState<string>("");
   const [startTime, setStartTime] = useState<number | null>(null);
   const [wpm, setWpm] = useState<number>(0);
@@ -67,7 +67,8 @@ export default function SpeedTyperPage() {
   const [seconds, setSeconds] = useState<number>(60);
   const [timerActive, setTimerActive] = useState<boolean>(false);
 
-  const targetText = SNIPPETS[area]?.[snippetIndex]?.text ?? "";
+  const activeSnippetIndex = snippetIndex % (SNIPPETS[area]?.length ?? 1);
+  const targetText = SNIPPETS[area]?.[activeSnippetIndex]?.text ?? "";
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Reiniciar jogo
@@ -225,7 +226,7 @@ export default function SpeedTyperPage() {
         {/* Caixa de Texto do Jogo */}
         <section className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-6 md:p-8 space-y-6 shadow-sm relative">
           <div className="flex items-center justify-between text-xs text-neutral-400 border-b border-neutral-100 dark:border-neutral-800 pb-3">
-            <span>Snippet: <span className="font-bold text-neutral-600 dark:text-neutral-200">{SNIPPETS[area]?.[snippetIndex]?.label}</span></span>
+            <span>Snippet: <span className="font-bold text-neutral-600 dark:text-neutral-200">{SNIPPETS[area]?.[activeSnippetIndex]?.label}</span></span>
             <button
               onClick={() => {
                 const nextIndex = (snippetIndex + 1) % (SNIPPETS[area]?.length ?? 1);

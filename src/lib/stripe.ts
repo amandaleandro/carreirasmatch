@@ -38,7 +38,7 @@ export async function createStripeCheckoutSession({
   originUrl,
 }: CreateStripeSessionOptions): Promise<Stripe.Checkout.Session> {
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
-  let unitAmountCents = 1290;
+  let unitAmountCents = 990;
   let productName = "Diagnóstico Completo de Candidatura";
 
   if (kind === "first_analysis") {

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
+import { calculateFreelanceCommissionCents, calculateFreelancerPayoutCents } from "@/lib/freelance";
 
 // Gerencia uma proposta:
 //  - o contratante (dono do projeto) aceita ("accept") ou rejeita ("reject");
@@ -63,6 +64,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           clientUserId: proposal.project.clientUserId,
           freelancerUserId: proposal.freelancerUserId,
           agreedCents: proposal.bidCents,
+          platformFeeCents: calculateFreelanceCommissionCents(proposal.bidCents),
+          freelancerPayoutCents: calculateFreelancerPayoutCents(proposal.bidCents),
         },
       });
       await tx.freelanceProposal.update({ where: { id: proposal.id }, data: { status: "accepted" } });

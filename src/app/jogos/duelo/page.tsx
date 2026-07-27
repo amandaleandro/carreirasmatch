@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { CareerGameContext } from "@/components/career-game-context";
 import { SiteFooter } from "@/components/site-footer";
@@ -17,6 +18,8 @@ import {
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { addXp } from "@/lib/gamification";
+import { gameAreaFromSlug } from "@/lib/game-area";
+import { normalizeGamePhase } from "@/lib/game-progression";
 
 type Question = {
   q: string;
@@ -60,9 +63,38 @@ const DUEL_QUESTIONS: Question[] = [
     options: ["Bounce Rate", "CTR", "ROAS", "LTV"],
     correct: 0,
   },
+  {
+    q: "Qual atitude ajuda a transformar um feedback em melhoria prática?",
+    options: ["Ignorar o comentário", "Definir uma ação e acompanhar o resultado", "Culpar outra pessoa", "Evitar novas avaliações"],
+    correct: 1,
+  },
+  {
+    q: "Em uma planilha, qual recurso ajuda a encontrar rapidamente um valor relacionado a uma chave?",
+    options: ["Filtro ou busca", "Alterar a cor da aba", "Fechar o arquivo", "Aumentar o zoom"],
+    correct: 0,
+  },
+  {
+    q: "O que uma boa comunicação profissional deve fazer quando há um atraso?",
+    options: ["Esconder o problema", "Avisar o impacto e propor um novo prazo", "Esperar alguém descobrir", "Cancelar sem explicar"],
+    correct: 1,
+  },
+  {
+    q: "Qual é uma evidência forte de uma habilidade no currículo?",
+    options: ["Um adjetivo sem exemplo", "Um projeto ou resultado concreto", "Uma lista enorme de interesses", "Uma promessa de aprendizado"],
+    correct: 1,
+  },
+  {
+    q: "Antes de executar uma tarefa importante, qual prática reduz retrabalho?",
+    options: ["Confirmar objetivo e critérios de entrega", "Começar sem ler o pedido", "Fazer várias versões sem prioridade", "Evitar perguntas"],
+    correct: 0,
+  },
 ];
 
 export default function DueloGamePage() {
+  const searchParams = useSearchParams();
+  const [area] = useState(() => gameAreaFromSlug(searchParams.get("area"), "carreira"));
+  const [phase] = useState(() => normalizeGamePhase(searchParams.get("fase")));
+  const [personalizedQuestions, setPersonalizedQuestions] = useState<Question[] | null>(null);
   const [playerHp, setPlayerHp] = useState<number>(100);
   const [botHp, setBotHp] = useState<number>(100);
 
@@ -73,7 +105,19 @@ export default function DueloGamePage() {
 
   const [statusMessage, setStatusMessage] = useState<string>("Escolha seu ataque!");
 
-  const currentQ = DUEL_QUESTIONS[roundIdx % DUEL_QUESTIONS.length];
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/jogos/personalizados?game=duelo&fase=${phase}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data: { questions?: Question[] } | null) => {
+        if (active && data?.questions?.length) setPersonalizedQuestions(data.questions);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [phase]);
+
+  const questions = personalizedQuestions ?? DUEL_QUESTIONS;
+  const currentQ = questions[roundIdx % questions.length];
 
   function startDuel() {
     setPlayerHp(100);
@@ -117,7 +161,7 @@ export default function DueloGamePage() {
     setSelectedOpt(null);
     setAnswered(false);
 
-    if (roundIdx + 1 < DUEL_QUESTIONS.length && playerHp > 0 && botHp > 0) {
+    if (roundIdx + 1 < questions.length && playerHp > 0 && botHp > 0) {
       setRoundIdx((r) => r + 1);
       setStatusMessage("Nova Rodada! Concentre-se no próximo golpe.");
     } else {
@@ -127,6 +171,11 @@ export default function DueloGamePage() {
 
   function endGame(playerWon: boolean) {
     setFinished(true);
+    void fetch("/api/jogos/scores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game: "duelo", area, score: playerWon ? 300 : 100 }),
+    }).catch(() => {});
     if (playerWon) {
       addXp(300);
     } else {
@@ -205,7 +254,7 @@ export default function DueloGamePage() {
         {!finished ? (
           <div className="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
             <header className="flex items-center justify-between text-xs text-neutral-400 border-b border-neutral-800 pb-3">
-              <span>Rodada {roundIdx + 1} de {DUEL_QUESTIONS.length}</span>
+              <span>Rodada {roundIdx + 1} de {questions.length}</span>
               <span className="font-bold text-purple-400 uppercase">Perguntas Relâmpago</span>
             </header>
 
@@ -252,7 +301,7 @@ export default function DueloGamePage() {
                 onClick={handleNextRound}
                 className="w-full rounded-2xl bg-purple-600 hover:bg-purple-500 text-white py-3 text-sm font-bold shadow-lg transition-all text-center cursor-pointer"
               >
-                {roundIdx + 1 === DUEL_QUESTIONS.length ? "Ver Vencedor da Batalha" : "Próximo Golpe"}
+                {roundIdx + 1 === questions.length ? "Ver Vencedor da Batalha" : "Próximo Golpe"}
               </button>
             )}
           </div>

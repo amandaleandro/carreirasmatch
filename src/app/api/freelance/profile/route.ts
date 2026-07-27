@@ -28,6 +28,7 @@ export async function PUT(req: Request) {
     portfolio?: unknown;
     available?: boolean;
     published?: boolean;
+    pixKey?: string;
   };
   try {
     body = await req.json();
@@ -46,12 +47,16 @@ export async function PUT(req: Request) {
   );
   const available = body.available !== false;
   const published = Boolean(body.published);
+  const pixKey = (body.pixKey ?? "").trim().slice(0, 120);
 
   if (published && !headline) {
     return NextResponse.json(
       { error: "Escreva um título profissional antes de publicar o perfil." },
       { status: 400 }
     );
+  }
+  if (published && !pixKey) {
+    return NextResponse.json({ error: "Informe uma chave Pix antes de publicar o perfil." }, { status: 400 });
   }
 
   const data = {
@@ -63,6 +68,7 @@ export async function PUT(req: Request) {
     portfolio: JSON.stringify(portfolioItems),
     available,
     published,
+    pixKey,
   };
 
   const profile = await prisma.freelancerProfile.upsert({

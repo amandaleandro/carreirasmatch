@@ -301,6 +301,26 @@ export function GamesCatalog({
 
       {/* Seletor de Categorias & Áreas */}
       {/* Banner de Área Selecionada */}
+      <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
+        <label htmlFor="games-track" className="text-[10px] font-black uppercase tracking-wider text-neutral-400">
+          Escolha sua trilha
+        </label>
+        <select
+          id="games-track"
+          value={selectedCategory}
+          onChange={(event) => setSelectedCategory(event.target.value)}
+          className="mt-2 w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm font-semibold text-neutral-800 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white"
+        >
+          <option value="todos">Todas as trilhas</option>
+          {(profileStage === "ensino-medio" || profileStage === "primeiro-emprego") && (
+            <option value={profileStage}>{profileStage === "ensino-medio" ? "Ensino Medio" : "Primeiro emprego"}</option>
+          )}
+          {VOCATION_AREAS.map((area) => (
+            <option key={area.slug} value={area.slug}>{area.label}</option>
+          ))}
+        </select>
+      </section>
+
       {activeArea && (
         <div className="rounded-2xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>

@@ -136,3 +136,15 @@ export function formatBudget(
   if (single != null) return `${formatCents(single)}${suffix}`;
   return "A combinar";
 }
+
+/** Comissão da plataforma sobre o valor bruto de cada serviço concluído. */
+export const FREELANCE_PLATFORM_COMMISSION_RATE = 0.05;
+
+export function calculateFreelanceCommissionCents(agreedCents: number): number {
+  if (!Number.isFinite(agreedCents) || agreedCents <= 0) return 0;
+  return Math.round(agreedCents * FREELANCE_PLATFORM_COMMISSION_RATE);
+}
+
+export function calculateFreelancerPayoutCents(agreedCents: number): number {
+  return Math.max(0, Math.round(agreedCents) - calculateFreelanceCommissionCents(agreedCents));
+}

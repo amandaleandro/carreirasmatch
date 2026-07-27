@@ -8,8 +8,17 @@ export async function POST(req: NextRequest) {
 
   try {
     const { game, area, score } = await req.json();
+    const allowedGames = new Set([
+      "typer", "quiz", "memory", "termo", "forca", "vf", "ordenar",
+      "cacapalavras", "curriculo", "dilemas", "inbox", "duelo",
+    ]);
 
-    if (!game || !area || typeof score !== "number") {
+    if (
+      typeof game !== "string" || !allowedGames.has(game) ||
+      typeof area !== "string" || area.length > 80 ||
+      typeof score !== "number" || !Number.isFinite(score) ||
+      !Number.isInteger(score) || score < 0 || score > 100000
+    ) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
     }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { PublicSiteHeader } from "@/components/public-site-header";
 import { CareerGameContext } from "@/components/career-game-context";
 import { SiteFooter } from "@/components/site-footer";
@@ -21,6 +22,7 @@ import {
 import Link from "next/link";
 import { ShareGameCard } from "@/components/share-game-card";
 import { addXp } from "@/lib/gamification";
+import { gameAreaFromSlug } from "@/lib/game-area";
 
 type TaskCategory = "urgente" | "agendar" | "delegar" | "descartar";
 
@@ -89,9 +91,95 @@ const SAMPLE_EMAILS: EmailItem[] = [
     preview: "Reposição dos pacotes de papel nas gavetas inferiores.",
     correctCategory: "delegar",
   },
+  {
+    id: "e9",
+    sender: "Cliente NovaPonte",
+    subject: "URGENTE: acesso bloqueado antes da apresentação para investidores",
+    preview: "A equipe não consegue entrar na plataforma e a apresentação começa em 30 minutos.",
+    correctCategory: "urgente",
+  },
+  {
+    id: "e10",
+    sender: "Financeiro",
+    subject: "Fechamento mensal: envie suas notas fiscais até sexta-feira",
+    preview: "Os documentos podem ser enviados pelo portal interno até as 17h.",
+    correctCategory: "agendar",
+  },
+  {
+    id: "e11",
+    sender: "Facilities",
+    subject: "Vistoria do ar-condicionado da sala de reuniões",
+    preview: "O técnico precisa de alguém para acompanhar a visita na próxima terça à tarde.",
+    correctCategory: "delegar",
+  },
+  {
+    id: "e12",
+    sender: "Loja de Eletrônicos",
+    subject: "Última chance: compre seu fone com desconto exclusivo",
+    preview: "Oferta promocional enviada para toda a base de contatos.",
+    correctCategory: "descartar",
+  },
+  {
+    id: "e13",
+    sender: "Segurança da Informação",
+    subject: "URGENTE: tentativa de login suspeita na sua conta",
+    preview: "Confirme agora se você reconhece o acesso originado de outro país.",
+    correctCategory: "urgente",
+  },
+  {
+    id: "e14",
+    sender: "Liderança do Projeto",
+    subject: "Reunião de acompanhamento da sprint",
+    preview: "Escolha um horário disponível entre quarta e quinta para revisar as entregas.",
+    correctCategory: "agendar",
+  },
+  {
+    id: "e15",
+    sender: "Time de Compras",
+    subject: "Três cotações para renovar o material de escritório",
+    preview: "Compare os fornecedores e recomende a melhor opção até o final da semana.",
+    correctCategory: "delegar",
+  },
+  {
+    id: "e16",
+    sender: "Rede Social Corporativa",
+    subject: "Você foi marcado em uma publicação sobre produtividade",
+    preview: "Veja as novidades e participe da conversa com outros profissionais.",
+    correctCategory: "descartar",
+  },
+  {
+    id: "e17",
+    sender: "Operações",
+    subject: "URGENTE: pedido errado enviado para um cliente estratégico",
+    preview: "O transporte sai em duas horas e precisamos decidir a correção imediatamente.",
+    correctCategory: "urgente",
+  },
+  {
+    id: "e18",
+    sender: "People & Culture",
+    subject: "Inscrições abertas para o treinamento de liderança",
+    preview: "Reserve uma das turmas disponíveis para o próximo mês.",
+    correctCategory: "agendar",
+  },
+  {
+    id: "e19",
+    sender: "Administrativo",
+    subject: "Atualização da lista de contatos de emergência",
+    preview: "Peça ao seu time para conferir os dados e enviar as alterações consolidadas.",
+    correctCategory: "delegar",
+  },
+  {
+    id: "e20",
+    sender: "Clube de Vantagens",
+    subject: "Pesquisa rápida: qual brinde você gostaria de receber?",
+    preview: "Responda à enquete promocional para concorrer a um kit personalizado.",
+    correctCategory: "descartar",
+  },
 ];
 
 export default function InboxZeroGamePage() {
+  const searchParams = useSearchParams();
+  const [area] = useState(() => gameAreaFromSlug(searchParams.get("area"), "carreira"));
   const [timeLeft, setTimeLeft] = useState<number>(40);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [finished, setFinished] = useState<boolean>(false);
@@ -99,6 +187,8 @@ export default function InboxZeroGamePage() {
   const [score, setScore] = useState<number>(0);
   const [streak, setStreak] = useState<number>(0);
   const [errors, setErrors] = useState<number>(0);
+  const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [feedbackCategory, setFeedbackCategory] = useState<TaskCategory | null>(null);
 
   const [currentIdx, setCurrentIdx] = useState<number>(0);
   const currentEmail = SAMPLE_EMAILS[currentIdx % SAMPLE_EMAILS.length];
@@ -108,7 +198,12 @@ export default function InboxZeroGamePage() {
     setFinished(true);
     const xpEarned = Math.max(50, Math.round(score * 1.5));
     addXp(xpEarned);
-  }, [score]);
+    void fetch("/api/jogos/scores", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ game: "inbox", area, score }),
+    }).catch(() => {});
+  }, [area, score]);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -127,6 +222,8 @@ export default function InboxZeroGamePage() {
     setScore(0);
     setStreak(0);
     setErrors(0);
+    setFeedback(null);
+    setFeedbackCategory(null);
     setCurrentIdx(0);
     setIsPlaying(true);
     setFinished(false);
@@ -136,11 +233,14 @@ export default function InboxZeroGamePage() {
     if (!isPlaying) return;
 
     if (category === currentEmail.correctCategory) {
+      setFeedback("correct");
       const newStreak = streak + 1;
       const points = 100 * (1 + Math.floor(newStreak / 3) * 0.5);
       setScore((s) => s + Math.round(points));
       setStreak(newStreak);
     } else {
+      setFeedback("wrong");
+      setFeedbackCategory(currentEmail.correctCategory);
       setStreak(0);
       setErrors((e) => {
         const nextErr = e + 1;
@@ -152,6 +252,7 @@ export default function InboxZeroGamePage() {
     }
 
     setCurrentIdx((i) => i + 1);
+    window.setTimeout(() => setFeedback(null), 700);
   }
 
   return (
@@ -227,6 +328,12 @@ export default function InboxZeroGamePage() {
                 Nova Mensagem
               </span>
             </div>
+
+            {feedback && (
+              <div className={`rounded-xl border px-3 py-2 text-center text-xs font-bold animate-in fade-in slide-in-from-top-2 duration-200 ${feedback === "correct" ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300" : "border-rose-500/30 bg-rose-500/10 text-rose-300"}`}>
+                {feedback === "correct" ? "Classificação correta!" : `Classificação incorreta. Esta mensagem era: ${feedbackCategory}.`}
+              </div>
+            )}
 
             <div className="space-y-2">
               <h3 className="text-lg sm:text-xl font-black text-white leading-snug">

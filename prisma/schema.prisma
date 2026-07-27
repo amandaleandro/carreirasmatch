@@ -1100,6 +1100,8 @@ model FreelancerProfile {
   skills          String   @default("[]")
   /// Valor/hora em centavos. null = "a combinar".
   hourlyRateCents Int?
+  /// Chave Pix usada para o repasse do freelancer (nunca exibida na vitrine).
+  pixKey          String   @default("")
   /// JSON de { title, url, imageUrl, description }[].
   portfolio       String   @default("[]")
   /// Aceitando novos projetos? Controla visibilidade na vitrine.
@@ -1179,6 +1181,17 @@ model FreelanceContract {
   freelancerUserId String
   freelancer       User              @relation("FreelancerContracts", fields: [freelancerUserId], references: [id], onDelete: Cascade)
   agreedCents      Int
+  /// Comissão da plataforma (5% do valor bruto), congelada no aceite.
+  platformFeeCents Int               @default(0)
+  /// Valor líquido devido ao freelancer após a comissão.
+  freelancerPayoutCents Int           @default(0)
+  paymentStatus   String            @default("pending") // pending | paid | cancelled | refunded
+  mpPaymentId     String?           @unique
+  paymentPaidAt   DateTime?
+  freelancerConfirmedAt DateTime?
+  clientConfirmedAt DateTime?
+  payoutStatus    String            @default("waiting") // waiting | ready | released
+  payoutReleasedAt DateTime?
   status           String            @default("active") // active | delivered | completed | cancelled
   deliveredAt      DateTime?
   completedAt      DateTime?

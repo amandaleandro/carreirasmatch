@@ -42,6 +42,22 @@ export async function POST(req: NextRequest) {
   if (!dataId) return NextResponse.json({ ok: true });
 
   if (type === "payment") {
+    const freelanceContract = await prisma.freelanceContract.findUnique({ where: { mpPaymentId: dataId } });
+    if (freelanceContract) {
+      const mpPayment = await getPayment(dataId);
+      const paymentStatus = mpPayment.status === "approved"
+        ? "paid"
+        : mpPayment.status === "rejected" || mpPayment.status === "cancelled"
+          ? "cancelled"
+          : mpPayment.status === "refunded" || mpPayment.status === "charged_back"
+            ? "refunded"
+            : "pending";
+      await prisma.freelanceContract.update({
+        where: { id: freelanceContract.id },
+        data: { paymentStatus, paymentPaidAt: paymentStatus === "paid" ? freelanceContract.paymentPaidAt ?? new Date() : freelanceContract.paymentPaidAt },
+      });
+      return NextResponse.json({ ok: true });
+    }
     const payment = await prisma.payment.findUnique({ where: { mpPaymentId: dataId } });
     if (!payment) {
       // Pode ser um pagamento de empresa (compra de créditos de triagem).
