@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         data: {
           name: normalizedName,
           passwordHash,
-          ...(normalizedPhone ? { phone: normalizedPhone } : {}),
+          ...(normalizedPhone ? { phone: normalizedPhone, whatsappMarketingOptIn: true } : {}),
           ...(typeof currentProfessionalArea === "string" ? { currentProfessionalArea: currentProfessionalArea.trim() || null } : {}),
           ...(typeof targetProfessionalArea === "string" ? { targetProfessionalArea: targetProfessionalArea.trim() || null } : {}),
           ...(typeof studyCourse === "string" ? { studyCourse: studyCourse.trim() || null } : {}),
@@ -101,6 +101,7 @@ export async function POST(req: NextRequest) {
     const data = {
       name: normalizedName,
       phone: normalizedPhone,
+      whatsappMarketingOptIn: Boolean(normalizedPhone),
       passwordHash,
       careerSegment: effectiveCareerSegment,
       professionalArea: typeof professionalArea === "string" && professionalArea.trim()

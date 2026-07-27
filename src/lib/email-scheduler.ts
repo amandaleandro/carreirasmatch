@@ -18,6 +18,7 @@ import {
   sendCompanyDormantNudgeEmail,
   sendWeeklyDigestEmail,
   sendCompanyNewTalentEmail,
+  sendWhatsappOptinInviteEmail,
 } from "@/lib/resend";
 import { createUrgencyCoupon } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/push";
@@ -107,6 +108,30 @@ async function sendOnboardingNudges(now: Date): Promise<void> {
 
     await sendOnce("onboarding_nudge", user.id, user.email, () =>
       sendOnboardingNudgeEmail(user.email!, { name: user.name })
+    );
+  }
+}
+
+/**
+ * Convite pra ligar o opt-in de WhatsApp (whatsappMarketingOptIn), pra quem
+ * já tem conta há mais de 3 dias e nunca ativou. Disparo único por usuário
+ * (EmailLog garante isso), sem janela de "até" — roda uma vez pra cada
+ * usuário e nunca mais. Existe porque a base de opt-in de WhatsApp estava
+ * em ~1 usuário: sem gente optada, a régua de WhatsApp inteira (conversão +
+ * alerta de vaga) não tem quem alcançar.
+ */
+async function sendWhatsappOptinInvites(now: Date): Promise<void> {
+  const to = new Date(now.getTime() - 3 * DAY_MS);
+
+  const users = await prisma.user.findMany({
+    where: { createdAt: { lte: to }, whatsappMarketingOptIn: false, email: { not: null } },
+    select: { id: true, name: true, email: true },
+  });
+
+  for (const user of users) {
+    if (!user.email) continue;
+    await sendOnce("whatsapp_optin_invite", user.id, user.email, () =>
+      sendWhatsappOptinInviteEmail(user.email!, user.name)
     );
   }
 }
@@ -698,6 +723,7 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["renewal_reminders", () => sendRenewalReminders(now)],
     ["expire_subscriptions", () => expireLapsedSubscriptions(now)],
     ["onboarding_nudges", () => sendOnboardingNudges(now)],
+    ["whatsapp_optin_invites", () => sendWhatsappOptinInvites(now)],
     ["lead_followups", () => sendLeadFollowUps(now)],
     ["company_dormant_nudges", () => sendCompanyDormantNudges(now)],
     ["diagnostic_upgrades", () => sendDiagnosticUpgradeEmails(now)],

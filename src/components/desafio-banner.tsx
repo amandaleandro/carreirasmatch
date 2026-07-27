@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { Flame, X, ArrowRight } from "lucide-react";
 
@@ -11,14 +11,15 @@ export function DesafioBanner() {
   const router = useRouter();
   const [dismissed, setDismissed] = useState(true);
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      try {
-        setDismissed(Boolean(window.localStorage.getItem(STORAGE_KEY)));
-      } catch {
-        setDismissed(false);
-      }
-    });
+  // useLayoutEffect (em vez de useEffect+queueMicrotask) resolve o estado antes do
+  // browser pintar, evitando o banner "pipocar" e empurrar o hero pra baixo (CLS)
+  // depois da primeira renderização para visitantes novos.
+  useLayoutEffect(() => {
+    try {
+      setDismissed(Boolean(window.localStorage.getItem(STORAGE_KEY)));
+    } catch {
+      setDismissed(false);
+    }
   }, []);
 
   // Exibir em todas as telas, exceto na própria página do desafio (/desafio)

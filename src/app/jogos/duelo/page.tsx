@@ -110,13 +110,22 @@ export default function DueloGamePage() {
     fetch(`/api/jogos/personalizados?game=duelo&fase=${phase}`)
       .then((response) => response.ok ? response.json() : null)
       .then((data: { questions?: Question[] } | null) => {
-        if (active && data?.questions?.length) setPersonalizedQuestions(data.questions);
+        // Guard against short packs (generic areas without a full term bank)
+        // repeating mid-duel and feeling like a stuck phase.
+        if (active && data?.questions && data.questions.length >= 4) {
+          setPersonalizedQuestions(data.questions);
+        }
       })
       .catch(() => {});
     return () => { active = false; };
   }, [phase]);
 
-  const questions = personalizedQuestions ?? DUEL_QUESTIONS;
+  // Fase sobe a dificuldade: menos rodadas para vencer e contra-ataques mais fortes do bot.
+  const roundsForPhase = phase === 1 ? 6 : phase === 2 ? 8 : 10;
+  const botDamageForPhase = phase === 1 ? 20 : phase === 2 ? 25 : 34;
+
+  const allQuestions = personalizedQuestions ?? DUEL_QUESTIONS;
+  const questions = allQuestions.slice(0, roundsForPhase);
   const currentQ = questions[roundIdx % questions.length];
 
   function startDuel() {
@@ -146,9 +155,9 @@ export default function DueloGamePage() {
       }
     } else {
       // Bot Hit Player
-      const nextPlayerHp = Math.max(0, playerHp - 20);
+      const nextPlayerHp = Math.max(0, playerHp - botDamageForPhase);
       setPlayerHp(nextPlayerHp);
-      setStatusMessage("💥 CONTRA-ATAQUE! O MatchBot aproveitou seu erro e te causou 20 de dano!");
+      setStatusMessage(`💥 CONTRA-ATAQUE! O MatchBot aproveitou seu erro e te causou ${botDamageForPhase} de dano!`);
 
       if (nextPlayerHp <= 0) {
         endGame(false);

@@ -18,28 +18,33 @@ const LOGO_URL = `${APP_URL}/logos/wordmark-dark.png`; // texto branco, p/ fundo
  */
 function layout(bodyHtml: string) {
   return `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f9;padding:32px 16px;font-family:-apple-system,'Segoe UI',sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f9;padding:40px 16px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.08);">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.10),0 1px 2px rgba(15,23,42,.06);">
             <tr>
-              <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:24px 28px;">
+              <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:28px 32px;">
                 <a href="${APP_URL}" style="text-decoration:none;">
-                  <img src="${LOGO_URL}" alt="${BRAND}" height="28" style="height:28px;width:auto;display:block;border:0;" />
+                  <img src="${LOGO_URL}" alt="${BRAND}" height="26" style="height:26px;width:auto;display:block;border:0;" />
                 </a>
               </td>
             </tr>
             <tr>
-              <td style="padding:28px 28px 6px;color:#0f172a;font-size:15px;line-height:1.65;">
+              <td style="height:4px;background:linear-gradient(90deg,#60a5fa,#2563eb,#1e40af);font-size:0;line-height:0;">&nbsp;</td>
+            </tr>
+            <tr>
+              <td style="padding:36px 32px 8px;color:#1e293b;font-size:15.5px;line-height:1.7;">
                 ${bodyHtml}
               </td>
             </tr>
             <tr>
-              <td style="padding:12px 28px 26px;">
-                <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0 16px;" />
-                <p style="font-size:12px;color:#64748b;margin:0;line-height:1.5;">
-                  Você recebeu este e-mail porque tem uma conta no ${BRAND} 💙<br/>
-                  <a href="${APP_URL}" style="color:#64748b;">${APP_URL.replace(/^https?:\/\//, "")}</a>
+              <td style="padding:8px 32px 30px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+                  <tr><td style="border-top:1px solid #eef2f7;font-size:0;line-height:0;">&nbsp;</td></tr>
+                </table>
+                <p style="font-size:12px;color:#94a3b8;margin:18px 0 0;line-height:1.6;">
+                  Você recebeu este e-mail porque tem uma conta no <strong style="color:#64748b;">${BRAND}</strong> 💙<br/>
+                  <a href="${APP_URL}" style="color:#94a3b8;">${APP_URL.replace(/^https?:\/\//, "")}</a>
                 </p>
               </td>
             </tr>
@@ -52,10 +57,10 @@ function layout(bodyHtml: string) {
 
 function button(href: string, label: string) {
   return `
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:22px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
       <tr>
-        <td style="border-radius:12px;background:linear-gradient(135deg,#2563eb,#1e40af);">
-          <a href="${href}" style="display:inline-block;padding:14px 26px;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;border-radius:12px;">
+        <td style="border-radius:12px;background:linear-gradient(135deg,#2563eb,#1e40af);box-shadow:0 4px 12px rgba(37,99,235,.28);">
+          <a href="${href}" style="display:inline-block;padding:14px 28px;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;border-radius:12px;letter-spacing:.2px;">
             ${label} →
           </a>
         </td>
@@ -204,13 +209,34 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
   const greeting = name?.trim() ? `Olá, ${name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   await send(
     to,
-    `Bem-vindo(a) ao ${BRAND} 🎉`,
+    `🔓 Sua conta está pronta: descubra seu score de aderência`,
     `
-      <h2 style="font-size: 20px;">${greeting}</h2>
-      <p>Sua conta no ${BRAND} está pronta. A partir de agora você pode analisar seu currículo contra qualquer vaga e descobrir, com IA, o quanto você está aderente e como melhorar.</p>
-      <p>Comece pela sua primeira análise 🚀</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Sua conta no ${BRAND} está pronta.</p>
+      <p>A partir de agora você descobre, com IA, o quanto seu currículo está aderente a qualquer vaga, e exatamente o que ajustar para subir esse número.</p>
+      <p>Leva menos de 2 minutos pra ver seu primeiro score 🚀</p>
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
       <p>💡 Dica: quanto mais específica for a descrição da vaga, mais preciso fica o diagnóstico.</p>
+    `
+  );
+}
+
+/**
+ * Convite pra ativar as "Dicas por WhatsApp" (whatsappMarketingOptIn), pra
+ * quem já tem conta mas nunca ligou o toggle. Disparo único (dedupe via
+ * EmailLog), aponta pra /settings onde fica o WhatsappOptInToggle.
+ */
+export async function sendWhatsappOptinInviteEmail(to: string, name?: string | null) {
+  const greeting = name?.trim() ? `Olá, ${name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
+  await send(
+    to,
+    `📲 Vaga boa não espera e-mail abrir`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Hoje a gente só te avisa por e-mail quando sai uma vaga com boa aderência ao seu perfil. Mas e-mail se acumula, WhatsApp você lê na hora.</p>
+      <p>Ativa o alerta por lá e seja um dos primeiros a ver (e aplicar) quando a vaga certa aparecer 🎯</p>
+      <p>Leva 10 segundos e dá pra desligar quando quiser, respondendo <strong>PARAR</strong>.</p>
+      ${button(`${APP_URL}/settings`, "Ativar dicas por WhatsApp")}
     `
   );
 }
@@ -303,8 +329,8 @@ export async function sendCompanyMemberInviteEmail(
     to,
     `🤝 Você foi adicionado(a) à equipe de ${opts.companyName} no ${BRAND}`,
     `
-      <h2 style="font-size: 20px;">Bem-vindo(a) à equipe 🤝</h2>
-      <p>Você foi adicionado(a) como membro da equipe de <strong>${opts.companyName}</strong> no ${BRAND}.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Bem-vindo(a) à equipe 🤝</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Você foi adicionado(a) como membro da equipe de <strong>${opts.companyName}</strong> no ${BRAND}.</p>
       <p>Entre com este e-mail e a senha temporária abaixo, e troque a senha no seu perfil:</p>
       <p style="background:#f1f5f9;border-radius:10px;padding:12px;font-size:16px;">
         🔑 Senha temporária: <strong>${opts.tempPassword}</strong>
@@ -347,10 +373,10 @@ export async function sendCompanySubscriptionCancelledEmail(to: string) {
 export async function sendCompanyDormantNudgeEmail(to: string, opts: { companyName: string }) {
   await send(
     to,
-    "Sua vaga ainda não saiu do papel 👀",
+    "👀 Enquanto isso, seus concorrentes já estão contratando",
     `
-      <h2 style="font-size: 20px;">Bora publicar sua primeira vaga? 👀</h2>
-      <p>Oi, ${opts.companyName}! Notamos que sua empresa se cadastrou no ${BRAND} mas ainda não publicou nenhuma vaga.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Bora publicar sua primeira vaga? 👀</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Oi, ${opts.companyName}! Notamos que sua empresa se cadastrou no ${BRAND} mas ainda não publicou nenhuma vaga.</p>
       <p>Cadastrar uma vaga leva menos de 2 minutos e você já recebe candidatos ranqueados por aderência com IA, sem custo pra começar.</p>
       ${button(`${APP_URL}/empresa/vagas/nova`, "Publicar minha primeira vaga")}
     `
@@ -496,10 +522,11 @@ export async function sendLeadFollowUpEmail(
   const checkoutUrl = opts.checkoutUrl?.startsWith("/") ? opts.checkoutUrl : "/analise";
   await send(
     to,
-    "📊 Seu diagnóstico de carreira está esperando",
+    "📊 Seu score já foi calculado. Falta só destravar",
     `
-      <h2 style="font-size: 20px;">${greeting}</h2>
-      <p>Você começou uma análise no ${BRAND} e ficou faltando pouco para ver o resultado completo: seu score de aderência, o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Você começou uma análise no ${BRAND} e ficou faltando pouco para ver o resultado completo.</p>
+      <p>Seu score de aderência já está calculado, o que falta é ver: o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
       <p>Leva menos de 2 minutos para desbloquear ⏱️</p>
       ${button(`${APP_URL}${checkoutUrl}`, "Ver minha análise completa")}
       <p>💡 Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
@@ -514,10 +541,10 @@ export async function sendDiagnosticUpgradeEmail(
   const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
   await send(
     to,
-    "🚀 Leve seu diagnóstico para as próximas vagas",
+    "🌱 O diagnóstico foi só o começo. O que vem agora?",
     `
-      <h2 style="font-size: 20px;">Um diagnóstico é só o começo 🌱</h2>
-      <p>Agora que você já viu o que ajustar nesta oportunidade, o próximo passo é repetir o processo nas próximas vagas e acompanhar sua evolução.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Um diagnóstico é só o começo 🌱</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Agora que você já viu o que ajustar nesta oportunidade, o próximo passo é repetir o processo nas próximas vagas e acompanhar sua evolução.</p>
       <p>Com o plano mensal, você reúne novas análises, currículo otimizado, preparação de entrevista, plano de ação e acompanhamento das candidaturas ✨</p>
       ${button(href, "Conhecer o plano mensal")}
       <p>Você pode cancelar quando quiser 🙂</p>
@@ -532,10 +559,10 @@ export async function sendCheckoutRecoveryEmail(
   const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
   await send(
     to,
-    "💳 Quer continuar sua assinatura?",
+    "💳 Faltou um clique pra sua assinatura ativar",
     `
-      <h2 style="font-size: 20px;">Seu plano ainda não foi ativado</h2>
-      <p>Você começou o pagamento, mas a assinatura ainda não foi confirmada. Se o Pix expirou ou o cartão não foi aprovado, pode retomar com outra forma de pagamento.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Seu plano ainda não foi ativado</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Você começou o pagamento, mas a assinatura ainda não foi confirmada. Se o Pix expirou ou o cartão não foi aprovado, pode retomar com outra forma de pagamento.</p>
       ${button(href, "Retomar assinatura")}
       <p>Se já pagou por Pix, aguarde alguns instantes, a confirmação é automática ⏳</p>
     `
@@ -549,11 +576,12 @@ export async function sendOnboardingNudgeEmail(
   const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   await send(
     to,
-    "✍️ Vamos fazer sua primeira análise?",
+    "🔍 Seu currículo está aderente ou não? Você ainda não sabe",
     `
-      <h2 style="font-size: 20px;">${greeting}</h2>
-      <p>Você criou sua conta no ${BRAND} mas ainda não fez sua primeira análise. É o passo que mostra, com IA, o quanto seu currículo está aderente a uma vaga e exatamente o que melhorar 🔍</p>
-      <p>Comece agora, leva menos de 2 minutos ⏱️</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Você criou sua conta no ${BRAND} mas ainda não fez sua primeira análise.</p>
+      <p>É o passo que mostra, com IA, o quanto seu currículo está aderente a uma vaga real e exatamente o que melhorar antes de aplicar 🔍</p>
+      <p>Leva menos de 2 minutos ⏱️</p>
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
       <p>Se tiver qualquer dúvida, é só responder este e-mail 💬</p>
     `
@@ -718,18 +746,19 @@ export async function sendJobAlertEmail(
   opts: { query: string; location: string; jobs: Array<{ title: string; url: string; source: string }> }
 ) {
   const rows = opts.jobs.slice(0, 10).map((job) => `
-    <div style="border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:10px 0;">
-      <strong>${job.title}</strong>
-      <p style="font-size:13px;color:#64748b;margin:5px 0;">${job.source}</p>
-      <a href="${job.url}" style="color:#2563eb;">Ver oportunidade</a>
+    <div style="background:#f8fafc;border:1px solid #eef2f7;border-radius:12px;padding:14px 16px;margin:10px 0;">
+      <strong style="font-size:15px;color:#0f172a;">${job.title}</strong>
+      <p style="font-size:13px;color:#94a3b8;margin:4px 0 8px;">${job.source}</p>
+      <a href="${job.url}" style="color:#2563eb;font-weight:600;font-size:13.5px;text-decoration:none;">Ver oportunidade →</a>
     </div>
   `).join("");
+  const count = opts.jobs.length;
   await send(
     to,
-    `📬 Novas vagas${opts.location ? ` em ${opts.location}` : ""}`,
+    `📬 ${count} vaga${count > 1 ? "s" : ""} nova${count > 1 ? "s" : ""}${opts.location ? ` em ${opts.location}` : ""} pra você`,
     `
-      <h2 style="font-size:20px;">📬 Encontramos novas oportunidades</h2>
-      <p>${opts.query ? `Busca: <strong>${opts.query}</strong>. ` : ""}${opts.location ? `Local: <strong>${opts.location}</strong>.` : ""}</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">📬 Encontramos novas oportunidades pra você</h2>
+      <p style="color:#64748b;margin:0 0 16px;">${opts.query ? `Busca: <strong>${opts.query}</strong>. ` : ""}${opts.location ? `Local: <strong>${opts.location}</strong>.` : ""}</p>
       ${rows}
       ${button(`${APP_URL}/vagas-publicas`, "Ver todas as vagas")}
       <p>Você pode alterar seus alertas nas configurações da sua conta ⚙️</p>
@@ -750,31 +779,153 @@ export async function sendWeeklyDigestEmail(
   }
 ) {
   const greeting = opts.name ? `Olá, ${opts.name.split(" ")[0]}!` : "Olá!";
-  const lines: string[] = [];
+  const stat = (icon: string, label: string, highlight?: string) => `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+      <tr>
+        <td style="background:#f8fafc;border:1px solid #eef2f7;border-radius:12px;padding:14px 16px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td width="36" style="font-size:20px;vertical-align:top;">${icon}</td>
+              <td style="font-size:14px;color:#334155;line-height:1.6;">
+                ${label}${highlight ? `<br/><strong style="font-size:17px;color:#0f172a;">${highlight}</strong>` : ""}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  `;
+  const cards: string[] = [];
   if (opts.analysesCount > 0) {
-    lines.push(
-      `<li>Você fez <strong>${opts.analysesCount}</strong> análise${opts.analysesCount > 1 ? "s" : ""} de currículo esta semana${opts.bestScore !== null ? ` — melhor nota: <strong>${opts.bestScore}/100</strong>` : ""}.</li>`
+    cards.push(
+      stat(
+        "📝",
+        `${opts.analysesCount} análise${opts.analysesCount > 1 ? "s" : ""} de currículo esta semana`,
+        opts.bestScore !== null ? `Melhor nota: ${opts.bestScore}/100` : undefined
+      )
     );
   }
   if (opts.scoreDelta !== null && opts.scoreDelta > 0) {
-    lines.push(`<li>Sua nota subiu <strong>+${opts.scoreDelta} pontos</strong> em relação à semana anterior. 📈</li>`);
+    cards.push(stat("📈", "Sua nota subiu em relação à semana anterior", `+${opts.scoreDelta} pontos`));
   }
   if (opts.newMatchesCount > 0) {
-    lines.push(`<li><strong>${opts.newMatchesCount}</strong> vaga${opts.newMatchesCount > 1 ? "s" : ""} nova${opts.newMatchesCount > 1 ? "s" : ""} compatível${opts.newMatchesCount > 1 ? "eis" : ""} com seu currículo. 🎯</li>`);
+    cards.push(
+      stat(
+        "🎯",
+        `Vaga${opts.newMatchesCount > 1 ? "s" : ""} nova${opts.newMatchesCount > 1 ? "s" : ""} compatível${opts.newMatchesCount > 1 ? "eis" : ""} com seu currículo`,
+        `${opts.newMatchesCount}`
+      )
+    );
   }
   if (opts.applicationsCount && opts.applicationsCount > 0) {
-    lines.push(`<li><strong>${opts.applicationsCount}</strong> candidatura${opts.applicationsCount > 1 ? "s" : ""} no seu painel de acompanhamento. 📌</li>`);
+    cards.push(
+      stat("📌", `Candidatura${opts.applicationsCount > 1 ? "s" : ""} no seu painel de acompanhamento`, `${opts.applicationsCount}`)
+    );
   }
+  const subject =
+    opts.scoreDelta !== null && opts.scoreDelta > 0
+      ? `📈 Sua nota subiu +${opts.scoreDelta} pontos esta semana`
+      : opts.bestScore !== null
+        ? `📊 Sua melhor nota da semana: ${opts.bestScore}/100`
+        : "📊 Sua semana no CarreirasMatch";
   await send(
     to,
-    "📊 Sua semana no CarreirasMatch",
+    subject,
     `
-      <h2 style="font-size:20px;">${greeting}</h2>
-      <p>Resumo da sua semana de busca:</p>
-      <ul style="font-size:14px;color:#334155;line-height:1.8;">${lines.join("")}</ul>
-      <p>Ajustou o currículo? Re-analise e veja sua nota subir.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 20px;">Resumo da sua semana de busca:</p>
+      ${cards.join("")}
+      <p style="margin-top:22px;">Ajustou o currículo? Re-analise e veja sua nota subir.</p>
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
     `,
+  );
+}
+
+/** Avisa o contratante que recebeu uma nova proposta num projeto freelance. */
+export async function sendFreelanceProposalReceivedEmail(
+  to: string,
+  opts: { clientName?: string | null; projectTitle: string; freelancerName: string; bidCents: number; projectId: string }
+) {
+  const greeting = opts.clientName?.trim() ? `Olá, ${opts.clientName.trim().split(" ")[0]}!` : "Olá!";
+  await send(
+    to,
+    `💼 Nova proposta em "${opts.projectTitle}"`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;"><strong>${opts.freelancerName}</strong> enviou uma proposta para o seu projeto <strong>${opts.projectTitle}</strong>.</p>
+      <p>Valor proposto: <strong>${formatCentsToBRL(opts.bidCents)}</strong>.</p>
+      ${button(`${APP_URL}/projetos/${opts.projectId}`, "Ver a proposta")}
+    `
+  );
+}
+
+/** Avisa o freelancer que sua proposta foi aceita e o contrato foi criado. */
+export async function sendFreelanceProposalAcceptedEmail(
+  to: string,
+  opts: { freelancerName?: string | null; projectTitle: string; contractId: string }
+) {
+  const greeting = opts.freelancerName?.trim() ? `${opts.freelancerName.trim().split(" ")[0]}, ` : "";
+  await send(
+    to,
+    `🎉 Proposta aceita: ${opts.projectTitle}`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Proposta aceita 🎉</h2>
+      <p style="color:#64748b;margin:0 0 16px;">${greeting}o contratante aceitou sua proposta para <strong>${opts.projectTitle}</strong>. O contrato já está ativo.</p>
+      <p>Combine os detalhes finais pelo chat do projeto e comece quando estiver alinhado 🚀</p>
+      ${button(`${APP_URL}/freelancer/meus-projetos`, "Ver meu contrato")}
+    `
+  );
+}
+
+/** Avisa o freelancer que sua proposta não foi selecionada desta vez. */
+export async function sendFreelanceProposalRejectedEmail(
+  to: string,
+  opts: { freelancerName?: string | null; projectTitle: string }
+) {
+  const greeting = opts.freelancerName?.trim() ? `${opts.freelancerName.trim().split(" ")[0]}, ` : "";
+  await send(
+    to,
+    `Sobre sua proposta para "${opts.projectTitle}"`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Desta vez não foi 🙂</h2>
+      <p style="color:#64748b;margin:0 0 16px;">${greeting}o contratante escolheu outra proposta para <strong>${opts.projectTitle}</strong>. Ainda tem outros projetos abertos esperando alguém com o seu perfil.</p>
+      ${button(`${APP_URL}/projetos`, "Ver outros projetos")}
+    `
+  );
+}
+
+/** Avisa o contratante que o freelancer marcou a entrega e aguarda confirmação. */
+export async function sendFreelanceDeliverySubmittedEmail(
+  to: string,
+  opts: { clientName?: string | null; projectTitle: string; contractId: string }
+) {
+  const greeting = opts.clientName?.trim() ? `${opts.clientName.trim().split(" ")[0]}, ` : "";
+  await send(
+    to,
+    `📦 Entrega pronta: ${opts.projectTitle}`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Sua entrega chegou 📦</h2>
+      <p style="color:#64748b;margin:0 0 16px;">${greeting}o freelancer marcou <strong>${opts.projectTitle}</strong> como entregue. Confira o trabalho e confirme a conclusão para liberar o pagamento.</p>
+      ${button(`${APP_URL}/projetos/${opts.contractId}`, "Revisar entrega")}
+    `
+  );
+}
+
+/** Avisa o freelancer que o contrato foi concluído e o repasse está a caminho. */
+export async function sendFreelanceContractCompletedEmail(
+  to: string,
+  opts: { freelancerName?: string | null; projectTitle: string; payoutCents: number }
+) {
+  const greeting = opts.freelancerName?.trim() ? `${opts.freelancerName.trim().split(" ")[0]}, ` : "";
+  await send(
+    to,
+    `✅ Contrato concluído: ${opts.projectTitle}`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Trabalho concluído ✅</h2>
+      <p style="color:#64748b;margin:0 0 16px;">${greeting}o contratante confirmou a entrega de <strong>${opts.projectTitle}</strong>. Seu repasse de <strong>${formatCentsToBRL(opts.payoutCents)}</strong> já está na fila de pagamento.</p>
+      <p>Aproveite pra avaliar o contratante, isso ajuda outros freelancers a escolherem melhor os projetos ⭐</p>
+      ${button(`${APP_URL}/freelancer/meus-projetos`, "Avaliar e ver meus contratos")}
+    `
   );
 }
 
@@ -786,11 +937,11 @@ export async function sendCompanyNewTalentEmail(
   const areasLabel = opts.areas.length > 0 ? ` nas áreas de ${opts.areas.join(", ")}` : "";
   await send(
     to,
-    `👋 ${opts.newTalentCount} candidato${opts.newTalentCount > 1 ? "s" : ""} novo${opts.newTalentCount > 1 ? "s" : ""} no banco de talentos`,
+    `👋 ${opts.newTalentCount} candidato${opts.newTalentCount > 1 ? "s" : ""} compatíve${opts.newTalentCount > 1 ? "is" : "l"} com suas vagas`,
     `
-      <h2 style="font-size:20px;">Novos candidatos para ${opts.companyName}</h2>
-      <p>Esta semana, <strong>${opts.newTalentCount}</strong> candidato${opts.newTalentCount > 1 ? "s" : ""} novo${opts.newTalentCount > 1 ? "s se cadastraram" : " se cadastrou"} no banco de talentos${areasLabel} — compatíveis com suas vagas abertas.</p>
-      <p>Rode o matching para ver a aderência de cada um e pedir contato.</p>
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Novos candidatos para ${opts.companyName}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Esta semana, <strong>${opts.newTalentCount}</strong> candidato${opts.newTalentCount > 1 ? "s" : ""} novo${opts.newTalentCount > 1 ? "s se cadastraram" : " se cadastrou"} no banco de talentos${areasLabel} — compatíveis com suas vagas abertas.</p>
+      <p>Rode o matching para ver a aderência de cada um e pedir contato antes que outra empresa chegue primeiro.</p>
       ${button(`${APP_URL}/empresa/talentos`, "Ver candidatos no banco de talentos")}
     `,
   );

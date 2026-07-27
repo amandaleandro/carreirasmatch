@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { calculateFreelanceCommissionCents, calculateFreelancerPayoutCents } from "@/lib/freelance";
+import { sendFreelanceProposalAcceptedEmail, sendFreelanceProposalRejectedEmail } from "@/lib/resend";
 
 // Gerencia uma proposta:
 //  - o contratante (dono do projeto) aceita ("accept") ou rejeita ("reject");
@@ -49,6 +50,13 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       return NextResponse.json({ error: "Esta proposta já foi resolvida." }, { status: 409 });
     }
     await prisma.freelanceProposal.update({ where: { id }, data: { status: "rejected" } });
+    const freelancer = await prisma.user.findUnique({ where: { id: proposal.freelancerUserId } });
+    if (freelancer?.email) {
+      void sendFreelanceProposalRejectedEmail(freelancer.email, {
+        freelancerName: freelancer.name,
+        projectTitle: proposal.project.title,
+      });
+    }
     return NextResponse.json({ ok: true });
   }
 
@@ -95,6 +103,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       });
       return created;
     });
+    const freelancer = await prisma.user.findUnique({ where: { id: proposal.freelancerUserId } });
+    if (freelancer?.email) {
+      void sendFreelanceProposalAcceptedEmail(freelancer.email, {
+        freelancerName: freelancer.name,
+        projectTitle: proposal.project.title,
+        contractId: contract.id,
+      });
+    }
     return NextResponse.json({ ok: true, contractId: contract.id });
   }
 

@@ -686,6 +686,59 @@ model ExternalCourse {
   @@index([partnerId])
 }
 
+model University {
+  id         String   @id @default(cuid())
+  name       String
+  slug       String   @unique
+  city       String   @default("")
+  state      String   @default("")
+  website    String   @default("")
+  source     String
+  active     Boolean  @default(true)
+  lastSeenAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  courses UniversityCourse[]
+
+  @@index([state, city])
+}
+
+model UniversityCourse {
+  id           String     @id @default(cuid())
+  universityId String
+  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  title        String
+  slug         String     @unique
+  area         String
+  subarea      String     @default("")
+  url          String     @unique
+  modality     String     @default("presencial")
+  active       Boolean    @default(true)
+  source       String
+  lastSeenAt   DateTime   @default(now())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  subjects CurriculumSubject[]
+
+  @@index([universityId])
+  @@index([active, area])
+  @@index([source, lastSeenAt])
+}
+
+model CurriculumSubject {
+  id                 String           @id @default(cuid())
+  universityCourseId String
+  universityCourse   UniversityCourse @relation(fields: [universityCourseId], references: [id], onDelete: Cascade)
+  name               String
+  semester           Int?
+  order              Int              @default(0)
+  createdAt          DateTime         @default(now())
+
+  @@index([universityCourseId])
+}
+
 model CareerVideo {
   id          String    @id @default(cuid())
   videoId     String    @unique

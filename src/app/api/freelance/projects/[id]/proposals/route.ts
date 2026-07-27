@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { reaisToCents } from "@/lib/freelance";
+import { sendFreelanceProposalReceivedEmail } from "@/lib/resend";
 
 // Freelancer envia uma proposta a um projeto aberto.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -54,6 +55,17 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     });
     return created;
   });
+
+  const client = await prisma.user.findUnique({ where: { id: project.clientUserId } });
+  if (client?.email) {
+    void sendFreelanceProposalReceivedEmail(client.email, {
+      clientName: client.name,
+      projectTitle: project.title,
+      freelancerName: session.user.name?.trim() || "Um freelancer",
+      bidCents,
+      projectId,
+    });
+  }
 
   return NextResponse.json({ id: proposal.id });
 }

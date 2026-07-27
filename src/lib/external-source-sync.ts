@@ -666,6 +666,7 @@ export async function syncRegisteredCourseSources() {
 import { syncUberHubData } from "@/lib/uberhub-sync";
 import { syncAllCitiesData } from "@/lib/city-scrapers/multi-city-sync";
 import { syncAllCDLData } from "@/lib/cdl-scrapers/cdl-sync";
+import { syncUniversityCurricula } from "@/lib/university-scrapers/sync";
 
 export async function syncAllExternalSources() {
   const results = await Promise.allSettled([
@@ -681,6 +682,7 @@ export async function syncAllExternalSources() {
     syncUberHubData(),
     syncAllCitiesData(),
     syncAllCDLData(),
+    syncUniversityCurricula(),
   ]);
   const errors = results.flatMap((result) =>
     result.status === "rejected"
@@ -717,6 +719,7 @@ export async function syncAllExternalSources() {
       results[5].status === "fulfilled" && typeof results[5].value === "object"
         ? results[5].value.vestibulares
         : 0,
+    universityCourses: results[12].status === "fulfilled" ? results[12].value : 0,
     errors,
   };
 }

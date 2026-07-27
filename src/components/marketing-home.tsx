@@ -92,6 +92,8 @@ function SocialProof({ analysisCount }: { analysisCount: number }) {
             alt="Agenda semanal com 5 entrevistas marcadas"
             width={1425}
             height={1205}
+            loading="lazy"
+            sizes="(min-width: 1024px) 45vw, 100vw"
             className="w-full rounded-3xl border border-slate-200 shadow-lg dark:border-slate-800"
           />
         ) : (

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
+import { sendFreelanceDeliverySubmittedEmail, sendFreelanceContractCompletedEmail } from "@/lib/resend";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { session, response } = await requireAuth();
@@ -9,7 +10,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   let body: { action?: string };
   try { body = await req.json(); } catch { return NextResponse.json({ error: "Requisição inválida." }, { status: 400 }); }
   const action = body.action;
-  const contract = await prisma.freelanceContract.findUnique({ where: { id } });
+  const contract = await prisma.freelanceContract.findUnique({ where: { id }, include: { project: true } });
   if (!contract) return NextResponse.json({ error: "Contrato não encontrado." }, { status: 404 });
   const isClient = contract.clientUserId === session.user.id;
   const isFreelancer = contract.freelancerUserId === session.user.id;
@@ -22,6 +23,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       where: { id },
       data: { status: "delivered", deliveredAt: new Date(), freelancerConfirmedAt: new Date() },
     });
+    const client = await prisma.user.findUnique({ where: { id: contract.clientUserId } });
+    if (client?.email) {
+      void sendFreelanceDeliverySubmittedEmail(client.email, {
+        clientName: client.name,
+        projectTitle: contract.project.title,
+        contractId: contract.id,
+      });
+    }
     return NextResponse.json({ ok: true });
   }
 
@@ -44,6 +53,14 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
       prisma.freelanceProject.update({ where: { id: contract.projectId }, data: { status: "completed" } }),
       prisma.freelancerProfile.updateMany({ where: { userId: contract.freelancerUserId }, data: { completedCount: { increment: 1 } } }),
     ]);
+    const freelancer = await prisma.user.findUnique({ where: { id: contract.freelancerUserId } });
+    if (freelancer?.email) {
+      void sendFreelanceContractCompletedEmail(freelancer.email, {
+        freelancerName: freelancer.name,
+        projectTitle: contract.project.title,
+        payoutCents: contract.freelancerPayoutCents,
+      });
+    }
     return NextResponse.json({ ok: true, payoutStatus: "ready" });
   }
 

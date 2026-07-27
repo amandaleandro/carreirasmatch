@@ -50,6 +50,60 @@ async function sendText(phone: string, text: string): Promise<void> {
   }
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Salvaguardas contra ban/restrição de número: a Evolution API roda em cima
+ * do Baileys (protocolo não-oficial), não da Cloud API da Meta — sem os
+ * limites e o selo de "conta business" oficiais, rajadas de mensagens
+ * idênticas e em sequência são o padrão mais comum de detecção de spam.
+ * Só se aplica a envio de MARKETING (régua de conversão, alerta de vaga,
+ * convite); notificação transacional (admin, empresa) não passa por aqui —
+ * é 1:1, esperada pelo destinatário, e não decide.
+ */
+const MARKETING_MIN_GAP_MS = 4000; // piso de 4s entre mensagens de marketing
+const MARKETING_JITTER_MS = 5000; // + até 5s aleatório (evita cadência robótica)
+const MARKETING_TICK_BUDGET = 150; // teto de segurança por execução do scheduler
+
+let lastMarketingSendAt = 0;
+let marketingSentThisTick = 0;
+
+/** Chamar no início de cada `runWhatsappTick`, pra zerar o teto por execução. */
+export function resetWhatsappMarketingBudget(): void {
+  marketingSentThisTick = 0;
+}
+
+/**
+ * Janela de horário humano (08h-20h em São Paulo). Mensagem de marketing
+ * fora desse horário é outro sinal clássico de automação pro WhatsApp —
+ * gente de verdade não manda oferta às 3h da manhã.
+ */
+export function isWithinWhatsappMarketingHours(now: Date = new Date()): boolean {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: "America/Sao_Paulo" }).format(now)
+  );
+  return hour >= 8 && hour < 20;
+}
+
+/**
+ * Envio de marketing com espaçamento aleatório e teto por execução. Todas as
+ * funções de régua (conversão, come-back, alerta de vaga, convite) passam por
+ * aqui em vez de chamar `sendText` direto.
+ */
+async function sendMarketingText(phone: string, text: string): Promise<void> {
+  if (marketingSentThisTick >= MARKETING_TICK_BUDGET) {
+    console.warn(`WhatsApp: teto de mensagens de marketing da execução atingido, envio para ${phone} adiado pro próximo tick.`);
+    return;
+  }
+  const wait = lastMarketingSendAt + MARKETING_MIN_GAP_MS + Math.random() * MARKETING_JITTER_MS - Date.now();
+  if (wait > 0) await sleep(wait);
+  lastMarketingSendAt = Date.now();
+  marketingSentThisTick++;
+  await sendText(phone, text);
+}
+
 /**
  * WhatsApp interno para o(s) admin(s): mesmo texto para cada número da lista.
  * Fire-and-forget, nunca lança para o chamador, igual ao `sendAdmin` de e-mail.
@@ -214,6 +268,11 @@ export async function sendWhatsappOnce(
   await send();
 }
 
+/** Escolhe uma variante aleatória — texto idêntico em massa é sinal de spam pro WhatsApp. */
+function pickVariant<T>(variants: T[]): T {
+  return variants[Math.floor(Math.random() * variants.length)];
+}
+
 /** Primeiro toque: mesma condição do e-mail (analisou, não assinou), tom leve. */
 export async function sendConvertToSubscriptionWhatsapp(
   phone: string,
@@ -228,9 +287,14 @@ export async function sendConvertToSubscriptionWhatsapp(
     opts.score != null
       ? `Vi aqui que seu currículo tirou *${opts.score}* de aderência. Nada mal, mas também nada que uma IA sem café não resolva 😅`
       : `Vi aqui que você já rodou uma análise de currículo com a gente. Diagnóstico feito, e agora?`;
-  await sendText(
+  const closing = pickVariant([
+    `Que tal voltar lá e ver o que rolou desde então? Tem vaga nova pra seu perfil e o plano pega esse resultado e transforma em ação: currículo reescrito, simulação de entrevista e reanálise a cada vaga nova.`,
+    `Vale a pena voltar e conferir: tem vaga nova saindo toda semana e o plano pega esse diagnóstico e transforma em currículo reescrito, simulação de entrevista e reanálise a cada vaga.`,
+    `Bora dar o próximo passo? O plano transforma esse diagnóstico em ação de verdade: currículo reescrito, simulação de entrevista e reanálise automática a cada vaga nova.`,
+  ]);
+  await sendMarketingText(
     phone,
-    `${greeting}\n\n${scoreLine}\n\nO plano pega esse resultado e transforma em ação: currículo reescrito, simulação de entrevista e reanálise a cada vaga nova. Dá uma olhada:\n${href}\n\nSe preferir não receber mais mensagens por aqui, é só responder *PARAR*.`
+    `${greeting}\n\n${scoreLine}\n\n${closing}\n${href}\n\nSe preferir não receber mais mensagens por aqui, é só responder *PARAR*.`
   );
 }
 
@@ -242,10 +306,12 @@ export async function sendConvertSecondNudgeWhatsapp(
   const href = opts.segment?.trim()
     ? `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment.trim())}`
     : `${APP_URL}/assinar`;
-  await sendText(
-    phone,
-    `Curiosidade nada assustadora 🕵️: recrutador gasta em média 7 segundos olhando um currículo antes de decidir se continua lendo.\n\nSeu currículo atual sobreviveria aos 7 segundos? O plano reorganiza pra garantir que sim:\n${href}\n\nResponda *PARAR* se quiser sair dessa lista.`
-  );
+  const body = pickVariant([
+    `Curiosidade nada assustadora 🕵️: recrutador gasta em média 7 segundos olhando um currículo antes de decidir se continua lendo.\n\nSeu currículo atual sobreviveria aos 7 segundos? Volta lá no Carreiras Match e reorganiza isso agora:`,
+    `Dado real 📊: em média, 7 segundos é o tempo que um recrutador dedica antes de decidir se continua lendo seu currículo.\n\nQuer testar se o seu passa nesse teste? Dá uma olhada de novo no Carreiras Match:`,
+    `Sabia que a maioria dos currículos é descartada em menos de 10 segundos? 👀\n\nVale voltar lá e ver o que dá pra ajustar no seu antes da próxima candidatura:`,
+  ]);
+  await sendMarketingText(phone, `${body}\n${href}\n\nResponda *PARAR* se quiser sair dessa lista.`);
 }
 
 /** Terceiro e último toque: cupom pessoal de uso único, mesma régua do e-mail. */
@@ -257,9 +323,57 @@ export async function sendUrgencyCouponWhatsapp(
     ? `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment.trim())}`
     : `${APP_URL}/assinar`;
   const hours = Math.round((opts.expiresAt.getTime() - Date.now()) / (60 * 60 * 1000));
-  await sendText(
+  const opening = pickVariant([
+    `Última mensagem sobre isso, prometo 🤝`,
+    `Essa é a última vez que eu te chamo pra isso 🙏`,
+    `Fechando esse assunto por aqui 🔒`,
+  ]);
+  await sendMarketingText(
     phone,
-    `Última mensagem sobre isso, prometo 🤝\n\nSepararei um cupom de 20% só seu, válido por ${hours}h: *${opts.code}*\n\n${href}\n\nDepois disso o cupom expira e eu paro de te encher o saco. Responda *PARAR* se quiser sair antes disso.`
+    `${opening}\n\nSepararei um cupom de 20% só seu, válido por ${hours}h, pra você voltar e terminar o que começou: *${opts.code}*\n\n${href}\n\nDepois disso o cupom expira e eu paro de te encher o saco. Responda *PARAR* se quiser sair antes disso.`
+  );
+}
+
+/**
+ * Alerta de vagas novas por WhatsApp, espelhando `sendJobAlertEmail`: mesma
+ * janela de vagas (JobAlert do usuário), canal diferente. Termina com um
+ * empurrão leve pro Pro (reanálise automática por vaga), já que quem está no
+ * alerta é candidato ativo — bom momento pra converter.
+ */
+export async function sendJobAlertWhatsapp(
+  phone: string,
+  opts: { query?: string | null; location?: string; jobs: Array<{ title: string; url: string; source: string }> }
+): Promise<void> {
+  const count = opts.jobs.length;
+  const heading =
+    count === 1 ? "1 vaga nova pra você 🎯" : `${count} vagas novas pra você 🎯`;
+  const filterLine = [opts.query, opts.location].filter((v) => v?.trim()).join(" • ");
+  const list = opts.jobs
+    .slice(0, 5)
+    .map((job) => `• ${job.title} (${job.source})\n${job.url}`)
+    .join("\n\n");
+  const filterText = filterLine ? `\nFiltro: ${filterLine}\n` : "\n";
+  await sendMarketingText(
+    phone,
+    `${heading}${filterText}\n${list}\n\nQuer chegar em cada uma dessas já com o currículo reanalisado pra vaga específica? É isso que o plano Pro faz automático:\n${APP_URL}/assinar\n\nResponda *PARAR* se não quiser mais alertas de vaga por aqui.`
+  );
+}
+
+/** Quarto e último toque: pura volta ao produto, sem falar em preço/cupom, pra quem sumiu de vez. */
+export async function sendComeBackWhatsapp(
+  phone: string,
+  opts: { name?: string | null }
+): Promise<void> {
+  const firstName = opts.name?.trim()?.split(" ")[0];
+  const greeting = firstName ? `${firstName}, faz tempo! 👋` : "Faz tempo! 👋";
+  const body = pickVariant([
+    `Desde a última vez que você passou por aqui entraram vagas novas e o painel mudou bastante. Vale a pena dar uma espiada de novo:`,
+    `Faz um tempinho que você não aparece por aqui. Tem coisa nova rolando, vale voltar e conferir:`,
+    `Passando só pra lembrar que o Carreiras Match continua de portas abertas pra você. Que tal dar uma passada de novo:`,
+  ]);
+  await sendMarketingText(
+    phone,
+    `${greeting}\n\n${body}\n${APP_URL}\n\nResponda *PARAR* se não quiser mais esse tipo de mensagem.`
   );
 }
 
@@ -322,7 +436,7 @@ export async function sendNextMarketingInviteWhatsapp(
     } catch {
       continue; // esse toque já foi enviado pra esse telefone, tenta o próximo
     }
-    await sendText(phone, MARKETING_INVITE_MESSAGES[i](firstName, href));
+    await sendMarketingText(phone, MARKETING_INVITE_MESSAGES[i](firstName, href));
     return true;
   }
   return false;
