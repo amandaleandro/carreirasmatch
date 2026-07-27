@@ -4,6 +4,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { prisma } from "@/lib/prisma";
 import {
   Search,
   KanbanSquare,
@@ -13,6 +14,9 @@ import {
   ShieldCheck,
   ArrowRight,
   CheckCircle2,
+  Briefcase,
+  Handshake,
+  Upload,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -84,12 +88,34 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { title: "Publique a vaga", description: "Descreva a vaga ou gere a descrição com IA em segundos." },
-  { title: "IA ranqueia os candidatos", description: "Cada candidatura chega já com score de aderência e pontos de atenção." },
+  { title: "Publique a vaga (ou suba currículos que já tem)", description: "Descreva a vaga e receba candidaturas, ou faça upload direto dos PDFs parados no seu e-mail." },
+  { title: "IA ranqueia os candidatos", description: "Cada currículo chega já com score de aderência e pontos de atenção." },
   { title: "Fale com os melhores", description: "Avance no Kanban, agende entrevistas e feche a contratação sem ruído." },
 ];
 
-export default function EmpresasLandingPage() {
+const ECOSYSTEM_CARDS = [
+  {
+    icon: Upload,
+    title: "Triagem dos currículos que você já tem",
+    description: "Sem vaga publicada ainda? Suba os PDFs recebidos por e-mail e a IA rankeia por aderência na hora.",
+    href: "/empresa/cadastro",
+  },
+  {
+    icon: Briefcase,
+    title: "Marketplace freelancer",
+    description: "Para demanda pontual, contrate um freelancer para o projeto sem abrir um processo de CLT.",
+    href: "/freelancers",
+  },
+  {
+    icon: Handshake,
+    title: "Seja parceiro",
+    description: "Divulgue cursos e conteúdo para candidatos ativos na plataforma buscando se qualificar.",
+    href: "/parceiro",
+  },
+] as const;
+
+export default async function EmpresasLandingPage() {
+  const analysisCount = await prisma.analysis.count().catch(() => 0);
   return (
     <div className="w-full">
       <JsonLd data={faqJsonLd(FAQ)} />
@@ -133,7 +159,7 @@ export default function EmpresasLandingPage() {
             Encontre os candidatos certos, ranqueados por IA
           </h1>
           <p className="text-white/70 mt-5 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
-            Publique a vaga, receba currículos já ranqueados por aderência e converse só com quem realmente encaixa. Sem planilha, sem abrir currículo por currículo.
+            Publique uma vaga nova ou suba os currículos que você já recebeu, receba tudo ranqueado por aderência e converse só com quem realmente encaixa. Sem planilha, sem abrir currículo por currículo.
           </p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
@@ -151,6 +177,11 @@ export default function EmpresasLandingPage() {
             </Link>
           </div>
           <p className="mt-4 text-[11px] text-white/40">Comece grátis, sem cartão de crédito.</p>
+          {analysisCount >= 50 && (
+            <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-200">
+              {analysisCount.toLocaleString("pt-BR")} candidatos já usam o CarreirasMatch para buscar vaga, do outro lado do seu processo seletivo.
+            </p>
+          )}
         </div>
       </div>
 
@@ -173,6 +204,34 @@ export default function EmpresasLandingPage() {
                   <h3 className="mt-4 font-bold text-neutral-900 dark:text-white">{feature.title}</h3>
                   <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{feature.description}</p>
                 </div>
+              );
+            })}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">Isso é só o começo</h2>
+          <p className="mt-2 text-center text-sm text-neutral-500 dark:text-neutral-400 max-w-xl mx-auto">
+            Recrutamento resolve o cargo de hoje. O CarreirasMatch continua útil para o RH depois dele.
+          </p>
+          <div className="mt-8 grid sm:grid-cols-3 gap-5">
+            {ECOSYSTEM_CARDS.map((card) => {
+              const Icon = card.icon;
+              return (
+                <Link
+                  key={card.title}
+                  href={card.href}
+                  className="group rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 hover:border-blue-400/60 transition-colors"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300">
+                    <Icon className="h-5 w-5" strokeWidth={1.9} />
+                  </span>
+                  <h3 className="mt-4 font-bold text-neutral-900 dark:text-white">{card.title}</h3>
+                  <p className="mt-1.5 text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">{card.description}</p>
+                  <span className="mt-4 inline-flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 transition-transform group-hover:translate-x-1">
+                    Conhecer <ArrowRight className="h-3.5 w-3.5" />
+                  </span>
+                </Link>
               );
             })}
           </div>
