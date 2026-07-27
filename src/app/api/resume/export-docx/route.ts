@@ -71,6 +71,19 @@ export async function POST(req: NextRequest) {
       children.push(heading("Palavras-Chave de Destaque (ATS)"), text(keywordsFound.join(" • "), 200));
     }
 
+    // Rede de segurança: se a extração estruturada veio pobre (sem formação, skills,
+    // idiomas nem certificações), o documento acima fica só com resumo/experiências
+    // otimizadas e perde dados do currículo original. Anexa o texto bruto pra ninguém
+    // enviar um currículo incompleto pra vaga.
+    const isSparse =
+      !resumeStructured?.education?.length &&
+      !resumeStructured?.skills?.length &&
+      !resumeStructured?.languages?.length &&
+      !resumeStructured?.certifications?.length;
+    if (resumeStructured && isSparse && resumeText) {
+      children.push(heading("Currículo Original (referência completa)"), text(resumeText, 200));
+    }
+
     const doc = new Document({ sections: [{ properties: {}, children: [
       new Paragraph({ text: contact?.name || title || "Currículo Otimizado — CarreirasMatch", heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER, spacing: { after: 300 } }),
       ...children,

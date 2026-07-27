@@ -119,5 +119,19 @@ export async function renderResumePdf(input: {
     paragraph(keywordsFound.join(" • "), 10, font, ink, 10);
   }
 
+  // Rede de segurança: se a extração estruturada veio pobre (sem formação, skills,
+  // idiomas nem certificações), o PDF acima fica só com resumo/experiências otimizadas
+  // e perde dados do currículo original. Anexa o texto bruto pra ninguém enviar um
+  // currículo incompleto pra vaga.
+  const isSparse =
+    !resumeStructured?.education?.length &&
+    !resumeStructured?.skills?.length &&
+    !resumeStructured?.languages?.length &&
+    !resumeStructured?.certifications?.length;
+  if (resumeStructured && isSparse && resumeText) {
+    section("Currículo Original (referência completa)");
+    paragraph(resumeText, 9.5, font, muted, 10);
+  }
+
   return pdf.save();
 }
