@@ -767,6 +767,41 @@ export async function sendJobAlertEmail(
   );
 }
 
+/**
+ * Avisa o candidato que o Piloto Automático encontrou vagas que não conseguiu concluir sozinho
+ * (CAPTCHA, formulário que exige login, ou campo obrigatório sem resposta configurada) e que
+ * precisam de candidatura manual. Disparo em lote (uma execução do robô pode gerar vários itens),
+ * dedupe por dia via sendOnce — não manda um e-mail por vaga bloqueada.
+ */
+export async function sendAutoApplyManualActionEmail(
+  to: string,
+  opts: {
+    name?: string | null;
+    items: Array<{ jobTitle: string; company: string; jobUrl: string; reason: string | null }>;
+  }
+) {
+  const greeting = opts.name?.trim() ? opts.name.trim().split(" ")[0] : null;
+  const rows = opts.items.slice(0, 10).map((item) => `
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:14px 16px;margin:10px 0;">
+      <strong style="font-size:15px;color:#0f172a;">${item.jobTitle}</strong>
+      <p style="font-size:13px;color:#94a3b8;margin:4px 0 4px;">${item.company}</p>
+      <p style="font-size:12.5px;color:#b45309;margin:0 0 8px;">${item.reason || "O robô não conseguiu concluir sozinho."}</p>
+      <a href="${item.jobUrl}" style="color:#2563eb;font-weight:600;font-size:13.5px;text-decoration:none;">Candidatar-se manualmente →</a>
+    </div>
+  `).join("");
+  const count = opts.items.length;
+  await send(
+    to,
+    `⚠️ ${count} candidatura${count > 1 ? "s" : ""} precisa${count > 1 ? "m" : ""} de você`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">⚠️ ${greeting ? `${greeting}, o` : "O"} Piloto Automático precisa da sua ajuda</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Encontramos ${count} vaga${count > 1 ? "s" : ""} compatível${count > 1 ? "eis" : ""} com você, mas o formulário externo tinha CAPTCHA, exigia login na plataforma da vaga, ou uma pergunta que não sabíamos responder — nada disso o robô pode contornar, então a candidatura ficou pendente.</p>
+      ${rows}
+      ${button(`${APP_URL}/#piloto-automatico`, "Ver no Piloto Automático")}
+    `,
+  );
+}
+
 /** Digest semanal do candidato: resumo da semana + gancho de re-análise. */
 export async function sendWeeklyDigestEmail(
   to: string,

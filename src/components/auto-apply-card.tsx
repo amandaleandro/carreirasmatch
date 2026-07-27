@@ -268,24 +268,47 @@ export function AutoApplySettingsCard() {
                 </div>
               ) : (
                 <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
-                  {queue.map((item) => (
-                    <div
-                      key={item.id}
-                      title={item.failureReason ?? undefined}
-                      className="flex items-center justify-between rounded-xl border border-slate-100 bg-slate-50 p-2.5 text-xs dark:border-neutral-800 dark:bg-neutral-800/50"
-                    >
-                      <div className="min-w-0 pr-2">
-                        <p className="truncate font-bold text-slate-900 dark:text-white">{item.jobTitle}</p>
-                        <p className="truncate text-[10px] text-slate-500">{item.company}</p>
+                  {queue.map((item) => {
+                    const needsManualAction = item.status === "blocked_external" || item.status === "unsupported_external";
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-xl border border-slate-100 bg-slate-50 p-2.5 text-xs dark:border-neutral-800 dark:bg-neutral-800/50"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0 pr-2">
+                            <p className="truncate font-bold text-slate-900 dark:text-white">{item.jobTitle}</p>
+                            <p className="truncate text-[10px] text-slate-500">{item.company}</p>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-[10px] font-black text-blue-600">{item.fitScore}% match</p>
+                            <p
+                              className={`text-[10px] font-bold ${
+                                needsManualAction ? "text-amber-600 dark:text-amber-400" : "text-slate-600 dark:text-slate-300"
+                              }`}
+                            >
+                              {STATUS_LABELS[item.status] ?? item.status}
+                            </p>
+                          </div>
+                        </div>
+                        {needsManualAction && (
+                          <div className="mt-2 flex items-center justify-between gap-2 border-t border-slate-200/70 pt-2 dark:border-neutral-700">
+                            <p className="min-w-0 truncate text-[10px] text-slate-500" title={item.failureReason ?? undefined}>
+                              {item.failureReason || "O robô não conseguiu concluir sozinho."}
+                            </p>
+                            <a
+                              href={item.jobUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="shrink-0 rounded-lg bg-amber-500 px-2.5 py-1 text-[10px] font-bold text-white hover:bg-amber-600"
+                            >
+                              Candidatar-se manualmente
+                            </a>
+                          </div>
+                        )}
                       </div>
-                      <div className="shrink-0 text-right">
-                        <p className="text-[10px] font-black text-blue-600">{item.fitScore}% match</p>
-                        <p className="text-[10px] font-bold text-slate-600 dark:text-slate-300">
-                          {STATUS_LABELS[item.status] ?? item.status}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

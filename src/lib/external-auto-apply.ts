@@ -113,10 +113,26 @@ async function hasCaptchaOrLogin(page: import("playwright").Page): Promise<strin
   if (await captcha.count()) return "A página exige CAPTCHA.";
 
   const text = normalize((await page.locator("body").innerText().catch(() => "")).slice(0, 15_000));
-  if (/(faca login|entre na sua conta|sign in to apply|login para se candidatar)/.test(text)) {
+  if (
+    /(faca login|entre na sua conta|sign in to apply|login para se candidatar|entrar para se candidatar|junte-se (agora )?para se candidatar|join to apply|you must be signed in|faca login para continuar|crie uma conta para se candidatar)/.test(
+      text,
+    )
+  ) {
     return "A plataforma exige login.";
   }
   return null;
+}
+
+/**
+ * Muitos ATS (LinkedIn, Gupy, sites em React/Vue) renderizam o formulário via JS bem depois do
+ * "domcontentloaded" — sem dar tempo pra isso, a busca por <form> roda cedo demais e não acha
+ * nada. Espera a rede acalmar (com timeout curto, pra não travar em páginas com polling infinito)
+ * e rola a página, já que alguns formulários só montam quando entram no viewport (lazy render).
+ */
+async function settlePage(page: import("playwright").Page): Promise<void> {
+  await page.waitForLoadState("networkidle", { timeout: 6_000 }).catch(() => {});
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2)).catch(() => {});
+  await page.waitForTimeout(500);
 }
 
 async function selectApplicationForm(
@@ -150,25 +166,81 @@ async function selectApplicationForm(
   return best ? forms.nth(best.index) : null;
 }
 
-async function findApplicationForm(
+/** Many ATS embed the actual application form in an iframe (Greenhouse, SmartRecruiters, Workday etc.) instead of the top document. */
+async function selectApplicationFormInFrames(
   page: import("playwright").Page,
-): Promise<ReturnType<import("playwright").Page["locator"]> | null> {
-  const existing = await selectApplicationForm(page);
-  if (existing) return existing;
+): Promise<{ frame: import("playwright").Frame; form: ReturnType<import("playwright").Page["locator"]> } | null> {
+  for (const frame of page.frames()) {
+    if (frame === page.mainFrame()) continue;
+    try {
+      const forms = frame.locator("form");
+      const count = Math.min(await forms.count(), 10);
+      for (let index = 0; index < count; index++) {
+        const form = forms.nth(index);
+        if (!(await form.isVisible().catch(() => false))) continue;
+        const hasFile = (await form.locator('input[type="file"]').count()) > 0;
+        if (hasFile) return { frame, form };
+      }
+    } catch {
+      continue;
+    }
+  }
+  return null;
+}
 
+/**
+ * Clica no botão/link de "candidatar-se" e retorna a página onde o formulário acabou aparecendo.
+ * Muitos agregadores (LinkedIn, Indeed, Adzuna) abrem o site real da vaga (ATS) numa NOVA aba em
+ * vez de navegar na mesma página — sem tratar isso, a busca por formulário nunca encontra nada.
+ */
+async function clickApplyAndFollow(
+  page: import("playwright").Page,
+): Promise<import("playwright").Page | null> {
+  const APPLY_TEXT =
+    /candidatar|candidate-se|aplicar|inscrever|inscreva-se|postular|quero me candidatar|enviar candidatura|apply now|apply for this job|apply|easy apply|submit application|send application/i;
   const applyAction = page
-    .getByRole("button", { name: /candidatar|candidate-se|aplicar|apply now|apply/i })
-    .or(page.getByRole("link", { name: /candidatar|candidate-se|aplicar|apply now|apply/i }))
+    .getByRole("button", { name: APPLY_TEXT })
+    .or(page.getByRole("link", { name: APPLY_TEXT }))
     .first();
   if (!(await applyAction.count())) return null;
 
+  const popupPromise = page.context().waitForEvent("page", { timeout: 8_000 }).catch(() => null);
   await Promise.allSettled([
     page.waitForLoadState("domcontentloaded", { timeout: NAVIGATION_TIMEOUT_MS }),
     applyAction.click({ timeout: 8_000 }),
   ]);
-  await page.waitForTimeout(750);
-  await assertPublicHttpUrl(page.url());
-  return selectApplicationForm(page);
+
+  const popup = await popupPromise;
+  if (popup) {
+    await popup.waitForLoadState("domcontentloaded", { timeout: NAVIGATION_TIMEOUT_MS }).catch(() => {});
+    await settlePage(popup);
+    return popup;
+  }
+
+  await settlePage(page);
+  return page;
+}
+
+async function findApplicationForm(
+  page: import("playwright").Page,
+): Promise<{ page: import("playwright").Page; form: ReturnType<import("playwright").Page["locator"]> } | null> {
+  const existing = await selectApplicationForm(page);
+  if (existing) return { page, form: existing };
+
+  const inFrame = await selectApplicationFormInFrames(page);
+  if (inFrame) return { page, form: inFrame.form };
+
+  const target = await clickApplyAndFollow(page);
+  if (!target) return null;
+
+  await assertPublicHttpUrl(target.url());
+  const found = await selectApplicationForm(target);
+  if (found) return { page: target, form: found };
+
+  const foundInFrame = await selectApplicationFormInFrames(target);
+  if (foundInFrame) return { page: target, form: foundInFrame.form };
+
+  return null;
 }
 
 async function fillControls(
@@ -300,15 +372,24 @@ export async function applyToExternalJob(input: ExternalApplyInput): Promise<Ext
       return { status: "failed", detail: `A página retornou HTTP ${response?.status() ?? "desconhecido"}.` };
     }
     await assertPublicHttpUrl(page.url());
+    await settlePage(page);
 
     const initialBlock = await hasCaptchaOrLogin(page);
     if (initialBlock) return { status: "blocked", detail: initialBlock };
-    const form = await findApplicationForm(page);
-    if (!form) {
+    const found = await findApplicationForm(page);
+    if (!found) {
+      const hostname = new URL(page.url()).hostname;
+      if (/(^|\.)linkedin\.com$/.test(hostname)) {
+        return {
+          status: "blocked",
+          detail: "Vaga do LinkedIn com Candidatura Simplificada — exige login no LinkedIn, não suportado pela automação.",
+        };
+      }
       return { status: "blocked", detail: "Não foi possível localizar um formulário público de candidatura." };
     }
+    const { page: activePage, form } = found;
 
-    const blockAfterOpen = await hasCaptchaOrLogin(page);
+    const blockAfterOpen = await hasCaptchaOrLogin(activePage);
     if (blockAfterOpen) return { status: "blocked", detail: blockAfterOpen };
 
     const unresolved = await fillControls(form, input.profile, resumePath);
@@ -327,17 +408,20 @@ export async function applyToExternalJob(input: ExternalApplyInput): Promise<Ext
       return { status: "blocked", detail: "O botão de envio não está disponível." };
     }
 
-    const beforeUrl = page.url();
+    const beforeUrl = activePage.url();
     await submit.click({ timeout: 10_000 });
-    await page.waitForTimeout(1_500);
+    await activePage.waitForTimeout(1_500);
 
-    const finalBlock = await hasCaptchaOrLogin(page);
+    const finalBlock = await hasCaptchaOrLogin(activePage);
     if (finalBlock) return { status: "blocked", detail: finalBlock };
 
-    const pageText = normalize((await page.locator("body").innerText().catch(() => "")).slice(0, 20_000));
+    const pageText = normalize((await activePage.locator("body").innerText().catch(() => "")).slice(0, 20_000));
     const successText =
       /(candidatura enviada|inscricao realizada|application submitted|application received|obrigad[oa] por se candidatar|thank you for applying)/;
-    if (successText.test(pageText) || (page.url() !== beforeUrl && /success|confirmation|obrigado|thank-you/i.test(page.url()))) {
+    if (
+      successText.test(pageText) ||
+      (activePage.url() !== beforeUrl && /success|confirmation|obrigado|thank-you/i.test(activePage.url()))
+    ) {
       return { status: "applied", detail: "Candidatura confirmada pela página externa." };
     }
 

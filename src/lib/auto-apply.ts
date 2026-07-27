@@ -1,8 +1,10 @@
 import { prisma } from "@/lib/prisma";
 import { sendCompanyNewApplicationWhatsapp } from "@/lib/evolution";
-import { sendCompanyNewApplicationEmail } from "@/lib/resend";
+import { sendCompanyNewApplicationEmail, sendAutoApplyManualActionEmail, sendOnce } from "@/lib/resend";
 import { parseAutoApplyProfile, type AutoApplyProfile } from "@/lib/auto-apply-profile";
 import { applyToExternalJob } from "@/lib/external-auto-apply";
+import { extractStructuredResume, tailorResumeForJob } from "@/lib/groq";
+import { renderResumePdf } from "@/lib/resume-pdf";
 
 export type AutoApplyRunResult = {
   queued: number;
@@ -23,10 +25,43 @@ const MAX_APPLICATIONS_PER_RUN = 5;
 
 type ExternalContext = {
   enabled: boolean;
+  autoTailorResume: boolean;
   profile: AutoApplyProfile;
   resumeFileName: string;
   resumePdf: Uint8Array | null;
+  resumeRawText: string | null;
 };
+
+/**
+ * Reescreve o currículo (resumo/skills/experiências) com ênfase na vaga e renderiza um PDF novo,
+ * pra candidatura externa não sair sempre com o currículo genérico. Qualquer falha (IA fora do ar,
+ * currículo sem texto extraído etc.) cai de volta pro PDF original — nunca bloqueia a candidatura.
+ */
+async function buildTailoredResumePdf(
+  resumeRawText: string | null,
+  jobTitle: string,
+  company: string,
+  jobText: string,
+  fallbackPdf: Uint8Array | null,
+): Promise<Uint8Array | null> {
+  if (!resumeRawText?.trim()) return fallbackPdf;
+  try {
+    const structured = await extractStructuredResume(resumeRawText);
+    const tailored = await tailorResumeForJob(structured, jobTitle, company, jobText);
+    const pdfBytes = await renderResumePdf({
+      summary: tailored.summary,
+      resumeStructured: {
+        ...structured,
+        skills: tailored.skills,
+        experiences: tailored.experiences,
+      },
+    });
+    return pdfBytes;
+  } catch (error) {
+    console.error("auto-apply: falha ao adaptar currículo, usando o original", error);
+    return fallbackPdf;
+  }
+}
 
 function startOfUtcDay(now: Date): Date {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -103,11 +138,21 @@ async function processQueueItem(
       return "unsupported";
     }
 
+    const resumePdf = external.autoTailorResume
+      ? await buildTailoredResumePdf(
+          external.resumeRawText,
+          item.jobTitle,
+          item.company,
+          item.job.jobText,
+          external.resumePdf,
+        )
+      : external.resumePdf;
+
     const externalResult = await applyToExternalJob({
       jobUrl: item.jobUrl,
       profile: external.profile,
       resumeFileName: external.resumeFileName,
-      resumePdf: external.resumePdf,
+      resumePdf: resumePdf,
     });
 
     if (externalResult.status !== "applied") {
@@ -249,6 +294,40 @@ async function processQueueItem(
   }
 }
 
+/**
+ * Avisa o candidato (uma vez por dia, em lote) das vagas que o robô encontrou mas não conseguiu
+ * concluir sozinho nesta execução (CAPTCHA, login exigido, campo sem resposta configurada) — sem
+ * isso o item some numa fila que o candidato pode nunca abrir, e a vaga fica intransponível pro
+ * robô mas continua aberta pra candidatura manual.
+ */
+async function notifyBlockedExternalItems(
+  userId: string,
+  runStart: Date,
+  user: { name: string | null; email: string | null } | null,
+): Promise<void> {
+  if (!user?.email) return;
+  const blocked = await prisma.autoApplicationQueue.findMany({
+    where: { userId, status: "blocked_external", updatedAt: { gte: runStart } },
+    select: { jobTitle: true, company: true, jobUrl: true, failureReason: true },
+  });
+  if (!blocked.length) return;
+  await sendOnce(
+    "auto_apply_manual_action",
+    `${userId}:${startOfUtcDay(runStart).toISOString()}`,
+    user.email,
+    () =>
+      sendAutoApplyManualActionEmail(user.email!, {
+        name: user.name,
+        items: blocked.map((item) => ({
+          jobTitle: item.jobTitle,
+          company: item.company,
+          jobUrl: item.jobUrl,
+          reason: item.failureReason,
+        })),
+      }),
+  );
+}
+
 export async function runAutoApplyForUser(
   userId: string,
   now = new Date(),
@@ -261,7 +340,7 @@ export async function runAutoApplyForUser(
   const resume = await prisma.resume.findFirst({
     where: { userId },
     orderBy: { createdAt: "desc" },
-    select: { id: true, fileName: true, pdfData: true },
+    select: { id: true, fileName: true, pdfData: true, rawText: true },
   });
   if (!resume) return { ...EMPTY_RESULT, skipped: 1 };
 
@@ -282,6 +361,7 @@ export async function runAutoApplyForUser(
   const storedProfile = parseAutoApplyProfile(settings.applicationProfile);
   const externalContext: ExternalContext = {
     enabled: settings.externalAutomationEnabled && Boolean(settings.externalConsentedAt),
+    autoTailorResume: settings.autoTailorResume,
     profile: {
       ...storedProfile,
       fullName: storedProfile.fullName || user?.name || "",
@@ -292,6 +372,7 @@ export async function runAutoApplyForUser(
     },
     resumeFileName: resume.fileName,
     resumePdf: resume.pdfData ? new Uint8Array(resume.pdfData) : null,
+    resumeRawText: resume.rawText,
   };
 
   const remaining = Math.max(0, settings.dailyLimit - alreadyAppliedToday);
@@ -324,6 +405,7 @@ export async function runAutoApplyForUser(
       where: { userId },
       data: { lastRunAt: now },
     });
+    await notifyBlockedExternalItems(userId, now, user);
     return result;
   }
 
@@ -386,6 +468,8 @@ export async function runAutoApplyForUser(
     else if (outcome === "failed") result.failed += 1;
     else result.skipped += 1;
   }
+
+  await notifyBlockedExternalItems(userId, now, user);
 
   await prisma.autoApplicationSettings.update({
     where: { userId },

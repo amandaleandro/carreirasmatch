@@ -1,7 +1,7 @@
 import { getSetting } from "@/lib/app-settings";
 import { GROQ_MODEL_SETTING_KEY } from "@/lib/groq-model-options";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
-import { profileSuggestionsSchema, refinementSchema, resumeAnalysisSchema, structuredResumeSchema } from "@/lib/ai-schemas";
+import { profileSuggestionsSchema, refinementSchema, resumeAnalysisSchema, structuredResumeSchema, tailoredResumeSchema } from "@/lib/ai-schemas";
 import {
   CAREER_SEGMENT_LABELS,
   normalizeCareerSegment,
@@ -633,6 +633,50 @@ export async function extractStructuredResume(resumeText: string): Promise<Struc
     structuredResumeSchema,
     "resume_extraction",
     "groq"
+  );
+}
+
+export type TailoredResumeContent = {
+  summary: string;
+  skills: string[];
+  experiences: { role: string; company: string; period: string; description: string }[];
+};
+
+const TAILOR_RESUME_SYSTEM_PROMPT = `Redator de currículos brasileiro, especializado em adaptar (tailoring) um currículo já existente para uma vaga específica, sem inventar nenhuma informação.
+
+REGRAS:
+1. NUNCA invente cargos, empresas, períodos, formação ou qualquer dado que não esteja no currículo original. Você só pode reescrever, reordenar e reenfatizar o que já existe.
+2. "summary": reescreva o resumo profissional (3-5 linhas) destacando a experiência e habilidades do candidato que mais casam com a vaga, em português.
+3. "skills": retorne a lista de competências do currículo original, REORDENADA para colocar primeiro as mais relevantes para a vaga. Não adicione competências que o candidato não tem.
+4. "experiences": para cada experiência do currículo original (mesma ordem, mesmo cargo/empresa/período), reescreva "description" destacando resultados e responsabilidades mais relevantes para a vaga, mantendo os fatos originais. Se uma experiência não tiver nenhuma relação com a vaga, apenas mantenha a descrição original sem inventar relação.
+5. Responda apenas em português do Brasil.`;
+
+/** Reescreve o resumo/skills/experiências de um currículo já extraído para dar ênfase ao que casa com uma vaga específica, sem inventar dados novos — usado na candidatura externa automática. */
+export async function tailorResumeForJob(
+  structured: StructuredResume,
+  jobTitle: string,
+  company: string,
+  jobText: string
+): Promise<TailoredResumeContent> {
+  jobText = normalizeForPrompt(jobText, MAX_JOB_TEXT_CHARS);
+  const jsonTemplate = `{
+  "summary": string,
+  "skills": string[],
+  "experiences": [ { "role": string, "company": string, "period": string, "description": string } ]
+}`;
+  const userMessage = `VAGA: ${jobTitle} — ${company}\n\nDESCRIÇÃO DA VAGA:\n${jobText}\n\nCURRÍCULO ESTRUTURADO ORIGINAL DO CANDIDATO:\n${JSON.stringify(
+    { skills: structured.skills, experiences: structured.experiences },
+    null,
+    2
+  )}\n\n${JSON_ONLY_INSTRUCTION}\n${jsonTemplate}`;
+  return runJsonPrompt<TailoredResumeContent>(
+    TAILOR_RESUME_SYSTEM_PROMPT,
+    userMessage,
+    0.3,
+    3000,
+    undefined,
+    tailoredResumeSchema,
+    "resume_tailoring"
   );
 }
 

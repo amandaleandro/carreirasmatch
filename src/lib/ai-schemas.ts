@@ -62,6 +62,14 @@ export const structuredResumeSchema = z.object({
   })),
 });
 
+export const tailoredResumeSchema = z.object({
+  summary: text,
+  skills: textArray,
+  experiences: z.array(z.object({
+    role: z.string(), company: z.string(), period: z.string(), description: text,
+  })),
+});
+
 export const profileSuggestionsSchema = z.object({
   suggestions: z.array(z.object({
     type: z.enum(["course", "certification", "book"]), title: text, provider: text,
