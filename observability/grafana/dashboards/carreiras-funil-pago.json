@@ -1,14 +1,23 @@
 {
-  "annotations": { "list": [] },
+  "annotations": {
+    "list": []
+  },
   "editable": true,
   "graphTooltip": 1,
   "title": "Carreiras Match - Funil Pago",
   "uid": "carreiras-funil-pago",
-  "tags": ["carreiras", "negocio", "funil"],
+  "tags": [
+    "carreiras",
+    "negocio",
+    "funil"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 1,
-  "time": { "from": "now-24h", "to": "now" },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
   "refresh": "5m",
   "templating": {
     "list": [
@@ -17,56 +26,142 @@
         "label": "Janela",
         "type": "custom",
         "query": "24h,7d,30d",
-        "current": { "text": "30d", "value": "30d" },
+        "current": {
+          "text": "30d",
+          "value": "30d"
+        },
         "options": [
-          { "text": "24h", "value": "24h", "selected": false },
-          { "text": "7d", "value": "7d", "selected": false },
-          { "text": "30d", "value": "30d", "selected": true }
+          {
+            "text": "24h",
+            "value": "24h",
+            "selected": false
+          },
+          {
+            "text": "7d",
+            "value": "7d",
+            "selected": false
+          },
+          {
+            "text": "30d",
+            "value": "30d",
+            "selected": true
+          }
         ]
       }
     ]
   },
   "panels": [
     {
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### O que este painel mostra\nO caminho do dinheiro: da visita ao site até o pagamento confirmado. Feito para time comercial entender onde as pessoas desistem antes de pagar — teaser bloqueado, clique em desbloquear, checkout, pagamento. Troque a **Janela** no topo para comparar 24h / 7 dias / 30 dias."
+      }
+    },
+    {
       "type": "row",
       "title": "Funil completo — $period",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
       "collapsed": false,
       "panels": []
     },
     {
       "type": "bargauge",
       "title": "Do visitante à assinatura",
-      "gridPos": { "h": 10, "w": 12, "x": 0, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "color": { "mode": "continuous-BlPu" }
+          "color": {
+            "mode": "continuous-BlPu"
+          }
         }
       },
       "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
-        "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
         "showUnfilled": true
       },
       "targets": [
-        { "refId": "A", "expr": "carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}", "legendFormat": "1. Sessões únicas" },
-        { "refId": "B", "expr": "carreiras_funnel_events{name=\"analysis_completed\",period=\"$period\"}", "legendFormat": "2. Análises concluídas" },
-        { "refId": "C", "expr": "carreiras_funnel_events{name=\"diagnostic_teaser_viewed\",period=\"$period\"}", "legendFormat": "3. Viu o teaser bloqueado" },
-        { "refId": "D", "expr": "carreiras_funnel_events{name=\"unlock_clicked\",period=\"$period\"}", "legendFormat": "4. Clicou em desbloquear" },
-        { "refId": "E", "expr": "carreiras_funnel_events{name=\"checkout_started\",period=\"$period\"}", "legendFormat": "5. Iniciou checkout" },
-        { "refId": "F", "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"$period\"}", "legendFormat": "6. Pagamento avulso confirmado" },
-        { "refId": "G", "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"$period\"}", "legendFormat": "7. Assinatura confirmada" }
-      ]
+        {
+          "refId": "A",
+          "expr": "carreiras_access_summary{metric=\"unique_sessions\",period=\"$period\"}",
+          "legendFormat": "1. Sessões únicas"
+        },
+        {
+          "refId": "B",
+          "expr": "carreiras_funnel_events{name=\"analysis_completed\",period=\"$period\"}",
+          "legendFormat": "2. Análises concluídas"
+        },
+        {
+          "refId": "C",
+          "expr": "carreiras_funnel_events{name=\"diagnostic_teaser_viewed\",period=\"$period\"}",
+          "legendFormat": "3. Viu o teaser bloqueado"
+        },
+        {
+          "refId": "D",
+          "expr": "carreiras_funnel_events{name=\"unlock_clicked\",period=\"$period\"}",
+          "legendFormat": "4. Clicou em desbloquear"
+        },
+        {
+          "refId": "E",
+          "expr": "carreiras_funnel_events{name=\"checkout_started\",period=\"$period\"}",
+          "legendFormat": "5. Iniciou checkout"
+        },
+        {
+          "refId": "F",
+          "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"$period\"}",
+          "legendFormat": "6. Pagamento avulso confirmado"
+        },
+        {
+          "refId": "G",
+          "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"$period\"}",
+          "legendFormat": "7. Assinatura confirmada"
+        }
+      ],
+      "description": "Cada etapa do funil de vendas, na ordem em que acontece. Quanto menor a barra em relação à anterior, maior a perda naquele ponto."
     },
     {
       "type": "stat",
       "title": "Taxas de conversão entre etapas",
-      "gridPos": { "h": 10, "w": 12, "x": 12, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -74,15 +169,29 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.02 },
-              { "color": "green", "value": 0.05 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.02
+              },
+              {
+                "color": "green",
+                "value": 0.05
+              }
             ]
           }
         }
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
         "colorMode": "value",
         "graphMode": "none",
         "textMode": "value_and_name"
@@ -108,23 +217,47 @@
           "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"$period\"} / carreiras_funnel_events{name=\"checkout_started\",period=\"$period\"}",
           "legendFormat": "Checkout → assinatura"
         }
-      ]
+      ],
+      "description": "Percentual de conversão etapa a etapa. Verde = bom (≥5%), amarelo = atenção, vermelho = etapa travando o funil."
     },
     {
       "type": "row",
       "title": "Receita e recuperação",
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 11 },
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
       "collapsed": false,
       "panels": []
     },
     {
       "type": "stat",
       "title": "Receita candidato — $period",
-      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 12 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2 } },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyBRL",
+          "decimals": 2
+        }
+      },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
         "colorMode": "value",
         "graphMode": "area"
       },
@@ -134,16 +267,35 @@
           "expr": "carreiras_business_revenue_cents{channel=\"candidate\",period=\"$period\"} / 100",
           "legendFormat": "receita"
         }
-      ]
+      ],
+      "description": "Receita paga por pessoas físicas (pagamento avulso ou assinatura) no período selecionado."
     },
     {
       "type": "stat",
       "title": "Assinaturas ativas (agora)",
-      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 12 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
-      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        }
+      },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
         "colorMode": "value",
         "graphMode": "area"
       },
@@ -158,8 +310,16 @@
     {
       "type": "stat",
       "title": "Checkouts iniciados sem pagar — $period",
-      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 12 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
@@ -167,15 +327,29 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 5 },
-              { "color": "red", "value": 20 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5
+              },
+              {
+                "color": "red",
+                "value": 20
+              }
             ]
           }
         }
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "values": false
+        },
         "colorMode": "value",
         "graphMode": "none"
       },
@@ -185,26 +359,60 @@
           "expr": "clamp_min(carreiras_funnel_events{name=\"checkout_started\",period=\"$period\"} - ignoring(name) carreiras_funnel_events{name=\"payment_confirmed\",period=\"$period\"}, 0)",
           "legendFormat": "abandonos"
         }
-      ]
+      ],
+      "description": "Pessoas que começaram o pagamento mas não concluíram — potencial de recuperação via e-mail/remarketing."
     },
     {
       "type": "timeseries",
       "title": "Evolução do funil (janela 24h, série temporal)",
-      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 12 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 16
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "custom": { "drawStyle": "line", "fillOpacity": 8, "spanNulls": true }
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "spanNulls": true
+          }
         }
       },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
       "targets": [
-        { "refId": "A", "expr": "carreiras_funnel_events{name=\"analysis_completed\",period=\"24h\"}", "legendFormat": "análises" },
-        { "refId": "B", "expr": "carreiras_funnel_events{name=\"unlock_clicked\",period=\"24h\"}", "legendFormat": "cliques desbloqueio" },
-        { "refId": "C", "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"24h\"}", "legendFormat": "pagamentos" },
-        { "refId": "D", "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"24h\"}", "legendFormat": "assinaturas" }
+        {
+          "refId": "A",
+          "expr": "carreiras_funnel_events{name=\"analysis_completed\",period=\"24h\"}",
+          "legendFormat": "análises"
+        },
+        {
+          "refId": "B",
+          "expr": "carreiras_funnel_events{name=\"unlock_clicked\",period=\"24h\"}",
+          "legendFormat": "cliques desbloqueio"
+        },
+        {
+          "refId": "C",
+          "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"24h\"}",
+          "legendFormat": "pagamentos"
+        },
+        {
+          "refId": "D",
+          "expr": "carreiras_funnel_events{name=\"subscription_confirmed\",period=\"24h\"}",
+          "legendFormat": "assinaturas"
+        }
       ]
     }
   ]

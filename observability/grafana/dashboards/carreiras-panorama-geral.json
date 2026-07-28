@@ -1,0 +1,122 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "graphTooltip": 1,
+  "title": "Carreiras Match - Panorama Geral",
+  "uid": "carreiras-panorama-geral",
+  "tags": ["carreiras-match", "negócio", "resumo"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "time": { "from": "now-30d", "to": "now" },
+  "refresh": "5m",
+  "templating": { "list": [] },
+  "panels": [
+    {
+      "type": "text",
+      "title": "",
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 0 },
+      "options": {
+        "mode": "markdown",
+        "content": "## Carreiras Match em uma página\nEste painel resume o negócio para quem não mexe nos números todo dia: quantas pessoas usam, quanto vira receita, e como está a saúde da operação. Para detalhe por etapa, veja os painéis **Negócio Executivo**, **Crescimento & Funil**, **Funil Pago** e **Farol das Jornadas**."
+      }
+    },
+    {
+      "type": "row", "title": "💰 O negócio em 3 números", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 4 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "stat", "title": "Pessoas cadastradas", "description": "Total de contas criadas na plataforma desde o início.",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "blue" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "area", "textMode": "auto" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_total{entity=\"users\"}", "legendFormat": "pessoas" }]
+    },
+    {
+      "type": "stat", "title": "Assinantes pagantes", "description": "Pessoas que pagam hoje pela assinatura — é a receita recorrente do negócio.",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "area", "textMode": "auto" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"}", "legendFormat": "assinantes" }]
+    },
+    {
+      "type": "stat", "title": "Receita confirmada (30 dias)", "description": "Tudo que foi pago e confirmado nos últimos 30 dias — avulso + assinatura.",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 5 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "currencyBRL", "decimals": 2, "color": { "mode": "fixed", "fixedColor": "purple" } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "area", "textMode": "auto" },
+      "targets": [{ "refId": "A", "expr": "sum(carreiras_business_revenue_cents{period=\"30d\"}) / 100", "legendFormat": "receita" }]
+    },
+    {
+      "type": "row", "title": "📈 Da visita ao pagamento — onde as pessoas desistem", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 12 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "bargauge", "title": "Jornada completa (últimos 30 dias)",
+      "description": "Cada barra é uma etapa do caminho até virar cliente. Quanto menor a barra em relação à anterior, mais gente desistiu naquele ponto — é aí que vale focar esforço de produto ou de venda.",
+      "gridPos": { "h": 11, "w": 24, "x": 0, "y": 13 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "min": 0, "color": { "mode": "continuous-BlPu" } } },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true, "reduceOptions": { "calcs": ["lastNotNull"], "values": false } },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_access_summary{metric=\"unique_sessions\",period=\"30d\"}", "legendFormat": "1. Visitantes (sessões únicas)" },
+        { "refId": "B", "expr": "carreiras_business_total{entity=\"leads\"}", "legendFormat": "2. Leads" },
+        { "refId": "C", "expr": "carreiras_business_total{entity=\"users\"}", "legendFormat": "3. Cadastraram-se" },
+        { "refId": "D", "expr": "carreiras_business_total{entity=\"analyses\"}", "legendFormat": "4. Fizeram uma análise" },
+        { "refId": "E", "expr": "carreiras_funnel_events{name=\"unlock_clicked\",period=\"30d\"}", "legendFormat": "5. Clicaram para desbloquear" },
+        { "refId": "F", "expr": "carreiras_funnel_events{name=\"payment_confirmed\",period=\"30d\"}", "legendFormat": "6. Pagaram" },
+        { "refId": "G", "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"}", "legendFormat": "7. Viraram assinantes" }
+      ]
+    },
+    {
+      "type": "row", "title": "🚦 Está tudo funcionando agora?", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 24 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "stat", "title": "Site no ar", "description": "Se está vermelho, o site está fora do ar agora.",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "FORA DO AR", "color": "red" }, "1": { "text": "NO AR", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "up{job=\"carreiras-app\"}" }]
+    },
+    {
+      "type": "stat", "title": "Análise por IA funcionando", "description": "% de análises de currículo que deram certo na última hora.",
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.9 }, { "color": "green", "value": 0.98 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "sum(rate(carreiras_analysis_total{outcome=\"success\"}[1h])) / clamp_min(sum(rate(carreiras_analysis_total[1h])), 0.000001)" }]
+    },
+    {
+      "type": "stat", "title": "Pagamentos aprovados", "description": "% de tentativas de pagamento de candidatos aprovadas nas últimas 24h.",
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1, "thresholds": { "mode": "absolute", "steps": [{ "color": "red", "value": null }, { "color": "yellow", "value": 0.5 }, { "color": "green", "value": 0.8 }] } } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_flow{metric=\"payments_paid\",channel=\"candidate\",period=\"24h\"} / clamp_min(carreiras_business_flow{metric=\"payment_attempts\",channel=\"candidate\",period=\"24h\"}, 1)" }]
+    },
+    {
+      "type": "stat", "title": "Coleta de números do negócio", "description": "Se está OK, os números deste painel estão atualizados.",
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 25 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "mappings": [{ "type": "value", "options": { "0": { "text": "DESATUALIZADO", "color": "red" }, "1": { "text": "OK", "color": "green" } } }] } },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "background", "graphMode": "none" },
+      "targets": [{ "refId": "A", "expr": "carreiras_business_snapshot_success" }]
+    },
+    {
+      "type": "row", "title": "🗓️ Como estamos crescendo", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 30 }, "collapsed": false, "panels": []
+    },
+    {
+      "type": "timeseries", "title": "Cadastros e análises ao longo do tempo",
+      "description": "Linha do tempo de novos usuários e análises feitas — bom para ver se o crescimento é constante, sazonal ou está caindo.",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 31 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "short", "decimals": 0, "custom": { "fillOpacity": 20, "drawStyle": "line" } } },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
+      "targets": [
+        { "refId": "A", "expr": "carreiras_business_created{entity=\"users\",period=\"30d\"}", "legendFormat": "novos usuários" },
+        { "refId": "B", "expr": "carreiras_business_created{entity=\"analyses\",period=\"30d\"}", "legendFormat": "análises feitas" }
+      ]
+    }
+  ]
+}

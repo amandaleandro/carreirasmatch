@@ -52,13 +52,27 @@
   },
   "panels": [
     {
+      "type": "text",
+      "title": "",
+      "gridPos": {
+        "h": 4,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "### O que este painel mostra\nFoco em crescimento: quantas pessoas chegam, quantas viram usuário, e quantas usam o produto de verdade (currículo, análise). O seletor **Janela** no topo troca o período (24h / 7 dias / 30 dias) de todos os painéis marcados com `$period`. Use para responder: 'estamos crescendo?' e 'onde as pessoas desistem?'"
+      }
+    },
+    {
       "type": "row",
       "title": "Aquisição e ativação — $period",
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 4
       },
       "collapsed": false,
       "panels": []
@@ -70,7 +84,7 @@
         "h": 5,
         "w": 4,
         "x": 0,
-        "y": 1
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -107,7 +121,7 @@
         "h": 5,
         "w": 4,
         "x": 4,
-        "y": 1
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -144,7 +158,7 @@
         "h": 5,
         "w": 4,
         "x": 8,
-        "y": 1
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -181,7 +195,7 @@
         "h": 5,
         "w": 4,
         "x": 12,
-        "y": 1
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -218,7 +232,7 @@
         "h": 5,
         "w": 4,
         "x": 16,
-        "y": 1
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -255,7 +269,7 @@
         "h": 5,
         "w": 4,
         "x": 20,
-        "y": 1
+        "y": 5
       },
       "datasource": {
         "type": "prometheus",
@@ -284,7 +298,8 @@
           "expr": "carreiras_business_created{entity=\"analyses\",period=\"$period\"} / clamp_min(carreiras_business_created{entity=\"users\",period=\"$period\"}, 1)",
           "legendFormat": "ativação"
         }
-      ]
+      ],
+      "description": "Quantas análises, em média, cada pessoa nova faz — indica se o produto está sendo realmente usado logo no início (ativação)."
     },
     {
       "type": "row",
@@ -293,7 +308,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 6
+        "y": 10
       },
       "collapsed": false,
       "panels": []
@@ -305,7 +320,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 7
+        "y": 11
       },
       "datasource": {
         "type": "prometheus",
@@ -349,7 +364,8 @@
           "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"}",
           "legendFormat": "5. Assinaturas"
         }
-      ]
+      ],
+      "description": "Do primeiro contato até virar assinante — números totais acumulados (não é só do período selecionado)."
     },
     {
       "type": "bargauge",
@@ -358,7 +374,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 11
       },
       "datasource": {
         "type": "prometheus",
@@ -415,7 +431,8 @@
           "expr": "carreiras_business_breakdown{metric=\"subscription_status\",value=\"active\"} / clamp_min(carreiras_business_total{entity=\"users\"}, 1)",
           "legendFormat": "Usuário → assinatura"
         }
-      ]
+      ],
+      "description": "Percentual de gente que avança de uma etapa para a próxima. Verde = etapa saudável, vermelho = ponto de atenção."
     },
     {
       "type": "row",
@@ -424,7 +441,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 16
+        "y": 20
       },
       "collapsed": false,
       "panels": []
@@ -436,7 +453,7 @@
         "h": 9,
         "w": 16,
         "x": 0,
-        "y": 17
+        "y": 21
       },
       "datasource": {
         "type": "prometheus",
@@ -476,7 +493,7 @@
         "h": 9,
         "w": 8,
         "x": 16,
-        "y": 17
+        "y": 21
       },
       "datasource": {
         "type": "prometheus",
@@ -510,7 +527,8 @@
           "expr": "carreiras_business_total{entity=\"applications\"} / clamp_min(carreiras_business_total{entity=\"users\"}, 1)",
           "legendFormat": "candidaturas/usuário"
         }
-      ]
+      ],
+      "description": "Média de uso por usuário cadastrado (histórico total, não só do período) — mostra engajamento contínuo."
     },
     {
       "type": "row",
@@ -519,7 +537,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 26
+        "y": 30
       },
       "collapsed": false,
       "panels": []
@@ -531,7 +549,7 @@
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 27
+        "y": 31
       },
       "datasource": {
         "type": "prometheus",
@@ -562,7 +580,7 @@
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 27
+        "y": 31
       },
       "datasource": {
         "type": "prometheus",
@@ -593,7 +611,7 @@
         "h": 8,
         "w": 8,
         "x": 16,
-        "y": 27
+        "y": 31
       },
       "datasource": {
         "type": "prometheus",
