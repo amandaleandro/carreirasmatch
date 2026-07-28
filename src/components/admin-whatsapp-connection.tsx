@@ -199,7 +199,7 @@ export function AdminWhatsappConnection() {
                   {busyId === instance.id ? "Gerando…" : "Gerar QR code"}
                 </button>
               )}
-              {instance.state === "open" && (
+              {instance.state !== "close" && (
                 <button
                   type="button"
                   onClick={() => void disconnect(instance.id)}
