@@ -290,6 +290,12 @@ export default async function AdminPage() {
 
         <div className="flex items-center gap-3 shrink-0">
           <Link
+            href="/admin/usuarios"
+            className="rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-3 text-xs font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-500/20 transition-colors"
+          >
+            Usuários
+          </Link>
+          <Link
             href="/admin/repasses"
             className="rounded-2xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 transition-colors"
           >
