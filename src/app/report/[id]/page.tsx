@@ -10,6 +10,7 @@ import {
   CareerTrack,
 } from "@/components/analysis-display";
 import { canViewFullDiagnostic, hasActiveSubscriptionAccess } from "@/lib/entitlements";
+import { isAdminEmail } from "@/lib/admin";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
@@ -48,14 +49,17 @@ export default async function ReportPage({
     getUserReferralStats(session.user.id),
   ]);
 
-  if (!record || record.resume.userId !== session.user.id) {
+  const isOwner = record?.resume.userId === session.user.id;
+  const isAdmin = isAdminEmail(session.user.email);
+  if (!record || (!isOwner && !isAdmin)) {
     notFound();
   }
 
-  const [unlocked, subscribed] = await Promise.all([
+  const [unlockedForOwner, subscribed] = await Promise.all([
     canViewFullDiagnostic(session.user.id, id),
     hasActiveSubscriptionAccess(session.user.id),
   ]);
+  const unlocked = isAdmin || unlockedForOwner;
   const segment = normalizeCareerSegment(user?.careerSegment);
   const diagnosticPrice = segment ? CAREER_OFFER_BY_SEGMENT[segment].diagnosticPrice : "R$9,90";
 
