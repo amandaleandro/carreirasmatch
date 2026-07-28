@@ -18,6 +18,7 @@ interface ApplicationProfile {
   fullName: string;
   email: string;
   phone: string;
+  cpf: string;
   city: string;
   state: string;
   linkedinUrl: string;
@@ -346,6 +347,7 @@ export function AutoApplySettingsCard() {
               ["fullName", "Nome completo", "text"],
               ["email", "E-mail", "email"],
               ["phone", "Telefone", "tel"],
+              ["cpf", "CPF", "text"],
               ["city", "Cidade", "text"],
               ["state", "Estado/UF", "text"],
               ["linkedinUrl", "URL do LinkedIn", "url"],

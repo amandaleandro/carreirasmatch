@@ -14,8 +14,10 @@ type FieldKind =
   | "fullName"
   | "email"
   | "phone"
+  | "cpf"
   | "city"
   | "state"
+  | "country"
   | "linkedinUrl"
   | "salaryExpectation"
   | "availability"
@@ -47,6 +49,7 @@ function normalize(value: string): string {
 export function classifyExternalField(hint: string): FieldKind | null {
   const text = normalize(hint);
   if (/\b(e-?mail|correio eletronico)\b/.test(text)) return "email";
+  if (/\bcpf\b/.test(text)) return "cpf";
   if (/\b(telefone|celular|phone|whatsapp)\b/.test(text)) return "phone";
   if (/\b(linkedin|perfil profissional)\b/.test(text)) return "linkedinUrl";
   if (/\b(pretensao|expectativa salarial|salario esperado|salary expectation)\b/.test(text)) {
@@ -60,15 +63,71 @@ export function classifyExternalField(hint: string): FieldKind | null {
   if (/\b(carta de apresentacao|cover letter|mensagem ao recrutador)\b/.test(text)) return "coverLetter";
   if (/\b(estado|uf|state)\b/.test(text)) return "state";
   if (/\b(cidade|municipio|city)\b/.test(text)) return "city";
+  if (/\b(pais( de origem)?|nacionalidade|country)\b/.test(text)) return "country";
   if (/\b(nome completo|full name|seu nome|nome)\b/.test(text)) return "fullName";
   return null;
 }
 
+// A plataforma foca candidatos no Brasil; a maioria dos formulários com "País" trata isso como
+// um campo obrigatório de preenchimento óbvio, não uma pergunta real ao candidato — não vale
+// deixar de enviar a candidatura por um select de país sem valor configurável no perfil.
+const DEFAULT_COUNTRY = "Brasil";
+
 function profileValue(profile: AutoApplyProfile, kind: FieldKind): string {
+  if (kind === "country") return DEFAULT_COUNTRY;
   const value = profile[kind];
   if (value === "yes") return "Sim";
   if (value === "no") return "Não";
   return typeof value === "string" ? value : "";
+}
+
+/** Combobox com busca (React-select, MUI Autocomplete, select2 etc.): um <input> de texto que abre uma lista filtrável ao digitar, em vez de um <select> nativo — muito comum em campos de país/cidade/estado. */
+async function isComboboxLikeInput(control: ReturnType<import("playwright").Page["locator"]>): Promise<boolean> {
+  return control.evaluate((element) => {
+    const el = element as HTMLElement;
+    return (
+      el.getAttribute("role") === "combobox" ||
+      el.hasAttribute("aria-autocomplete") ||
+      el.hasAttribute("aria-expanded") ||
+      el.hasAttribute("aria-controls")
+    );
+  }).catch(() => false);
+}
+
+/**
+ * Digita no combobox (via keystrokes reais, já que muitas libs só filtram no keyup/keydown, não
+ * num `input` sintético) e clica na opção da lista que melhor bate. A lista quase sempre é
+ * renderizada num portal fora do <form> (react-select, MUI etc.), então a busca por opções é na
+ * página inteira, não dentro do form. Sem match exato, cai pra ArrowDown+Enter (aceita a primeira
+ * sugestão) em vez de deixar o campo vazio.
+ */
+async function fillCombobox(
+  page: import("playwright").Page,
+  control: ReturnType<import("playwright").Page["locator"]>,
+  value: string,
+): Promise<void> {
+  await control.click({ timeout: 3_000 }).catch(() => {});
+  await control.pressSequentially(value, { delay: 30, timeout: 5_000 }).catch(() => {});
+  await page.waitForTimeout(500);
+
+  const options = page.locator(
+    '[role="option"], [role="listbox"] li, ul[role="listbox"] li, .select__option, [class*="-option"]',
+  );
+  const optionCount = Math.min(await options.count().catch(() => 0), 30);
+  const wanted = normalize(value);
+  for (let index = 0; index < optionCount; index++) {
+    const option = options.nth(index);
+    if (!(await option.isVisible().catch(() => false))) continue;
+    const text = normalize(await option.innerText().catch(() => ""));
+    if (!text) continue;
+    if (text === wanted || text.includes(wanted) || wanted.includes(text)) {
+      await option.click({ timeout: 3_000 }).catch(() => {});
+      return;
+    }
+  }
+
+  await control.press("ArrowDown").catch(() => {});
+  await control.press("Enter").catch(() => {});
 }
 
 function customAnswer(profile: AutoApplyProfile, hint: string): string {
@@ -249,7 +308,22 @@ async function fillControls(
   resumePath: string | null,
 ): Promise<string[]> {
   const unresolved: string[] = [];
-  const controls = form.locator("input, textarea, select");
+  const page = form.page();
+
+  // Inputs de arquivo tratados à parte, ANTES do filtro de visibilidade: praticamente todo
+  // upload de currículo estilizado (botão "Anexar currículo" etc.) esconde o <input type="file">
+  // real (opacity/position) por trás de um botão custom — se ele passasse pelo isVisible() do
+  // loop principal, o currículo nunca seria anexado e o form seguiria "preenchido" sem currículo.
+  // setInputFiles funciona em inputs ocultos, não precisa clicar em nada visível.
+  const fileControls = form.locator('input[type="file"]');
+  const fileCount = Math.min(await fileControls.count(), MAX_CONTROLS);
+  for (let index = 0; index < fileCount; index++) {
+    const control = fileControls.nth(index);
+    if (resumePath) await control.setInputFiles(resumePath).catch(() => unresolved.push("currículo em PDF"));
+    else unresolved.push("currículo em PDF");
+  }
+
+  const controls = form.locator("input:not([type='file']), textarea, select");
   const count = Math.min(await controls.count(), MAX_CONTROLS);
 
   for (let index = 0; index < count; index++) {
@@ -261,12 +335,6 @@ async function fillControls(
     if (["hidden", "submit", "button", "reset", "image"].includes(type)) continue;
     const hint = await controlHint(control);
     const normalizedHint = normalize(hint);
-
-    if (type === "file") {
-      if (resumePath) await control.setInputFiles(resumePath);
-      else unresolved.push("currículo em PDF");
-      continue;
-    }
 
     if (type === "checkbox") {
       const required = (await control.getAttribute("required")) !== null ||
@@ -301,6 +369,7 @@ async function fillControls(
 
     const kind = classifyExternalField(hint);
     const value = (kind ? profileValue(profile, kind) : "") || customAnswer(profile, hint);
+    const isCombobox = value && tag !== "select" ? await isComboboxLikeInput(control) : false;
     if (value) {
       if (tag === "select") {
         const options = await control.locator("option").allTextContents();
@@ -312,10 +381,18 @@ async function fillControls(
             (wanted === "nao" && /\b(nao|no)\b/.test(normalizedOption));
         });
         if (best) await control.selectOption({ label: best });
+      } else if (isCombobox) {
+        await fillCombobox(page, control, value);
       } else {
         await control.fill(value);
       }
     }
+
+    // Comboboxes com busca (react-select, MUI etc.) muitas vezes limpam o próprio <input> depois
+    // de escolher uma opção — o valor selecionado vive num elemento visual à parte, não no input.
+    // Checar `inputValue()` vazio aqui daria falso "campo obrigatório sem resposta" mesmo tendo
+    // clicado certo na opção, então esse campo confia no que foi tentado acima.
+    if (isCombobox) continue;
 
     const required = (await control.getAttribute("required")) !== null ||
       (await control.getAttribute("aria-required")) === "true";

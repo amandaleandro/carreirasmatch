@@ -6,6 +6,7 @@ export const autoApplyProfileSchema = z.object({
   fullName: optionalText,
   email: z.union([z.literal(""), z.string().trim().email().max(320)]).optional().default(""),
   phone: z.string().trim().max(40).optional().default(""),
+  cpf: z.string().trim().max(20).optional().default(""),
   city: z.string().trim().max(120).optional().default(""),
   state: z.string().trim().max(120).optional().default(""),
   linkedinUrl: z.union([z.literal(""), z.string().trim().url().max(500)]).optional().default(""),
