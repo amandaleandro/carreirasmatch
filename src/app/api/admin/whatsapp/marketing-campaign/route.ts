@@ -1,15 +1,19 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
-import { evolutionEnabled, sendNextMarketingInviteWhatsapp } from "@/lib/evolution";
+import { evolutionEnabled, listWhatsappInstances, sendNextMarketingInviteWhatsapp } from "@/lib/evolution";
 
 /**
  * Disparo manual do convite de marketing (banco de mensagens em
- * MARKETING_INVITE_MESSAGES) pra dois públicos que ainda não converteram:
- * leads com telefone que nunca viraram conta, e usuários cadastrados (com
- * opt-in de WhatsApp) que não têm assinatura ativa nem pagamento aprovado.
+ * MARKETING_INVITE_MESSAGES) pra usuários cadastrados com opt-in de WhatsApp
+ * que ainda não converteram (sem assinatura ativa nem pagamento aprovado).
  * Idempotente: cada telefone só recebe cada mensagem uma vez, então clicar de
  * novo só avança pro próximo toque de quem ainda não esgotou a lista.
+ *
+ * Não inclui `leads` (contatos capturados em formulários que nunca viraram
+ * conta): esse público nunca deu opt-in de WhatsApp, e mandar marketing sem
+ * consentimento pra ele foi o que gerou denúncias em massa e o ban do número
+ * em 2026-07-28. Ver AGENTS.md / whatsappMarketingOptIn.
  */
 export async function POST() {
   const { session, response } = await requireAdminApi();
@@ -17,32 +21,24 @@ export async function POST() {
 
   if (!evolutionEnabled) {
     return NextResponse.json(
-      { error: "Evolution API não configurada no ambiente (EVOLUTION_API_URL/EVOLUTION_API_KEY/EVOLUTION_INSTANCE)." },
+      { error: "Evolution API não configurada no ambiente (EVOLUTION_API_URL/EVOLUTION_API_KEY)." },
+      { status: 400 }
+    );
+  }
+
+  const instances = await listWhatsappInstances();
+  if (instances.length === 0) {
+    return NextResponse.json(
+      { error: "Nenhum número cadastrado. Cadastre e pareie ao menos um em Admin → WhatsApp." },
       { status: 400 }
     );
   }
 
   let sent = 0;
   let skipped = 0;
+  let failed = 0;
   let total = 0;
 
-  const leads = await prisma.lead.findMany({
-    select: { name: true, email: true, phone: true },
-    distinct: ["phone"],
-  });
-  for (const lead of leads) {
-    if (!lead.phone.trim()) continue;
-    const user = await prisma.user.findUnique({ where: { email: lead.email }, select: { id: true } });
-    if (user) continue; // já virou conta, não é mais um lead frio
-
-    total++;
-    const didSend = await sendNextMarketingInviteWhatsapp(lead.phone, lead.name);
-    if (didSend) sent++;
-    else skipped++;
-  }
-
-  // Cadastrou mas não assinou: mesmo banco de mensagens, agora pra quem já tem
-  // conta mas nunca converteu (sem depender de ter ou não feito uma análise).
   const users = await prisma.user.findMany({
     where: { whatsappMarketingOptIn: true, phone: { not: null } },
     select: {
@@ -57,10 +53,11 @@ export async function POST() {
     if (user.subscription?.status === "active" || user._count.payments > 0) continue;
 
     total++;
-    const didSend = await sendNextMarketingInviteWhatsapp(user.phone, user.name);
-    if (didSend) sent++;
+    const result = await sendNextMarketingInviteWhatsapp(user.phone, user.name);
+    if (result === "sent") sent++;
+    else if (result === "failed") failed++;
     else skipped++;
   }
 
-  return NextResponse.json({ sent, skipped, total });
+  return NextResponse.json({ sent, skipped, failed, total });
 }

@@ -33,10 +33,12 @@ export async function POST(req: NextRequest) {
       targetProfessionalArea,
       studyCourse,
       coupon,
+      whatsappOptIn,
     } = await req.json();
     const normalizedName = normalizePersonName(name);
     const normalizedEmail = normalizeEmail(email);
     const normalizedPhone = normalizeBrazilPhone(phone);
+    const whatsappMarketingOptIn = Boolean(normalizedPhone) && whatsappOptIn === true;
 
     if (!isValidFullName(normalizedName)) {
       return NextResponse.json({ error: "Informe seu nome e sobrenome completos." }, { status: 400 });
@@ -70,7 +72,7 @@ export async function POST(req: NextRequest) {
         data: {
           name: normalizedName,
           passwordHash,
-          ...(normalizedPhone ? { phone: normalizedPhone, whatsappMarketingOptIn: true } : {}),
+          ...(normalizedPhone ? { phone: normalizedPhone, whatsappMarketingOptIn } : {}),
           ...(typeof currentProfessionalArea === "string" ? { currentProfessionalArea: currentProfessionalArea.trim() || null } : {}),
           ...(typeof targetProfessionalArea === "string" ? { targetProfessionalArea: targetProfessionalArea.trim() || null } : {}),
           ...(typeof studyCourse === "string" ? { studyCourse: studyCourse.trim() || null } : {}),
@@ -101,7 +103,7 @@ export async function POST(req: NextRequest) {
     const data = {
       name: normalizedName,
       phone: normalizedPhone,
-      whatsappMarketingOptIn: Boolean(normalizedPhone),
+      whatsappMarketingOptIn,
       passwordHash,
       careerSegment: effectiveCareerSegment,
       professionalArea: typeof professionalArea === "string" && professionalArea.trim()

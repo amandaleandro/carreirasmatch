@@ -27,6 +27,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
   const [phone, setPhone] = useState("");
+  const [whatsappOptIn, setWhatsappOptIn] = useState(false);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [careerSegment, setCareerSegment] = useState<CareerSegment | "">("");
@@ -56,6 +57,7 @@ export default function RegisterPage() {
           name,
           email,
           phone,
+          whatsappOptIn: Boolean(phone) && whatsappOptIn,
           password,
           careerSegment: careerSegment || null,
           professionalArea: needsTargetArea && professionalArea ? professionalArea : null,
@@ -157,6 +159,17 @@ export default function RegisterPage() {
                 className="w-full rounded-xl border border-[#E2E8F0] bg-white pl-9.5 pr-4 py-2.5 text-xs text-[#071827] outline-none transition-all placeholder:text-neutral-400 focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
               />
             </div>
+            {phone && (
+              <label className="flex items-start gap-2 pt-1 text-[10px] leading-snug text-[#64748B] dark:text-slate-400">
+                <input
+                  type="checkbox"
+                  checked={whatsappOptIn}
+                  onChange={(e) => setWhatsappOptIn(e.target.checked)}
+                  className="mt-0.5 h-3.5 w-3.5 rounded border-[#E2E8F0] text-[#2563EB] focus:ring-[#2563EB]/30"
+                />
+                Quero receber dicas e novidades por WhatsApp neste número.
+              </label>
+            )}
           </div>
 
           {/* E-mail */}

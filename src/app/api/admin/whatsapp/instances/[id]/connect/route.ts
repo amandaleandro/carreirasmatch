@@ -1,20 +1,20 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "@/lib/admin";
-import { evolutionEnabled, requestEvolutionQrCode } from "@/lib/evolution";
+import { prisma } from "@/lib/prisma";
+import { requestEvolutionQrCode } from "@/lib/evolution";
 
-export async function POST() {
+export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { session, response } = await requireAdminApi();
   if (!session) return response!;
 
-  if (!evolutionEnabled) {
-    return NextResponse.json(
-      { error: "Evolution API não configurada no ambiente (EVOLUTION_API_URL/EVOLUTION_API_KEY/EVOLUTION_INSTANCE)." },
-      { status: 400 }
-    );
+  const { id } = await params;
+  const instance = await prisma.whatsappInstance.findUnique({ where: { id } });
+  if (!instance) {
+    return NextResponse.json({ error: "Número não encontrado." }, { status: 404 });
   }
 
   try {
-    const { base64, pairingCode } = await requestEvolutionQrCode();
+    const { base64, pairingCode } = await requestEvolutionQrCode(instance.instanceName);
     if (!base64) {
       return NextResponse.json({ error: "A Evolution API não retornou um QR code." }, { status: 502 });
     }

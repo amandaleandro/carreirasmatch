@@ -3,12 +3,13 @@ import { formatCentsToBRL } from "@/lib/pricing";
 
 const SERVER_URL = (process.env.EVOLUTION_API_URL ?? "").replace(/\/$/, "");
 const API_KEY = process.env.EVOLUTION_API_KEY ?? "";
-const INSTANCE = process.env.EVOLUTION_INSTANCE ?? "";
 const APP_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 
-// Mesmo padrão do RESEND_API_KEY em lib/resend.ts: sem as três envs, tudo vira
-// no-op (loga e sai) e nada quebra — a régua de WhatsApp é 100% opcional.
-export const evolutionEnabled = Boolean(SERVER_URL && API_KEY && INSTANCE);
+// Mesmo padrão do RESEND_API_KEY em lib/resend.ts: sem as envs, tudo vira
+// no-op (loga e sai) e nada quebra — a régua de WhatsApp é 100% opcional. Os
+// números (instâncias) em si vivem no banco (WhatsappInstance), não em env,
+// pra dar pra cadastrar mais de um pelo painel sem redeploy.
+export const evolutionEnabled = Boolean(SERVER_URL && API_KEY);
 
 /** Evolution API (v2) espera o número como DDI+DDD+telefone, só dígitos, sem "+". */
 function toWhatsappNumber(phone: string): string {
@@ -27,27 +28,79 @@ const ADMIN_RECIPIENTS = (process.env.ADMIN_WHATSAPP_NUMBERS ?? "")
   .filter(Boolean);
 
 /**
- * Envia uma mensagem de texto via Evolution API (self-hosted).
+ * Envia uma mensagem de texto via Evolution API (self-hosted), por uma
+ * instância (número) específica.
  * Nunca lança para o chamador (fire-and-forget) — mesmo espírito do `send()`
  * de e-mail: um problema no canal de marketing não pode derrubar outra coisa.
  */
-async function sendText(phone: string, text: string): Promise<void> {
+async function sendText(phone: string, text: string, instanceName: string): Promise<boolean> {
   if (!evolutionEnabled) {
     console.error(`Evolution API não configurada, WhatsApp não enviado para ${phone}.`);
-    return;
+    return false;
   }
   try {
-    const res = await fetch(`${SERVER_URL}/message/sendText/${INSTANCE}`, {
+    const res = await fetch(`${SERVER_URL}/message/sendText/${instanceName}`, {
       method: "POST",
       headers: { "Content-Type": "application/json", apikey: API_KEY },
       body: JSON.stringify({ number: toWhatsappNumber(phone), text }),
     });
     if (!res.ok) {
-      console.error(`Evolution API recusou a mensagem para ${phone}:`, res.status, await res.text());
+      console.error(`Evolution API (${instanceName}) recusou a mensagem para ${phone}:`, res.status, await res.text());
+      return false;
     }
+    return true;
   } catch (err) {
-    console.error(`Falha ao enviar WhatsApp para ${phone}:`, err);
+    console.error(`Falha ao enviar WhatsApp (${instanceName}) para ${phone}:`, err);
+    return false;
   }
+}
+
+/**
+ * Instâncias pareadas (`WhatsappInstance`) que estão de fato conectadas
+ * agora na Evolution API. Cache curto pra não bater no status a cada
+ * mensagem de uma campanha inteira.
+ */
+let openInstancesCache: { names: string[]; expiresAt: number } | null = null;
+
+function invalidateOpenInstancesCache(): void {
+  openInstancesCache = null;
+}
+
+async function getOpenInstanceNames(): Promise<string[]> {
+  const now = Date.now();
+  if (openInstancesCache && openInstancesCache.expiresAt > now) return openInstancesCache.names;
+
+  const instances = await prisma.whatsappInstance.findMany({ select: { instanceName: true } });
+  const checked = await Promise.all(
+    instances.map(async ({ instanceName }) => {
+      const state = await getEvolutionConnectionState(instanceName);
+      return state === "open" ? instanceName : null;
+    })
+  );
+  const names = checked.filter((name): name is string => name !== null);
+  openInstancesCache = { names, expiresAt: now + 60_000 };
+  return names;
+}
+
+let roundRobinCounter = 0;
+
+/** Escolhe a próxima instância conectada em rodízio, pra distribuir o volume entre os números. */
+async function pickInstance(): Promise<string | null> {
+  const names = await getOpenInstanceNames();
+  if (names.length === 0) return null;
+  const name = names[roundRobinCounter % names.length];
+  roundRobinCounter++;
+  return name;
+}
+
+/** Envia por qualquer instância conectada (usado por notificações 1:1, não por marketing em massa). */
+async function sendTextViaAnyInstance(phone: string, text: string): Promise<boolean> {
+  const instanceName = await pickInstance();
+  if (!instanceName) {
+    console.error(`WhatsApp: nenhuma instância conectada, mensagem não enviada para ${phone}.`);
+    return false;
+  }
+  return sendText(phone, text, instanceName);
 }
 
 function sleep(ms: number): Promise<void> {
@@ -92,16 +145,21 @@ export function isWithinWhatsappMarketingHours(now: Date = new Date()): boolean 
  * funções de régua (conversão, come-back, alerta de vaga, convite) passam por
  * aqui em vez de chamar `sendText` direto.
  */
-async function sendMarketingText(phone: string, text: string): Promise<void> {
+async function sendMarketingText(phone: string, text: string): Promise<boolean> {
   if (marketingSentThisTick >= MARKETING_TICK_BUDGET) {
     console.warn(`WhatsApp: teto de mensagens de marketing da execução atingido, envio para ${phone} adiado pro próximo tick.`);
-    return;
+    return false;
+  }
+  const instanceName = await pickInstance();
+  if (!instanceName) {
+    console.error(`WhatsApp: nenhuma instância conectada, mensagem de marketing não enviada para ${phone}.`);
+    return false;
   }
   const wait = lastMarketingSendAt + MARKETING_MIN_GAP_MS + Math.random() * MARKETING_JITTER_MS - Date.now();
   if (wait > 0) await sleep(wait);
   lastMarketingSendAt = Date.now();
   marketingSentThisTick++;
-  await sendText(phone, text);
+  return sendText(phone, text, instanceName);
 }
 
 /**
@@ -118,7 +176,7 @@ async function sendAdmin(text: string): Promise<void> {
     return;
   }
   for (const number of ADMIN_RECIPIENTS) {
-    await sendText(number, text);
+    await sendTextViaAnyInstance(number, text);
   }
 }
 
@@ -161,7 +219,7 @@ export async function sendCompanyNewApplicationWhatsapp(
   opts: { candidateName: string; vagaTitle: string; vagaId: string }
 ): Promise<void> {
   if (!phone.trim()) return;
-  await sendText(
+  await sendTextViaAnyInstance(
     phone,
     `🎯 Nova candidatura\n\n${opts.candidateName} se candidatou à sua vaga *${opts.vagaTitle}*.\n\nVeja os dados do candidato:\n${APP_URL}/empresa/vagas/${opts.vagaId}`
   );
@@ -174,7 +232,7 @@ export async function sendCompanyContactAcceptedWhatsapp(
 ): Promise<void> {
   if (!phone.trim()) return;
   const forJob = opts.jobTitle?.trim() ? ` para a vaga de *${opts.jobTitle.trim()}*` : "";
-  await sendText(
+  await sendTextViaAnyInstance(
     phone,
     `🔓 Contato liberado\n\n${opts.candidateName} aceitou seu pedido de contato${forJob}. Veja os dados na sua central de contatos:\n${APP_URL}/empresa/contatos`
   );
@@ -198,10 +256,8 @@ export async function notifyAdminSupportTicketWhatsapp(opts: {
 
 /** Chamada autenticada genérica à Evolution API, usada pelo painel de admin. */
 async function evolutionFetch(path: string, init?: RequestInit): Promise<Response> {
-  if (!SERVER_URL || !API_KEY || !INSTANCE) {
-    throw new Error(
-      "Evolution API não configurada (defina EVOLUTION_API_URL, EVOLUTION_API_KEY e EVOLUTION_INSTANCE)."
-    );
+  if (!SERVER_URL || !API_KEY) {
+    throw new Error("Evolution API não configurada (defina EVOLUTION_API_URL e EVOLUTION_API_KEY).");
   }
   return fetch(`${SERVER_URL}${path}`, {
     ...init,
@@ -212,8 +268,8 @@ async function evolutionFetch(path: string, init?: RequestInit): Promise<Respons
 export type EvolutionConnectionState = "open" | "connecting" | "close" | "unknown";
 
 /** Estado da sessão pareada: "open" = conectado, "connecting" = aguardando QR, "close" = desconectado. */
-export async function getEvolutionConnectionState(): Promise<EvolutionConnectionState> {
-  const res = await evolutionFetch(`/instance/connectionState/${INSTANCE}`);
+export async function getEvolutionConnectionState(instanceName: string): Promise<EvolutionConnectionState> {
+  const res = await evolutionFetch(`/instance/connectionState/${instanceName}`);
   if (!res.ok) return "unknown";
   const data = await res.json().catch(() => null);
   const state = data?.instance?.state;
@@ -221,21 +277,23 @@ export async function getEvolutionConnectionState(): Promise<EvolutionConnection
 }
 
 /**
- * Gera um QR code novo para parear o número dedicado. Tenta criar a instância
+ * Gera um QR code novo para parear um número. Tenta criar a instância
  * (primeira vez); se ela já existir, cai para `/instance/connect`, que também
  * devolve um QR fresco para repareamento.
  */
-export async function requestEvolutionQrCode(): Promise<{ base64: string | null; pairingCode: string | null }> {
+export async function requestEvolutionQrCode(
+  instanceName: string
+): Promise<{ base64: string | null; pairingCode: string | null }> {
   const createRes = await evolutionFetch(`/instance/create`, {
     method: "POST",
-    body: JSON.stringify({ instanceName: INSTANCE, qrcode: true, integration: "WHATSAPP-BAILEYS" }),
+    body: JSON.stringify({ instanceName, qrcode: true, integration: "WHATSAPP-BAILEYS" }),
   });
   if (createRes.ok) {
     const data = await createRes.json();
     return { base64: data?.qrcode?.base64 ?? null, pairingCode: data?.qrcode?.pairingCode ?? null };
   }
 
-  const connectRes = await evolutionFetch(`/instance/connect/${INSTANCE}`);
+  const connectRes = await evolutionFetch(`/instance/connect/${instanceName}`);
   if (!connectRes.ok) {
     throw new Error(`Evolution API recusou a conexão: ${connectRes.status} ${await connectRes.text()}`);
   }
@@ -244,9 +302,56 @@ export async function requestEvolutionQrCode(): Promise<{ base64: string | null;
 }
 
 /** Desconecta a sessão pareada (mantém a instância, permitindo reparear depois). */
-export async function logoutEvolutionInstance(): Promise<void> {
-  const res = await evolutionFetch(`/instance/logout/${INSTANCE}`, { method: "DELETE" });
+export async function logoutEvolutionInstance(instanceName: string): Promise<void> {
+  const res = await evolutionFetch(`/instance/logout/${instanceName}`, { method: "DELETE" });
   if (!res.ok) throw new Error(`Evolution API recusou o logout: ${res.status} ${await res.text()}`);
+  invalidateOpenInstancesCache();
+}
+
+/**
+ * Números (instâncias) cadastrados pelo painel de admin, pra envio em
+ * rodízio/failover. Não inclui o status ao vivo — quem precisar do estado
+ * chama `getEvolutionConnectionState` por instância.
+ */
+export async function listWhatsappInstances() {
+  return prisma.whatsappInstance.findMany({ orderBy: { createdAt: "asc" } });
+}
+
+function slugifyInstanceName(label: string): string {
+  const base = label
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-+|-+$)/g, "")
+    .slice(0, 40);
+  return base || "numero";
+}
+
+/** Cadastra um novo número (instância) no banco. O pareamento (QR) é um passo separado. */
+export async function createWhatsappInstance(label: string) {
+  const trimmed = label.trim();
+  if (!trimmed) throw new Error("Informe um nome pra identificar o número.");
+
+  const base = slugifyInstanceName(trimmed);
+  let instanceName = base;
+  let suffix = 1;
+  while (await prisma.whatsappInstance.findUnique({ where: { instanceName } })) {
+    suffix++;
+    instanceName = `${base}-${suffix}`;
+  }
+
+  const instance = await prisma.whatsappInstance.create({ data: { label: trimmed, instanceName } });
+  invalidateOpenInstancesCache();
+  return instance;
+}
+
+/** Remove um número: desconecta e apaga a instância na Evolution API, depois o registro local. */
+export async function deleteWhatsappInstance(id: string): Promise<void> {
+  const instance = await prisma.whatsappInstance.findUnique({ where: { id } });
+  if (!instance) return;
+  await evolutionFetch(`/instance/logout/${instance.instanceName}`, { method: "DELETE" }).catch(() => {});
+  await evolutionFetch(`/instance/delete/${instance.instanceName}`, { method: "DELETE" }).catch(() => {});
+  await prisma.whatsappInstance.delete({ where: { id } });
+  invalidateOpenInstancesCache();
 }
 
 /**
@@ -424,20 +529,29 @@ const MARKETING_INVITE_MESSAGES: Array<(firstName: string, href: string) => stri
  * que sai — sem repetir e sem duplicar em reexecuções do scheduler.
  * Retorna `true` se mandou algo, `false` se o telefone já recebeu tudo.
  */
+export type MarketingInviteResult = "sent" | "exhausted" | "failed";
+
 export async function sendNextMarketingInviteWhatsapp(
   phone: string,
   name?: string | null
-): Promise<boolean> {
+): Promise<MarketingInviteResult> {
   const firstName = name?.trim()?.split(" ")[0] || "tudo bem";
   const href = `${APP_URL}/desafio`;
   for (let i = 0; i < MARKETING_INVITE_MESSAGES.length; i++) {
+    let log;
     try {
-      await prisma.whatsappLog.create({ data: { type: `marketing_invite_${i}`, dedupeKey: phone, phone } });
+      log = await prisma.whatsappLog.create({ data: { type: `marketing_invite_${i}`, dedupeKey: phone, phone } });
     } catch {
       continue; // esse toque já foi enviado pra esse telefone, tenta o próximo
     }
-    await sendMarketingText(phone, MARKETING_INVITE_MESSAGES[i](firstName, href));
-    return true;
+    const delivered = await sendMarketingText(phone, MARKETING_INVITE_MESSAGES[i](firstName, href));
+    if (!delivered) {
+      // Evolution API recusou ou falhou: desfaz a reserva pra esse toque poder
+      // ser tentado de novo depois, em vez de ficar marcado como "enviado" pra sempre.
+      await prisma.whatsappLog.delete({ where: { id: log.id } }).catch(() => {});
+      return "failed";
+    }
+    return "sent";
   }
-  return false;
+  return "exhausted";
 }

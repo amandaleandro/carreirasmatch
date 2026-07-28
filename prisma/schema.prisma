@@ -567,6 +567,16 @@ model WhatsappLog {
   @@index([phone])
 }
 
+/// Números/instâncias da Evolution API disponíveis pra envio. Suporta mais de
+/// um número pareado (rotação e failover), pra não ficar 100% parado se um
+/// deles for banido/desconectado.
+model WhatsappInstance {
+  id           String   @id @default(cuid())
+  label        String
+  instanceName String   @unique
+  createdAt    DateTime @default(now())
+}
+
 /// Configurações operacionais editáveis pela tela de admin (ex.: qual modelo da Groq usar).
 model AppSetting {
   key       String   @id
