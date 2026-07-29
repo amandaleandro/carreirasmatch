@@ -12,6 +12,7 @@ import { JobAlertManager } from "@/components/job-alert-manager";
 import { DiscoverableToggle } from "@/components/discoverable-toggle";
 import { WhatsappOptInToggle } from "@/components/whatsapp-optin-toggle";
 import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
+import { DataPrivacySection } from "@/components/data-privacy-section";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 
@@ -45,6 +46,7 @@ export default async function SettingsPage({
         discoverable: true,
         phone: true,
         whatsappMarketingOptIn: true,
+        passwordHash: true,
       },
     }),
     prisma.userCourse.findMany({
@@ -187,6 +189,14 @@ export default async function SettingsPage({
           />
         </section>
       )}
+
+      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <h2 className="text-lg font-semibold mb-1">Seus dados e privacidade</h2>
+        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
+          Baixe uma cópia dos seus dados ou exclua sua conta permanentemente, conforme a LGPD.
+        </p>
+        <DataPrivacySection hasPassword={Boolean(user?.passwordHash)} />
+      </section>
     </main>
   );
 }

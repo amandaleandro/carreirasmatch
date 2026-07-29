@@ -11,6 +11,9 @@ export const resumeAnalysisSchema = z.object({
   applicationStatus: z.enum(["apply_now", "adjust_first", "deprioritize"]),
   applicationStatusReason: text,
   keywordsFound: textArray, keywordsMissing: textArray,
+  keywordEvidence: z.array(z.object({
+    keyword: text, found: z.boolean(), quote: z.string().nullable(),
+  })).optional(),
   suggestedSummary: text, currentSummary: text,
   strengths: textArray.min(1), weaknesses: textArray.min(1), fixes: textArray.min(1),
   interviewQuestions: textArray.min(1),

@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Upload, FileText, Sparkles, AlertCircle, ArrowRight, CheckCircle2, Link2 } from "lucide-react";
 import { CAREER_TRACK_OPTIONS, CareerTrack } from "@/components/analysis-display";
 import { ReferralRewardBox } from "@/components/referral-reward-box";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 interface DesafioFormProps {
   isLoggedIn: boolean;
   userId?: string;
+  referralCode?: string;
   referralStats?: {
     totalReferrals: number;
     credits: number;
@@ -16,8 +18,15 @@ interface DesafioFormProps {
   } | null;
 }
 
-export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormProps) {
+export function DesafioForm({ isLoggedIn, userId, referralCode, referralStats }: DesafioFormProps) {
   const router = useRouter();
+
+  useEffect(() => {
+    if (referralCode) {
+      track(ANALYTICS_EVENTS.REFERRAL_LINK_OPENED, { ref: referralCode });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const [file, setFile] = useState<File | null>(null);
   const [jobTitle, setJobTitle] = useState("");

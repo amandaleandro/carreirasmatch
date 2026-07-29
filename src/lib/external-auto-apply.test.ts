@@ -21,4 +21,8 @@ describe("classifyExternalField", () => {
   it("não inventa resposta para pergunta desconhecida", () => {
     expect(classifyExternalField("Conte sobre um desafio técnico")).toBeNull();
   });
+
+  it("reconhece campo de e-mail pelo type mesmo sem label/name (só placeholder de exemplo)", () => {
+    expect(classifyExternalField("you@example.com", "email")).toBe("email");
+  });
 });

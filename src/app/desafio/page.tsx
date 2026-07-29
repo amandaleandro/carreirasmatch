@@ -73,6 +73,7 @@ export default async function DesafioPage({
           isLoggedIn={Boolean(session?.user?.id)}
           referralStats={referralStats}
           userId={session?.user?.id}
+          referralCode={ref}
         />
 
         {/* Seção explicativa da Recompensa por Indicação */}

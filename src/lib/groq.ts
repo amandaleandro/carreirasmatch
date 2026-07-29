@@ -198,6 +198,7 @@ export type ResumeAnalysis = {
   applicationStatusReason: string;
   keywordsFound: string[];
   keywordsMissing: string[];
+  keywordEvidence?: KeywordEvidence[];
   suggestedSummary: string;
   currentSummary: string;
   strengths: string[];
@@ -238,6 +239,12 @@ export type JobDecodedTerm = {
   termo: string;
   significa: string;
   ouSeja: string;
+};
+
+export type KeywordEvidence = {
+  keyword: string;
+  found: boolean;
+  quote: string | null;
 };
 
 export type ClarifyingQuestion = {
@@ -360,6 +367,8 @@ REGRAS DE PONTUAÇÃO:
 8. Nunca prometa contratação, fale em aderência/chance de entrevista.
 
 9. keywordsFound / keywordsMissing: termos EXATOS da vaga (ferramenta, técnica, certificação, idioma, anos de experiência), separando comprovados de ausentes/vagos. Sem sinônimos duplicados.
+
+9b. keywordEvidence: um item para CADA keyword de keywordsFound e keywordsMissing (mesma ordem, sem repetir). Cada item: "keyword" (idêntico ao texto usado em keywordsFound/keywordsMissing), "found" (true se está em keywordsFound), "quote" (para found=true: TRECHO LITERAL copiado do currículo, entre 4 e 25 palavras, que comprova esse requisito — nunca parafraseie, nunca invente; para found=false: null). Se não existir um trecho literal claro que comprove a keyword, mova-a para keywordsMissing em vez de forçar uma citação.
 
 10. applicationStatus (overallScore + requisitos eliminatórios ausentes: idioma, senioridade muito distante, certificação obrigatória, anos de experiência muito abaixo):
    - "apply_now": score>=70, sem requisito eliminatório crítico ausente.
@@ -517,6 +526,7 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
   "structureFeedback": string (feedback de 1-2 frases sobre a legibilidade e estrutura do currículo do candidato, sugerindo melhorias),
   "missingBasicInfo": string[] (lista de informações fundamentais ausentes no currículo, como: telefone, e-mail, link do LinkedIn, datas de início/fim das experiências, localidade, resumo profissional. Retorne vazio [] se contiver todas essas informações básicas),
   "keywordsFound": string[], "keywordsMissing": string[],
+  "keywordEvidence": [{ "keyword": string, "found": boolean, "quote": string | null }] (um item por keyword de keywordsFound e keywordsMissing, ver instrução 9b),
   "suggestedSummary": string, "currentSummary": string,
   "strengths": string[] (3-5, nunca vazio), "weaknesses": string[] (3-5, nunca vazio), "fixes": string[] (3-5, nunca vazio),
   "interviewQuestions": string[] (4-6, calibradas ao nível da vaga),

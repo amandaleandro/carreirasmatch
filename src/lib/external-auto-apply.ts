@@ -46,8 +46,9 @@ function normalize(value: string): string {
     .trim();
 }
 
-export function classifyExternalField(hint: string): FieldKind | null {
+export function classifyExternalField(hint: string, inputType?: string): FieldKind | null {
   const text = normalize(hint);
+  if (inputType === "email") return "email";
   if (/\b(e-?mail|correio eletronico)\b/.test(text)) return "email";
   if (/\bcpf\b/.test(text)) return "cpf";
   if (/\b(telefone|celular|phone|whatsapp)\b/.test(text)) return "phone";
@@ -165,9 +166,23 @@ async function controlHint(locator: ReturnType<import("playwright").Page["locato
   });
 }
 
+// Formulários sem label/name reconhecível (só ícone + placeholder) fazem `controlHint` cair no
+// placeholder cru — que costuma ser um exemplo genérico ("you@example.com", "John Doe"), não uma
+// pergunta real. Mostrar isso como "campo faltando" confunde o usuário; troca por uma descrição
+// baseada no `type` do input quando o hint bate com esse padrão de exemplo.
+const EXAMPLE_PLACEHOLDER = /^[\w.+-]+@example\.(com|org|net)$/i;
+
+function describeUnresolvedField(hint: string, inputType: string): string {
+  if (hint && !EXAMPLE_PLACEHOLDER.test(hint.trim())) return hint;
+  if (inputType === "email") return "e-mail";
+  if (inputType === "tel") return "telefone";
+  if (inputType === "url") return "link (URL)";
+  return hint || "campo obrigatório desconhecido";
+}
+
 async function hasCaptchaOrLogin(page: import("playwright").Page): Promise<string | null> {
   const captcha = page.locator(
-    'iframe[src*="captcha"], iframe[title*="captcha" i], .g-recaptcha, [data-sitekey], input[name*="captcha" i]',
+    'iframe[src*="captcha"], iframe[title*="captcha" i], iframe[src*="turnstile" i], iframe[title*="turnstile" i], iframe[src*="hcaptcha" i], .g-recaptcha, .h-captcha, [data-sitekey], [data-hcaptcha-widget-id], input[name*="captcha" i]',
   );
   if (await captcha.count()) return "A página exige CAPTCHA.";
 
@@ -342,7 +357,7 @@ async function fillControls(
       if (required && /\b(termos|privacidade|consent|terms|privacy)\b/.test(normalizedHint)) {
         await control.check();
       } else if (required && !(await control.isChecked())) {
-        unresolved.push(hint || "confirmação obrigatória");
+        unresolved.push(hint && !EXAMPLE_PLACEHOLDER.test(hint.trim()) ? hint : "confirmação obrigatória");
       }
       continue;
     }
@@ -367,7 +382,7 @@ async function fillControls(
       : await control.inputValue().catch(() => "");
     if (current.trim()) continue;
 
-    const kind = classifyExternalField(hint);
+    const kind = classifyExternalField(hint, type);
     const value = (kind ? profileValue(profile, kind) : "") || customAnswer(profile, hint);
     const isCombobox = value && tag !== "select" ? await isComboboxLikeInput(control) : false;
     if (value) {
@@ -397,7 +412,7 @@ async function fillControls(
     const required = (await control.getAttribute("required")) !== null ||
       (await control.getAttribute("aria-required")) === "true";
     if (required && !(await control.inputValue().catch(() => "")).trim()) {
-      unresolved.push(hint || "campo obrigatório desconhecido");
+      unresolved.push(describeUnresolvedField(hint, type));
     }
   }
 
@@ -446,7 +461,14 @@ export async function applyToExternalJob(input: ExternalApplyInput): Promise<Ext
       timeout: NAVIGATION_TIMEOUT_MS,
     });
     if (!response?.ok()) {
-      return { status: "failed", detail: `A página retornou HTTP ${response?.status() ?? "desconhecido"}.` };
+      const httpStatus = response?.status();
+      // 401/403 quase sempre é bloqueio anti-bot (Cloudflare/WAF) contra o navegador automatizado,
+      // não uma falha transitória — repetir a tentativa não muda o resultado, então trata como
+      // "blocked" (mostra link de candidatura manual pro usuário) em vez de "failed" sem saída.
+      const isAccessDenied = httpStatus === 401 || httpStatus === 403;
+      return isAccessDenied
+        ? { status: "blocked", detail: "A vaga bloqueou o acesso automatizado (proteção anti-bot)." }
+        : { status: "failed", detail: `A página retornou HTTP ${httpStatus ?? "desconhecido"}.` };
     }
     await assertPublicHttpUrl(page.url());
     await settlePage(page);

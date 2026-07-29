@@ -66,6 +66,7 @@ function analysisRecordToResumeAnalysis(record: {
   jobDecoded: string | null;
   jobRedFlags: string | null;
   clarifyingQuestions: string | null;
+  keywordEvidence: string | null;
 }): ResumeAnalysis {
   return {
     overallScore: record.overallScore,
@@ -104,6 +105,7 @@ function analysisRecordToResumeAnalysis(record: {
     ...(record.jobDecoded ? { jobDecoded: JSON.parse(record.jobDecoded) } : {}),
     ...(record.jobRedFlags ? { jobRedFlags: JSON.parse(record.jobRedFlags) } : {}),
     ...(record.clarifyingQuestions ? { clarifyingQuestions: JSON.parse(record.clarifyingQuestions) } : {}),
+    ...(record.keywordEvidence ? { keywordEvidence: JSON.parse(record.keywordEvidence) } : {}),
   } as ResumeAnalysis;
 }
 
@@ -414,6 +416,14 @@ export async function POST(req: NextRequest) {
         jobDecoded: analysis.jobDecoded ? JSON.stringify(analysis.jobDecoded) : null,
         jobRedFlags: analysis.jobRedFlags ? JSON.stringify(analysis.jobRedFlags) : null,
         clarifyingQuestions: analysis.clarifyingQuestions ? JSON.stringify(analysis.clarifyingQuestions) : null,
+        keywordEvidence: analysis.keywordEvidence
+          ? JSON.stringify(
+              analysis.keywordEvidence.map((item) => ({
+                ...item,
+                found: analysis.keywordsFound.includes(item.keyword),
+              }))
+            )
+          : null,
         experienceSuggestions: JSON.stringify(analysis.experienceSuggestions ?? []),
         atsChecklist: JSON.stringify(analysis.atsChecklist ?? []),
         currentSummary: analysis.currentSummary ?? "",

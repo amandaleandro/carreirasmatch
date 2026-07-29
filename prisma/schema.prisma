@@ -169,6 +169,7 @@ model Analysis {
   applicationStatusReason String
   keywordsFound           String
   keywordsMissing         String
+  keywordEvidence         String?
   suggestedSummary        String
   strengths               String
   weaknesses              String

@@ -84,7 +84,9 @@ function getInitialCareerTrack(
 function getInitialDraft(): DraftState {
   if (typeof window === "undefined") return {};
   try {
-    return JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "{}") as DraftState;
+    const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? "{}") as DraftState;
+    if (draft.savedAt && Date.now() - draft.savedAt > DRAFT_MAX_AGE_MS) return {};
+    return draft;
   } catch {
     return {};
   }
@@ -231,7 +233,18 @@ type DraftState = {
   jobText?: string;
   jobLink?: string;
   pastFeedback?: string;
+  savedAt?: number;
 };
+
+const DRAFT_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+function hasMeaningfulDraft(draft: DraftState): boolean {
+  return Boolean(
+    (draft.jobTitle && draft.jobTitle.trim()) ||
+    (draft.jobText && draft.jobText.trim()) ||
+    (draft.jobLink && draft.jobLink.trim())
+  );
+}
 
 export function AnalyzeVagaPage({
   suggestedTrack,
@@ -267,6 +280,7 @@ export function AnalyzeVagaPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draftSaved, setDraftSaved] = useState(false);
+  const [showRestoreBanner, setShowRestoreBanner] = useState(() => hasMeaningfulDraft(initialDraft));
   const [result, setResult] = useState<AnalysisWithId | null>(null);
   const [resultTrack, setResultTrack] = useState<CareerTrack | null>(null);
   const [resultJobTitle, setResultJobTitle] = useState("");
@@ -282,11 +296,34 @@ export function AnalyzeVagaPage({
   function saveDraft() {
     localStorage.setItem(
       DRAFT_KEY,
-      JSON.stringify({ careerTrack, jobTitle, jobText, jobLink, pastFeedback })
+      JSON.stringify({ careerTrack, jobTitle, jobText, jobLink, pastFeedback, savedAt: Date.now() })
     );
     setDraftSaved(true);
     setTimeout(() => setDraftSaved(false), 2000);
   }
+
+  function discardDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    setJobTitle("");
+    setJobText("");
+    setJobLink("");
+    setPastFeedback("");
+    setShowRestoreBanner(false);
+  }
+
+  // Autosave silencioso: guarda o progresso a cada mudança (debounced), sem exigir
+  // clique manual. O upload do PDF em si não sobrevive a reload (File não serializa
+  // em localStorage), só os campos de texto da vaga.
+  useEffect(() => {
+    if (!hasMeaningfulDraft({ jobTitle, jobText, jobLink })) return;
+    const timer = setTimeout(() => {
+      localStorage.setItem(
+        DRAFT_KEY,
+        JSON.stringify({ careerTrack, jobTitle, jobText, jobLink, pastFeedback, savedAt: Date.now() })
+      );
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [careerTrack, jobTitle, jobText, jobLink, pastFeedback]);
 
   function handleDrop(e: DragEvent<HTMLDivElement>) {
     e.preventDefault();
@@ -592,6 +629,35 @@ export function AnalyzeVagaPage({
       )}
 
       <AnalysisTour enabled={step1Done} />
+
+      {showRestoreBanner && (
+        <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-4">
+          <div>
+            <p className="text-xs font-bold text-blue-900 dark:text-blue-200">
+              Você deixou uma análise em andamento.
+            </p>
+            <p className="text-[11px] text-blue-700/80 dark:text-blue-300/70 mt-0.5">
+              {jobTitle ? `Vaga: ${jobTitle}. ` : ""}Recuperamos os dados que você já tinha preenchido. Falta só reenviar o currículo em PDF.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              type="button"
+              onClick={() => setShowRestoreBanner(false)}
+              className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 text-xs font-bold transition-all cursor-pointer"
+            >
+              Continuar de onde parei
+            </button>
+            <button
+              type="button"
+              onClick={discardDraft}
+              className="rounded-xl px-3.5 py-2 text-xs font-semibold text-blue-700/70 dark:text-blue-300/70 hover:text-blue-900 dark:hover:text-blue-200 transition-all cursor-pointer"
+            >
+              Descartar
+            </button>
+          </div>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5 items-start">

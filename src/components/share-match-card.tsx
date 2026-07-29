@@ -309,6 +309,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
         link.download = `match-carreira-${overallScore}pct.png`;
         link.href = dataUrl;
         link.click();
+        track(ANALYTICS_EVENTS.SHARE_CARD_GENERATED, { method: "download", analysisId: analysisId ?? "" });
       }
       setIsGenerating(false);
     }, 100);
@@ -318,6 +319,9 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
     setIsGenerating(true);
     const dataUrl = generateCanvasImage();
     setIsGenerating(false);
+    if (dataUrl) {
+      track(ANALYTICS_EVENTS.SHARE_CARD_GENERATED, { method: "share", analysisId: analysisId ?? "" });
+    }
 
     const origin = typeof window !== "undefined" ? window.location.origin : "https://carreirasmatch.com.br";
     const shareUrl = userId ? `${origin}/desafio?ref=${userId}` : `${origin}/desafio`;

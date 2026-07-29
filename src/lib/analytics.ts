@@ -42,6 +42,14 @@ export const ANALYTICS_EVENTS = {
   PARTNER_SUBMISSION_SENT: "partner_submission_sent",
   COMPANY_JOB_CREATED: "company_job_created",
   FREELANCE_PROPOSAL_SUBMITTED: "freelance_proposal_submitted",
+  LANDING_VIEWED: "landing_viewed",
+  JOB_DESCRIPTION_ADDED: "job_description_added",
+  SCORE_VIEWED: "score_viewed",
+  RECOMMENDATION_CLICKED: "recommendation_clicked",
+  SHARE_CARD_GENERATED: "share_card_generated",
+  REFERRAL_LINK_OPENED: "referral_link_opened",
+  SECOND_ANALYSIS_STARTED: "second_analysis_started",
+  SURVEY_RESPONDED: "survey_responded",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

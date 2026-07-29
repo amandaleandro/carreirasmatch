@@ -14,10 +14,13 @@ import {
   ScorePercentileCard,
 } from "@/components/resume-quality-cards";
 import type { BulletAnalysisSummary } from "@/lib/bullet-analysis";
-import { build3StepMakeovers } from "@/lib/bullet-analysis";
 import type { StructuredResume } from "@/lib/groq";
 import { ATSHelperModal } from "@/components/ATSHelperModal";
-import { BulletPointMakeover } from "@/components/BulletPointMakeover";
+import {
+  ExperienceApprovalEditor,
+  applyApprovals,
+  type ExperienceApproval,
+} from "@/components/experience-approval-editor";
 import { ScoreBeforeAfter } from "@/components/score-before-after";
 import { ShareMatchCard } from "@/components/share-match-card";
 import {
@@ -93,6 +96,7 @@ export type Analysis = {
   applicationStatusReason: string;
   keywordsFound: string[];
   keywordsMissing: string[];
+  keywordEvidence?: { keyword: string; found: boolean; quote: string | null }[];
   suggestedSummary: string;
   currentSummary?: string;
   strengths: string[];
@@ -1033,10 +1037,15 @@ export function Recruiter7SecondHeatmapCard({
 export function ScoreEvidenceTableCard({
   keywordsFound,
   keywordsMissing,
+  keywordEvidence,
 }: {
   keywordsFound: string[];
   keywordsMissing: string[];
+  keywordEvidence?: { keyword: string; found: boolean; quote: string | null }[];
 }) {
+  const evidenceByKeyword: globalThis.Map<string, string | null> = new globalThis.Map(
+    (keywordEvidence ?? []).map((item) => [item.keyword, item.quote])
+  );
   return (
     <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/40 p-5 md:p-6 space-y-4">
       <div className="flex items-center justify-between">
@@ -1064,18 +1073,27 @@ export function ScoreEvidenceTableCard({
             </tr>
           </thead>
           <tbody className="divide-y divide-[#E2E8F0] dark:divide-neutral-800 text-neutral-800 dark:text-neutral-200">
-            {keywordsFound.slice(0, 4).map((kw, i) => (
-              <tr key={`found-${i}`} className="hover:bg-neutral-50 dark:hover:bg-neutral-950/30">
-                <td className="py-3 px-3 font-semibold text-neutral-900 dark:text-white">{kw}</td>
-                <td className="py-3 px-3 text-[#22C55E] font-medium">Comprovado nas palavras-chave do perfil</td>
-                <td className="py-3 px-3">
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                    Forte
-                  </span>
-                </td>
-                <td className="py-3 px-3 text-[#64748B]">Usar como exemplo prático na entrevista</td>
-              </tr>
-            ))}
+            {keywordsFound.slice(0, 4).map((kw, i) => {
+              const quote = evidenceByKeyword.get(kw);
+              return (
+                <tr key={`found-${i}`} className="hover:bg-neutral-50 dark:hover:bg-neutral-950/30">
+                  <td className="py-3 px-3 font-semibold text-neutral-900 dark:text-white align-top">{kw}</td>
+                  <td className="py-3 px-3 text-[#22C55E] font-medium max-w-xs">
+                    {quote ? (
+                      <span className="italic">&ldquo;{quote}&rdquo;</span>
+                    ) : (
+                      "Comprovado nas palavras-chave do perfil"
+                    )}
+                  </td>
+                  <td className="py-3 px-3 align-top">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      Forte
+                    </span>
+                  </td>
+                  <td className="py-3 px-3 text-[#64748B] align-top">Usar como exemplo prático na entrevista</td>
+                </tr>
+              );
+            })}
 
             {keywordsMissing.slice(0, 4).map((kw, i) => (
               <tr key={`missing-${i}`} className="hover:bg-neutral-50 dark:hover:bg-neutral-950/30">
@@ -1198,6 +1216,11 @@ export function AnalysisResult({
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
+  const [experienceApprovals, setExperienceApprovals] = useState<ExperienceApproval[]>([]);
+  const approvedExperienceSuggestions = applyApprovals(
+    result.experienceSuggestions ?? [],
+    experienceApprovals
+  );
 
   useEffect(() => {
     if (analysisId) track(ANALYTICS_EVENTS.RESULT_VIEWED, { analysisId });
@@ -1256,6 +1279,7 @@ export function AnalysisResult({
             <ScoreEvidenceTableCard
               keywordsFound={result.keywordsFound}
               keywordsMissing={result.keywordsMissing}
+              keywordEvidence={result.keywordEvidence}
             />
 
             <Recruiter7SecondHeatmapCard
@@ -1315,7 +1339,7 @@ export function AnalysisResult({
                       body: JSON.stringify({
                         title: `Currículo Otimizado`,
                         summary: result.suggestedSummary,
-                        experienceSuggestions: result.experienceSuggestions,
+                        experienceSuggestions: approvedExperienceSuggestions,
                         keywordsFound: result.keywordsFound,
                         fixes: result.fixes,
                         resumeStructured,
@@ -1350,7 +1374,7 @@ export function AnalysisResult({
                       body: JSON.stringify({
                         title: "Currículo Otimizado",
                         summary: result.suggestedSummary,
-                        experienceSuggestions: result.experienceSuggestions,
+                        experienceSuggestions: approvedExperienceSuggestions,
                         keywordsFound: result.keywordsFound,
                         resumeStructured,
                         resumeText,
@@ -1412,9 +1436,17 @@ export function AnalysisResult({
         {/* ABA: Currículo & Gaps */}
         {activeTab === "gaps" && (
           <>
-            {/* Makeover 3 Passos */}
-            <BulletPointMakeover
-              makeovers={build3StepMakeovers(resumeStructured?.experiences)}
+            {/* Antes/depois com aprovação do usuário */}
+            <ExperienceApprovalEditor
+              suggestions={result.experienceSuggestions ?? []}
+              approvals={experienceApprovals}
+              onChange={(index, approval) =>
+                setExperienceApprovals((prev) => {
+                  const next = [...prev];
+                  next[index] = approval;
+                  return next;
+                })
+              }
             />
 
             <div className="grid gap-5 md:grid-cols-2">
