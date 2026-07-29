@@ -77,7 +77,7 @@ export default function EnemEssayPage() {
             <Award className="h-3.5 w-3.5" />
             Correção Oficial ENEM com Gemini AI
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
             Corretor de Redação ENEM
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm leading-relaxed">
@@ -184,7 +184,7 @@ export default function EnemEssayPage() {
               <span className="text-xs font-extrabold uppercase tracking-wider text-blue-200">
                 Resultado da Correção ENEM
               </span>
-              <div className="text-5xl md:text-6xl font-black tracking-tight text-amber-300">
+              <div className="text-5xl md:text-6xl font-bold tracking-tight text-amber-300">
                 {evaluation.totalScore} <span className="text-2xl text-white font-bold">/ 1000</span>
               </div>
               <p className="text-xs md:text-sm text-blue-100 max-w-xl mx-auto leading-relaxed">

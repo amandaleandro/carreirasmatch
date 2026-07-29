@@ -76,19 +76,19 @@ export default async function CompanyVagasPage({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 p-4 shadow-2xs backdrop-blur-xs">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total de Vagas</p>
-          <p className="text-2xl font-black text-slate-900 dark:text-white mt-1">{totalVagas}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{totalVagas}</p>
         </div>
         <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 shadow-2xs">
           <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Vagas Abertas</p>
-          <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{vagasAbertasCount}</p>
+          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{vagasAbertasCount}</p>
         </div>
         <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/40 p-4 shadow-2xs">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Vagas Encerradas</p>
-          <p className="text-2xl font-black text-slate-700 dark:text-slate-300 mt-1">{vagasFechadasCount}</p>
+          <p className="text-2xl font-bold text-slate-700 dark:text-slate-300 mt-1">{vagasFechadasCount}</p>
         </div>
         <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 shadow-2xs">
           <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">Candidatos Ranqueados</p>
-          <p className="text-2xl font-black text-blue-600 dark:text-blue-400 mt-1">{totalCandidatosRanqueados}</p>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">{totalCandidatosRanqueados}</p>
         </div>
       </div>
 

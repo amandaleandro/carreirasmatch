@@ -457,7 +457,7 @@ export default function DilemasGamePage() {
             )}
 
             <div className="space-y-2">
-              <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
+              <h2 className="text-xl sm:text-2xl font-bold text-white leading-tight">
                 {currentScenario.title}
               </h2>
               <p className="text-neutral-300 text-sm leading-relaxed">
@@ -512,7 +512,7 @@ export default function DilemasGamePage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white">Fim da Jornada!</h2>
+              <h2 className="text-2xl font-bold text-white">Fim da Jornada!</h2>
               <p className="text-rose-400 text-xs font-semibold bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">
                 {gameOverReason}
               </p>

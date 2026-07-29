@@ -5,7 +5,7 @@ import type { BulletAnalysisSummary, BulletCheckStatus } from "@/lib/bullet-anal
 import type { StructuredResume } from "@/lib/groq";
 
 const CARD =
-  "rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)]";
+  "rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 md:p-6";
 
 const STATUS_STYLE: Record<BulletCheckStatus, { icon: string; text: string }> = {
   pass: { icon: "✓", text: "text-[#22C55E]" },
@@ -240,7 +240,7 @@ export function ScorePercentileCard({
       : "border-[#EF4444]/25 bg-[#EF4444]/5 text-[#EF4444]";
   return (
     <div className={`rounded-2xl border p-4 flex items-center gap-4 ${tone}`}>
-      <span className="text-2xl font-black tracking-tight shrink-0">
+      <span className="text-2xl font-bold tracking-tight shrink-0">
         {betterThanPercent}%
       </span>
       <p className="text-xs leading-relaxed font-medium">

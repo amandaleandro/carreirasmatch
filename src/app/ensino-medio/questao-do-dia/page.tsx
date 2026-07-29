@@ -67,7 +67,7 @@ export default function DailyQuestionPage() {
             <Trophy className="h-3.5 w-3.5" />
             Desafio Diário ENEM com Gemini
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
             Questão do Dia
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm leading-relaxed">

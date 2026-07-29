@@ -313,7 +313,7 @@ export default function QuizPage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-neutral-900 dark:text-white">Fim do Show!</h2>
+              <h2 className="text-2xl font-bold text-neutral-900 dark:text-white">Fim do Show!</h2>
               <p className="text-neutral-500 text-sm">
                 Você acertou <span className="font-bold text-blue-600 dark:text-blue-400">{score}</span> de {questions.length} perguntas na categoria <span className="font-bold text-neutral-900 dark:text-white uppercase">{area}</span>.
               </p>

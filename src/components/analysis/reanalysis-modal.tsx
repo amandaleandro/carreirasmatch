@@ -157,12 +157,12 @@ export function ReanalysisModal({
             <div className="grid grid-cols-2 gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-neutral-950 border border-slate-200 dark:border-neutral-800 text-center">
               <div className="space-y-1 border-r border-slate-200 dark:border-neutral-800">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Score Anterior</span>
-                <p className="text-3xl font-black text-slate-600 dark:text-slate-400">{previousScore}%</p>
+                <p className="text-3xl font-bold text-slate-600 dark:text-slate-400">{previousScore}%</p>
               </div>
               <div className="space-y-1">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Novo Score Atualizado</span>
                 <div className="flex items-center justify-center gap-2">
-                  <p className="text-3xl font-black text-blue-600 dark:text-blue-400">{result.overallScore}%</p>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{result.overallScore}%</p>
                   {result.overallScore > previousScore && (
                     <span className="text-xs font-extrabold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                       +{result.overallScore - previousScore}% 🚀

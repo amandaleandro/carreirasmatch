@@ -134,17 +134,14 @@ export default async function FreelancersPage({ searchParams }: Props) {
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-8 space-y-16">
         {/* High-Converting Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white p-6 sm:p-12 shadow-2xl border border-blue-900/40">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
+        <section className="relative overflow-hidden rounded-2xl bg-slate-950 text-white p-6 sm:p-12 border border-blue-900/40">
           <div className="relative z-10 max-w-3xl space-y-5">
-            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider rounded-full px-3.5 py-1.5 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-300 border border-blue-400/30 backdrop-blur-md">
-              <Sparkles className="w-4 h-4 text-blue-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wide rounded-full px-3.5 py-1.5 bg-blue-500/15 text-blue-300 border border-blue-400/30">
+              <Sparkles className="w-4 h-4 text-blue-400" />
               <span>Plataforma Freelancer 100% Gratuita</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-[1.15] bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-200">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.15] text-white">
               Divulgue seus serviços ou contrate especialistas sem comissões abusivas
             </h1>
 
@@ -156,7 +153,7 @@ export default async function FreelancersPage({ searchParams }: Props) {
             <div className="pt-2 flex flex-wrap items-center gap-4">
               <Link
                 href="/freelancer/perfil"
-                className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 px-6 py-3.5 text-sm sm:text-base font-bold text-white shadow-xl shadow-blue-600/30 hover:from-blue-500 hover:to-indigo-500 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center justify-center gap-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 px-6 py-3.5 text-sm sm:text-base font-bold text-white transition-colors"
               >
                 <UserCheck className="w-5 h-5" />
                 <span>Quero Oferecer meus Serviços</span>
@@ -219,7 +216,7 @@ export default async function FreelancersPage({ searchParams }: Props) {
                     <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
                       <Icon className="w-5 h-5" />
                     </div>
-                    <span className="text-2xl font-black text-slate-300 dark:text-slate-800">
+                    <span className="text-2xl font-bold text-slate-300 dark:text-slate-800">
                       {h.step}
                     </span>
                   </div>

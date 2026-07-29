@@ -66,7 +66,7 @@ export default function MapaMentalPage() {
             <GitBranch className="h-3.5 w-3.5" />
             Visualização Didática por Nós
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Gerador de Mapas Mentais com IA
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
@@ -153,7 +153,7 @@ export default function MapaMentalPage() {
             <button
               onClick={handleGenerateMap}
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 text-white font-bold text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -178,7 +178,7 @@ export default function MapaMentalPage() {
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 px-2.5 py-0.5 rounded-full">
                   {mapData.subjectName} • {mapData.yearLabel}
                 </span>
-                <h2 className="text-2xl font-black text-neutral-900 dark:text-white mt-1">
+                <h2 className="text-2xl font-bold text-neutral-900 dark:text-white mt-1">
                   Mapa Mental: {mapData.topic}
                 </h2>
               </div>
@@ -199,7 +199,7 @@ export default function MapaMentalPage() {
                 <span className="text-[10px] font-extrabold uppercase tracking-widest bg-white/20 px-2.5 py-0.5 rounded-full">
                   🎯 Conceito Central
                 </span>
-                <h3 className="text-2xl font-black">{mapData.root.title}</h3>
+                <h3 className="text-2xl font-bold">{mapData.root.title}</h3>
                 <p className="text-xs text-indigo-100 leading-relaxed">{mapData.root.description}</p>
               </div>
 

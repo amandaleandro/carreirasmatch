@@ -198,26 +198,26 @@ export default function SpeedTyperPage() {
         <section className="grid grid-cols-4 gap-4 max-w-2xl mx-auto text-center">
           <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <p className="text-[10px] uppercase font-bold text-neutral-400">Tempo</p>
-            <p className="text-2xl font-black mt-1 text-neutral-900 dark:text-white">
+            <p className="text-2xl font-bold mt-1 text-neutral-900 dark:text-white">
               {seconds}s
             </p>
           </div>
           <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <p className="text-[10px] uppercase font-bold text-neutral-400">PPM (WPM)</p>
-            <p className="text-2xl font-black mt-1 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-1">
+            <p className="text-2xl font-bold mt-1 text-blue-600 dark:text-blue-400 flex items-center justify-center gap-1">
               <Flame className="h-5 w-5 fill-blue-600" />
               {wpm}
             </p>
           </div>
           <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <p className="text-[10px] uppercase font-bold text-neutral-400">Acurácia</p>
-            <p className="text-2xl font-black mt-1 text-emerald-600 dark:text-emerald-400">
+            <p className="text-2xl font-bold mt-1 text-emerald-600 dark:text-emerald-400">
               {accuracy}%
             </p>
           </div>
           <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4">
             <p className="text-[10px] uppercase font-bold text-neutral-400">Progresso</p>
-            <p className="text-2xl font-black mt-1 text-neutral-700 dark:text-neutral-300">
+            <p className="text-2xl font-bold mt-1 text-neutral-700 dark:text-neutral-300">
               {Math.min(100, Math.round((inputVal.length / targetText.length) * 100))}%
             </p>
           </div>

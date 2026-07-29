@@ -67,7 +67,7 @@ export default async function SubjectDetailPage({
             </div>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
             {subject.name}
           </h1>
 

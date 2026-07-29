@@ -76,7 +76,7 @@ export default async function DesafioPage({
         />
 
         {/* Seção explicativa da Recompensa por Indicação */}
-        <section className="bg-[#FFFFFF] dark:bg-[#0e2032] border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 space-y-5 shadow-[0_8px_30px_rgb(0,0,0,0.02)]">
+        <section className="bg-[#FFFFFF] dark:bg-[#0e2032] border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 space-y-5">
           <div className="flex items-center gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-3">
             <div className="p-2.5 bg-[#2563EB]/10 text-[#2563EB] rounded-2xl border border-[#2563EB]/25">
               <Trophy className="w-5 h-5" />

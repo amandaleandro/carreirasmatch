@@ -160,7 +160,7 @@ export default function CurriculoPage() {
             <div className="h-14 w-14 rounded-full bg-cyan-50 dark:bg-cyan-950/50 text-cyan-500 flex items-center justify-center mx-auto">
               <Trophy className="h-7 w-7" />
             </div>
-            <h2 className="text-2xl font-black">Currículo montado!</h2>
+            <h2 className="text-2xl font-bold">Currículo montado!</h2>
             <p className="text-sm text-neutral-500">Você fez <span className="font-bold text-cyan-600">{total}</span> pontos em {pool.length} currículos.</p>
             <button onClick={() => startRound(area)} className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-3 text-sm font-bold transition-all">
               <RotateCcw className="h-4 w-4" />

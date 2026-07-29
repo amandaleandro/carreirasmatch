@@ -154,7 +154,7 @@ export default function ForcaPage() {
             <div className="h-14 w-14 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-500 flex items-center justify-center mx-auto">
               <Trophy className="h-7 w-7" />
             </div>
-            <h2 className="text-2xl font-black">Fim da rodada!</h2>
+            <h2 className="text-2xl font-bold">Fim da rodada!</h2>
             <p className="text-sm text-neutral-500">Você fez <span className="font-bold text-rose-600">{total}</span> pontos em {pool.length} palavras.</p>
             <button onClick={() => startRound(area)} className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white px-5 py-3 text-sm font-bold transition-all">
               <RotateCcw className="h-4 w-4" />
@@ -181,7 +181,7 @@ export default function ForcaPage() {
                 ch === " " ? (
                   <div key={i} className="w-4" />
                 ) : (
-                  <div key={i} className="h-11 w-9 border-b-4 border-neutral-300 dark:border-neutral-700 flex items-center justify-center text-2xl font-black">
+                  <div key={i} className="h-11 w-9 border-b-4 border-neutral-300 dark:border-neutral-700 flex items-center justify-center text-2xl font-bold">
                     {guessed.has(ch) || roundDone ? ch : ""}
                   </div>
                 )

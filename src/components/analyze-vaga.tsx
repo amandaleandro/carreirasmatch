@@ -387,7 +387,7 @@ export function AnalyzeVagaPage({
 
     return (
       <div className="min-h-[70vh] flex items-center justify-center p-4 font-sans bg-[#F8FAFC] dark:bg-[#071827]">
-        <div className="max-w-md w-full bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6 animate-in fade-in zoom-in duration-300">
+        <div className="max-w-md w-full bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-6 space-y-6 animate-in fade-in zoom-in duration-300">
           
           {/* Radar Animado */}
           <div className="flex flex-col items-center text-center">
@@ -540,7 +540,7 @@ export function AnalyzeVagaPage({
 
       {/* Cabeçalho Unificado (Banner Limpo) */}
       {!hideHero && (
-      <div className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5.5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+      <div className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5.5">
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
 
@@ -600,7 +600,7 @@ export function AnalyzeVagaPage({
           <div className="space-y-5">
 
             {/* Etapa 1 */}
-            <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+            <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 space-y-4">
               <div className="flex items-center gap-3">
                 <span className="h-6 w-6 rounded-full bg-[#2563EB] text-white text-[10px] font-bold flex items-center justify-center shadow-sm">1</span>
                 <div>
@@ -692,7 +692,7 @@ export function AnalyzeVagaPage({
             </section>
 
             {/* Curiosidades */}
-            <section className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-4 md:p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+            <section className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-4 md:p-5">
               <div className="flex items-start gap-3">
                 <span className="h-8 w-8 rounded-xl bg-[#2563EB]/15 text-[#2563EB] flex items-center justify-center shrink-0">
                   <BulbIcon className="h-4.5 w-4.5" />
@@ -725,7 +725,7 @@ export function AnalyzeVagaPage({
             <section
               ref={step2Ref}
               aria-disabled={!step1Done}
-              className={`relative rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4 transition-opacity ${
+              className={`relative rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 space-y-4 transition-opacity ${
                 step1Done ? "" : "opacity-40 pointer-events-none select-none"
               }`}
             >
@@ -888,7 +888,7 @@ export function AnalyzeVagaPage({
           <aside className="space-y-4 lg:sticky lg:top-6">
             
             {/* Benefícios */}
-            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 space-y-4">
               <div>
                 <h2 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white flex items-center gap-1.5">
                   <span>📋</span> O que você vai receber
@@ -935,7 +935,7 @@ export function AnalyzeVagaPage({
             </div>
 
             {/* Como Funciona o Algoritmo (Preenche o espaço em branco lateral perfeitamente) */}
-            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-3.5">
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 space-y-3.5">
               <div>
                 <h3 className="font-title font-bold text-xs md:text-sm text-[#071827] dark:text-white">Como a análise funciona?</h3>
                 <p className="text-[10px] text-[#64748B] mt-0.5">Entenda as etapas da nossa tecnologia.</p>

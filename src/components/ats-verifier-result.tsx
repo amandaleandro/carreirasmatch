@@ -47,7 +47,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-4xl font-black">{data.atsReadabilityScore}</span>
+            <span className="text-4xl font-bold">{data.atsReadabilityScore}</span>
             <span className="text-sm font-semibold opacity-70">/100</span>
           </div>
           <p className="mt-2 text-xs font-medium opacity-90">
@@ -66,7 +66,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
             </span>
           </div>
           <div className="mt-4 flex items-baseline gap-2">
-            <span className="text-4xl font-black">{data.resumeQualityScore}</span>
+            <span className="text-4xl font-bold">{data.resumeQualityScore}</span>
             <span className="text-sm font-semibold opacity-70">/100</span>
           </div>
           <p className="mt-2 text-xs font-medium opacity-90">
@@ -86,7 +86,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
               </span>
             </div>
             <div className="mt-4 flex items-center gap-2 text-blue-600 dark:text-blue-400">
-              <span className="text-3xl font-black">?</span>
+              <span className="text-3xl font-bold">?</span>
               <span className="text-xs font-semibold">Desbloqueável com uma vaga</span>
             </div>
             <p className="mt-2 text-xs text-blue-700 dark:text-blue-300">
@@ -210,7 +210,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
                 }`}
               >
                 <div className="font-bold flex items-center gap-2">
-                  <span className="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded font-black bg-white/60 dark:bg-black/40">
+                  <span className="uppercase text-[10px] tracking-wider px-2 py-0.5 rounded font-bold bg-white/60 dark:bg-black/40">
                     {issue.severity}
                   </span>
                   {issue.title}
@@ -252,7 +252,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
 
       {/* Ponte de Alta Conversão */}
       <div className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-3xl p-8 shadow-xl text-center space-y-4">
-        <h3 className="text-xl sm:text-2xl font-black">
+        <h3 className="text-xl sm:text-2xl font-bold">
           Seu currículo está lido pelo ATS. Agora ele está preparado para a Vaga dos Seus Sonhos?
         </h3>
         <p className="text-sm text-blue-100 max-w-2xl mx-auto leading-relaxed">
@@ -260,7 +260,7 @@ export function AtsVerifierResult({ data, rawText }: AtsVerifierResultProps) {
         </p>
         <button
           onClick={() => setShowJobModal(true)}
-          className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-blue-50 text-blue-700 rounded-2xl font-black text-sm shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
+          className="inline-flex items-center gap-2 px-8 py-4 bg-white hover:bg-blue-50 text-blue-700 rounded-2xl font-bold text-sm shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5"
         >
           <span>🎯</span> Comparar com uma Vaga Real Gratuitamente
         </button>

@@ -2,8 +2,6 @@
 
 import { useState } from "react";
 import {
-  Sparkles,
-  Quote,
   Smile,
   Zap,
   CheckCircle2,
@@ -55,24 +53,16 @@ export function DailyMotivationCard({
   }
 
   return (
-    <div className="rounded-3xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 p-6 shadow-sm space-y-5 transition-all duration-300 relative overflow-hidden">
-      {/* Background Subtle Accent */}
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl -z-10 pointer-events-none" />
-
+    <div className="rounded-2xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 p-6 space-y-5">
       {/* Header com Situação Atual e Seletor */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-neutral-800/80">
-        <div className="flex items-center gap-2">
-          <span className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-            <Sparkles className="w-5 h-5" />
-          </span>
-          <div>
-            <h3 className="font-title font-bold text-base text-slate-900 dark:text-white flex items-center gap-2">
-              Dose Diária de Motivação & Humor
-            </h3>
-            <p className="text-xs text-slate-500 dark:text-neutral-400">
-              Conteúdo diário personalizado para o seu momento profissional
-            </p>
-          </div>
+        <div>
+          <h3 className="font-title font-bold text-base text-slate-900 dark:text-white">
+            Motivação do dia
+          </h3>
+          <p className="text-xs text-slate-500 dark:text-neutral-400">
+            Conteúdo diário para o seu momento profissional
+          </p>
         </div>
 
         {/* Seletor de Situação */}
@@ -117,18 +107,17 @@ export function DailyMotivationCard({
       </div>
 
       {/* Card da Frase Inspiradora */}
-      <div className="rounded-2xl border border-blue-500/10 bg-blue-500/5 dark:bg-blue-500/10 p-4 space-y-2 relative">
-        <Quote className="w-6 h-6 text-blue-500/30 absolute top-3 right-3" />
-        <p className="text-sm font-medium italic text-slate-800 dark:text-slate-200 leading-relaxed pr-6">
+      <div className="rounded-xl border-l-2 border-blue-500/40 bg-slate-50 dark:bg-neutral-800/40 pl-4 pr-3 py-3 space-y-1.5">
+        <p className="text-sm font-medium italic text-slate-800 dark:text-slate-200 leading-relaxed">
           &ldquo;{motivation.quote}&rdquo;
         </p>
-        <p className="text-xs font-bold text-blue-600 dark:text-blue-400">
+        <p className="text-xs font-semibold text-slate-500 dark:text-neutral-400">
           — {motivation.author}
         </p>
       </div>
 
       {/* Dica Prática do Dia */}
-      <div className="flex items-start gap-3 rounded-2xl bg-slate-50 dark:bg-neutral-800/50 border border-slate-100 dark:border-neutral-800 p-3.5">
+      <div className="flex items-start gap-3 rounded-xl bg-slate-50 dark:bg-neutral-800/50 border border-slate-100 dark:border-neutral-800 p-3.5">
         <Zap className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
         <div className="text-xs text-slate-600 dark:text-neutral-300 space-y-0.5">
           <span className="font-bold text-slate-900 dark:text-white mr-1">Dica prática de hoje:</span>
@@ -141,16 +130,15 @@ export function DailyMotivationCard({
         {!showMeme ? (
           <button
             onClick={() => setShowMeme(true)}
-            className="w-full py-2.5 px-4 rounded-xl border border-dashed border-slate-300 dark:border-neutral-700 hover:border-amber-500/60 bg-amber-500/5 hover:bg-amber-500/10 text-amber-700 dark:text-amber-400 text-xs font-bold transition-all flex items-center justify-center gap-2 group cursor-pointer"
+            className="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-neutral-700 hover:border-amber-500/50 text-slate-600 dark:text-neutral-300 hover:text-amber-700 dark:hover:text-amber-400 text-xs font-semibold transition-colors flex items-center justify-center gap-2 cursor-pointer"
           >
-            <Smile className="w-4 h-4 text-amber-500 group-hover:scale-110 transition-transform" />
-            <span>Revelar Meme & Humor do Dia 😂</span>
+            <Smile className="w-4 h-4" />
+            <span>Ver piada do dia</span>
           </button>
         ) : (
-          <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3 animate-in fade-in duration-200">
+          <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 space-y-3">
             <div className="flex items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 bg-amber-500/20 text-amber-800 dark:text-amber-300">
-                <Smile className="w-3 h-3" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">
                 {motivation.memeTag}
               </span>
               <button
@@ -165,7 +153,7 @@ export function DailyMotivationCard({
               <h4 className="font-bold text-sm text-slate-900 dark:text-white">
                 {motivation.memeTitle}
               </h4>
-              <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1.5 font-mono bg-white/80 dark:bg-neutral-900/80 p-3 rounded-xl border border-amber-500/10">
+              <div className="text-xs text-slate-700 dark:text-slate-300 space-y-1.5 font-mono bg-white/80 dark:bg-neutral-900/80 p-3 rounded-lg border border-amber-500/10">
                 <p className="font-medium text-slate-600 dark:text-neutral-400">{motivation.memeSetup}</p>
                 <p className="font-bold text-amber-700 dark:text-amber-300 pt-1 border-t border-amber-500/10">
                   {motivation.memePunchline}
@@ -183,7 +171,7 @@ export function DailyMotivationCard({
                 }`}
               >
                 <ThumbsUp className="w-3.5 h-3.5" />
-                <span>{liked ? "Curtiu! 😂" : "Curtiu?"}</span>
+                <span>{liked ? "Curtiu" : "Curtiu?"}</span>
               </button>
             </div>
           </div>

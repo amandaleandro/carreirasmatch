@@ -109,7 +109,7 @@ export default function RegisterPage() {
         </p>
       </header>
 
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-5 md:p-6 animate-in fade-in slide-in-from-bottom-6 duration-600">
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 md:p-6 animate-in fade-in slide-in-from-bottom-6 duration-600">
         <form onSubmit={handleSubmit} className="space-y-3">
           
           {/* Nome */}

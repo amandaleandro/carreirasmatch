@@ -322,7 +322,7 @@ export default function DueloGamePage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white">
+              <h2 className="text-2xl font-bold text-white">
                 {isPlayerWinner ? "Vitória Épica! 🏆" : "Derrota no Duelo!"}
               </h2>
               <p className="text-neutral-400 text-xs">

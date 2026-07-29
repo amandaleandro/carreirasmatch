@@ -45,13 +45,13 @@ export default async function SeloPage({ params }: { params: Promise<{ id: strin
   return (
     <main className="min-h-screen bg-[#F8FAFC] dark:bg-[#071827] font-sans flex items-center justify-center px-4 py-16">
       <div className="max-w-md w-full space-y-6">
-        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 p-8 text-center space-y-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 p-8 text-center space-y-5">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#22C55E]/10 border border-[#22C55E]/25 text-[#22C55E] text-[10px] font-bold uppercase tracking-wider">
             ✓ Currículo analisado e verificado
           </span>
 
           <div
-            className="mx-auto flex h-32 w-32 items-center justify-center rounded-full border-8 text-4xl font-black text-[#071827] dark:text-white"
+            className="mx-auto flex h-32 w-32 items-center justify-center rounded-full border-8 text-4xl font-bold text-[#071827] dark:text-white"
             style={{ borderColor: ringColor }}
           >
             {score}

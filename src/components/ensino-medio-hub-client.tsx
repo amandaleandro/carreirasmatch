@@ -49,7 +49,7 @@ export function EnsinoMedioHubClient() {
           <Sparkles className="h-3.5 w-3.5" />
           Suíte Completa do Ensino Médio por Anos (1º, 2º, 3º & ENEM)
         </div>
-        <h1 className="text-3xl md:text-5xl font-black tracking-tight text-neutral-900 dark:text-white leading-tight">
+        <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-white leading-tight">
           Estude para a Escola e para o ENEM por Ano Escolar
         </h1>
         <p className="text-neutral-600 dark:text-neutral-300 text-sm md:text-base leading-relaxed max-w-2xl mx-auto">

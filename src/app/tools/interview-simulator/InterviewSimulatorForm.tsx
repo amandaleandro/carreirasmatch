@@ -203,7 +203,7 @@ export function InterviewSimulatorForm() {
       </div>
 
       {!started && (
-        <form onSubmit={handleStart} className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+        <form onSubmit={handleStart} className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
           <div>
             <label className="block text-xs font-bold uppercase tracking-wider text-[#64748B] mb-1.5">Cargo-alvo</label>
             <input
@@ -273,12 +273,12 @@ export function InterviewSimulatorForm() {
           {turns.map((turn, index) => (
             <div
               key={index}
-              className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4"
+              className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4"
             >
               <div className="flex items-start justify-between gap-3 pb-2 border-b border-neutral-100 dark:border-neutral-850">
                 <p className="text-xs font-bold text-[#071827] dark:text-white leading-normal">{turn.question}</p>
                 <span
-                  className={`shrink-0 text-[10px] font-black uppercase tracking-wider rounded px-2 py-0.5 ${scoreClass(turn.feedback.score)}`}
+                  className={`shrink-0 text-[10px] font-bold uppercase tracking-wider rounded px-2 py-0.5 ${scoreClass(turn.feedback.score)}`}
                 >
                   Nota: {turn.feedback.score}/10
                 </span>
@@ -371,7 +371,7 @@ export function InterviewSimulatorForm() {
           )}
 
           {finished && (
-            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] text-center space-y-3.5">
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 text-center space-y-3.5">
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Média da entrevista</p>
               <p className="text-3xl font-extrabold text-blue-600">{averageScore}/10</p>
               <p className="text-xs text-[#64748B] max-w-sm mx-auto leading-relaxed">

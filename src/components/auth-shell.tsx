@@ -232,7 +232,7 @@ export function AuthShell({
                 </svg>
 
                 <div className="absolute flex flex-col items-center justify-center">
-                  <span className="text-xs font-black text-[#071827] dark:text-white">{currentScore}%</span>
+                  <span className="text-xs font-bold text-[#071827] dark:text-white">{currentScore}%</span>
                   <span className="text-[5px] text-[#64748B] uppercase tracking-widest font-extrabold">Match</span>
                 </div>
               </div>

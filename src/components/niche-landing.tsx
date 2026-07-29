@@ -1448,7 +1448,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               </div>
               <Link
                 href="/ensino-medio"
-                className="shrink-0 inline-flex items-center justify-center rounded-2xl bg-white hover:bg-blue-50 text-blue-950 font-black px-6 py-3.5 text-sm transition-all shadow-md active:scale-95"
+                className="shrink-0 inline-flex items-center justify-center rounded-2xl bg-white hover:bg-blue-50 text-blue-950 font-bold px-6 py-3.5 text-sm transition-all shadow-md active:scale-95"
               >
                 Acessar Suíte Ensino Médio →
               </Link>

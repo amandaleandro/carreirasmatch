@@ -196,7 +196,7 @@ export default function VfPage() {
             <div className="h-14 w-14 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-500 flex items-center justify-center mx-auto">
               <Trophy className="h-7 w-7" />
             </div>
-            <h2 className="text-2xl font-black">Tempo!</h2>
+            <h2 className="text-2xl font-bold">Tempo!</h2>
             <p className="text-sm text-neutral-500">Você fez <span className="font-bold text-indigo-600">{score}</span> pontos. Melhor sequência: <span className="font-bold">{best}</span>.</p>
             <button onClick={start} className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-3 text-sm font-bold transition-all">
               <RotateCcw className="h-4 w-4" />

@@ -381,7 +381,7 @@ export function ComparadorVagasClient() {
                     {/* Match Score Display */}
                     <div className="flex items-center justify-between p-3.5 rounded-2xl bg-slate-50/80 dark:bg-neutral-950 border border-slate-100 dark:border-neutral-850">
                       <span className="text-[10px] uppercase font-bold text-slate-500">Match Estimado</span>
-                      <span className="text-lg font-black font-mono text-purple-600 dark:text-purple-400">
+                      <span className="text-lg font-bold font-mono text-purple-600 dark:text-purple-400">
                         {c.matchScore}%
                       </span>
                     </div>

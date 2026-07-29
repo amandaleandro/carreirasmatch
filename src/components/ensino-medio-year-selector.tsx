@@ -41,7 +41,7 @@ export function EnsinoMedioYearSelector({
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className={`text-xs font-black tracking-tight ${isActive ? "text-white" : "text-neutral-900 dark:text-white"}`}>
+                <span className={`text-xs font-bold tracking-tight ${isActive ? "text-white" : "text-neutral-900 dark:text-white"}`}>
                   {year.label}
                 </span>
                 {year.id === "3o-ano" ? (

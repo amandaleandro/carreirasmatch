@@ -296,7 +296,7 @@ export default function MemoryGamePage() {
         {/* Estatísticas */}
         {memorizing && (
           <div className="mx-auto max-w-xl rounded-3xl border border-violet-200 bg-gradient-to-r from-violet-50 via-blue-50 to-cyan-50 p-4 text-center shadow-sm dark:border-violet-900/60 dark:from-violet-950/40 dark:via-blue-950/30 dark:to-cyan-950/30">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-violet-600 dark:text-violet-300">Memorize os pares</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-violet-600 dark:text-violet-300">Memorize os pares</p>
             <p className="mt-1 text-sm font-bold text-violet-950 dark:text-white">Os cards serão virados em {memorizeSeconds}s</p>
             <p className="mt-1 text-xs text-violet-700/80 dark:text-violet-200/80">Observe o termo e sua definição. Depois encontre os pares com o menor número de erros.</p>
           </div>
@@ -352,13 +352,13 @@ export default function MemoryGamePage() {
           <div className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-8 text-center space-y-6 shadow-sm max-w-md mx-auto animate-in zoom-in-95 duration-200">
             <Trophy className="h-14 w-14 text-amber-500 mx-auto" />
             <div>
-              <h2 className="text-2xl font-black">Excelente Memória!</h2>
+              <h2 className="text-2xl font-bold">Excelente Memória!</h2>
               <p className="text-neutral-500 text-sm mt-1">
                 Você pareou todos os termos em <span className="font-bold">{seconds}s</span> com {errors} erros.
               </p>
               <div className="mt-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 p-4 border border-blue-100 dark:border-blue-900/30 text-center">
                 <span className="text-xs text-neutral-400 font-semibold block uppercase">Pontuação Final</span>
-                <span className="text-3xl font-black text-blue-600 dark:text-blue-400 mt-1 block">
+                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400 mt-1 block">
                   {score} pts
                 </span>
                 {submitting ? (

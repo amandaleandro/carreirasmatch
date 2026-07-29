@@ -9,11 +9,11 @@ export function SubscriptionUpsell({
   context?: "diagnostic" | "limit";
 }) {
   return (
-    <aside className="rounded-3xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 p-6 md:p-8 shadow-md relative overflow-hidden font-sans space-y-5">
+    <aside className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-slate-900 p-6 md:p-8 font-sans space-y-5">
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-600 text-white shadow-xs">
+        <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide rounded-full px-3 py-1 bg-blue-600 text-white">
           <Sparkles className="w-3.5 h-3.5" />
-          Acelere sua Carreira
+          Acelere sua carreira
         </span>
         <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1 rounded-full border border-blue-200/60 dark:border-blue-900/60">
           Por apenas R$ 24,90/mês
@@ -56,7 +56,7 @@ export function SubscriptionUpsell({
 
         <Link
           href={`/assinar?segment=${encodeURIComponent(segment)}`}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold px-6 py-3 text-sm shadow-md shadow-blue-500/20 transition-all hover:scale-[1.02]"
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 text-sm transition-colors"
         >
           <span>Assinar agora por R$ 24,90/mês</span>
           <ArrowRight className="w-4 h-4" />

@@ -85,7 +85,7 @@ export function AllJobsFilterForm({
     <form
       method="GET"
       action="/todas-as-vagas"
-      className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4 font-sans"
+      className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4 font-sans"
     >
       <div className="flex flex-col sm:flex-row items-stretch gap-3">
         <div className="relative flex-1">

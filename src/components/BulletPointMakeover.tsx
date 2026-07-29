@@ -19,7 +19,7 @@ export function BulletPointMakeover({ makeovers = [] }: BulletPointMakeoverProps
   if (!makeovers || makeovers.length === 0) return null;
 
   return (
-    <div className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-6">
+    <div className="rounded-3xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900/40 p-5 md:p-6 space-y-6">
       <div className="flex items-center gap-3">
         <div className="p-2.5 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
           <Sparkles className="w-5 h-5" />

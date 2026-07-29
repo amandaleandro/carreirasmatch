@@ -74,7 +74,7 @@ export default async function ResumeIndexPage() {
       </div>
 
       {/* Seção Currículo Base */}
-      <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+      <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-start gap-4">
             <div className="p-3 bg-[#2563EB]/10 text-[#2563EB] rounded-xl shrink-0">
@@ -132,7 +132,7 @@ export default async function ResumeIndexPage() {
               return (
                 <div
                   key={a.id}
-                  className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] hover:shadow-md transition-all flex flex-col justify-between gap-4"
+                  className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 hover:shadow-md transition-all flex flex-col justify-between gap-4"
                 >
                   <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3">

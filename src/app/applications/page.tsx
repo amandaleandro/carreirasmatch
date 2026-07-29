@@ -147,12 +147,12 @@ export default async function ApplicationsPage() {
       </section>
 
       {/* Jornada de Busca */}
-      <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+      <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40">
         <h2 className="text-sm font-bold text-[#071827] dark:text-white">Sua jornada de busca</h2>
         <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           {journeyStats.map((stat) => (
             <div key={stat.label} className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800/80 bg-[#F8FAFC]/50 dark:bg-white/[0.02] px-4 py-3">
-              <p className={`text-2xl font-black tracking-tight tabular-nums ${stat.tone}`}>{stat.value}</p>
+              <p className={`text-2xl font-bold tracking-tight tabular-nums ${stat.tone}`}>{stat.value}</p>
               <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mt-1">{stat.label}</p>
             </div>
           ))}
@@ -166,13 +166,13 @@ export default async function ApplicationsPage() {
           return (
             <div
               key={metric.label}
-              className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-4.5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]"
+              className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-4.5 bg-[#FFFFFF] dark:bg-neutral-900/40"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-bold text-[#64748B]">
                   {metric.label}
                 </p>
-                <p className="text-xs font-black text-[#071827] dark:text-white">
+                <p className="text-xs font-bold text-[#071827] dark:text-white">
                   {metric.done}/{metric.target}
                 </p>
               </div>
@@ -185,7 +185,7 @@ export default async function ApplicationsPage() {
       </section>
 
       {upcomingDeadlines.length > 0 && (
-        <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+        <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40">
           <h2 className="text-sm font-bold text-[#071827] dark:text-white">Prazos próximos</h2>
           <div className="mt-3 space-y-2">
             {upcomingDeadlines.map((item) => {
@@ -213,7 +213,7 @@ export default async function ApplicationsPage() {
       <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
         <form
           action={createApplication}
-          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4"
+          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 space-y-4"
         >
           <div>
             <h2 className="text-sm font-bold text-[#071827] dark:text-white">Adicionar candidatura</h2>
@@ -245,7 +245,7 @@ export default async function ApplicationsPage() {
 
         <form
           action={updateWeeklyGoal}
-          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4 flex flex-col justify-between"
+          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 space-y-4 flex flex-col justify-between"
         >
           <div className="space-y-3.5">
             <div>

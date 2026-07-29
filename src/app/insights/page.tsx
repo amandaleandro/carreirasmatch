@@ -48,7 +48,7 @@ export default async function InsightsPage() {
               key={s.label}
               className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 text-center"
             >
-              <p className="text-2xl font-black text-[#2563EB]">{s.value}</p>
+              <p className="text-2xl font-bold text-[#2563EB]">{s.value}</p>
               <p className="text-[11px] text-[#64748B] mt-1">{s.label}</p>
             </div>
           ))}

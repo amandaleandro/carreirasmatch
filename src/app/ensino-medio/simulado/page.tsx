@@ -97,7 +97,7 @@ export default function SimuladoPorAnoPage() {
             <Trophy className="h-3.5 w-3.5" />
             Simulado por Ano Escolar
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Simulado Personalizado do Ensino Médio
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
@@ -207,7 +207,7 @@ export default function SimuladoPorAnoPage() {
             <button
               onClick={handleGenerateSimulado}
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white font-bold text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -343,7 +343,7 @@ export default function SimuladoPorAnoPage() {
                   <button
                     onClick={handleFinish}
                     disabled={Object.keys(userAnswers).length < simulado.questions.length}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-black text-sm rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white font-bold text-sm rounded-xl transition-all shadow-md active:scale-95 flex items-center justify-center gap-2"
                   >
                     <CheckCircle2 className="h-4 w-4" />
                     Finalizar Simulado ({Object.keys(userAnswers).length}/{simulado.questions.length})

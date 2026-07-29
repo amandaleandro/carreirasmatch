@@ -36,11 +36,11 @@ export function DailyQuestsCard() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-neutral-900 via-neutral-900 to-indigo-950/80 border border-neutral-800 text-white rounded-3xl p-5 sm:p-6 shadow-xl space-y-6">
+    <div className="bg-neutral-900 border border-neutral-800 text-white rounded-2xl p-5 sm:p-6 space-y-6">
       {/* Top Banner: Level + Streak */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-neutral-800 pb-5">
         <div className="flex items-center gap-3.5">
-          <div className="h-12 w-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-black text-lg shadow-lg shrink-0 border border-white/10">
+          <div className="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shrink-0">
             {levelInfo.level}
           </div>
           <div>
@@ -60,13 +60,13 @@ export function DailyQuestsCard() {
         </div>
 
         {/* Badge de Sequência de Fogo (Streak) */}
-        <div className="flex items-center gap-2 bg-gradient-to-r from-orange-500/20 to-amber-500/20 border border-orange-500/30 text-amber-400 px-4 py-2 rounded-2xl shrink-0">
-          <Flame className="h-5 w-5 text-orange-500 fill-orange-500 animate-bounce" />
+        <div className="flex items-center gap-2 bg-orange-500/10 border border-orange-500/30 text-amber-400 px-4 py-2 rounded-xl shrink-0">
+          <Flame className="h-5 w-5 text-orange-500 fill-orange-500" />
           <div>
             <div className="text-[10px] uppercase font-bold text-orange-300 leading-tight">
               Sequência Ativa
             </div>
-            <div className="text-xs font-black text-amber-300">
+            <div className="text-xs font-bold text-amber-300">
               {streakDays} Dias Seguidos!
             </div>
           </div>

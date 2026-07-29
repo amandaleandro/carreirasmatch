@@ -131,7 +131,7 @@ export function DesafioForm({ isLoggedIn, userId, referralStats }: DesafioFormPr
         />
       )}
 
-      <form onSubmit={handleSubmit} className="bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-4">
+      <form onSubmit={handleSubmit} className="bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 space-y-4">
         
         <div className="border-b border-[#E2E8F0] dark:border-neutral-800 pb-3 flex items-center justify-between">
           <div>

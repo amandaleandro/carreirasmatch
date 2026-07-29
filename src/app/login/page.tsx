@@ -24,7 +24,7 @@ export default function LoginPage() {
         </p>
       </header>
 
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-950 shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-5 md:p-6">
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-950 p-5 md:p-6">
         <LoginForm googleEnabled={googleEnabled} />
       </div>
     </AuthShell>

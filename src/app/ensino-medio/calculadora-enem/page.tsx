@@ -69,7 +69,7 @@ export default function EnemCalculatorPage() {
             <Calculator className="h-3.5 w-3.5" />
             Simulador de Pesos SISU com Gemini AI
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
             Calculadora de Média Ponderada do ENEM
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm leading-relaxed">
@@ -214,7 +214,7 @@ export default function EnemCalculatorPage() {
                 <span className="text-xs font-bold uppercase tracking-wider text-neutral-400">
                   Média Simples (Aritmética)
                 </span>
-                <div className="text-4xl font-black text-neutral-900 dark:text-white">
+                <div className="text-4xl font-bold text-neutral-900 dark:text-white">
                   {result.simpleAverage} <span className="text-sm text-neutral-400 font-medium">pts</span>
                 </div>
               </div>
@@ -223,7 +223,7 @@ export default function EnemCalculatorPage() {
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-200">
                   Média Ponderada Estimada para {result.course}
                 </span>
-                <div className="text-4xl font-black text-amber-300">
+                <div className="text-4xl font-bold text-amber-300">
                   {result.weightedAverage} <span className="text-sm text-white font-medium">pts</span>
                 </div>
               </div>

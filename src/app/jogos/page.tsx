@@ -192,7 +192,7 @@ export default async function GamesHubPage({
 
           <div id="rankings" className="grid gap-4 md:grid-cols-3">
             {/* Diário */}
-            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
               <h3 className="font-bold text-xs text-[#071827] dark:text-white flex items-center gap-2 border-b border-neutral-100 dark:border-neutral-850 pb-2.5 uppercase tracking-wider">
                 <Flame className="h-4 w-4 text-orange-500" />
                 Top 10 do Dia
@@ -212,7 +212,7 @@ export default async function GamesHubPage({
             </div>
 
             {/* Mensal */}
-            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
               <h3 className="font-bold text-xs text-[#071827] dark:text-white flex items-center gap-2 border-b border-neutral-100 dark:border-neutral-850 pb-2.5 uppercase tracking-wider">
                 <Calendar className="h-4 w-4 text-blue-500" />
                 Top 10 do Mês
@@ -232,7 +232,7 @@ export default async function GamesHubPage({
             </div>
 
             {/* Anual */}
-            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+            <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
               <h3 className="font-bold text-xs text-[#071827] dark:text-white flex items-center gap-2 border-b border-neutral-100 dark:border-neutral-850 pb-2.5 uppercase tracking-wider">
                 <CalendarDays className="h-4 w-4 text-purple-500" />
                 Top 10 do Ano

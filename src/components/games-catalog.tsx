@@ -228,7 +228,7 @@ export function GamesCatalog({
     <div className="space-y-8">
       {profile.segment && (profile.area || profile.studyCourse) ? (
         <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 dark:border-blue-900/60 dark:from-blue-950/40 dark:to-indigo-950/30">
-          <p className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-300">Jogos recomendados para você</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">Jogos recomendados para você</p>
           <h2 className="mt-1 text-lg font-extrabold text-blue-950 dark:text-white">{profile.area ?? profile.studyCourse}</h2>
           <p className="mt-1 text-xs leading-relaxed text-blue-800/80 dark:text-blue-200/80">
             {profile.segment === "career_change" && profile.currentArea
@@ -247,7 +247,7 @@ export function GamesCatalog({
       <section className="rounded-3xl border border-indigo-200 bg-white p-5 shadow-sm dark:border-indigo-900/60 dark:bg-neutral-900/60">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Sua trilha de hoje</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-300">Sua trilha de hoje</p>
             <h2 className="mt-1 text-lg font-extrabold text-neutral-900 dark:text-white">3 jogos, 10 minutos e uma habilidade a mais</h2>
             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
               {completedToday === 3 ? "Trilha concluída. Volte amanhã para um novo desafio." : `${completedToday}/3 etapas concluídas · próximo: ${nextStep.title}.`}
@@ -265,7 +265,7 @@ export function GamesCatalog({
             return (
               <div key={step.game} className={`rounded-2xl border p-3 ${done ? "border-emerald-200 bg-emerald-50 dark:border-emerald-900/60 dark:bg-emerald-950/30" : "border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-950/40"}`}>
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-neutral-400">0{index + 1}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">0{index + 1}</span>
                   <span className={`text-[10px] font-bold ${done ? "text-emerald-600 dark:text-emerald-400" : "text-neutral-400"}`}>{done ? "Concluído" : step.label}</span>
                 </div>
                 <p className="mt-2 text-[11px] font-bold text-neutral-800 dark:text-neutral-200">{step.title}</p>
@@ -280,7 +280,7 @@ export function GamesCatalog({
       <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-wider text-neutral-400">Progressão da trilha</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">Progressão da trilha</p>
             <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Escolha o nível dos desafios para sua área.</p>
           </div>
           <div className="flex gap-2">
@@ -302,7 +302,7 @@ export function GamesCatalog({
       {/* Seletor de Categorias & Áreas */}
       {/* Banner de Área Selecionada */}
       <section className="rounded-2xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900/60">
-        <label htmlFor="games-track" className="text-[10px] font-black uppercase tracking-wider text-neutral-400">
+        <label htmlFor="games-track" className="text-[10px] font-bold uppercase tracking-wider text-neutral-400">
           Escolha sua trilha
         </label>
         <select
@@ -364,7 +364,7 @@ export function GamesCatalog({
                   </div>
                   <div className="flex items-center gap-1.5">
                     {game.isNew && (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-500 text-white shadow-sm animate-pulse">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-amber-500 text-white">
                         <Flame className="h-2.5 w-2.5 fill-white" /> NOVO
                       </span>
                     )}

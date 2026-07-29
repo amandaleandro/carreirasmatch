@@ -416,7 +416,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
             </div>
 
             <div className={`my-2 inline-flex flex-col items-center justify-center w-28 h-28 rounded-full border-4 ${ringColorClass} bg-slate-950/60 shadow-xl relative`}>
-              <span className="text-3xl font-black text-white leading-none">{overallScore}%</span>
+              <span className="text-3xl font-bold text-white leading-none">{overallScore}%</span>
               <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-1">Aderência</span>
             </div>
 

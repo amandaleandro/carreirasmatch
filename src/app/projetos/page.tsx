@@ -59,17 +59,14 @@ export default async function ProjectsPage({ searchParams }: Props) {
 
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 md:px-8 py-8 space-y-10">
         {/* Hero Section */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white p-6 sm:p-10 shadow-2xl border border-blue-900/40">
-          <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
-
+        <section className="relative overflow-hidden rounded-2xl bg-slate-950 text-white p-6 sm:p-10 border border-blue-900/40">
           <div className="relative z-10 max-w-3xl space-y-4">
-            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider rounded-full px-3.5 py-1 bg-blue-500/15 text-blue-300 border border-blue-400/30 backdrop-blur-md">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+            <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide rounded-full px-3.5 py-1 bg-blue-500/15 text-blue-300 border border-blue-400/30">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
               <span>Projetos em Destaque</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-200">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white">
               Precisa de um projeto feito? Publique e receba propostas
             </h1>
 
@@ -80,7 +77,7 @@ export default async function ProjectsPage({ searchParams }: Props) {
             <div className="pt-3 flex flex-wrap items-center gap-3">
               <Link
                 href="/projetos/novo"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 hover:from-blue-500 hover:to-blue-600 transition-all transform hover:-translate-y-0.5 active:translate-y-0"
+                className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 px-5 py-3 text-sm font-semibold text-white transition-colors"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Publicar meu projeto</span>

@@ -43,7 +43,7 @@ export function EnsinoMedioToolsNav() {
       <div className="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between overflow-x-auto no-scrollbar py-2.5 gap-2">
         <div className="flex items-center gap-1.5 shrink-0 pr-4 border-r border-neutral-200 dark:border-neutral-800">
           <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-          <span className="text-xs font-black uppercase tracking-wider text-neutral-900 dark:text-white">
+          <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
             Ensino Médio AI
           </span>
         </div>

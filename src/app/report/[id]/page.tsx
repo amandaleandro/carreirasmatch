@@ -209,7 +209,7 @@ export default async function ReportPage({
               : "border-amber-200 dark:border-amber-900 bg-amber-50/60 dark:bg-amber-950/30"
           }`}
         >
-          <span className={`text-2xl font-black shrink-0 ${scoreDelta > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+          <span className={`text-2xl font-bold shrink-0 ${scoreDelta > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
             {scoreDelta > 0 ? `+${scoreDelta}` : scoreDelta}
           </span>
           <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed">

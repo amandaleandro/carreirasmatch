@@ -231,7 +231,7 @@ export function ActionPlan({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)] flex gap-3.5 items-start">
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 flex gap-3.5 items-start">
           <span className="h-9 w-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
             <GoalIcon className="h-5 w-5" />
           </span>
@@ -244,7 +244,7 @@ export function ActionPlan({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)] flex gap-3.5 items-start">
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 flex gap-3.5 items-start">
           <span className="h-9 w-9 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
             <CalendarIcon className="h-5 w-5" />
           </span>
@@ -257,7 +257,7 @@ export function ActionPlan({
           </div>
         </div>
 
-        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 shadow-[0_8px_30px_rgb(0,0,0,0.01)] flex gap-3.5 items-center">
+        <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-4 flex gap-3.5 items-center">
           <div className="shrink-0">
             <CircularScore value={overallScore} size={44} strokeWidth={5} />
           </div>
@@ -274,7 +274,7 @@ export function ActionPlan({
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-start">
-        <div className="lg:col-span-2 rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+        <div className="lg:col-span-2 rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
           <h2 className="text-sm font-bold text-[#071827] dark:text-white">Plano personalizado</h2>
           <div className="space-y-5">
             {buckets.map((bucket) => {
@@ -378,7 +378,7 @@ export function ActionPlan({
             </div>
           )}
 
-          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
             <h3 className="text-xs font-bold text-[#071827] dark:text-white uppercase tracking-wider">Lacunas prioritárias</h3>
             <div className="space-y-3">
               {priorityGaps.map((gap) => (
@@ -403,7 +403,7 @@ export function ActionPlan({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
             <h3 className="text-xs font-bold text-[#071827] dark:text-white uppercase tracking-wider">Cursos recomendados</h3>
             <div className="grid grid-cols-1 gap-2.5">
               {priorityGaps.slice(0, 4).map((gap, i) => {
@@ -444,7 +444,7 @@ export function ActionPlan({
             </div>
           </div>
 
-          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
+          <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-850 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5">
             <div className="flex items-center gap-3">
               <span className="h-9 w-9 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
                 <GoalIcon className="h-5 w-5" />

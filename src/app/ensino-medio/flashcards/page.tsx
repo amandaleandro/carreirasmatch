@@ -83,7 +83,7 @@ export default function Flashcards3DPage() {
             <Zap className="h-3.5 w-3.5" />
             Memorização Rápida • Flashcards 3D
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Flashcards Interativos por Série
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
@@ -170,7 +170,7 @@ export default function Flashcards3DPage() {
             <button
               onClick={handleGenerateDeck}
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:opacity-50 text-white font-bold text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -215,7 +215,7 @@ export default function Flashcards3DPage() {
               className="w-full min-h-[280px] sm:min-h-[320px] rounded-3xl bg-white dark:bg-neutral-900 border-2 border-neutral-200 dark:border-neutral-800 hover:border-purple-500 dark:hover:border-purple-500 p-8 shadow-lg cursor-pointer flex flex-col justify-between transition-all hover:scale-[1.01] relative overflow-hidden select-none"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-black uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 px-3 py-1 rounded-full">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/40 px-3 py-1 rounded-full">
                   {currentCard.category || "Conceito"}
                 </span>
 
@@ -226,7 +226,7 @@ export default function Flashcards3DPage() {
 
               <div className="my-auto text-center px-4">
                 {!isFlipped ? (
-                  <h3 className="text-xl sm:text-2xl font-black text-neutral-900 dark:text-white leading-relaxed">
+                  <h3 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white leading-relaxed">
                     {currentCard.front}
                   </h3>
                 ) : (

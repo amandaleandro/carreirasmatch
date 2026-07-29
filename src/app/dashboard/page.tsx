@@ -194,14 +194,12 @@ export default async function DashboardPage() {
       {/* Gráfico de Evolução do Score de Aderência */}
       <CareerScoreEvolutionChart dataPoints={scoreDataPoints} />
       <div data-tour="dash-overview" className="animate-in fade-in duration-300">
-        <span className="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/25">
-          Visão geral
-        </span>
+        <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-1.5">Visão geral</p>
         <h1 className="text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
           {greeting}
         </h1>
         <p className="text-[#64748B] dark:text-neutral-400 mt-1 text-sm">
-          Este é o seu mapa da próxima oportunidade com clareza e direção para avançar na carreira.
+          Seu mapa da próxima oportunidade.
         </p>
       </div>
 
@@ -216,15 +214,15 @@ export default async function DashboardPage() {
       />
 
       {isTopPlayer && (
-        <div className="rounded-3xl border border-amber-300 dark:border-amber-500/20 bg-gradient-to-r from-amber-500/10 via-amber-600/5 to-transparent p-6 space-y-4 shadow-sm relative overflow-hidden animate-in fade-in duration-250">
+        <div className="rounded-2xl border border-amber-300/70 dark:border-amber-500/20 bg-amber-50/60 dark:bg-amber-500/5 p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <Trophy className="h-8 w-8 text-amber-500 fill-amber-500 shrink-0" />
+            <Trophy className="h-6 w-6 text-amber-500 shrink-0" />
             <div>
-              <h2 className="text-lg font-title font-bold text-[#071827] dark:text-white">
-                Você é um dos 10 melhores jogadores do mês! 🏆
+              <h2 className="text-base font-title font-bold text-[#071827] dark:text-white">
+                Você está entre os 10 melhores do mês
               </h2>
               <p className="text-xs text-[#64748B] dark:text-neutral-400">
-                Como recompensa por sua dedicação, aqui estão vagas exclusivas recomendadas com prioridade para você:
+                Vagas exclusivas recomendadas com prioridade para você:
               </p>
             </div>
           </div>
@@ -234,14 +232,14 @@ export default async function DashboardPage() {
               <Link
                 key={vaga.id}
                 href={`/vagas/empresa/${vaga.id}`}
-                className="group relative rounded-2xl border border-amber-500/30 dark:border-amber-700/50 bg-gradient-to-b from-amber-500/5 to-transparent dark:bg-neutral-900 p-4 shadow-xs hover:border-amber-500 hover:shadow-md transition-all flex flex-col justify-between"
+                className="group relative rounded-xl border border-amber-500/25 dark:border-amber-700/40 bg-white dark:bg-neutral-900 p-4 hover:border-amber-500 transition-colors flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-bold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-500/20">
+                    <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/60 px-2 py-0.5 rounded-full">
                       {vaga.area}
                     </span>
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
                       Prioritária
                     </span>
                   </div>
@@ -250,8 +248,8 @@ export default async function DashboardPage() {
                   </h3>
                   <p className="text-xs text-[#64748B] mt-1">{vaga.company.name}</p>
                 </div>
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 mt-4 inline-flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  Ver Vaga Exclusiva →
+                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-4 inline-flex items-center gap-1">
+                  Ver vaga exclusiva →
                 </span>
               </Link>
             ))}
@@ -263,18 +261,18 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Aderência Média */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300">
+        <div className="lg:col-span-2 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
           <div>
-            <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider">Aderência média às vagas</p>
-            <p className="text-5xl font-black text-[#2563EB] mt-2">
+            <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Aderência média às vagas</p>
+            <p className="text-4xl font-bold text-[#071827] dark:text-white mt-2">
               {averageAdherence}%
             </p>
-            <p className="text-sm text-[#22C55E] dark:text-[#22C55E] mt-2 font-semibold">
+            <p className="text-sm text-[#22C55E] dark:text-[#22C55E] mt-2 font-medium">
               {averageAdherence >= 75
-                ? "Boa aderência! Pronto para aplicar."
+                ? "Boa aderência, pronto para aplicar."
                 : averageAdherence >= 50
-                ? "Aderência moderada. Alguns ajustes recomendados."
-                : "Aderência baixa. Mapeie novos diferenciais."}
+                ? "Aderência moderada, alguns ajustes recomendados."
+                : "Aderência baixa, mapeie novos diferenciais."}
             </p>
           </div>
           <div className="sm:ml-auto">
@@ -283,20 +281,20 @@ export default async function DashboardPage() {
         </div>
 
         {/* Semáforo de Prioridade */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.05)] transition-all duration-300">
-          <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider mb-4">Semáforo de prioridade</p>
-          <div className="space-y-3">
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
+          <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4">Semáforo de prioridade</p>
+          <div className="space-y-2">
             {(Object.keys(STATUS_CONFIG) as (keyof typeof STATUS_CONFIG)[]).map(
               (status) => (
                 <div
                   key={status}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-2.5 text-sm transition-all hover:scale-[1.01] ${STATUS_CONFIG[status].chip}`}
+                  className="flex items-center justify-between px-1 py-2 text-sm border-b border-[#E2E8F0] dark:border-neutral-800 last:border-0"
                 >
-                  <span className="flex items-center gap-2 font-semibold text-[#071827] dark:text-neutral-200">
-                    <span className={`h-2.5 w-2.5 rounded-full ${STATUS_CONFIG[status].dot}`} />
+                  <span className="flex items-center gap-2 font-medium text-[#071827] dark:text-neutral-200">
+                    <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[status].dot}`} />
                     {STATUS_CONFIG[status].label}
                   </span>
-                  <span className="font-extrabold text-[#071827] dark:text-white">{priorityCounts[status]}</span>
+                  <span className="font-bold text-[#071827] dark:text-white">{priorityCounts[status]}</span>
                 </div>
               )
             )}
@@ -308,7 +306,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Melhores Vagas */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E2E8F0] dark:border-neutral-800">
               <p className="font-title font-bold text-[#071827] dark:text-white">Melhores oportunidades</p>
@@ -321,7 +319,7 @@ export default async function DashboardPage() {
                 <Link
                   key={a.id}
                   href={`/report/${a.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] hover:shadow-sm transition-all"
+                  className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] transition-colors"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-sm text-[#071827] dark:text-white truncate">{a.jobTitle}</p>
@@ -337,7 +335,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* Próximo Passo Recomendado */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between">
           <div>
             <p className="font-title font-bold text-[#071827] dark:text-white mb-3">Próximo passo recomendado</p>
             <p className="text-sm font-semibold text-[#071827] dark:text-white">
@@ -366,13 +364,13 @@ export default async function DashboardPage() {
         </div>
 
         {/* Resumo do Currículo */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)] flex flex-col justify-between">
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between">
           <div>
             <p className="font-title font-bold text-[#071827] dark:text-white mb-3">Resumo do currículo</p>
             <p className="text-sm font-semibold text-[#071827] dark:text-white">
               {latest.atsScore >= 75
-                ? "Seu currículo está muito bom! 🚀"
-                : "Seu currículo possui pontos de melhoria ⚠️"}
+                ? "Seu currículo está muito bom"
+                : "Seu currículo possui pontos de melhoria"}
             </p>
             <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
               Última análise com base em &quot;{latestResume.fileName}&quot;, feita em{" "}
@@ -390,16 +388,11 @@ export default async function DashboardPage() {
 
       {/* Perfil Comportamental */}
       {behavioralResult && (
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)] space-y-4">
+        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E2E8F0] dark:border-neutral-800 pb-4">
-            <div className="flex items-center gap-3">
-              <span className="h-9 w-9 rounded-xl bg-[#2563EB]/10 text-[#2563EB] flex items-center justify-center shrink-0 text-lg">
-                🧠
-              </span>
-              <div>
-                <h3 className="font-title font-bold text-[#071827] dark:text-white">Seu perfil comportamental</h3>
-                <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">Mapeamento de soft skills realizado</p>
-              </div>
+            <div>
+              <h3 className="font-title font-bold text-[#071827] dark:text-white">Seu perfil comportamental</h3>
+              <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">Mapeamento de soft skills realizado</p>
             </div>
             <Link
               href="/tools/behavioral-test"
@@ -458,7 +451,7 @@ export default async function DashboardPage() {
       {(upcomingDeadlines.length > 0 || upcomingInterviews.length > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {upcomingDeadlines.length > 0 && (
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
               <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Prazos próximos</p>
               <div className="space-y-2">
                 {upcomingDeadlines.map((item) => {
@@ -467,7 +460,7 @@ export default async function DashboardPage() {
                     <Link
                       href="/applications"
                       key={item.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] hover:shadow-sm transition-all text-sm"
+                      className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] transition-colors text-sm"
                     >
                       <div className="min-w-0">
                         <p className="font-semibold text-sm text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
@@ -492,14 +485,14 @@ export default async function DashboardPage() {
           )}
 
           {upcomingInterviews.length > 0 && (
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
               <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Próximas entrevistas</p>
               <div className="space-y-2">
                 {upcomingInterviews.map((item) => (
                   <Link
                     href={`/interviews/${item.id}`}
                     key={item.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] hover:shadow-sm transition-all text-sm"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] transition-colors text-sm"
                   >
                     <div className="min-w-0">
                       <p className="font-semibold text-sm text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
@@ -517,23 +510,23 @@ export default async function DashboardPage() {
       )}
 
       {/* Jornada de Busca */}
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
         <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Sua jornada de busca</p>
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <p className="text-3xl font-black text-[#2563EB]">
+            <p className="text-3xl font-bold text-[#071827] dark:text-white">
               {journey.daysSearching !== null ? journey.daysSearching : "Sem dados"}
             </p>
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Dias em busca</p>
           </div>
           <div>
-            <p className="text-3xl font-black text-[#2563EB]">
+            <p className="text-3xl font-bold text-[#071827] dark:text-white">
               {journey.responseRate !== null ? `${journey.responseRate}%` : "Sem dados"}
             </p>
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Taxa de resposta</p>
           </div>
           <div>
-            <p className="text-3xl font-black text-[#2563EB]">
+            <p className="text-3xl font-bold text-[#071827] dark:text-white">
               {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "Sem dados"}
             </p>
             <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Taxa de rejeição</p>
@@ -542,7 +535,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Pipeline */}
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 border-b border-[#E2E8F0] dark:border-neutral-800 pb-3">
           <div>
             <p className="font-title font-bold text-[#071827] dark:text-white">Pipeline de candidaturas</p>
@@ -567,7 +560,7 @@ export default async function DashboardPage() {
               <Link
                 href="/applications"
                 key={item.id}
-                className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 bg-[#F8FAFC] dark:bg-neutral-800 hover:border-[#2563EB] hover:shadow-sm transition-all"
+                className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 bg-[#F8FAFC] dark:bg-neutral-800 hover:border-[#2563EB] transition-colors"
               >
                 <p className="text-sm font-semibold text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
                 <p className="text-xs text-[#64748B] mt-1 truncate">
@@ -585,7 +578,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Plano de Evolução */}
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 shadow-[0_8px_30px_rgb(0,0,0,0.03)]">
+      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
         <p className="font-title font-bold text-[#071827] dark:text-white mb-6">Plano de evolução</p>
         {(() => {
           const evolutionSteps = [
@@ -615,7 +608,7 @@ export default async function DashboardPage() {
                         step.done
                           ? "bg-[#22C55E] text-white"
                           : step.status === "Em andamento"
-                          ? "bg-[#2563EB] text-white animate-pulse"
+                          ? "bg-[#2563EB] text-white"
                           : "bg-[#F8FAFC] dark:bg-neutral-800 text-[#64748B] border border-[#E2E8F0] dark:border-neutral-700"
                       }`}
                     >
@@ -647,7 +640,7 @@ export default async function DashboardPage() {
                           step.done
                             ? "bg-[#22C55E] text-white"
                             : step.status === "Em andamento"
-                            ? "bg-[#2563EB] text-white animate-pulse"
+                            ? "bg-[#2563EB] text-white"
                             : "bg-[#F8FAFC] dark:bg-neutral-800 text-[#64748B] border border-[#E2E8F0] dark:border-neutral-700"
                         }`}
                       >

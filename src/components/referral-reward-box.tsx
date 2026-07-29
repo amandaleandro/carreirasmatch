@@ -32,7 +32,7 @@ export function ReferralRewardBox({
   };
 
   return (
-    <div className="bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.02)] space-y-5 relative overflow-hidden animate-in fade-in duration-300">
+    <div className="bg-[#FFFFFF] dark:bg-neutral-900 border border-[#E2E8F0] dark:border-neutral-800 rounded-3xl p-5 sm:p-6 space-y-5 relative overflow-hidden animate-in fade-in duration-300">
       
       {/* Cabeçalho do Card */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2E8F0] dark:border-neutral-800 pb-3.5">
@@ -58,7 +58,7 @@ export function ReferralRewardBox({
             </div>
           ) : (
             credits > 0 && (
-              <div className="flex items-center gap-1 bg-[#22C55E]/15 text-[#22C55E] font-bold text-[10px] px-3 py-1 rounded-full border border-[#22C55E]/20 animate-pulse">
+              <div className="flex items-center gap-1 bg-[#22C55E]/15 text-[#22C55E] font-bold text-[10px] px-3 py-1 rounded-full border border-[#22C55E]/20">
                 <Sparkles className="w-3 h-3" />
                 <span>{credits} {credits === 1 ? "Análise Grátis Liberada!" : "Análises Grátis Liberadas!"}</span>
               </div>

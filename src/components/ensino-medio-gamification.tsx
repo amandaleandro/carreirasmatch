@@ -22,13 +22,13 @@ export function EnsinoMedioGamification() {
     <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
-          <div className="h-12 w-12 rounded-2xl bg-amber-400 text-blue-950 flex items-center justify-center font-black text-xl shadow-md shrink-0">
+          <div className="h-12 w-12 rounded-2xl bg-amber-400 text-blue-950 flex items-center justify-center font-bold text-xl shadow-md shrink-0">
             {level}
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-lg font-extrabold">Estudante Nível {level}</h3>
-              <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full text-[10px] font-black uppercase">
+              <span className="bg-amber-400/20 text-amber-300 border border-amber-400/30 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase">
                 {level >= 5 ? "Veterano" : "Em Evolução ⚡"}
               </span>
             </div>
@@ -60,7 +60,7 @@ export function EnsinoMedioGamification() {
 
       {/* Grid de Conquistas & Insígnias */}
       <div className="space-y-3 pt-2">
-        <span className="text-[11px] font-black uppercase tracking-wider text-blue-200 flex items-center gap-1.5">
+        <span className="text-[11px] font-bold uppercase tracking-wider text-blue-200 flex items-center gap-1.5">
           <Sparkles className="h-3.5 w-3.5 text-amber-300" /> Insígnias Desbloqueadas:
         </span>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">

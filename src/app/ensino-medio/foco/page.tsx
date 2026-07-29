@@ -83,7 +83,7 @@ export default function FocoPomodoroPage() {
             <Timer className="h-3.5 w-3.5" />
             Método Pomodoro Escolar
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Temporizador de Foco & Estudo
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
@@ -148,7 +148,7 @@ export default function FocoPomodoroPage() {
 
           {/* Relógio Digital */}
           <div className="py-4">
-            <div className="text-6xl sm:text-7xl md:text-8xl font-black font-mono tracking-tighter text-neutral-900 dark:text-white">
+            <div className="text-6xl sm:text-7xl md:text-8xl font-bold font-mono tracking-tighter text-neutral-900 dark:text-white">
               {formatTime(timeLeft)}
             </div>
             <p className="text-xs text-neutral-500 font-medium mt-2">
@@ -162,7 +162,7 @@ export default function FocoPomodoroPage() {
           <div className="flex items-center justify-center gap-3">
             <button
               onClick={() => setIsRunning(!isRunning)}
-              className={`px-8 py-4 rounded-2xl font-black text-sm text-white shadow-md transition-all active:scale-95 flex items-center gap-2 ${
+              className={`px-8 py-4 rounded-2xl font-bold text-sm text-white shadow-md transition-all active:scale-95 flex items-center gap-2 ${
                 isRunning
                   ? "bg-amber-600 hover:bg-amber-700"
                   : "bg-emerald-600 hover:bg-emerald-700"
@@ -193,7 +193,7 @@ export default function FocoPomodoroPage() {
           {/* Placar de Conquistas de Foco */}
           <div className="pt-6 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-2 gap-4 text-center">
             <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800">
-              <p className="text-2xl font-black text-emerald-600 dark:text-emerald-400">
+              <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
                 {completedCycles}
               </p>
               <p className="text-[11px] text-neutral-500 font-bold uppercase tracking-wider mt-0.5">
@@ -202,7 +202,7 @@ export default function FocoPomodoroPage() {
             </div>
 
             <div className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800">
-              <p className="text-2xl font-black text-blue-600 dark:text-blue-400">
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {totalFocusMinutes} min
               </p>
               <p className="text-[11px] text-neutral-500 font-bold uppercase tracking-wider mt-0.5">

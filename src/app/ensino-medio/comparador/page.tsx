@@ -69,7 +69,7 @@ export default function CourseComparatorPage() {
             <Scale className="h-3.5 w-3.5" />
             Comparador de Formação com Gemini AI
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold text-neutral-900 dark:text-white">
             Faculdade vs Curso Técnico
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm leading-relaxed">
@@ -157,7 +157,7 @@ export default function CourseComparatorPage() {
                 </div>
 
                 <div className="space-y-3 border-b border-neutral-100 dark:border-neutral-800 pb-4">
-                  <h3 className="text-lg font-black text-neutral-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
                     {comparison.collegePath.title}
                   </h3>
                   <div className="flex flex-wrap gap-2 text-xs">
@@ -206,7 +206,7 @@ export default function CourseComparatorPage() {
                 </div>
 
                 <div className="space-y-3 border-b border-neutral-100 dark:border-neutral-800 pb-4">
-                  <h3 className="text-lg font-black text-neutral-900 dark:text-white">
+                  <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
                     {comparison.technicalPath.title}
                   </h3>
                   <div className="flex flex-wrap gap-2 text-xs">

@@ -74,7 +74,7 @@ export default function GeradorExerciciosPage() {
             <FileText className="h-3.5 w-3.5" />
             Gerador de Listas de Exercícios
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Listas de Exercícios por Série
           </h1>
           <p className="text-neutral-600 dark:text-neutral-400 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
@@ -170,7 +170,7 @@ export default function GeradorExerciciosPage() {
             <button
               onClick={handleGenerateLista}
               disabled={loading}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white font-black text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 text-white font-bold text-sm rounded-2xl shadow-md transition-all active:scale-[0.99] flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -225,10 +225,10 @@ export default function GeradorExerciciosPage() {
             {/* Documento Imprimível */}
             <div className="bg-white dark:bg-neutral-900 print:bg-white print:text-black border border-neutral-200 dark:border-neutral-800 print:border-none rounded-3xl print:rounded-none p-6 md:p-10 space-y-6 shadow-sm">
               <div className="border-b border-neutral-200 dark:border-neutral-800 pb-4 space-y-1">
-                <span className="text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 print:text-blue-800">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 print:text-blue-800">
                   CarreirasMatch • Ensino Médio & ENEM
                 </span>
-                <h2 className="text-2xl font-black text-neutral-900 dark:text-white print:text-black">
+                <h2 className="text-2xl font-bold text-neutral-900 dark:text-white print:text-black">
                   {lista.title}
                 </h2>
                 <p className="text-xs text-neutral-500 print:text-gray-600">

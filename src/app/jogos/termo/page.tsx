@@ -191,7 +191,7 @@ export default function TermoPage() {
                   const ch = guess ? guess[col] : isCurrent ? current[col] ?? "" : "";
                   const state: LetterState = ev ? ev[col] : "empty";
                   return (
-                    <div key={col} className={`h-12 w-12 rounded-lg border-2 flex items-center justify-center text-xl font-black uppercase ${cellColor(state)}`}>
+                    <div key={col} className={`h-12 w-12 rounded-lg border-2 flex items-center justify-center text-xl font-bold uppercase ${cellColor(state)}`}>
                       {ch}
                     </div>
                   );
@@ -209,7 +209,7 @@ export default function TermoPage() {
               <Trophy className="h-7 w-7" />
             </div>
             <p className="font-bold text-lg">{won ? "Acertou! 🎉" : "Não foi dessa vez"}</p>
-            <p className="text-sm text-neutral-500">A palavra era <span className="font-black text-neutral-900 dark:text-white">{target}</span>.</p>
+            <p className="text-sm text-neutral-500">A palavra era <span className="font-bold text-neutral-900 dark:text-white">{target}</span>.</p>
             <button onClick={() => newGame(area)} className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 text-sm font-bold transition-all">
               <RotateCcw className="h-4 w-4" />
               Nova Palavra

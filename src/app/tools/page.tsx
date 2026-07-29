@@ -67,17 +67,14 @@ export default async function ToolsPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-blue-950 to-indigo-950 text-white p-6 sm:p-10 shadow-2xl border border-blue-900/40">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-
+      <section className="relative overflow-hidden rounded-2xl bg-slate-950 text-white p-6 sm:p-10 border border-blue-900/40">
         <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider rounded-full px-3.5 py-1 bg-blue-500/15 text-blue-300 border border-blue-400/30 backdrop-blur-md">
+          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide rounded-full px-3.5 py-1 bg-blue-500/15 text-blue-300 border border-blue-400/30">
             <Wrench className="w-3.5 h-3.5 text-blue-400" />
             <span>Hub de Ferramentas Personalizadas</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight leading-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-blue-200">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white">
             Ferramentas Selecionadas para o seu Momento
           </h1>
 
@@ -127,7 +124,7 @@ export default async function ToolsPage() {
 
       {/* Humorous Banner for Free Account Users */}
       {session?.user?.id && !isPaidUser && (
-        <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-blue-500/10 border border-amber-500/30 p-6 sm:p-7 shadow-sm transition-all hover:border-amber-500/50">
+        <section className="relative overflow-hidden rounded-2xl bg-amber-500/5 border border-amber-500/30 p-6 sm:p-7 transition-colors hover:border-amber-500/50">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
             <div className="space-y-2 max-w-2xl">
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-0.5 rounded-full">
@@ -142,7 +139,7 @@ export default async function ToolsPage() {
             </div>
             <Link
               href="/assinar"
-              className="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold text-xs sm:text-sm px-5 py-3.5 shadow-md transition-all hover:scale-[1.02]"
+              className="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-5 py-3.5 transition-colors"
             >
               <Sparkles className="w-4 h-4 text-amber-300" />
               <span>Quero o Plano Pro ✨</span>

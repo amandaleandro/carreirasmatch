@@ -128,12 +128,7 @@ export default async function ParceiroLandingPage() {
 
   return (
     <div className="w-full">
-      <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950 via-emerald-900 to-slate-950">
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -top-32 -left-24 h-[26rem] w-[26rem] rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 opacity-25 blur-3xl" />
-          <div className="absolute -bottom-40 right-[-6rem] h-[30rem] w-[30rem] rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 opacity-15 blur-3xl" />
-        </div>
-
+      <div className="relative overflow-hidden bg-emerald-950">
         <header className="public-header relative max-w-7xl mx-auto px-4 md:px-8 py-6 flex flex-wrap items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-12 sm:h-14" onDark />

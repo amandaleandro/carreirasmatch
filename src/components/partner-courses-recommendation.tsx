@@ -9,11 +9,11 @@ export function PartnerCoursesRecommendation({ courses }: PartnerCoursesRecommen
   if (!courses || courses.length === 0) return null;
 
   return (
-    <section className="rounded-2xl border border-indigo-100 dark:border-indigo-900/50 bg-gradient-to-br from-indigo-50/50 via-white to-purple-50/30 dark:from-indigo-950/20 dark:via-neutral-900 dark:to-purple-950/20 p-6 shadow-sm space-y-4">
+    <section className="rounded-2xl border border-indigo-100 dark:border-indigo-900/50 bg-indigo-50/40 dark:bg-neutral-900 p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-100/60 dark:bg-indigo-900/40 px-2.5 py-0.5 rounded-full mb-1">
-            🎓 Recomendado para fechar suas lacunas
+          <span className="inline-flex items-center gap-1 text-[11px] font-bold uppercase tracking-wide text-indigo-600 dark:text-indigo-400 mb-1">
+            Recomendado para fechar suas lacunas
           </span>
           <h3 className="text-lg font-bold text-neutral-900 dark:text-white">
             Cursos Recomendados por Parceiros

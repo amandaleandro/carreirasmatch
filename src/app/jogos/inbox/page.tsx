@@ -285,7 +285,7 @@ export default function InboxZeroGamePage() {
               <Clock className="h-5 w-5 animate-pulse" />
               <div>
                 <div className="text-[10px] uppercase font-bold text-neutral-400">Tempo</div>
-                <div className="text-base font-black">{timeLeft}s</div>
+                <div className="text-base font-bold">{timeLeft}s</div>
               </div>
             </div>
 
@@ -295,7 +295,7 @@ export default function InboxZeroGamePage() {
               <Trophy className="h-5 w-5" />
               <div>
                 <div className="text-[10px] uppercase font-bold text-neutral-400">Pontuação</div>
-                <div className="text-base font-black">{score} pts</div>
+                <div className="text-base font-bold">{score} pts</div>
               </div>
             </div>
           </div>
@@ -336,7 +336,7 @@ export default function InboxZeroGamePage() {
             )}
 
             <div className="space-y-2">
-              <h3 className="text-lg sm:text-xl font-black text-white leading-snug">
+              <h3 className="text-lg sm:text-xl font-bold text-white leading-snug">
                 {currentEmail.subject}
               </h3>
               <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed bg-neutral-950 p-4 rounded-2xl border border-neutral-800/80">
@@ -387,7 +387,7 @@ export default function InboxZeroGamePage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white">Inbox Zero Challenge</h2>
+              <h2 className="text-2xl font-bold text-white">Inbox Zero Challenge</h2>
               <p className="text-neutral-400 text-xs leading-relaxed">
                 Classifique e-mails e demandas de trabalho em tempo recorde! Separe o que é **Urgente**, **Agendar**, **Delegar** ou **Descartar** antes que a caixa de entrada vença você.
               </p>
@@ -409,7 +409,7 @@ export default function InboxZeroGamePage() {
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-white">Caixa Limpa!</h2>
+              <h2 className="text-2xl font-bold text-white">Caixa Limpa!</h2>
               <p className="text-neutral-400 text-xs">
                 Sua pontuação final foi de <span className="font-extrabold text-cyan-400 text-sm">{score} pontos</span> com combo máximo de <span className="font-bold text-amber-400">{streak}x</span>!
               </p>

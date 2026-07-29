@@ -139,10 +139,10 @@ export function AutoApplySettingsCard() {
   }
 
   return (
-    <section id="piloto-automatico" className="scroll-mt-6 space-y-6 overflow-hidden rounded-3xl border border-blue-500/20 bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30 p-6 shadow-lg shadow-blue-500/5 dark:from-blue-950/20 dark:via-neutral-900/40 dark:to-indigo-950/10">
+    <section id="piloto-automatico" className="scroll-mt-6 space-y-6 overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-50/40 dark:bg-blue-950/10 p-6">
       <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center dark:border-slate-800">
         <div>
-          <span className="mb-1.5 inline-flex rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white">
+          <span className="mb-1.5 inline-flex rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
             Candidatura autônoma
           </span>
           <h2 className="text-lg font-extrabold text-slate-900 dark:text-white">
@@ -282,7 +282,7 @@ export function AutoApplySettingsCard() {
                             <p className="truncate text-[10px] text-slate-500">{item.company}</p>
                           </div>
                           <div className="shrink-0 text-right">
-                            <p className="text-[10px] font-black text-blue-600">{item.fitScore}% match</p>
+                            <p className="text-[10px] font-bold text-blue-600">{item.fitScore}% match</p>
                             <p
                               className={`text-[10px] font-bold ${
                                 needsManualAction ? "text-amber-600 dark:text-amber-400" : "text-slate-600 dark:text-slate-300"

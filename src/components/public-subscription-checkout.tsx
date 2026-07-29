@@ -176,7 +176,7 @@ export function PublicSubscriptionCheckout({
       {/* Main Grid: Offer summary + Payment form */}
       <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
         {/* Left Column: What's included */}
-        <aside className="rounded-3xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-br from-blue-50/80 via-white to-indigo-50/60 dark:from-slate-900 dark:via-slate-900 dark:to-blue-950/40 p-6 sm:p-8 shadow-sm space-y-6">
+        <aside className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-slate-900 p-6 sm:p-8 space-y-6">
           <div>
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2.5 py-1 rounded">
               {offer.title}
