@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   Briefcase,
-  ExternalLink,
   Filter,
-  MapPin,
   Search,
   Sparkles,
-  Clock,
   ChevronLeft,
   ChevronRight,
   Globe,
@@ -18,7 +15,8 @@ import {
 import { prisma } from "@/lib/prisma";
 import { PUBLIC_JOB_CATEGORIES } from "@/lib/public-job-categories";
 import { ContentPage } from "@/components/content-page";
-import { cleanJobSnippet } from "@/lib/job-snippet";
+import { AllJobsList } from "@/app/feed/AllJobsList";
+import { workModelFilter } from "@/lib/job-filters";
 
 export const dynamic = "force-dynamic";
 
@@ -56,16 +54,6 @@ function startOfTodaySaoPaulo(): Date {
 
 function recentFallbackStart(todayStart: Date): Date {
   return new Date(todayStart.getTime() - (FALLBACK_DAYS - 1) * 24 * 60 * 60 * 1000);
-}
-
-function formatDateTime(date: Date): string {
-  return new Intl.DateTimeFormat("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
 }
 
 function interleaveByArea(jobs: PublicJob[]): PublicJob[] {
@@ -126,19 +114,23 @@ export default async function JobsTodayPage({
     ...(source ? { source } : {}),
     ...(area ? { area } : {}),
     ...(seniority ? { seniority } : {}),
-    ...(workModel ? { workModel } : {}),
     ...(contractType ? { contractType } : {}),
     ...(entryLevel ? { entryLevel: true } : {}),
-    ...(q
-      ? {
-          OR: [
-            { jobTitle: { contains: q } },
-            { jobText: { contains: q } },
-            { location: { contains: q } },
-          ],
-        }
-      : {}),
   };
+  const andFilters = [
+    ...(workModel ? [workModelFilter(workModel)] : []),
+    ...(q
+      ? [
+          {
+            OR: [
+              { jobTitle: { contains: q } },
+              { jobText: { contains: q } },
+              { location: { contains: q } },
+            ],
+          },
+        ]
+      : []),
+  ];
 
   const todayCount = await prisma.job.count({
     where: { active: true, createdAt: { gte: todayStart } },
@@ -146,7 +138,7 @@ export default async function JobsTodayPage({
   const usingFallback = todayCount === 0;
   const effectiveStart = usingFallback ? recentFallbackStart(todayStart) : todayStart;
   const optionWhere = { active: true, createdAt: { gte: effectiveStart } };
-  const where = { ...optionWhere, ...baseFilters };
+  const where = { ...optionWhere, ...baseFilters, ...(andFilters.length ? { AND: andFilters } : {}) };
 
   const [total, allActiveCount, rawJobs, sources, areas, seniorities, workModels, contractTypes] = await Promise.all([
     prisma.job.count({ where }),
@@ -440,7 +432,7 @@ export default async function JobsTodayPage({
           </div>
         </form>
 
-        {/* Jobs List */}
+        {/* Jobs List (mesmo design de card usado em /todas-as-vagas) */}
         {jobs.length === 0 ? (
           <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-10 text-center shadow-sm space-y-3">
             <Briefcase className="h-10 w-10 mx-auto text-slate-400" />
@@ -460,85 +452,7 @@ export default async function JobsTodayPage({
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
-            {jobs.map((job) => (
-              <article
-                key={job.id}
-                className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:border-blue-500/60 dark:hover:border-blue-500/60 hover:shadow-lg transition-all duration-200 space-y-3"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                  <div className="min-w-0 space-y-1.5">
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                      <span className="rounded-md bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2.5 py-0.5 font-semibold">
-                        via {job.source}
-                      </span>
-                      {job.location && (
-                        <span className="inline-flex items-center gap-1 text-slate-500 dark:text-slate-400">
-                          <MapPin className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                          <span>{job.location}</span>
-                        </span>
-                      )}
-                      <span className="inline-flex items-center gap-1 text-slate-400">
-                        <Clock className="h-3.5 w-3.5 shrink-0" />
-                        <span>{formatDateTime(job.createdAt)}</span>
-                      </span>
-                    </div>
-
-                    <a
-                      href={job.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block text-lg font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug"
-                    >
-                      {job.jobTitle}
-                    </a>
-                  </div>
-
-                  <a
-                    href={job.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-blue-600 hover:text-white hover:border-blue-600 dark:hover:bg-blue-600 dark:hover:text-white transition-all shrink-0 self-start shadow-2xs"
-                  >
-                    <span>Ver vaga</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                </div>
-
-                <p className="text-sm text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
-                  {cleanJobSnippet(job.jobText)}...
-                </p>
-
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  {job.area && (
-                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
-                      {job.area}
-                    </span>
-                  )}
-                  {job.seniority && (
-                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
-                      {job.seniority}
-                    </span>
-                  )}
-                  {job.workModel && (
-                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
-                      {job.workModel}
-                    </span>
-                  )}
-                  {job.contractType && (
-                    <span className="rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 text-xs font-medium border border-slate-200/60 dark:border-slate-700/60">
-                      {job.contractType}
-                    </span>
-                  )}
-                  {job.entryLevel && (
-                    <span className="rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 text-xs font-semibold border border-emerald-500/20">
-                      Primeiro emprego / Entrada
-                    </span>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
+          <AllJobsList jobs={jobs} />
         )}
 
         {/* Pagination */}

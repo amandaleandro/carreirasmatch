@@ -6,6 +6,7 @@ import { AllJobsList } from "@/app/feed/AllJobsList";
 import { Pagination } from "@/components/Pagination";
 import { AllJobsFilterForm } from "./AllJobsFilterForm";
 import { locationSearchVariants, stateSearchVariants } from "@/lib/brazil-locations";
+import { workModelFilter } from "@/lib/job-filters";
 import type { Prisma } from "@/generated/prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -51,39 +52,7 @@ export default async function AllJobsPage({
     andFilters.push({ area: { contains: area, mode: "insensitive" } });
   }
   if (workModel) {
-    const wmLower = workModel.toLowerCase();
-    if (wmLower === "remoto") {
-      andFilters.push({
-        OR: [
-          { workModel: { contains: "remoto", mode: "insensitive" } },
-          { location: { contains: "remote", mode: "insensitive" } },
-          { location: { contains: "remoto", mode: "insensitive" } },
-          { jobTitle: { contains: "remoto", mode: "insensitive" } },
-          { jobTitle: { contains: "remote", mode: "insensitive" } },
-        ]
-      });
-    } else if (wmLower === "hibrido") {
-      andFilters.push({
-        OR: [
-          { workModel: { contains: "hibrido", mode: "insensitive" } },
-          { location: { contains: "hybrid", mode: "insensitive" } },
-          { location: { contains: "hibrido", mode: "insensitive" } },
-          { jobTitle: { contains: "hibrid", mode: "insensitive" } },
-          { jobTitle: { contains: "hybrid", mode: "insensitive" } },
-        ]
-      });
-    } else if (wmLower === "presencial") {
-      andFilters.push({
-        OR: [
-          { workModel: { contains: "presencial", mode: "insensitive" } },
-          { location: { contains: "onsite", mode: "insensitive" } },
-          { location: { contains: "on-site", mode: "insensitive" } },
-          { location: { contains: "presencial", mode: "insensitive" } },
-        ]
-      });
-    } else {
-      andFilters.push({ workModel: { contains: workModel, mode: "insensitive" } });
-    }
+    andFilters.push(workModelFilter(workModel));
   }
   if (contractType) {
     andFilters.push({ contractType: { contains: contractType, mode: "insensitive" } });
@@ -145,7 +114,10 @@ export default async function AllJobsPage({
           <div>
             <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white">Todas as vagas</h1>
             <p className="text-xs text-[#64748B] mt-0.5">
-              Lista de todas as vagas ativas no banco de dados, sem filtros de perfil.
+              Lista de todas as vagas ativas no banco de dados, sem filtros de perfil.{" "}
+              <Link href="/vagas-de-hoje" className="text-[#2563EB] font-semibold hover:underline">
+                Ver só as de hoje →
+              </Link>
             </p>
           </div>
           <p className="text-xs text-[#64748B] shrink-0 font-bold">{totalJobs} vaga(s) encontrada(s).</p>
@@ -175,7 +147,10 @@ export default async function AllJobsPage({
           </span>
           <h1 className="text-xl md:text-2xl font-title font-bold text-[#071827] dark:text-white mt-1">Todas as vagas</h1>
           <p className="text-xs text-[#64748B] mt-0.5">
-            São {totalJobs.toLocaleString("pt-BR")} vagas ativas coletadas de várias fontes.
+            São {totalJobs.toLocaleString("pt-BR")} vagas ativas coletadas de várias fontes.{" "}
+            <Link href="/vagas-de-hoje" className="text-[#2563EB] font-semibold hover:underline">
+              Ver só as de hoje →
+            </Link>
           </p>
         </div>
       </div>
