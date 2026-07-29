@@ -46,3 +46,8 @@ next-env.d.ts
 # local sqlite database
 *.db
 *.db-journal
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/

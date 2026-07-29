@@ -222,6 +222,7 @@ function PdfIcon({ className }: { className?: string }) {
 const STEPS = [
   { n: 1, label: "Momento" },
   { n: 2, label: "Currículo e vaga" },
+  { n: 3, label: "Resultado" },
 ] as const;
 
 type DraftState = {
@@ -590,7 +591,7 @@ export function AnalyzeVagaPage({
       </div>
       )}
 
-      <AnalysisTour />
+      <AnalysisTour enabled={step1Done} />
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5 items-start">
@@ -642,6 +643,7 @@ export function AnalyzeVagaPage({
                     return (
                       <button
                         key={option.value}
+                        data-testid={`career-track-${option.value}`}
                         type="button"
                         onClick={() => {
                           setCareerTrack(option.value);
@@ -674,10 +676,11 @@ export function AnalyzeVagaPage({
 
               {careerTrack === "reemployment" && (
                 <div className="mt-3 pt-3 border-t border-[#E2E8F0] dark:border-neutral-800 space-y-1">
-                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
+                  <label htmlFor="past-feedback" className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
                     Feedbacks recebidos (opcional)
                   </label>
                   <textarea
+                    id="past-feedback"
                     value={pastFeedback}
                     onChange={(e) => setPastFeedback(e.target.value)}
                     rows={2}
@@ -716,8 +719,23 @@ export function AnalyzeVagaPage({
               </div>
             </section>
 
-            {/* Etapa 2 */}
-            <section ref={step2Ref} className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4">
+            {/* Etapa 2: fica visualmente travada até a Etapa 1 ser concluída. Continua
+                montada (não some do DOM) para o tour de onboarding sempre achar os
+                elementos-alvo (#curriculo-upload, #vaga-input, #analisar-button). */}
+            <section
+              ref={step2Ref}
+              aria-disabled={!step1Done}
+              className={`relative rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_8px_30px_rgb(0,0,0,0.01)] space-y-4 transition-opacity ${
+                step1Done ? "" : "opacity-40 pointer-events-none select-none"
+              }`}
+            >
+              {!step1Done && (
+                <div className="absolute inset-0 z-10 flex items-center justify-center rounded-3xl bg-white/40 dark:bg-neutral-900/40">
+                  <span className="rounded-full border border-[#E2E8F0] bg-white px-4 py-1.5 text-[10px] font-bold text-[#64748B] shadow-sm dark:border-neutral-700 dark:bg-neutral-900">
+                    Escolha seu momento profissional acima para continuar
+                  </span>
+                </div>
+              )}
               <div className="flex items-center gap-3">
                 <span className="h-6 w-6 rounded-full bg-[#2563EB] text-white text-[10px] font-bold flex items-center justify-center shadow-sm">2</span>
                 <div>
@@ -727,7 +745,7 @@ export function AnalyzeVagaPage({
               </div>
 
               <div className="space-y-1 relative group">
-                <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">Cargo desejado (opcional)</label>
+                <label htmlFor="job-title" className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider group-focus-within:text-[#2563EB] transition-colors">Cargo desejado (opcional)</label>
                 <div className="relative flex items-center">
                   <span className="absolute left-3 text-neutral-400 group-focus-within:text-[#2563EB] transition-colors">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -735,6 +753,7 @@ export function AnalyzeVagaPage({
                     </svg>
                   </span>
                   <input
+                    id="job-title"
                     ref={jobTitleInputRef}
                     type="text"
                     value={jobTitle}
@@ -801,7 +820,7 @@ export function AnalyzeVagaPage({
 
                 {/* Requisitos Text Area */}
                 <div className="space-y-1.5 flex flex-col">
-                  <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Requisitos / Descrição da vaga</label>
+                  <label htmlFor="vaga-input" className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Requisitos / Descrição da vaga</label>
                   <textarea
                     id="vaga-input"
                     value={jobText}
@@ -815,7 +834,7 @@ export function AnalyzeVagaPage({
 
               {/* Link Opcional */}
               <div className="pt-3 border-t border-[#E2E8F0] dark:border-neutral-800 space-y-1.5">
-                <label className="flex items-center gap-1.5 text-xs font-bold text-[#2563EB] cursor-pointer">
+                <label htmlFor="job-link" className="flex items-center gap-1.5 text-xs font-bold text-[#2563EB] cursor-pointer">
                   <LinkIcon className="h-3.5 w-3.5" />
                   Inserir link da vaga (LinkedIn, Gupy, etc.)
                 </label>
@@ -826,6 +845,7 @@ export function AnalyzeVagaPage({
                     </svg>
                   </span>
                   <input
+                    id="job-link"
                     type="url"
                     value={jobLink}
                     onChange={(e) => setJobLink(e.target.value)}
@@ -854,7 +874,7 @@ export function AnalyzeVagaPage({
                     id="analisar-button"
                     type="submit"
                     disabled={loading}
-                    className="flex-1 sm:flex-none rounded-xl bg-[#2563EB] px-6 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1D4ED8] transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
+                    className="flex-1 sm:flex-none min-h-11 rounded-xl bg-[#2563EB] px-6 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1D4ED8] transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"
                   >
                     {loading ? "Calculando Match..." : "Calcular meu Match grátis →"}
                   </button>

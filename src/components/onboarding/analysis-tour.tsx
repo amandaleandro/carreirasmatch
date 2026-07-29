@@ -9,9 +9,15 @@ const TOUR_STORAGE_KEY = "cm_analysis_tour_completed";
 /**
  * Tour de primeiro uso da tela de análise. Roda uma vez por navegador
  * (localStorage) e só se todos os elementos-alvo existirem na página.
+ *
+ * `enabled` deve refletir se a etapa 2 (currículo/vaga) já está destravada
+ * (momento profissional escolhido). O overlay do Driver.js bloqueia cliques
+ * fora do elemento destacado, então disparar o tour antes disso impediria a
+ * pessoa de sequer escolher o momento profissional na etapa 1.
  */
-export function AnalysisTour() {
+export function AnalysisTour({ enabled = true }: { enabled?: boolean }) {
   useEffect(() => {
+    if (!enabled) return;
     if (localStorage.getItem(TOUR_STORAGE_KEY) === "true") return;
 
     const targets = ["#curriculo-upload", "#vaga-input", "#analisar-button"];
@@ -59,7 +65,7 @@ export function AnalysisTour() {
     }, 600);
 
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [enabled]);
 
   return null;
 }

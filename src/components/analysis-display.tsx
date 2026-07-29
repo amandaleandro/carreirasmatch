@@ -1210,6 +1210,29 @@ export function AnalysisResult({
         {/* ABA: Visão Geral */}
         {activeTab === "overview" && (
           <>
+            {/* Compatibilidade geral: primeira coisa que a pessoa vê, antes de qualquer ação secundária */}
+            <ScoreHero
+              status={result.applicationStatus}
+              reason={result.applicationStatusReason}
+              overall={result.overallScore}
+              technical={result.technicalScore}
+              experience={result.experienceScore}
+              seniority={result.seniorityScore}
+              ats={result.atsScore}
+            />
+
+            {/* Resumo visual: o que pesa a favor e contra o match */}
+            <ScoreEvidenceTableCard
+              keywordsFound={result.keywordsFound}
+              keywordsMissing={result.keywordsMissing}
+            />
+
+            <Recruiter7SecondHeatmapCard
+              jobTitle={jobTitle}
+              structured={resumeStructured}
+              bulletAnalysis={bulletAnalysis}
+            />
+
             <ScoreBeforeAfter
               initialScore={Math.max(35, result.overallScore - 32)}
               optimizedScore={result.overallScore}
@@ -1322,29 +1345,6 @@ export function AnalysisResult({
                 Baixar em PDF
               </button>
             </div>
-
-            <ScoreHero
-              status={result.applicationStatus}
-              reason={result.applicationStatusReason}
-              overall={result.overallScore}
-              technical={result.technicalScore}
-              experience={result.experienceScore}
-              seniority={result.seniorityScore}
-              ats={result.atsScore}
-            />
-
-            {/* Recruiter 7-Second Heatmap Card */}
-            <Recruiter7SecondHeatmapCard
-              jobTitle={jobTitle}
-              structured={resumeStructured}
-              bulletAnalysis={bulletAnalysis}
-            />
-
-            {/* Score por Evidências Table */}
-            <ScoreEvidenceTableCard
-              keywordsFound={result.keywordsFound}
-              keywordsMissing={result.keywordsMissing}
-            />
 
             {/* Botão de Abertura do Assistente ATS */}
             <button

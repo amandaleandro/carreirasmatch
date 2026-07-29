@@ -30,12 +30,25 @@ export function initPostHog() {
     return;
   }
 
-  posthog.init(key, {
-    api_host: host,
-    person_profiles: "identified_only",
-    capture_pageview: true,
-    capture_exceptions: true,
-  });
+  function start() {
+    posthog.init(key!, {
+      api_host: host!,
+      person_profiles: "identified_only",
+      capture_pageview: true,
+      capture_exceptions: true,
+    });
+    window.posthog = posthog;
+  }
 
-  window.posthog = posthog;
+  // O loader do PostHog insere seu próprio <script> logo antes do primeiro
+  // script existente no documento. Rodando isso antes da hidratação (como
+  // instrumentation-client.ts faz), ele acaba se intercalando com o script
+  // "theme-initializer" (next/script strategy="beforeInteractive") do
+  // layout.tsx, causando erro de hidratação. Adiar para depois do load
+  // evita a corrida sem atrasar a coleta de eventos de forma perceptível.
+  if (document.readyState === "complete") {
+    start();
+  } else {
+    window.addEventListener("load", start, { once: true });
+  }
 }

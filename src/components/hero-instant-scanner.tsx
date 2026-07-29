@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, useRef, FormEvent } from "react";
 import Link from "next/link";
-import { Search, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
+import { Search, CheckCircle2, AlertCircle, ArrowRight } from "lucide-react";
 import { triggerConfetti } from "@/lib/confetti";
 
 export function HeroInstantScanner() {
@@ -14,6 +14,38 @@ export function HeroInstantScanner() {
     skills: string[];
     gaps: string[];
   } | null>(null);
+  const [displayScore, setDisplayScore] = useState(0);
+  const reduceMotionRef = useRef(false);
+
+  useEffect(() => {
+    reduceMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
+  useEffect(() => {
+    if (!result) {
+      setDisplayScore(0);
+      return;
+    }
+    if (reduceMotionRef.current) {
+      setDisplayScore(result.score);
+      return;
+    }
+
+    const durationMs = 700;
+    const start = performance.now();
+    let frame: number;
+
+    function step(now: number) {
+      const progress = Math.min((now - start) / durationMs, 1);
+      setDisplayScore(Math.round(result!.score * progress));
+      if (progress < 1) {
+        frame = requestAnimationFrame(step);
+      }
+    }
+
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [result]);
 
   function handleScan(e: FormEvent) {
     e.preventDefault();
@@ -72,6 +104,7 @@ export function HeroInstantScanner() {
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/50" />
           <input
+            data-testid="hero-scanner-input"
             type="text"
             required
             value={roleQuery}
@@ -82,6 +115,7 @@ export function HeroInstantScanner() {
         </div>
 
         <button
+          data-testid="hero-scanner-submit"
           type="submit"
           disabled={scanning}
           className="w-full rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 text-xs sm:text-sm shadow-md transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2 active:scale-95"
@@ -102,14 +136,14 @@ export function HeroInstantScanner() {
 
       {/* Simulated Live Result */}
       {result && (
-        <div className="rounded-2xl border border-white/15 bg-slate-950/90 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-xl">
+        <div data-testid="hero-scanner-result" className="rounded-2xl border border-white/15 bg-slate-950/90 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-xl">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div>
               <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Cargo Simulado</p>
               <h4 className="font-bold text-sm text-white truncate max-w-[12rem] sm:max-w-xs">{result.role}</h4>
             </div>
             <div className="text-right">
-              <span className="text-2xl font-extrabold text-blue-400">{result.score}%</span>
+              <span data-testid="hero-scanner-score" className="text-2xl font-extrabold text-blue-400 tabular-nums">{displayScore}%</span>
               <span className="block text-[10px] font-semibold text-emerald-400 mt-0.5">
                 Excelente alinhamento
               </span>
@@ -123,6 +157,18 @@ export function HeroInstantScanner() {
                 <span key={s} className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-3 py-1 text-[11px] font-medium inline-flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-300">O que pode estar faltando:</p>
+            <div className="flex flex-wrap gap-1.5">
+              {result.gaps.map((g) => (
+                <span key={g} className="rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 px-3 py-1 text-[11px] font-medium inline-flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-amber-400" />
+                  {g}
                 </span>
               ))}
             </div>
