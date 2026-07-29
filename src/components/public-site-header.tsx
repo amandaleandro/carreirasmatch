@@ -3,31 +3,39 @@ import { BrandLogo } from "@/components/brand-logo";
 
 /**
  * Shared header for public (logged-out) pages:
- * wordmark logo + auth buttons (Entrar & Criar conta).
+ * Apple-style glass header with wordmark logo + navigation links + pill action buttons.
  */
 export function PublicSiteHeader() {
   return (
-    <header className="public-header border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#090d16]">
-      <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex items-center justify-between gap-4">
-        <Link href="/" aria-label="CarreirasMatch">
-          <BrandLogo heightClassName="h-10 sm:h-12" />
+    <header className="public-header glass-header sticky top-0 z-30 transition-all">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 py-3.5 flex items-center justify-between gap-4">
+        <Link href="/" aria-label="CarreirasMatch" className="hover:opacity-90 transition-opacity">
+          <BrandLogo heightClassName="h-9 sm:h-10" />
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-neutral-600 dark:text-neutral-300 md:flex">
-          <Link href="/assinar" className="hover:text-neutral-950 dark:hover:text-white">Planos</Link>
-          <Link href="/freelancers" className="hover:text-neutral-950 dark:hover:text-white">Freelancers</Link>
-          <Link href="/empresas" className="hover:text-neutral-950 dark:hover:text-white">Empresas</Link>
-          <Link href="/parceiro" className="hover:text-neutral-950 dark:hover:text-white">Parceiros</Link>
+        <nav className="hidden items-center gap-7 text-xs font-semibold text-slate-600 dark:text-slate-300 md:flex">
+          <Link href="/assinar" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            Planos
+          </Link>
+          <Link href="/freelancers" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            Freelancers
+          </Link>
+          <Link href="/empresas" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            Empresas
+          </Link>
+          <Link href="/parceiro" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            Parceiros
+          </Link>
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5">
           <Link
             href="/login"
-            className="rounded-lg border border-neutral-200 dark:border-neutral-800 px-4 py-2 text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-colors"
+            className="rounded-full border border-slate-200 dark:border-slate-800 px-4.5 py-2 text-xs font-semibold text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all"
           >
             Entrar
           </Link>
           <Link
             href="/register"
-            className="rounded-lg bg-blue-600 text-white px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm"
+            className="rounded-full bg-blue-600 text-white px-5 py-2 text-xs font-semibold hover:bg-blue-700 transition-all shadow-xs shadow-blue-600/20 active:scale-95"
           >
             Criar conta
           </Link>

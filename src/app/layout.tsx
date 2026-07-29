@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Manrope } from "next/font/google";
 import { AppShell } from "@/components/app-shell";
+import { auth } from "@/auth";
 import { Analytics } from "@/components/analytics";
 import { MarketingPixels } from "@/components/marketing-pixels";
 import { AdsenseScript } from "@/components/adsense-script";
@@ -57,11 +58,13 @@ export const viewport: Viewport = {
   themeColor: "#2563eb",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
+
   return (
     <html
       lang="pt-BR"
@@ -86,7 +89,18 @@ export default function RootLayout({
         <Analytics />
         <MarketingPixels />
         <Suspense fallback={null}>
-          <AccessTracker />
+          <AccessTracker
+            user={
+              session?.user?.id
+                ? {
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: session.user.name,
+                    accountType: session.user.accountType ?? "candidate",
+                  }
+                : null
+            }
+          />
         </Suspense>
         <DashSanitizer />
       </body>

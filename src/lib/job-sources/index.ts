@@ -4,7 +4,8 @@ import { fetchRemoteOkJobs } from "./remoteok";
 import { fetchAdzunaJobs, isAdzunaConfigured } from "./adzuna";
 import { fetchLinkedInJobs } from "./linkedin";
 import { fetchIndeedJobs, isIndeedConfigured } from "./indeed";
-import { fetchGupyJobs, isGupyConfigured } from "./gupy";
+import { fetchGupyJobs } from "./gupy";
+import { fetchInhireJobs } from "./inhire";
 import { fetchTheMuseJobs } from "./themuse";
 import { fetchJoobleJobs, isJoobleConfigured } from "./jooble";
 import { fetchGlassdoorJobs, isGlassdoorConfigured } from "./glassdoor";
@@ -73,9 +74,14 @@ export async function fetchNewJobsFromAllSources(
   if (isAdzunaConfigured()) {
     sources.push({ name: "adzuna", fetch: () => fetchAdzunaJobs(searchTerms?.titlePt, location) });
   }
-  if (isGupyConfigured()) {
-    sources.push({ name: "gupy", fetch: () => fetchGupyJobs() });
-  }
+  sources.push({
+    name: "gupy",
+    fetch: () => fetchGupyJobs(searchTerms?.titlePt),
+  });
+  sources.push({
+    name: "inhire",
+    fetch: () => fetchInhireJobs(filterKeywords),
+  });
   if (isSolidesConfigured()) {
     sources.push({ name: "solides", fetch: () => fetchSolidesJobs() });
   }

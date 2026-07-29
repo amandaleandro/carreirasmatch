@@ -110,10 +110,7 @@ export function PublicSubscriptionCheckout({
     <main className="max-w-5xl mx-auto px-4 py-10 w-full font-sans space-y-10">
       {/* Top Banner Header */}
       <header className="text-center max-w-3xl mx-auto space-y-3">
-        <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-          <Sparkles className="w-3.5 h-3.5" />
-          Aceleração Profissional CarreirasMatch
-        </span>
+
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
           {segmentMsg.headline}
         </h1>

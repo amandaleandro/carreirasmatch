@@ -1,132 +1,94 @@
-import * as cheerio from "cheerio";
-import { fetchJobFromUrl } from "@/lib/scrape-job";
 import { FetchedJob } from "./types";
+import { isBrazilRelevantLocation } from "./location-filter";
 
-const FEED_URL = "https://job-boards.api.gupy.io/production/job-board-content";
-const MAX_JOBS_PER_COMPANY = 20;
-const DETAIL_CONCURRENCY = 5;
-const USER_AGENT =
-  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+// A Gupy expõe uma API de busca global e pública, usada pelo próprio portal
+// de vagas (employability-portal.gupy.io), que cobre TODAS as empresas que
+// usam a plataforma — não só uma lista fixa. Substitui a abordagem anterior
+// (sitemap por empresa + scraping de cada página de vaga), que ficava presa
+// a ~34 empresas cadastradas manualmente e era lenta (1 fetch por vaga).
+// `pagination.total` da API é bugado (trava em 100 quando limit>=100), então
+// pagina por offset até uma página vir com menos linhas que o limit.
+const API_URL = "https://employability-portal.gupy.io/api/v1/jobs";
+const PAGE_LIMIT = 100;
+const MAX_OFFSET = 500; // segurança: até 6 páginas por termo de busca
 
-// Gupy não tem busca agregada pública. Cada empresa expõe um feed de vagas
-// (voltado para indexação no Google for Jobs, referenciado no robots.txt de
-// {empresa}.gupy.io) que lista as URLs das vagas abertas daquela empresa.
-// Empresas brasileiras de grande porte que contratam em vários setores
-// (varejo, atendimento/call center, farmácia, logística, indústria, banco),
-// validadas contra o feed público da Gupy. Usadas quando `GUPY_COMPANIES`
-// está vazio, para o feed não ficar enviesado em vagas de tecnologia.
-const DEFAULT_GUPY_COMPANIES = [
-  "assai", // atacado/varejo
-  "localiza", // serviços/locação
-  "petz", // varejo pet
-  "lojasrenner", // moda
-  "riachuelo", // moda
-  "grupoboticario", // cosméticos
-  "cacaushow", // alimentos/varejo
-  "tenda", // construção civil
-  "cyrela", // construção civil
-  "jsl", // logística/transporte
-  "atento", // atendimento/call center
-  "americanas", // varejo
-  "raiadrogasil", // farmácia
-  "mdiasbranco", // indústria alimentícia
-  "suzano", // indústria (papel/celulose)
-  "vibraenergia", // energia
-  "c6bank", // banco
-  "picpay", // fintech
-  "gpa", // varejo/supermercado (Pão de Açúcar)
-  "vivo", // telecom
-  "claro", // telecom
-  "accenture", // consultoria/TI
-  "pagseguro", // fintech
-  "fastshop", // varejo eletrônicos
-  "weg", // indústria
-  "ecorodovias", // infraestrutura/logística
-  "ambev", // bebidas/bens de consumo
-  "stefanini", // tecnologia/serviços
-  "movida", // locação/serviços
-  "unidas", // locação/serviços
-  "mondelez", // alimentos
-  "dasa", // saúde/diagnósticos
-  "serasa", // serviços financeiros
-  "compassouol", // tecnologia/consultoria
-];
+type GupyJob = {
+  id: string | number;
+  name: string;
+  careerPageName?: string;
+  workplaceType?: string;
+  isRemoteWork?: boolean;
+  city?: string;
+  state?: string;
+  country?: string;
+  jobUrl?: string;
+  careerPageUrl?: string;
+  publishedDate?: string;
+  description?: string;
+};
 
-export function isGupyConfigured(): boolean {
-  return getGupyCompanies().length > 0;
-}
+type GupyResponse = {
+  data?: GupyJob[];
+};
 
-export function getGupyCompanies(): string[] {
-  const configured = (process.env.GUPY_COMPANIES ?? "")
-    .split(",")
-    .map((company) => company.trim())
-    .filter(Boolean);
-
-  return configured.length > 0 ? configured : DEFAULT_GUPY_COMPANIES;
-}
-
-async function fetchCompanyJobUrls(subdomain: string): Promise<string[]> {
-  const url = new URL(FEED_URL);
-  url.searchParams.set("jobBoardName", "google");
-  url.searchParams.set("subdomain", subdomain);
+async function fetchPage(query: string, offset: number): Promise<GupyJob[]> {
+  const url = new URL(API_URL);
+  url.searchParams.set("jobName", query);
+  url.searchParams.set("offset", String(offset));
+  url.searchParams.set("limit", String(PAGE_LIMIT));
 
   const response = await fetch(url.toString(), {
-    headers: { "User-Agent": USER_AGENT },
+    headers: { Accept: "application/json" },
     signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) {
-    throw new Error(`feed de vagas da Gupy (${subdomain}) retornou erro ${response.status}`);
+    throw new Error(`API de busca da Gupy retornou erro ${response.status}`);
   }
 
-  const xml = await response.text();
-  const $ = cheerio.load(xml, { xmlMode: true });
-  const urls: string[] = [];
-  $("url > loc").each((_, el) => {
-    const loc = $(el).text().trim();
-    if (loc) urls.push(loc);
-  });
-
-  return urls.slice(0, MAX_JOBS_PER_COMPANY);
+  const body: GupyResponse = await response.json();
+  return body.data ?? [];
 }
 
-async function mapWithConcurrency<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>
-): Promise<R[]> {
-  const results: R[] = [];
-  for (let i = 0; i < items.length; i += limit) {
-    const batch = items.slice(i, i + limit);
-    results.push(...(await Promise.all(batch.map(fn))));
+async function fetchAllPages(query: string): Promise<GupyJob[]> {
+  const jobs: GupyJob[] = [];
+  let offset = 0;
+  while (offset <= MAX_OFFSET) {
+    const page = await fetchPage(query, offset);
+    jobs.push(...page);
+    if (page.length < PAGE_LIMIT) break;
+    offset += PAGE_LIMIT;
   }
-  return results;
+  return jobs;
 }
 
-export async function fetchGupyJobs(
-  companies: string[] = getGupyCompanies()
-): Promise<FetchedJob[]> {
-  if (companies.length === 0) return [];
+function jobLocation(job: GupyJob): string | undefined {
+  return [job.city, job.state, job.country].filter(Boolean).join(" / ") || undefined;
+}
 
-  const perCompany = await Promise.allSettled(companies.map(fetchCompanyJobUrls));
-  const jobUrls = new Set<string>();
-  for (const result of perCompany) {
-    if (result.status === "fulfilled") {
-      for (const url of result.value) jobUrls.add(url);
-    }
+function toFetchedJob(job: GupyJob): FetchedJob | null {
+  const url = job.jobUrl || job.careerPageUrl;
+  if (!url || !job.name) return null;
+
+  return {
+    url,
+    jobTitle: job.name,
+    jobText: job.description ?? job.name,
+    source: "gupy",
+    company: job.careerPageName,
+    location: jobLocation(job),
+  };
+}
+
+export async function fetchGupyJobs(query = "Assistente Administrativo"): Promise<FetchedJob[]> {
+  const jobsById = new Map<string | number, GupyJob>();
+  const pages = await fetchAllPages(query);
+  for (const job of pages) jobsById.set(job.id, job);
+
+  const jobs: FetchedJob[] = [];
+  for (const job of jobsById.values()) {
+    if (!isBrazilRelevantLocation(jobLocation(job))) continue;
+    const fetched = toFetchedJob(job);
+    if (fetched) jobs.push(fetched);
   }
-
-  const jobs = await mapWithConcurrency([...jobUrls], DETAIL_CONCURRENCY, async (url) => {
-    const result = await fetchJobFromUrl(url);
-    if ("error" in result) return null;
-    const job: FetchedJob = {
-      url,
-      jobTitle: result.jobTitle,
-      jobText: result.jobText,
-      source: "gupy",
-      location: result.location,
-    };
-    return job;
-  });
-
-  return jobs.filter((job): job is FetchedJob => job !== null);
+  return jobs;
 }

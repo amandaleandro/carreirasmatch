@@ -45,9 +45,26 @@ function isDevelopmentOrLocalhost() {
   );
 }
 
-export function AccessTracker() {
+type IdentifiedUser = {
+  id: string;
+  email?: string | null;
+  name?: string | null;
+  accountType: "candidate" | "company" | "partner";
+};
+
+export function AccessTracker({ user }: { user: IdentifiedUser | null }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (!user) return;
+
+    window.posthog?.identify(user.id, {
+      email: user.email,
+      name: user.name,
+      account_type: user.accountType,
+    });
+  }, [user]);
 
   useEffect(() => {
     if (!pathname) return;

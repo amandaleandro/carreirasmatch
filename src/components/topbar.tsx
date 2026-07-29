@@ -12,38 +12,58 @@ import type { CareerSegment } from "@/lib/career-segments";
 
 const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; label: string }[]>> = {
   student: [
-    { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" }, { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico" },
-    { href: "/cursos-gratuitos", label: "Cursos gratuitos" }, { href: "/vestibulares", label: "Radar de vestibulares" },
-    { href: "/mentorias", label: "Mentorias" }, { href: "/jogos", label: "Jogos" },
+    { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" },
+    { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico" },
+    { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
+    { href: "/vestibulares", label: "Radar de vestibulares" },
+    { href: "/mentorias", label: "Mentorias" },
+    { href: "/jogos", label: "Jogos" },
   ],
   apprentice: [
-    { href: "/jovem-aprendiz", label: "Jovem Aprendiz" }, { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" },
-    { href: "/tools/apprentice-areas", label: "Áreas de atuação" }, { href: "/tools/apprentice-companies", label: "Empresas" },
-    { href: "/tools/apprentice-guide", label: "Guia do Aprendiz" }, { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
-    { href: "/feed", label: "Feed de Vagas" }, { href: "/radar", label: "Alertas de vagas" },
-    { href: "/todas-as-vagas", label: "Todas as Vagas" }, { href: "/applications", label: "Candidaturas" },
+    { href: "/jovem-aprendiz", label: "Jovem Aprendiz" },
+    { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" },
+    { href: "/tools/apprentice-areas", label: "Áreas de atuação" },
+    { href: "/tools/apprentice-companies", label: "Empresas" },
+    { href: "/tools/apprentice-guide", label: "Guia do Aprendiz" },
+    { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
+    { href: "/feed", label: "Feed de Vagas" },
+    { href: "/radar", label: "Alertas de vagas" },
+    { href: "/todas-as-vagas", label: "Todas as Vagas" },
+    { href: "/applications", label: "Candidaturas" },
   ],
   first_job: [
-    { href: "/primeiro-emprego", label: "Primeiro emprego" }, { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência" },
-    { href: "/tools/first-job-guide", label: "Guia do primeiro emprego" }, { href: "/vagas-de-hoje", label: "Vagas de hoje" },
+    { href: "/primeiro-emprego", label: "Primeiro emprego" },
+    { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência" },
+    { href: "/tools/first-job-guide", label: "Guia do primeiro emprego" },
+    { href: "/vagas-de-hoje", label: "Vagas de hoje" },
     { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
-    { href: "/feed", label: "Feed de Vagas" }, { href: "/radar", label: "Alertas de vagas" },
-    { href: "/todas-as-vagas", label: "Todas as Vagas" }, { href: "/applications", label: "Candidaturas" },
+    { href: "/feed", label: "Feed de Vagas" },
+    { href: "/radar", label: "Alertas de vagas" },
+    { href: "/todas-as-vagas", label: "Todas as Vagas" },
+    { href: "/applications", label: "Candidaturas" },
   ],
   internship: [
-    { href: "/estagio", label: "Estágios" }, { href: "/feed", label: "Feed de estágios" }, { href: "/analise", label: "Análise de Vaga" },
-    { href: "/tools/internship-guide", label: "Guia de estágio" }, { href: "/tools/internship-checklist", label: "Checklist de estágio" },
-    { href: "/tools/internship-calculator", label: "Calculadora de bolsa" }, { href: "/resume", label: "Meu Currículo" },
-    { href: "/radar", label: "Alertas de vagas" }, { href: "/todas-as-vagas", label: "Todas as Vagas" },
+    { href: "/estagio", label: "Estágios" },
+    { href: "/feed", label: "Feed de estágios" },
+    { href: "/analise", label: "Análise de Vaga" },
+    { href: "/tools/internship-guide", label: "Guia de estágio" },
+    { href: "/tools/internship-checklist", label: "Checklist de estágio" },
+    { href: "/tools/internship-calculator", label: "Calculadora de bolsa" },
+    { href: "/resume", label: "Meu Currículo" },
+    { href: "/radar", label: "Alertas de vagas" },
+    { href: "/todas-as-vagas", label: "Todas as Vagas" },
     { href: "/applications", label: "Candidaturas" },
   ],
   concurseiro: [
-    { href: "/concursos", label: "Radar de Concursos" }, { href: "/concurso", label: "Preparação para concurso" },
-    { href: "/tools/concurso", label: "Plano e simulados" }, { href: "/tools/leitor-edital", label: "Leitor de edital" },
+    { href: "/concursos", label: "Radar de Concursos" },
+    { href: "/concurso", label: "Preparação para concurso" },
+    { href: "/tools/concurso", label: "Plano e simulados" },
+    { href: "/tools/leitor-edital", label: "Leitor de edital" },
     { href: "/tools/essay-grader", label: "Corretor de redação" },
   ],
   oab: [
-    { href: "/oab", label: "Preparação para OAB" }, { href: "/tools/oab", label: "Simulados OAB" },
+    { href: "/oab", label: "Preparação para OAB" },
+    { href: "/tools/oab", label: "Simulados OAB" },
     { href: "/tools/oab/segunda-fase", label: "Segunda fase" },
   ],
 };
@@ -80,12 +100,12 @@ export function Topbar({
 
   return (
     <>
-      <header className="flex items-center justify-between gap-4 border-b border-neutral-200/75 dark:border-neutral-800 px-4 md:px-6 py-3 bg-white/80 dark:bg-[#090d16]/80 backdrop-blur-md sticky top-0 z-20 w-full">
+      <header className="glass-header sticky top-0 z-20 flex items-center justify-between gap-4 px-4 py-3 md:px-6">
         {/* Mobile menu toggle */}
         <button
           type="button"
           onClick={() => setMobileNavOpen((v) => !v)}
-          className="md:hidden p-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900"
+          className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden"
           aria-label="Menu"
         >
           {mobileNavOpen ? (
@@ -99,150 +119,178 @@ export function Topbar({
           <div className="relative">
             <Search
               strokeWidth={1.75}
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"
             />
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               type="search"
-              placeholder="Buscar..."
-              className="w-full rounded-full border border-neutral-200 dark:border-neutral-800 bg-neutral-50 dark:bg-neutral-900 pl-9 pr-4 py-1.5 text-xs md:text-sm outline-none transition-all focus:border-blue-500 focus:bg-white dark:focus:bg-[#090d16]"
+              placeholder="Buscar histórico ou ferramenta..."
+              className="w-full rounded-full border border-slate-200/90 dark:border-slate-800 bg-slate-100/70 dark:bg-slate-900/70 pl-10 pr-4 py-2 text-xs md:text-sm text-slate-900 dark:text-slate-100 placeholder:text-slate-400 outline-none transition-all focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-500/20"
             />
           </div>
         </form>
 
-        <ThemeToggle className="hidden sm:inline-flex" />
+        <div className="flex items-center gap-3">
+          <ThemeToggle className="hidden sm:inline-flex" />
 
-        <div className="flex items-center gap-2 md:gap-3">
-        <div className="relative">
-          <button
-            type="button"
-            onClick={() => setMenuOpen((v) => !v)}
-            className="flex items-center gap-2.5 group"
-          >
-            {userImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={userImage}
-                alt={userName}
-                className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover shadow-sm"
-              />
-            ) : (
-              <span className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-xs md:text-sm font-semibold shadow-sm">
-                {initials || "?"}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              className="flex items-center gap-2.5 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800/60 transition-all"
+            >
+              {userImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={userImage}
+                  alt={userName}
+                  className="h-8 w-8 md:h-9 md:w-9 rounded-full object-cover shadow-xs border border-slate-200 dark:border-slate-700"
+                />
+              ) : (
+                <span className="h-8 w-8 md:h-9 md:w-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs md:text-sm font-bold shadow-xs">
+                  {initials || "?"}
+                </span>
+              )}
+              <span className="hidden sm:block text-left pr-1">
+                <span className="block text-xs font-semibold leading-tight text-slate-900 dark:text-slate-100">
+                  {userName}
+                </span>
+                <span className="block text-[10px] text-slate-500 font-medium">Plano Profissional</span>
               </span>
-            )}
-            <span className="hidden sm:block text-left">
-              <span className="block text-sm font-medium leading-tight">{userName}</span>
-              <span className="block text-xs text-neutral-500 leading-tight">Plano Profissional</span>
-            </span>
-          </button>
+            </button>
 
-          {menuOpen && (
-            <div className="absolute right-0 mt-2 w-52 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 shadow-lg py-2 z-30">
-              <p className="px-3 py-1.5 text-[10px] md:text-xs text-neutral-500 truncate">{userEmail}</p>
-              <div className="border-t border-neutral-100 dark:border-neutral-800 my-1" />
-              <div className="px-3 py-1.5">
-                <LogoutButton />
+            {menuOpen && (
+              <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-xl py-2 z-30 animate-in fade-in slide-in-from-top-2">
+                <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800/80">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{userName}</p>
+                  <p className="text-[11px] text-slate-500 truncate">{userEmail}</p>
+                </div>
+                <div className="py-1">
+                  <Link
+                    href="/settings"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                  >
+                    Configurações da conta
+                  </Link>
+                  <Link
+                    href="/history"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60"
+                  >
+                    Histórico de análises
+                  </Link>
+                </div>
+                <div className="border-t border-slate-100 dark:border-slate-800/80 pt-1 px-2">
+                  <LogoutButton className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors" />
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-
-        <LogoutButton className="hidden sm:flex items-center gap-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors" />
+            )}
+          </div>
         </div>
       </header>
 
       {/* Mobile Drawer */}
       {mobileNavOpen && (
-        <div className="md:hidden fixed inset-0 z-30 bg-neutral-950/40 backdrop-blur-sm" onClick={() => setMobileNavOpen(false)}>
-          <nav 
-            className="w-64 h-full bg-[#071827] text-white p-5 flex flex-col justify-between border-r border-slate-800/80"
+        <div
+          className="md:hidden fixed inset-0 z-30 bg-slate-950/50 backdrop-blur-xs"
+          onClick={() => setMobileNavOpen(false)}
+        >
+          <nav
+            className="w-72 h-full bg-[#071827] text-white p-6 flex flex-col justify-between border-r border-slate-800/80"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="space-y-6">
-              <div className="flex items-center justify-between pb-4 border-b border-white/5">
-                <BrandLogo heightClassName="h-10" onDark />
-                <button type="button" className="text-slate-400" onClick={() => setMobileNavOpen(false)}>
+              <div className="flex items-center justify-between pb-4 border-b border-white/10">
+                <BrandLogo heightClassName="h-8" onDark />
+                <button type="button" className="text-slate-400 p-1 rounded-lg" onClick={() => setMobileNavOpen(false)}>
                   <X className="h-5 w-5" strokeWidth={1.75} />
                 </button>
               </div>
 
-              <div className="space-y-1.5">
-                <Link href="/dashboard" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Dashboard</Link>
-                {segment ? MOBILE_LINKS_BY_SEGMENT[segment]?.map((link) => (
-                  <Link key={link.href} href={link.href} onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">{link.label}</Link>
-                )) : null}
-                {false ? (
-                  <>
-                    <Link href="/ensino-medio" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Ensino Médio &amp; ENEM 🎓</Link>
-                    <Link href="/faculdade-ou-tecnico" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Faculdade ou Técnico</Link>
-                    <Link href="/cursos-gratuitos" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Cursos gratuitos</Link>
-                    <Link href="/vestibulares" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de vestibulares</Link>
-                    <Link href="/mentorias" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Mentorias</Link>
-                    <Link href="/jogos" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Jogos</Link>
-                  </>
-                ) : null}
+              <div className="space-y-1">
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/10 rounded-xl font-medium"
+                >
+                  Dashboard
+                </Link>
+                {segment
+                  ? MOBILE_LINKS_BY_SEGMENT[segment]?.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMobileNavOpen(false)}
+                        className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                      >
+                        {link.label}
+                      </Link>
+                    ))
+                  : null}
                 {(!segment || segment === "career_change" || segment === "career_pro") && (
                   <>
-                <Link href="/analise" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Análise de Vaga</Link>
-                <Link href="/feed" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Feed de Vagas</Link>
-                <Link href="/todas-as-vagas" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Todas as Vagas</Link>
-                <Link href="/applications" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Candidaturas</Link>
-                <Link href="/resume" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Meu Currículo</Link>
-                <Link href="/profile" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Desenvolvimento</Link>
-                <Link href="/action-plan" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Plano de Ação</Link>
-                <Link href="/interviews" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Entrevistas</Link>
-                <Link href="/history" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Relatórios</Link>
-                <Link href="/tools" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Ferramentas</Link>
-                <Link href="/mentorias" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Mentorias</Link>
-                <Link href="/concursos" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de concursos</Link>
-                <Link href="/vestibulares" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Radar de vestibulares</Link>
+                    <Link
+                      href="/analise"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      Análise de Vaga
+                    </Link>
+                    <Link
+                      href="/feed"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      Feed de Vagas
+                    </Link>
+                    <Link
+                      href="/resume"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      Meu Currículo
+                    </Link>
+                    <Link
+                      href="/action-plan"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      Plano de Ação
+                    </Link>
                   </>
                 )}
-                <Link href="/suporte" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Suporte</Link>
-                <Link href="/settings" onClick={() => setMobileNavOpen(false)} className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/5 rounded-lg">Perfil</Link>
-                <div className="mt-2 pt-2 border-t border-white/5">
-                  <LogoutButton className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-red-300 hover:bg-white/5 rounded-lg" />
-                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileNavOpen(false);
-                  openNews();
-                }}
-                className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white"
-                aria-haspopup="dialog"
-              >
-                <Sparkles className="h-4 w-4 shrink-0" strokeWidth={1.9} />
-                Novidades
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileNavOpen(false);
-                  openTour();
-                }}
-                className="flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] px-2 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10 hover:text-white"
-              >
-                <HelpCircle className="h-4 w-4 shrink-0" strokeWidth={1.9} />
-                Tour
-              </button>
-            </div>
+            <div className="space-y-3 pt-4 border-t border-white/10">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileNavOpen(false);
+                    openNews();
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Novidades
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileNavOpen(false);
+                    openTour();
+                  }}
+                  className="flex items-center justify-center gap-1.5 rounded-xl border border-white/10 bg-white/5 px-2 py-2 text-xs font-semibold text-slate-200 hover:bg-white/10"
+                >
+                  <HelpCircle className="h-3.5 w-3.5" />
+                  Tour
+                </button>
+              </div>
 
-            <div className="rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 p-4">
-              <p className="text-xs font-semibold">🏆 Plano Profissional</p>
-              <Link
-                href="/tools"
-                onClick={() => setMobileNavOpen(false)}
-                className="mt-2.5 block text-center text-xs font-semibold bg-white text-blue-700 rounded-md py-1.5"
-              >
-                Ver plano
-              </Link>
+              <LogoutButton className="flex w-full items-center justify-center gap-2 px-3 py-2.5 text-xs font-semibold text-red-300 hover:bg-white/10 rounded-xl" />
             </div>
           </nav>
         </div>

@@ -14,6 +14,7 @@ import { AnalysisTeaser } from "@/lib/analysis-teaser";
 import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
 import { LeadGate, getStoredLeadContact } from "@/components/lead-gate";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { AnalysisTour } from "@/components/onboarding/analysis-tour";
 
 type AnalysisWithId =
   | ({ id: string; unlocked: true; diagnosticPrice: string; loggedIn: boolean } & Analysis)
@@ -541,9 +542,7 @@ export function AnalyzeVagaPage({
       <div className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5.5 shadow-[0_8px_30px_rgb(0,0,0,0.01)]">
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-[#2563EB]/20 bg-[#2563EB]/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#2563EB]">
-              ANTES DE ENVIAR
-            </span>
+
             <h1 className="text-2xl md:text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
               Você encontrou a vaga. Seu currículo está pronto?
             </h1>
@@ -590,6 +589,8 @@ export function AnalyzeVagaPage({
         </div>
       </div>
       )}
+
+      <AnalysisTour />
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px] gap-5 items-start">
@@ -749,6 +750,7 @@ export function AnalyzeVagaPage({
                 <div className="space-y-1.5">
                   <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Seu currículo (PDF ou DOCX)</label>
                   <div
+                    id="curriculo-upload"
                     onDragOver={(e) => {
                       e.preventDefault();
                       setDragActive(true);
@@ -801,6 +803,7 @@ export function AnalyzeVagaPage({
                 <div className="space-y-1.5 flex flex-col">
                   <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Requisitos / Descrição da vaga</label>
                   <textarea
+                    id="vaga-input"
                     value={jobText}
                     onChange={(e) => setJobText(e.target.value)}
                     placeholder="Cole os requisitos, atribuições e detalhes da vaga anunciada aqui..."
@@ -848,6 +851,7 @@ export function AnalyzeVagaPage({
                     {draftSaved ? "Salvo ✓" : "Salvar Rascunho"}
                   </button>
                   <button
+                    id="analisar-button"
                     type="submit"
                     disabled={loading}
                     className="flex-1 sm:flex-none rounded-xl bg-[#2563EB] px-6 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#1D4ED8] transition-all active:scale-[0.98] cursor-pointer disabled:opacity-50"

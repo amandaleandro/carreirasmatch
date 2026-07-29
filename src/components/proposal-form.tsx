@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 const inputClass =
   "w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-3 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors";
@@ -31,6 +32,9 @@ export function ProposalForm({ projectId }: { projectId: string }) {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao enviar proposta.");
+      track(ANALYTICS_EVENTS.FREELANCE_PROPOSAL_SUBMITTED, {
+        estimated_days_provided: Boolean(estimatedDays),
+      });
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
