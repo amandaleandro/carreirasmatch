@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 type CreatedAlert = { id: string; query: string; city: string; state: string; frequency: string };
 
@@ -28,7 +29,10 @@ export function JobAlertForm({ initialQuery = "", initialCity = "", initialState
       return;
     }
     const data = await response.json();
-    if (response.ok) onCreated?.(data.alert);
+    if (response.ok) {
+      track(ANALYTICS_EVENTS.JOB_ALERT_CREATED, { frequency });
+      onCreated?.(data.alert);
+    }
     setMessage(response.ok ? "Alerta criado. Você receberá novas oportunidades por e-mail." : data.error);
   }
 

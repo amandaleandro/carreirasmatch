@@ -6,6 +6,7 @@ import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { resetPostHog } from "@/lib/analytics";
 import {
   LayoutDashboard,
   Briefcase,
@@ -165,7 +166,10 @@ export function CompanyShell({
 
           <button
             type="button"
-            onClick={() => signOut({ callbackUrl: "/empresa/login" })}
+            onClick={() => {
+              resetPostHog();
+              void signOut({ callbackUrl: "/empresa/login" });
+            }}
             className="flex items-center gap-1.5 rounded-lg border border-neutral-200 dark:border-neutral-800 px-3 py-1.5 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 transition-colors"
           >
             <LogOut className="h-4 w-4" strokeWidth={1.75} />
@@ -204,7 +208,8 @@ export function CompanyShell({
                 type="button"
                 onClick={() => {
                   setMobileNavOpen(false);
-                  signOut({ callbackUrl: "/empresa/login" });
+                  resetPostHog();
+                  void signOut({ callbackUrl: "/empresa/login" });
                 }}
                 className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-red-300 hover:bg-white/5"
               >

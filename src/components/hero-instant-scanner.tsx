@@ -2,7 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
-import { Search, CheckCircle2, ArrowRight, Target, Sparkles } from "lucide-react";
+import { Search, CheckCircle2, ArrowRight, Sparkles } from "lucide-react";
 import { triggerConfetti } from "@/lib/confetti";
 
 export function HeroInstantScanner() {
@@ -54,25 +54,17 @@ export function HeroInstantScanner() {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-white/20 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-2xl space-y-6 font-sans">
-      {/* Laser Scanning Effect */}
-      {scanning && <div className="animate-laser-sweep z-20" />}
-
+    <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6 font-sans">
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-500/20 text-blue-200 border border-blue-400/30">
-          <Target className="w-3.5 h-3.5 text-blue-400" />
-          Diagnóstico de Aderência
-        </span>
-        <span className="text-[11px] text-white/70 font-medium inline-flex items-center gap-1">
-          <Sparkles className="w-3 h-3 text-amber-300 animate-pulse" />
+        <h3 className="text-lg font-bold text-white">Simule sua vaga desejada</h3>
+        <span className="text-xs text-blue-300 font-medium">
           100% Gratuito
         </span>
       </div>
 
-      <div className="space-y-1.5">
-        <h3 className="text-xl font-bold text-white">Teste seu perfil para a vaga agora</h3>
-        <p className="text-xs text-white/80 leading-relaxed">
-          Digite o cargo que você procura e veja o que costuma pesar nessa oportunidade.
+      <div className="space-y-1">
+        <p className="text-xs text-slate-300 leading-relaxed">
+          Digite o cargo que você procura e veja em segundos os pontos fortes que o recrutador busca.
         </p>
       </div>
 
@@ -85,23 +77,23 @@ export function HeroInstantScanner() {
             value={roleQuery}
             onChange={(e) => setRoleQuery(e.target.value)}
             placeholder="Ex: Desenvolvedor Front-end, Vendedor..."
-            className="w-full rounded-2xl border border-white/20 bg-black/30 pl-10 pr-4 py-3 text-sm text-white placeholder-white/50 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20 transition-all"
+            className="w-full rounded-full border border-white/20 bg-black/30 pl-10 pr-4 py-3 text-sm text-white placeholder-white/50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition-all"
           />
         </div>
 
         <button
           type="submit"
           disabled={scanning}
-          className="w-full btn-shine-glow rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3.5 text-xs sm:text-sm shadow-lg shadow-blue-600/30 transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2"
+          className="w-full rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 text-xs sm:text-sm shadow-md transition-all duration-200 disabled:opacity-50 inline-flex items-center justify-center gap-2 active:scale-95"
         >
           {scanning ? (
             <span className="inline-flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              Lendo os requisitos da vaga...
+              Analisando perfil para o cargo...
             </span>
           ) : (
             <span className="inline-flex items-center gap-2">
-              <span>Simular Compatibilidade Gratuitamente</span>
+              <span>Simular vaga gratuitamente</span>
               <ArrowRight className="w-4 h-4" />
             </span>
           )}
@@ -110,25 +102,25 @@ export function HeroInstantScanner() {
 
       {/* Simulated Live Result */}
       {result && (
-        <div className="rounded-2xl border border-white/20 bg-slate-950/95 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-3 duration-300 shadow-2xl">
+        <div className="rounded-2xl border border-white/15 bg-slate-950/90 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-xl">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-white/60 font-bold">Cargo Simulado</p>
-              <h4 className="font-extrabold text-sm text-white truncate max-w-[12rem] sm:max-w-xs">{result.role}</h4>
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Cargo Simulado</p>
+              <h4 className="font-bold text-sm text-white truncate max-w-[12rem] sm:max-w-xs">{result.role}</h4>
             </div>
             <div className="text-right">
               <span className="text-2xl font-extrabold text-blue-400">{result.score}%</span>
-              <span className="block text-[10px] font-bold text-emerald-400 badge-pulse-glow px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 mt-0.5">
-                Alta Compatibilidade
+              <span className="block text-[10px] font-semibold text-emerald-400 mt-0.5">
+                Excelente alinhamento
               </span>
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-[10px] font-bold uppercase tracking-wider text-white/70">Pontos Fortes Identificados:</p>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-slate-300">Pontos Relevantes Identificados:</p>
             <div className="flex flex-wrap gap-1.5">
               {result.skills.map((s) => (
-                <span key={s} className="rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2.5 py-0.5 text-[10px] font-bold inline-flex items-center gap-1 transition-transform hover:scale-105">
+                <span key={s} className="rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-3 py-1 text-[11px] font-medium inline-flex items-center gap-1">
                   <CheckCircle2 className="w-3 h-3 text-emerald-400" />
                   {s}
                 </span>
@@ -139,9 +131,9 @@ export function HeroInstantScanner() {
           <div className="pt-2">
             <Link
               href={`/analise?role=${encodeURIComponent(result.role)}`}
-              className="w-full btn-shine-glow inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-extrabold py-3 text-xs shadow-md transition-all"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 text-xs shadow-sm transition-all"
             >
-              <span>Ver o que posso melhorar no meu currículo</span>
+              <span>Ver análise detalhada do meu currículo</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

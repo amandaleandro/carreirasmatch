@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Sparkles, X } from "lucide-react";
+import { ArrowRight, CheckCircle2, X } from "lucide-react";
 
 type NudgeReason = "engagement" | "exit" | "limit";
 
@@ -13,39 +13,32 @@ type SubscriptionNudge = {
 
 const SubscriptionNudgeContext = createContext<SubscriptionNudge | null>(null);
 
-// Um popup por sessão de navegador, não importa qual gatilho disparar primeiro -
-// isso é o que evita a sensação de "site cheio de popup".
 const SESSION_KEY = "subscription-nudge:shown";
-
-// Páginas onde empurrar assinatura não faz sentido: é o próprio checkout, telas de
-// autenticação ou áreas de empresa/parceiro (não é o público do plano candidato).
 const SUPPRESSED_PREFIXES = ["/assinar", "/login", "/register", "/empresa", "/parceiro"];
-
-const ENGAGEMENT_DELAY_MS = 60_000;
 
 const COPY: Record<NudgeReason, { eyebrow: string; title: string; body: string }> = {
   engagement: {
-    eyebrow: "Continue de onde parou",
-    title: "Gostando do que viu até aqui?",
-    body: "Isso é só uma fração do que dá pra fazer com o Plano Profissional: análises ilimitadas, simulador de entrevista e currículo otimizado por IA.",
+    eyebrow: "Aceleração de carreira",
+    title: "Conheça o Plano Profissional",
+    body: "Análises ilimitadas de currículo, simulador interativo de entrevistas no modelo STAR e acompanhamento de vagas.",
   },
   exit: {
-    eyebrow: "Antes de sair",
-    title: "Leve seu diagnóstico completo com você",
-    body: "Assine agora e destrave análises ilimitadas de currículo, simulador de entrevista e muito mais. Cancela quando quiser, com 1 clique.",
+    eyebrow: "Plano Profissional",
+    title: "Potencialize suas candidaturas",
+    body: "Destrave análises ilimitadas de currículo, simulador de entrevistas e acompanhamento completo. Cancele quando quiser.",
   },
   limit: {
-    eyebrow: "Você já viu do que a IA é capaz",
-    title: "Continue analisando sem parar",
-    body: "Sua primeira análise completa foi por nossa conta. Assine o Plano Profissional para repetir isso em cada vaga que você quiser.",
+    eyebrow: "Limite atingido",
+    title: "Continue analisando sem limites",
+    body: "Sua análise gratuita foi concluída. Assine o Plano Profissional para repetir o processo em cada vaga que desejar.",
   },
 };
 
 const BENEFITS = [
-  "Análises de vaga & match ilimitados por IA",
+  "Análises de vaga e match ilimitados",
   "Simulador interativo de perguntas de entrevista",
   "Ajustes de palavras-chave para passar nos robôs (ATS)",
-  "Cartas de apresentação e mensagens para recrutadores",
+  "Modelos de mensagem direta para recrutadores",
 ];
 
 export function SubscriptionNudgeProvider({
@@ -67,7 +60,7 @@ export function SubscriptionNudgeProvider({
     try {
       if (window.sessionStorage.getItem(SESSION_KEY)) shownRef.current = true;
     } catch {
-      /* sessionStorage indisponível (modo privado etc.): segue sem persistir entre abas */
+      /* ignore */
     }
   }, []);
 
@@ -92,7 +85,7 @@ export function SubscriptionNudgeProvider({
   return (
     <SubscriptionNudgeContext.Provider value={value}>
       {children}
-      {active && <AutoTriggers openNudge={openNudge} />}
+      {/* Popups automáticos invasivos desativados para não incomodar o usuário */}
       {reason && <NudgeModal reason={reason} segment={segment} onClose={close} />}
     </SubscriptionNudgeContext.Provider>
   );
@@ -106,32 +99,11 @@ export function useSubscriptionNudge(): SubscriptionNudge {
   return context;
 }
 
-/** Dispara um gatilho contextual assim que o componente monta (ex.: página de resultado grátis). */
 export function SubscriptionNudgeAutoOpen({ reason }: { reason: NudgeReason }) {
   const { openNudge } = useSubscriptionNudge();
   useEffect(() => {
     openNudge(reason);
   }, [openNudge, reason]);
-  return null;
-}
-
-function AutoTriggers({ openNudge }: { openNudge: (reason: NudgeReason) => void }) {
-  useEffect(() => {
-    const timer = window.setTimeout(() => openNudge("engagement"), ENGAGEMENT_DELAY_MS);
-
-    // Exit-intent: só dispara quando o mouse sai por cima da janela (movimento
-    // típico de ir fechar a aba ou a barra de endereço), não em qualquer mouseleave.
-    const onMouseLeave = (event: MouseEvent) => {
-      if (event.clientY <= 0) openNudge("exit");
-    };
-    document.addEventListener("mouseleave", onMouseLeave);
-
-    return () => {
-      window.clearTimeout(timer);
-      document.removeEventListener("mouseleave", onMouseLeave);
-    };
-  }, [openNudge]);
-
   return null;
 }
 
@@ -159,36 +131,35 @@ function NudgeModal({
       <button
         type="button"
         aria-label="Fechar"
-        className="absolute inset-0 bg-slate-950/55 backdrop-blur-sm"
+        className="absolute inset-0 bg-slate-950/50 backdrop-blur-xs"
         onClick={onClose}
       />
       <section
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-md overflow-hidden rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-950 shadow-2xl shadow-slate-950/25 p-6 space-y-5"
+        className="relative w-full max-w-md overflow-hidden rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl p-6 space-y-5"
       >
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 top-4 rounded-lg p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-900 dark:hover:text-white"
+          className="absolute right-4 top-4 rounded-xl p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
           aria-label="Fechar"
         >
           <X className="h-5 w-5" strokeWidth={1.9} />
         </button>
 
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white">
-          <Sparkles className="w-3.5 h-3.5" />
+        <span className="inline-block rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 px-3 py-1 text-xs font-semibold">
           {copy.eyebrow}
         </span>
 
         <div className="space-y-2 pr-4">
-          <h2 className="text-xl font-extrabold leading-tight text-slate-900 dark:text-white">{copy.title}</h2>
+          <h2 className="text-xl font-bold leading-tight text-slate-900 dark:text-white">{copy.title}</h2>
           <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-300">{copy.body}</p>
         </div>
 
         <div className="space-y-2">
           {BENEFITS.map((benefit) => (
-            <div key={benefit} className="flex items-center gap-2.5 text-sm font-semibold text-slate-800 dark:text-slate-200">
+            <div key={benefit} className="flex items-center gap-2.5 text-xs font-semibold text-slate-800 dark:text-slate-200">
               <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
               <span>{benefit}</span>
             </div>
@@ -198,16 +169,16 @@ function NudgeModal({
         <Link
           href={`/assinar?segment=${encodeURIComponent(segment)}`}
           onClick={onClose}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-extrabold text-white shadow-md shadow-blue-500/20 transition-all hover:bg-blue-700"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-95"
         >
-          <span>Assinar por R$ 24,90/mês</span>
+          Conhecer Plano Profissional
           <ArrowRight className="h-4 w-4" />
         </Link>
 
         <button
           type="button"
           onClick={onClose}
-          className="w-full text-center text-xs font-semibold text-slate-400 transition hover:text-slate-600 dark:hover:text-slate-300"
+          className="w-full text-center text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white"
         >
           Agora não
         </button>

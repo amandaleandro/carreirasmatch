@@ -156,10 +156,7 @@ export function ProfileSuggestions({
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-            <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-            Plano de Desenvolvimento Profissional
-          </span>
+
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             Recomendações Personalizadas por IA
           </h1>

@@ -37,6 +37,11 @@ export const ANALYTICS_EVENTS = {
   APPLICATION_CREATED: "application_created",
   RESULT_VIEWED: "result_viewed",
   CARD_SHARED: "card_shared",
+  JOB_ALERT_CREATED: "job_alert_created",
+  JOB_ALERT_DELETED: "job_alert_deleted",
+  PARTNER_SUBMISSION_SENT: "partner_submission_sent",
+  COMPANY_JOB_CREATED: "company_job_created",
+  FREELANCE_PROPOSAL_SUBMITTED: "freelance_proposal_submitted",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];
@@ -46,13 +51,26 @@ type FbqFn = (type: string, eventName: string, params?: Record<string, unknown>)
 type LintrkFn = (action: string, data: { conversion_id?: number | string }) => void;
 type GtagFn = (command: string, targetId: string, params?: Record<string, unknown>) => void;
 
+type PostHogFn = {
+  capture: (event: string, props?: Record<string, unknown>) => void;
+  identify: (distinctId: string, properties?: Record<string, unknown>) => void;
+  reset: () => void;
+};
+
 declare global {
   interface Window {
     plausible?: PlausibleFn;
     fbq?: FbqFn;
     lintrk?: LintrkFn;
     gtag?: GtagFn;
+    posthog?: PostHogFn;
   }
+}
+
+/** Limpa a identidade persistida ao encerrar a sessão, preservando o próximo visitante como anônimo. */
+export function resetPostHog() {
+  if (typeof window === "undefined") return;
+  window.posthog?.reset();
 }
 
 /** Registra um evento de funil. Seguro chamar no servidor ou sem provedor, vira no-op. */
@@ -97,7 +115,10 @@ export function track(event: AnalyticsEvent, props?: Record<string, string | num
       window.gtag("event", event, props ?? {});
     }
 
-    // 5. Backend Event Logging
+    // 5. PostHog (funil/eventos por usuário, roda em paralelo ao Plausible)
+    window.posthog?.capture(event, props);
+
+    // 6. Backend Event Logging
     const body = JSON.stringify({
       name: event,
       path: window.location.pathname,

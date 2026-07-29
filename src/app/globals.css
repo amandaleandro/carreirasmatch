@@ -1,13 +1,11 @@
 @import "tailwindcss";
 
 /*
-  Paleta oficial CarreirasMatch
-  Azul Profundo #071827 · Azul Principal #2563EB · Verde Avanço #22C55E
+  Paleta oficial CarreirasMatch (Apple, Samsung & WhatsApp Inspired Design System)
+  Azul Profundo #071827 · Azul Principal #2563EB · Verde Avanço #22C55E / #25D366
   Amarelo Atenção #F59E0B · Vermelho Alerta #EF4444 · Branco Gelo #F8FAFC · Cinza Texto #64748B
 */
 
-/* Dark mode is opt-in via [data-theme="dark"] on <html> (see ThemeToggle),
-   not the OS preference - the app defaults to a light background. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
@@ -20,11 +18,13 @@
   --color-ice: #f8fafc;
   --color-muted: #64748b;
 
-  /* light theme (default) */
+  /* Theme tokens */
   --background: #f8fafc;
   --foreground: #071827;
   --surface: #ffffff;
+  --surface-elevated: #ffffff;
   --border-color: #e2e8f0;
+  --border-hover: #cbd5e1;
   --muted-foreground: #64748b;
   --accent: #2563eb;
   --accent-hover: #1d4ed8;
@@ -36,7 +36,9 @@
   --background: #071827;
   --foreground: #f8fafc;
   --surface: #0e2032;
-  --border-color: rgba(248, 250, 252, 0.1);
+  --surface-elevated: #132a42;
+  --border-color: rgba(248, 250, 252, 0.08);
+  --border-hover: rgba(248, 250, 252, 0.16);
   --muted-foreground: #94a3b8;
   --accent: #3b82f6;
   --accent-hover: #60a5fa;
@@ -61,57 +63,129 @@
   --color-danger: #ef4444;
   --color-ice: #f8fafc;
   --color-muted: #64748b;
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-title: var(--font-manrope), system-ui, sans-serif;
+  --font-sans: var(--font-inter), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-title: var(--font-manrope), system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background:
-    radial-gradient(1100px 520px at 12% -10%, rgba(37, 99, 235, 0.1), transparent 60%),
-    radial-gradient(900px 480px at 100% 0%, rgba(245, 158, 11, 0.08), transparent 55%),
-    var(--background);
+  background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-title);
+  letter-spacing: -0.025em;
 }
 
-[data-theme="dark"] body {
-  background:
-    radial-gradient(1100px 520px at 12% -10%, rgba(59, 130, 246, 0.16), transparent 60%),
-    radial-gradient(900px 480px at 100% 0%, rgba(245, 158, 11, 0.08), transparent 55%),
-    var(--background);
+/* ---------------------------------------------------------------------------
+   ESTILO APPLE & SAMSUNG: VIDRO TRANSLÚCIDO & CARDS ULTRA-LIMPOS
+--------------------------------------------------------------------------- */
+
+/* Header com efeito de vidro translúcido estilo Apple iOS/macOS */
+.glass-header {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .glass-header {
+  background: rgba(7, 24, 39, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Glass panel translúcido */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+}
+
+[data-theme="dark"] .glass-panel {
+  background: rgba(14, 32, 50, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+}
+
+/* Cards no estilo Apple: limpos, bordas sutis, elevação elegante */
+.card-apple {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 8px -2px rgba(7, 24, 39, 0.04), 0 1px 2px 0 rgba(7, 24, 39, 0.02);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-apple:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 12px 24px -6px rgba(7, 24, 39, 0.06), 0 4px 8px -2px rgba(7, 24, 39, 0.03);
+  transform: translateY(-2px);
+}
+
+/* Manter retrocompatibilidade de .card-premium apontando para estilo elegante */
+.card-premium {
+  background: var(--surface);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem;
+  box-shadow: 0 2px 8px -2px rgba(7, 24, 39, 0.04);
+  transition: all 0.2s ease;
+}
+.card-premium:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+/* ---------------------------------------------------------------------------
+   ESTILO WHATSAPP: BOLHAS DE CONVERSA E MENSAGENS LIMPAS
+--------------------------------------------------------------------------- */
+
+.chat-bubble-user {
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 1.25rem 1.25rem 0.25rem 1.25rem;
+  padding: 0.875rem 1.125rem;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.15);
+}
+
+.chat-bubble-ai {
+  background: var(--surface);
+  color: var(--foreground);
+  border: 1px solid var(--border-color);
+  border-radius: 1.25rem 1.25rem 1.25rem 0.25rem;
+  padding: 0.875rem 1.125rem;
+  box-shadow: 0 2px 6px rgba(7, 24, 39, 0.03);
+}
+
+/* Botões pílula no estilo Apple / WhatsApp */
+.btn-pill {
+  border-radius: 9999px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-pill:active {
+  transform: scale(0.98);
 }
 
 .text-gradient-brand {
-  background: linear-gradient(90deg, #2563eb, #60a5fa 55%, #f59e0b);
+  background: linear-gradient(90deg, #2563eb, #3b82f6 60%, #1d4ed8);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
 
-/* Premium clean SaaS Card style (similar to Linear or Vercel) */
-.card-premium {
-  background: var(--surface);
-  border: 1px solid var(--border-color);
-  border-radius: 1rem;
-  box-shadow: 0 1px 2px 0 rgba(7, 24, 39, 0.03), 0 4px 12px -2px rgba(7, 24, 39, 0.05);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.card-premium:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 1px 2px 0 rgba(7, 24, 39, 0.03), 0 12px 24px -4px rgba(7, 24, 39, 0.08);
-  border-color: color-mix(in srgb, var(--border-color) 70%, var(--accent) 30%);
-}
-
-
-/* Native <option> popups render with a white background on Windows
-   regardless of page theme, so force readable dark text there always. */
+/* Native select popup styling */
 select {
   color-scheme: light;
 }
@@ -120,13 +194,12 @@ select option {
   background-color: #ffffff;
 }
 
-/* O AdSense marca unidades sem inventário como "unfilled". Elas não devem
-   continuar reservando um grande bloco vazio entre o conteúdo e o rodapé. */
+/* AdSense slot fix */
 .ad-slot:has(.adsbygoogle[data-ad-status="unfilled"]) {
   display: none;
 }
 
-/* Custom subtle scrollbar styling */
+/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -135,128 +208,20 @@ select option {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.3);
+  background: rgba(100, 116, 139, 0.25);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.5);
+  background: rgba(100, 116, 139, 0.45);
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(2px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   Movimento da landing (nicho): sutil, não compete com a leitura.
-   Tudo abaixo é desativado quando o usuário pede menos movimento.
---------------------------------------------------------------------------- */
-
-/* Entrada escalonada dos elementos do hero (roda uma vez, no load). */
-@keyframes riseIn {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.animate-rise {
-  opacity: 0;
-  animation: riseIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/* Reveal em scroll SEM JS: usa a timeline de view nativa do CSS, então cada
-   elemento anima conforme entra na viewport (o stagger em grids sai de graça,
-   porque cada item tem sua própria posição). Protegido por @supports: em
-   browser sem suporte o conteúdo aparece normal (nunca fica invisível). */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .reveal-up {
-      opacity: 0;
-      animation: revealUp 1ms linear both;
-      animation-timeline: view();
-      animation-range: entry 4% cover 24%;
-    }
-  }
-}
-@keyframes revealUp {
-  from {
-    opacity: 0;
-    transform: translateY(26px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Reveal ao rolar: aparece só quando entra na viewport (JS adiciona .is-visible). */
-.reveal {
-  opacity: 0;
-  transform: translateY(22px);
-  transition:
-    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
-}
-
-/* Header público (logo + nav + Entrar/Criar conta) das páginas de marketing e
-   conteúdo. Quando a página é vista por um usuário logado, ela é renderizada
-   dentro do AppShell (que já traz Topbar + Sidebar), então escondemos o header
-   público para não duplicar a navegação. Deslogado, aparece normalmente. */
+/* Authenticated shell rules */
 [data-authenticated] .public-header,
 [data-authenticated] .public-footer,
 [data-authenticated] .public-mobile-cta {
   display: none;
 }
 
-/* Cartões sobrepostos do hero: mantidos estáticos (sem flutuar) para um
-   visual mais sóbrio; as classes seguem no markup mas não animam. */
-.animate-float-soft,
-.animate-float-soft-slow {
-  animation: none;
-}
-
-/* Aurora atrás do hero: glow estático e discreto, sem drift em loop. */
-.animate-aurora,
-.animate-aurora-delayed {
-  animation: none;
-}
-
-/* CTAs primários: sem faixa de brilho varrendo; a classe fica inerte. */
-.btn-shine {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-/* Anel de progresso do score: preenche o traço do círculo. */
-@keyframes ringFill {
-  from {
-    stroke-dashoffset: var(--ring-circumference);
-  }
-  to {
-    stroke-dashoffset: var(--ring-offset);
-  }
-}
-.score-ring circle.score-ring-value {
-  animation: ringFill 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-}
-
-/* Link do menu: um traço cresce da esquerda no hover. */
 .nav-underline {
   position: relative;
 }
@@ -276,326 +241,11 @@ select option {
   transform: scaleX(1);
 }
 
-/* Plano em destaque: profundidade estática e discreta (sem pulsar) para
-   puxar o olho à conversão de forma sóbria. */
-.animate-soft-glow {
-  box-shadow:
-    0 18px 50px rgba(7, 24, 39, 0.14),
-    0 0 0 1px rgba(37, 99, 235, 0.12);
-}
-
-/* Cartão do hero: inclina seguindo o ponteiro (vars setadas por JS). */
-.hero-tilt {
-  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.25s ease-out;
-  transform-style: preserve-3d;
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .animate-rise,
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-    animation: none !important;
-    transition: none !important;
-  }
-  .animate-float-soft,
-  .animate-float-soft-slow,
-  .animate-aurora,
-  .animate-aurora-delayed,
-  .btn-shine::after,
-  .score-ring circle.score-ring-value {
-    animation: none !important;
-  }
-  .btn-shine::after {
-    display: none !important;
-  }
-  .animate-soft-glow,
-  .nav-underline::after {
-    animation: none !important;
-    transition: none !important;
-  }
-  .hero-tilt {
-    transform: none !important;
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
-
-/* Guided tour highlight - a soft pulsing glow around the focused element. */
-@keyframes tourPulse {
-  0%,
-  100% {
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
-  }
-  50% {
-    box-shadow: 0 0 0 7px rgba(37, 99, 235, 0.12);
-  }
-}
-.animate-tour-pulse {
-  animation: tourPulse 1.8s ease-in-out infinite;
-}
-
-/* Identidade compartilhada das ferramentas. As telas mantêm seus componentes,
-   enquanto este layout dá ritmo, profundidade e estados consistentes. */
-.tools-workspace {
-  position: relative;
-  isolation: isolate;
-  width: 100%;
-  min-height: 100%;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(239, 246, 255, 0.72) 0, rgba(248, 250, 252, 0.2) 28rem),
-    transparent;
-}
-
-[data-theme="dark"] .tools-workspace {
-  background:
-    linear-gradient(180deg, rgba(15, 42, 68, 0.42) 0, rgba(7, 24, 39, 0.08) 30rem),
-    transparent;
-}
-
-.tools-workspace-content {
-  position: relative;
-  z-index: 1;
-}
-
-.tools-workspace-glow {
-  position: absolute;
-  z-index: 0;
-  border-radius: 9999px;
-  filter: blur(2px);
-  pointer-events: none;
-}
-
-.tools-workspace-glow-primary {
-  top: 2rem;
-  left: max(-12rem, calc(50% - 48rem));
-  width: 24rem;
-  height: 24rem;
-  background: radial-gradient(circle, rgba(37, 99, 235, 0.13), transparent 68%);
-}
-
-.tools-workspace-glow-accent {
-  top: 16rem;
-  right: max(-10rem, calc(50% - 46rem));
-  width: 21rem;
-  height: 21rem;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.1), transparent 68%);
-}
-
-.tools-workspace main {
-  position: relative;
-}
-
-.tools-workspace main > a:first-child {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.25rem;
-  padding: 0.4rem 0.75rem;
-  border: 1px solid var(--border-color);
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--surface) 86%, transparent);
-  box-shadow: 0 1px 2px rgba(7, 24, 39, 0.04);
-  text-decoration: none;
-  backdrop-filter: blur(12px);
-}
-
-.tools-workspace main > header:not([class*="bg-gradient"]) {
-  position: relative;
-  padding: 1.5rem 1.5rem 1.5rem 1.75rem;
-  border: 1px solid color-mix(in srgb, var(--border-color) 88%, #2563eb 12%);
-  border-radius: 1.25rem;
-  background: color-mix(in srgb, var(--surface) 94%, transparent);
-  box-shadow: 0 18px 50px rgba(7, 24, 39, 0.07);
-  overflow: hidden;
-}
-
-.tools-workspace main > header:not([class*="bg-gradient"])::before {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 0.3rem;
-  background: linear-gradient(180deg, #2563eb, #60a5fa 60%, #f59e0b);
-}
-
-.tools-workspace main > header h1 {
-  color: var(--foreground);
-  letter-spacing: -0.035em;
-}
-
-.tools-workspace main > header[class*="bg-gradient"] h1 {
-  color: white;
-}
-
-.tools-workspace main > form {
-  padding: 1.25rem;
-  border: 1px solid var(--border-color);
-  border-radius: 1.25rem;
-  background: color-mix(in srgb, var(--surface) 96%, transparent);
-  box-shadow: 0 16px 45px rgba(7, 24, 39, 0.065);
-}
-
-.tools-workspace input:not([type="checkbox"]):not([type="radio"]),
-.tools-workspace textarea,
-.tools-workspace select {
-  border-color: color-mix(in srgb, var(--border-color) 86%, #64748b 14%);
-  background-color: var(--surface);
-  box-shadow: 0 1px 2px rgba(7, 24, 39, 0.035);
-}
-
-.tools-workspace input:not([type="checkbox"]):not([type="radio"]):focus,
-.tools-workspace textarea:focus,
-.tools-workspace select:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.11);
-}
-
-.tools-workspace section[class*="rounded-2xl"],
-.tools-workspace div[class*="rounded-2xl"][class*="border"] {
-  box-shadow: 0 12px 36px rgba(7, 24, 39, 0.055);
-}
-
-.tools-workspace button,
-.tools-workspace a {
-  -webkit-tap-highlight-color: transparent;
-}
-
-@media (max-width: 640px) {
-  .tools-workspace main {
-    padding-top: 1.5rem;
-    padding-bottom: 2.5rem;
-  }
-
-  .tools-workspace main > header:not([class*="bg-gradient"]) {
-    padding: 1.25rem 1.15rem 1.25rem 1.4rem;
-    border-radius: 1rem;
-  }
-
-  .tools-workspace main > form {
-    padding: 1rem;
-    border-radius: 1rem;
-  }
-}
-
-/* Animações e Efeitos das Telas de Autenticação */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-4px); }
-  75% { transform: translateX(4px); }
-}
-
-.animate-in.fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-in.fade-in.slide-in-from-bottom-4 {
-  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-shake {
-  animation: shake 0.2s ease-in-out 2;
-}
-
-/* ---------------------------------------------------------------------------
-   Efeitos Visuais Premium & Micro-interações
---------------------------------------------------------------------------- */
-
-/* Laser Sweep (Scanner de AI e ATS) */
-@keyframes laserSweep {
-  0% { top: 0%; opacity: 0.2; }
-  50% { opacity: 0.95; }
-  100% { top: 100%; opacity: 0.2; }
-}
-
-.animate-laser-sweep {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, #3b82f6, #60a5fa, #22c55e, transparent);
-  box-shadow: 0 0 15px 3px rgba(59, 130, 246, 0.6), 0 0 25px 6px rgba(34, 197, 94, 0.4);
-  animation: laserSweep 1.8s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-/* Card Shimmer Border (Linear / Vercel style) */
-@keyframes borderRotate {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.shimmer-card {
-  position: relative;
-  background: var(--surface);
-  border-radius: 1rem;
-  z-index: 1;
-}
-
-.shimmer-card::before {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: calc(1rem + 1px);
-  background: linear-gradient(90deg, rgba(37, 99, 235, 0.4), rgba(245, 158, 11, 0.4), rgba(34, 197, 94, 0.4), rgba(37, 99, 235, 0.4));
-  background-size: 300% 300%;
-  animation: borderRotate 6s ease infinite;
-  z-index: -1;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-}
-
-.shimmer-card:hover::before {
-  opacity: 1;
-}
-
-/* Primary Button Shine Ray */
-.btn-shine-glow {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-}
-
-.btn-shine-glow::after {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -60%;
-  width: 50%;
-  height: 200%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.35),
-    transparent
-  );
-  transform: rotate(25deg);
-  transition: all 0.6s ease;
-  pointer-events: none;
-}
-
-.btn-shine-glow:hover::after {
-  left: 120%;
-}
-
-/* Badge Glow */
-.badge-pulse-glow {
-  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
-  animation: pulseGlow 2.5s ease-in-out infinite alternate;
-}
-
-@keyframes pulseGlow {
-  0% { box-shadow: 0 0 8px rgba(34, 197, 94, 0.25); }
-  100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.5); }
-}
-
-

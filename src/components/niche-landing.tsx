@@ -911,9 +911,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
           {/* Hero remonta ao trocar de nicho para reproduzir a entrada escalonada */}
           <section key={activeSlug} className="py-10 md:py-14 grid grid-cols-1 lg:grid-cols-[1.15fr_1fr] gap-10 items-center">
             <div>
-              <span className={`animate-rise inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 ${theme.badge}`}>
-                {niche.eyebrow}
-              </span>
+
               <h1 className="animate-rise text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight" style={{ animationDelay: "80ms" }}>
                 {isDedicatedLanding ? dedicatedCopy.headline : niche.headline}
               </h1>

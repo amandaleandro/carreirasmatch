@@ -2,12 +2,16 @@
 
 import { signOut } from "next-auth/react";
 import { LogOut } from "lucide-react";
+import { resetPostHog } from "@/lib/analytics";
 
 export function LogoutButton({ className }: { className?: string }) {
   return (
     <button
       type="button"
-      onClick={() => signOut({ callbackUrl: "/" })}
+      onClick={() => {
+        resetPostHog();
+        void signOut({ callbackUrl: "/" });
+      }}
       className={
         className ??
         "flex w-full items-center gap-2 text-sm font-medium text-red-600 dark:text-red-400 hover:underline"

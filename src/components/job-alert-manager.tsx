@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { JobAlertForm } from "@/components/job-alert-form";
 import { PushOptIn } from "@/components/push-opt-in";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 type Alert = {
   id: string;
@@ -21,7 +22,10 @@ export function JobAlertManager({ initialAlerts }: { initialAlerts: Alert[] }) {
 
   async function remove(id: string) {
     const response = await fetch(`/api/job-alerts/${id}`, { method: "DELETE" });
-    if (response.ok) setAlerts((current) => current.filter((alert) => alert.id !== id));
+    if (response.ok) {
+      track(ANALYTICS_EVENTS.JOB_ALERT_DELETED);
+      setAlerts((current) => current.filter((alert) => alert.id !== id));
+    }
   }
 
   return (

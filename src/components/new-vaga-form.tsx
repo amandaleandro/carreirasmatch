@@ -3,6 +3,7 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { WORK_MODELS, SENIORITIES, JOB_TYPES } from "@/lib/vaga-fields";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 export function NewVagaForm() {
   const router = useRouter();
@@ -68,6 +69,12 @@ export function NewVagaForm() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao cadastrar a vaga.");
+      track(ANALYTICS_EVENTS.COMPANY_JOB_CREATED, {
+        published_to_feed: publishToFeed,
+        work_model_selected: Boolean(workModel),
+        seniority_selected: Boolean(seniority),
+        job_type_selected: Boolean(jobType),
+      });
       router.push(`/empresa/vagas/${data.id}`);
       router.refresh();
     } catch (err) {

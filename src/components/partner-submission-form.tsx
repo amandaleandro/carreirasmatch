@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 
 export function PartnerSubmissionForm() {
   const [sent, setSent] = useState(false);
@@ -14,8 +15,12 @@ export function PartnerSubmissionForm() {
       body: JSON.stringify(Object.fromEntries(form)),
     });
     const data = await response.json();
-    if (response.ok) setSent(true);
-    else setError(data.error ?? "Não foi possível enviar.");
+    if (response.ok) {
+      track(ANALYTICS_EVENTS.PARTNER_SUBMISSION_SENT);
+      setSent(true);
+    } else {
+      setError(data.error ?? "Não foi possível enviar.");
+    }
   }
   if (sent) return <div className="rounded-2xl bg-emerald-50 p-6 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">Recebemos sua publicação. Nossa equipe fará a revisão antes de divulgar.</div>;
   const field = "rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700";
