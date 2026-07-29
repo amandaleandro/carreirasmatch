@@ -35,6 +35,8 @@ services:
         NEXT_PUBLIC_ADSENSE_SLOT_BLOG_LIST: ${NEXT_PUBLIC_ADSENSE_SLOT_BLOG_LIST:-}
         NEXT_PUBLIC_ADSENSE_SLOT_TOOL_GUIDE: ${NEXT_PUBLIC_ADSENSE_SLOT_TOOL_GUIDE:-}
         NEXT_PUBLIC_GOOGLE_ADS_ID: ${NEXT_PUBLIC_GOOGLE_ADS_ID:-}
+        NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN: ${NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN:-}
+        NEXT_PUBLIC_POSTHOG_HOST: ${NEXT_PUBLIC_POSTHOG_HOST:-}
     container_name: carreiras-match-app
     restart: unless-stopped
     environment:
@@ -89,6 +91,8 @@ services:
       - SENTRY_DSN=${SENTRY_DSN:-}
       - NEXT_PUBLIC_SENTRY_DSN=${NEXT_PUBLIC_SENTRY_DSN:-}
       - SENTRY_TRACES_SAMPLE_RATE=${SENTRY_TRACES_SAMPLE_RATE:-0}
+      - NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN=${NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN:-}
+      - NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST:-}
       # Trava opcional do /api/metrics (vazia = sem trava; ver observability/README.md).
       - METRICS_TOKEN=${METRICS_TOKEN:-}
       # Provedores de IA extras (multi-provedor com fallback) - ligam ao setar a chave.
