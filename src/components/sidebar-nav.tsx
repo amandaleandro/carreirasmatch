@@ -337,6 +337,7 @@ export function SidebarNav({
                   key={item.href}
                   href={item.href}
                   data-tour={item.tour}
+                  aria-current={active ? "page" : undefined}
                   className={`group flex items-center gap-3 rounded-xl px-3.5 py-2 text-xs transition-all ${
                     active
                       ? "bg-blue-600/20 text-blue-400 font-bold border border-blue-500/30"

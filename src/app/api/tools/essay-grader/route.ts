@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireToolAccess } from "@/lib/require-auth";
 import { gradeEssay } from "@/lib/tools";
+import { logStudyActivity } from "@/lib/study-activity";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +15,8 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await gradeEssay(essayText, theme ?? "");
+
+    void logStudyActivity(session.user.id, "redacao_concurso", result.totalScore);
 
     return NextResponse.json(result);
   } catch (error) {

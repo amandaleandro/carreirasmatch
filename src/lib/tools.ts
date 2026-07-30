@@ -391,6 +391,10 @@ export type ResumeFromScratchInput = {
   targetRole: string;
   jobTitle?: string;
   jobText?: string;
+  /** Resumo do perfil comportamental (do teste de soft skills), se o usuário já fez o
+   * teste. Usado só para calibrar o TOM do resumo/experiências (ex: alguém com
+   * proatividade alta pode ter isso refletido na escrita) — nunca para inventar fatos. */
+  softSkillsSummary?: string;
 };
 
 export type ResumeFromScratchResult = {
@@ -441,7 +445,11 @@ PROJETOS/ATIVIDADES (acadêmicos, pessoais, cursos, voluntariado, etc):
 ${input.projects}
 
 HABILIDADES/TECNOLOGIAS:
-${input.skills}`;
+${input.skills}${
+    input.softSkillsSummary
+      ? `\n\nPERFIL COMPORTAMENTAL (use só para calibrar o tom da escrita, nunca para inventar experiências): ${input.softSkillsSummary}`
+      : ""
+  }`;
 
   return runToolJsonPrompt<ResumeFromScratchResult>("resume_from_scratch", systemPrompt, userMessage);
 }
@@ -536,6 +544,13 @@ export type InterviewSimulatorInput = {
   area: string;
   seniority: string;
   history: InterviewTurn[];
+  /** Pontos fracos já identificados na análise de currículo x vaga (opcional, só na
+   * primeira pergunta) — usados para a entrevista sondar exatamente onde o candidato
+   * mais precisa treinar, em vez de perguntas genéricas. */
+  focusAreas?: string[];
+  /** Perguntas prováveis já geradas pela análise, como inspiração/repertório do
+   * entrevistador (não precisam ser usadas literalmente). */
+  suggestedQuestions?: string[];
 };
 
 export type InterviewQuestionResult = { question: string };
@@ -548,10 +563,19 @@ export type InterviewAnswerResult = {
   nextQuestion: string | null;
 };
 
-function interviewContext({ targetRole, area, seniority }: InterviewSimulatorInput): string {
-  return `CARGO-ALVO: ${targetRole}
+function interviewContext({ targetRole, area, seniority, focusAreas, suggestedQuestions }: InterviewSimulatorInput): string {
+  let context = `CARGO-ALVO: ${targetRole}
 ÁREA: ${area || "não informada"}
 NÍVEL: ${seniority || "não informado"}`;
+
+  if (focusAreas?.length) {
+    context += `\nPONTOS FRACOS JÁ IDENTIFICADOS NO CURRÍCULO DESTE CANDIDATO PARA ESTA VAGA (priorize sondar isso): ${focusAreas.join("; ")}`;
+  }
+  if (suggestedQuestions?.length) {
+    context += `\nPERGUNTAS PROVÁVEIS PARA ESTA VAGA (use como repertório, não precisa repetir literalmente): ${suggestedQuestions.join(" | ")}`;
+  }
+
+  return context;
 }
 
 // A entrevista roda para QUALQUER área (saúde, vendas, logística, tecnologia...),

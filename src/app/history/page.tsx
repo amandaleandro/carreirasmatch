@@ -110,6 +110,11 @@ export default async function HistoryPage({
         </Link>
       </div>
 
+      <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
+        {total} {total === 1 ? "diagnóstico encontrado" : "diagnósticos encontrados"}
+        {(q || track || status) && " com os filtros atuais"}.
+      </p>
+
       {seniorityTimeline.length >= 2 && (
         <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
           <div className="flex items-center justify-between gap-4 mb-4">
@@ -158,10 +163,11 @@ export default async function HistoryPage({
             <SearchIcon className="h-4 w-4" />
           </span>
           <input
-            type="text"
+            type="search"
             name="q"
             defaultValue={q || ""}
             placeholder="Buscar por vaga..."
+            aria-label="Buscar por vaga"
             className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
+import { logStudyActivity } from "@/lib/study-activity";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +37,8 @@ TEXTO DO EDITAL:
 ${editalText.slice(0, 5000)}`;
 
     const parsedData = await runJsonPrompt(systemPrompt, userPrompt, 0.2);
+
+    void logStudyActivity(session.user.id, "edital");
 
     return NextResponse.json({ success: true, parsedData });
   } catch (error) {

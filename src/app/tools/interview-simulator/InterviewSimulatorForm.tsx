@@ -49,9 +49,17 @@ function scoreClass(score: number) {
   return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300";
 }
 
-export function InterviewSimulatorForm() {
-  const [targetRole, setTargetRole] = useState("");
-  const [area, setArea] = useState("");
+export function InterviewSimulatorForm({
+  analysisId,
+  initialTargetRole = "",
+  initialArea = "",
+}: {
+  analysisId?: string;
+  initialTargetRole?: string;
+  initialArea?: string;
+}) {
+  const [targetRole, setTargetRole] = useState(initialTargetRole);
+  const [area, setArea] = useState(initialArea);
   const [seniority, setSeniority] = useState("Júnior");
 
   const [started, setStarted] = useState(false);
@@ -103,7 +111,13 @@ export function InterviewSimulatorForm() {
     const res = await fetch("/api/tools/interview-simulator", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ targetRole, area, seniority, history }),
+      body: JSON.stringify({
+        targetRole,
+        area,
+        seniority,
+        history,
+        ...(history.length === 0 && analysisId ? { analysisId } : {}),
+      }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error ?? "Erro ao processar.");
@@ -199,6 +213,11 @@ export function InterviewSimulatorForm() {
           <p className="text-xs text-[#64748B] mt-0.5">
             Pratique com {TOTAL_QUESTIONS} perguntas reais do seu cargo, com nota e feedback a cada resposta.
           </p>
+          {analysisId && (
+            <p className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 mt-1">
+              ✓ Personalizado com base na sua análise para {initialTargetRole || "esta vaga"}
+            </p>
+          )}
         </div>
       </div>
 

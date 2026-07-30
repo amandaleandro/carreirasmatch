@@ -18,6 +18,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const softSkillResult = await prisma.softSkillTestResult.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      select: { personalityLabel: true, summary: true },
+    });
+
     const result = await generateResumeFromScratch({
       fullName: fullName ?? "",
       education,
@@ -26,6 +32,9 @@ export async function POST(req: NextRequest) {
       targetRole: targetRole ?? "",
       jobTitle: jobTitle ?? "",
       jobText: jobText ?? "",
+      softSkillsSummary: softSkillResult
+        ? `${softSkillResult.personalityLabel}. ${softSkillResult.summary}`
+        : undefined,
     });
 
     const resume = await prisma.resume.create({

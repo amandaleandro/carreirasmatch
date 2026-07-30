@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { evaluateEnemEssay } from "@/lib/ensino-medio-tools";
+import { logStudyActivity } from "@/lib/study-activity";
 
 export async function POST(req: Request) {
   try {
@@ -21,6 +23,10 @@ export async function POST(req: Request) {
     }
 
     const evaluation = await evaluateEnemEssay(topic.trim(), essayText.trim());
+
+    const session = await auth();
+    if (session?.user?.id) void logStudyActivity(session.user.id, "redacao_enem", evaluation.totalScore);
+
     return NextResponse.json(evaluation);
   } catch (error) {
     console.error("[API redacao/corrigir] Erro:", error);

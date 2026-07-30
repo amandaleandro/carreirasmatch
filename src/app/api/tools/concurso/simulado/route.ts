@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireToolAccess } from "@/lib/require-auth";
 import { generateConcursoMockExam } from "@/lib/tools";
+import { logStudyActivity } from "@/lib/study-activity";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,6 +19,8 @@ export async function POST(req: NextRequest) {
       banca: String(banca ?? ""),
       disciplina: String(disciplina),
     });
+
+    void logStudyActivity(session.user.id, "simulado_concurso");
 
     return NextResponse.json(result);
   } catch (error) {

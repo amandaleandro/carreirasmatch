@@ -137,6 +137,31 @@ export default async function ApplicationsPage() {
       </div>
 
       {/* Piloto Automático de Candidatura Inteligente */}
+      {upcomingDeadlines.length > 0 && (
+        <section aria-labelledby="deadlines-heading" className="rounded-3xl border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/60 dark:bg-amber-950/20">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Atenção</p>
+              <h2 id="deadlines-heading" className="mt-1 text-sm font-bold text-slate-900 dark:text-white">Você tem prazo próximo</h2>
+            </div>
+            <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">{upcomingDeadlines.length} processo{upcomingDeadlines.length === 1 ? "" : "s"}</span>
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+            {upcomingDeadlines.map((item) => {
+              const days = daysUntil(item.deadline!, now);
+              return (
+                <div key={item.id} className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-white/70 px-3 py-2 dark:border-amber-900/50 dark:bg-slate-900/50">
+                  <p className="truncate text-xs font-semibold text-slate-800 dark:text-slate-200">{item.jobTitle}</p>
+                  <span className={`shrink-0 rounded-lg px-2 py-1 text-[10px] font-bold ${deadlineBadgeClass(days)}`}>
+                    {days <= 0 ? "Hoje" : `${days}d`}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
+
       <AutoApplySettingsCard />
 
       {/* Kanban Board Visual */}
@@ -185,7 +210,7 @@ export default async function ApplicationsPage() {
       </section>
 
       {upcomingDeadlines.length > 0 && (
-        <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40">
+        <section className="hidden">
           <h2 className="text-sm font-bold text-[#071827] dark:text-white">Prazos próximos</h2>
           <div className="mt-3 space-y-2">
             {upcomingDeadlines.map((item) => {

@@ -82,7 +82,7 @@ export default function RegisterPage() {
       }
 
       track(ANALYTICS_EVENTS.SIGNUP_COMPLETED, { careerSegment: careerSegment || "unknown" });
-      router.push("/dashboard");
+      router.push("/onboarding");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");

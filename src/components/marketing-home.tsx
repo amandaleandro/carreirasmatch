@@ -18,6 +18,7 @@ import {
   Gift,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
+import { PublicNav, PublicNavMobile } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
@@ -61,14 +62,14 @@ const ecosystemCards = [
 ] as const;
 
 const audienceCards = [
-  ["Estágio", "Mostre seu potencial desde o início", "Descubra como seus projetos da faculdade e cursos contam como experiência prática.", "/estagio"],
-  ["Jovem Aprendiz", "Sua primeira oportunidade no mercado", "Monte um currículo claro destacando sua dedicação, escola e vontade de aprender.", "/jovem-aprendiz"],
-  ["Primeiro emprego", "Valorize tudo o que você já sabe", "Crie uma candidatura consistente e mostre seu valor mesmo sem carteira assinada.", "/primeiro-emprego"],
-  ["Transição de carreira", "Sua bagagem não começa do zero", "Identifique as habilidades que você já possui e aproximam você da nova área.", "/transicao"],
-  ["Recolocação profissional", "Volte ao mercado com confiança", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
-  ["Ensino Médio", "Escolha seu próximo passo profissional", "Tire dúvidas, pratique redação e entenda o caminho entre faculdade e curso técnico.", "/faculdade-ou-tecnico"],
-  ["Concursos públicos", "Estude com estratégia até a aprovação", "Organize os tópicos do edital, acompanhe seu progresso e treine com simulados.", "/concurso"],
-  ["Exame da OAB", "Prepare-se com foco em cada fase", "Treine com questões no estilo da banca e identifique exatamente o que revisar.", "/oab"],
+  ["Descobrir", "Estou escolhendo uma profissão", "Teste vocacional, comparação de profissões e o caminho entre faculdade e curso técnico.", "/faculdade-ou-tecnico"],
+  ["Aprender", "Estou estudando", "Ensino médio, concursos, OAB e ferramentas de estudo com tutor por IA.", "/concurso"],
+  ["Conquistar", "Quero estágio", "Transforme projetos da faculdade e cursos em experiência que conta.", "/estagio"],
+  ["Conquistar", "Quero meu primeiro emprego", "Crie uma candidatura consistente e mostre seu valor mesmo sem carteira assinada.", "/primeiro-emprego"],
+  ["Conquistar", "Quero melhorar minhas candidaturas", "Analise seu currículo contra a vaga e descubra exatamente o que ajustar.", "/analise"],
+  ["Evoluir", "Quero mudar de carreira", "Identifique as habilidades que você já possui e aproximam você da nova área.", "/transicao"],
+  ["Conquistar", "Quero voltar ao mercado", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
+  ["Freelancer", "Quero trabalhar por conta", "Monte seu perfil, envie propostas e acompanhe contratos em um só lugar.", "/freelancers"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -150,33 +151,29 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           <Link href="/" aria-label="CarreirasMatch">
             <BrandLogo heightClassName="h-10 sm:h-12" onDark />
           </Link>
-          <nav aria-label="Navegação principal" className="hidden items-center gap-7 text-xs font-semibold text-slate-300 md:flex">
-            <a href="#exemplo" className="hover:text-white transition-colors">Como Funciona</a>
-            <a href="#como-funciona" className="hover:text-white transition-colors">Passo a Passo</a>
-            <a href="#kit" className="hover:text-white transition-colors">O Que Você Recebe</a>
-            <a href="#preco" className="hover:text-white transition-colors">Planos</a>
-          </nav>
+          <PublicNav />
           <div className="flex items-center gap-2.5">
             <Link href="/login" className="rounded-full border border-white/20 px-4.5 py-2 text-xs font-semibold hover:bg-white/10 transition-all">Entrar</Link>
             <Link href="/register" className="rounded-full bg-blue-600 px-5 py-2 text-xs font-semibold text-white hover:bg-blue-500 transition-all shadow-xs">Criar Conta</Link>
+            <PublicNavMobile />
           </div>
         </header>
 
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-14">
           <div className="space-y-6">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Cansado de enviar currículos e não receber resposta?
+              Sua carreira inteira, em um só lugar.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              Sabemos como é frustrante. O problema raramente é o seu talento, mas sim o fato de as empresas utilizarem filtros automáticos que descartam excelentes candidatos. Nós te ajudamos a adequar seu currículo para ser visto pelos recrutadores.
+              Descubra caminhos, desenvolva competências, prepare-se para oportunidades e acompanhe sua evolução profissional com inteligência artificial.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Analisar meu currículo grátis" />
-              <Link href="/verificador-ats" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
-                Conhecer a ferramenta
-              </Link>
+              <PrimaryCta label="Descobrir meu próximo passo" />
+              <a href="#momento" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
+                Conhecer a plataforma
+              </a>
             </div>
 
             <div className="grid gap-2.5 text-xs font-medium text-slate-300 sm:grid-cols-2 pt-2">
@@ -195,13 +192,13 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
 
       <main>
         {/* MOMENTO PROFISSIONAL */}
-        <section className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+        <section id="momento" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-16 md:px-8">
           <div className="max-w-2xl space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Em qualquer momento da sua carreira, você merece ser ouvido
+              Em que momento da sua carreira você está?
             </h2>
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Seja buscando o primeiro estágio, mudando de área ou voltando ao mercado, adequar sua apresentação à oportunidade faz toda a diferença.
+              Escolha o que mais combina com você agora. O CarreirasMatch entende seu momento e mostra o próximo passo, sem que você precise conhecer todas as ferramentas.
             </p>
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

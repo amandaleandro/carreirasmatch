@@ -589,6 +589,28 @@ export async function sendOnboardingNudgeEmail(
   );
 }
 
+export async function sendObjectiveFirstStepNudgeEmail(
+  to: string,
+  opts: { name?: string | null; objectiveLabel: string; ctaLabel: string; ctaHref: string }
+) {
+  const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
+  await send(
+    to,
+    `🎯 Seu objetivo: ${opts.objectiveLabel}`,
+    `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">
+        Quando você entrou no ${BRAND}, contou que seu objetivo agora é
+        <strong>${opts.objectiveLabel.toLowerCase()}</strong>.
+      </p>
+      <p>Vimos que você ainda não deu o primeiro passo recomendado para chegar lá. Não precisa ser perfeito, só precisa começar 🎯</p>
+      ${button(`${APP_URL}${opts.ctaHref}`, opts.ctaLabel)}
+      <p>Se o seu objetivo mudou, é só ajustar em "Minha Jornada" no seu painel.</p>
+      <p>Se tiver qualquer dúvida, é só responder este e-mail 💬</p>
+    `
+  );
+}
+
 export async function sendConvertToSubscriptionEmail(
   to: string,
   opts: { name?: string | null; segment?: string | null; score?: number | null; jobTitle?: string | null }

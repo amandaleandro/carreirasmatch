@@ -27,6 +27,8 @@ model User {
   currentProfessionalArea     String?
   targetProfessionalArea      String?
   studyCourse                 String?
+  objective                   String?
+  objectiveDeadline           String?
   city                        String?
   state                       String?
   hasFormalEducation          Boolean?
@@ -52,6 +54,7 @@ model User {
   passwordResetTokens         PasswordResetToken[]
   supportTickets              SupportTicket[]
   freeToolUsages              FreeToolUsage[]
+  studyActivityLogs           StudyActivityLog[]
   jobAlerts                   JobAlert[]
   pushSubscriptions           PushSubscription[]
   opportunityReports          OpportunityReport[]
@@ -680,6 +683,21 @@ model FreeToolUsage {
 
   @@unique([userId, tool])
   @@index([createdAt])
+}
+
+/** Log de uso das ferramentas de estudo (simulados, redação, flashcards, edital, OAB).
+ * Ao contrário de FreeToolUsage (1 linha por ferramenta, para gate de uso grátis),
+ * aqui cada uso gera uma linha nova — é o que alimenta o "plano de estudos da semana"
+ * no dashboard para quem tem objetivo de estudo (student/concurseiro/oab). */
+model StudyActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tool      String
+  score     Int?
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
 model ExternalCourse {

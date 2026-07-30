@@ -5,12 +5,14 @@ import { prisma } from "@/lib/prisma";
 import { CircularScore } from "@/components/circular-score";
 import { TRACK_LABELS, CareerTrack } from "@/components/analysis-display";
 import { normalizeCareerSegment } from "@/lib/career-segments";
+import { findObjective, OBJECTIVE_DEADLINE_OPTIONS } from "@/lib/onboarding-objectives";
 import { toolsForSegment } from "@/lib/tools-catalog";
+import { STUDY_ACTIVITY_TOOLS, type StudyActivityTool } from "@/lib/study-activity";
 import { matchAreaSlug } from "@/lib/vocation-areas";
-import { computeJourneyMetrics } from "@/lib/applications";
+import { computeJourneyMetrics, getWeekStart } from "@/lib/applications";
 import { formatBrazilDate, formatBrazilDateTime, getBrazilGreeting } from "@/lib/brazil";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
-import { Trophy } from "lucide-react";
+import { Trophy, ArrowRight, Sparkles, Target, CheckCircle2 } from "lucide-react";
 import { CareerScoreEvolutionChart } from "@/components/career-score-evolution-chart";
 import { DailyMotivationCard } from "@/components/daily-motivation-card";
 import { updateEmploymentStatusAction } from "./actions";
@@ -18,9 +20,9 @@ import { updateEmploymentStatusAction } from "./actions";
 export const dynamic = "force-dynamic";
 
 const STATUS_CONFIG = {
-  apply_now: { label: "Aplicar agora", dot: "bg-[#22C55E]", chip: "bg-[#22C55E]/10 text-[#071827] dark:text-emerald-300 border-[#22C55E]/20 dark:border-[#22C55E]/10" },
-  adjust_first: { label: "Ajustar antes de aplicar", dot: "bg-[#F59E0B]", chip: "bg-[#F59E0B]/10 text-[#071827] dark:text-amber-300 border-[#F59E0B]/20 dark:border-[#F59E0B]/10" },
-  deprioritize: { label: "Não priorizar agora", dot: "bg-[#EF4444]", chip: "bg-[#EF4444]/10 text-[#071827] dark:text-red-300 border-[#EF4444]/20 dark:border-[#EF4444]/10" },
+  apply_now: { label: "Aplicar agora", dot: "bg-emerald-500", chip: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800" },
+  adjust_first: { label: "Ajustar antes de aplicar", dot: "bg-amber-500", chip: "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800" },
+  deprioritize: { label: "Não priorizar agora", dot: "bg-rose-500", chip: "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border-rose-200 dark:border-rose-800" },
 } as const;
 
 export default async function DashboardPage() {
@@ -46,6 +48,8 @@ export default async function DashboardPage() {
         studyCourse: true,
         name: true,
         employmentStatus: true,
+        objective: true,
+        objectiveDeadline: true,
       },
     }),
     prisma.softSkillTestResult.findFirst({
@@ -60,8 +64,6 @@ export default async function DashboardPage() {
     }),
   ]);
 
-  // O selo/recomendação premium do Top 10 é reservado a quem assina: o ranking em si
-  // é aberto a todos, mas a recompensa (vagas exclusivas) é benefício pago.
   const isTopPlayer =
     topMonthlyScores.some((s) => s.userId === session.user.id) &&
     (await hasActiveSubscriptionAccess(session.user.id));
@@ -73,6 +75,10 @@ export default async function DashboardPage() {
         include: { company: { select: { name: true } } },
       })
     : [];
+
+  const segment = normalizeCareerSegment(user?.careerSegment);
+  const isStudySegment = segment === "student" || segment === "concurseiro" || segment === "oab";
+  const weekStart = getWeekStart();
 
   const applications = await prisma.application.findMany({
     where: { userId: session.user.id },
@@ -89,12 +95,53 @@ export default async function DashboardPage() {
     orderBy: { interviewAt: "asc" },
     take: 3,
   });
+
+  const [studyScheduleItems, studyActivitiesThisWeek] = isStudySegment
+    ? await Promise.all([
+        prisma.studyScheduleItem.findMany({
+          where: { userId: session.user.id, weekStart },
+          orderBy: { createdAt: "asc" },
+        }),
+        prisma.studyActivityLog.findMany({
+          where: { userId: session.user.id, createdAt: { gte: weekStart } },
+          orderBy: { createdAt: "desc" },
+          take: 5,
+        }),
+      ])
+    : [[], []];
+
+  const weeklyPlan = isStudySegment
+    ? []
+    : await (async () => {
+        const [weeklyGoal, resumeTweaksThisWeek, appliedThisWeekCount, interviewsActiveCount] = await Promise.all([
+          prisma.weeklyGoal.findUnique({
+            where: { userId_weekStart: { userId: session.user.id, weekStart } },
+          }),
+          prisma.analysis.count({
+            where: { resume: { userId: session.user.id }, createdAt: { gte: weekStart } },
+          }),
+          prisma.application.count({
+            where: { userId: session.user.id, appliedAt: { gte: weekStart } },
+          }),
+          prisma.application.count({
+            where: { userId: session.user.id, status: { in: ["interview", "technical_test", "offer"] } },
+          }),
+        ]);
+        const currentWeeklyGoal = weeklyGoal ?? { targetApplications: 8, targetResumeTweaks: 2, targetInterviews: 3 };
+        return [
+          { label: "Candidaturas na semana", done: appliedThisWeekCount, target: currentWeeklyGoal.targetApplications },
+          { label: "Currículos ajustados", done: resumeTweaksThisWeek, target: currentWeeklyGoal.targetResumeTweaks },
+          { label: "Entrevistas em andamento", done: interviewsActiveCount, target: currentWeeklyGoal.targetInterviews },
+        ];
+      })();
+
   const allApplicationsForMetrics = await prisma.application.findMany({
     where: { userId: session.user.id },
     select: { status: true, createdAt: true },
   });
   const journey = computeJourneyMetrics(allApplicationsForMetrics);
-  const segment = normalizeCareerSegment(user?.careerSegment);
+  const currentObjective = findObjective(segment, user?.objective ?? "");
+  const deadlineLabel = OBJECTIVE_DEADLINE_OPTIONS.find((o) => o.value === user?.objectiveDeadline)?.label ?? null;
   const userAreaSlug = matchAreaSlug(user?.targetProfessionalArea || user?.professionalArea || user?.studyCourse);
   const motivationProfile = {
     careerSegment: user?.careerSegment,
@@ -107,18 +154,132 @@ export default async function DashboardPage() {
 
   const greeting = getBrazilGreeting(session.user.name ?? user?.name ?? undefined);
 
+  const weeklyPlanSection = isStudySegment ? (
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="font-bold text-slate-900 dark:text-white text-base">Plano de estudos da semana</p>
+        <Link href="/ensino-medio/cronograma" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+          Editar cronograma →
+        </Link>
+      </div>
+      {studyScheduleItems.length > 0 ? (
+        <ul className="space-y-2">
+          {studyScheduleItems.map((item) => (
+            <li key={item.id} className="flex items-center gap-3 text-sm">
+              <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${item.done ? "border-blue-600 bg-blue-600" : "border-slate-300 dark:border-slate-700"}`}>
+                {item.done && <CheckCircle2 className="h-3 w-3 text-white" />}
+              </span>
+              <span className={item.done ? "text-slate-400 line-through" : "text-slate-700 dark:text-slate-200"}>
+                {item.task}{item.focus ? ` — ${item.focus}` : ""}
+              </span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-xs text-slate-500 dark:text-slate-400">
+          Você ainda não montou seu cronograma desta semana.
+        </p>
+      )}
+
+      <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+        <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+          Atividades de estudo nesta semana ({studyActivitiesThisWeek.length})
+        </p>
+        {studyActivitiesThisWeek.length > 0 ? (
+          <ul className="space-y-1.5">
+            {studyActivitiesThisWeek.map((activity) => (
+              <li key={activity.id} className="flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
+                <span>{STUDY_ACTIVITY_TOOLS[activity.tool as StudyActivityTool] ?? activity.tool}</span>
+                {typeof activity.score === "number" && (
+                  <span className="font-semibold text-slate-900 dark:text-white">{activity.score}/1000</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            Nenhum simulado, redação ou flashcard feito ainda esta semana.
+          </p>
+        )}
+      </div>
+    </div>
+  ) : (
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="font-bold text-slate-900 dark:text-white text-base">Plano da semana</p>
+        <Link href="/applications" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+          Ajustar metas →
+        </Link>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-3">
+        {weeklyPlan.map((item) => {
+          const pct = item.target > 0 ? Math.min(100, Math.round((item.done / item.target) * 100)) : item.done > 0 ? 100 : 0;
+          return (
+            <div key={item.label} className="space-y-1.5">
+              <div className="flex items-baseline justify-between text-xs">
+                <span className="font-medium text-slate-700 dark:text-slate-300">{item.label}</span>
+                <span className="font-semibold text-slate-900 dark:text-white">{item.done}/{item.target}</span>
+              </div>
+              <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div className="h-full rounded-full bg-blue-600" style={{ width: `${pct}%` }} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+
+  // Prioriza os atalhos do objetivo específico escolhido no onboarding; completa com
+  // os atalhos genéricos do segmento (evitando repetir a mesma rota nas duas listas).
+  const objectiveShortcuts = currentObjective?.shortcuts ?? [];
+  const objectiveShortcutHrefs = new Set(objectiveShortcuts.map((s) => s.href));
+  const fallbackShortcuts = recommendedTools
+    .filter((tool) => !objectiveShortcutHrefs.has(tool.href))
+    .map((tool) => ({ title: tool.title, description: tool.description, href: tool.href }));
+  const combinedShortcuts = [...objectiveShortcuts, ...fallbackShortcuts].slice(0, 4);
+
+  const shortcutsSection = combinedShortcuts.length > 0 && (
+    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="font-bold text-slate-900 dark:text-white text-base">Atalhos para o seu momento</p>
+        <Link href="/tools" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+          Ver todas →
+        </Link>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {combinedShortcuts.map((tool) => (
+          <Link
+            key={tool.href}
+            href={tool.href}
+            className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 p-4 hover:border-blue-300 dark:hover:border-blue-800 transition-all"
+          >
+            <p className="text-sm font-semibold text-slate-900 dark:text-white leading-snug">{tool.title}</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2">{tool.description}</p>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+
   if (analyses.length === 0) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16 w-full text-center font-sans space-y-6">
-        <h1 className="text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12 md:py-16 w-full text-center space-y-6">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
           {greeting}
         </h1>
-        <p className="text-[#64748B] dark:text-neutral-400">
-          Você ainda não fez nenhum diagnóstico. Envie seu currículo e uma vaga
-          para ver sua aderência e seu plano de ação aqui.
-        </p>
+        {currentObjective ? (
+          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+            Seu objetivo é <span className="font-semibold text-slate-800 dark:text-slate-200">{currentObjective.label.toLowerCase()}</span>.
+            Seu primeiro passo recomendado é {currentObjective.cta.label.toLowerCase()}.
+          </p>
+        ) : (
+          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base leading-relaxed">
+            Você ainda não fez nenhum diagnóstico. Envie seu currículo e uma vaga
+            para ver sua aderência e seu plano de ação aqui.
+          </p>
+        )}
 
-        {/* Dose Diária de Motivação mesmo sem análises ainda */}
         <div className="text-left">
           <DailyMotivationCard
             initialStatus={user?.employmentStatus}
@@ -131,11 +292,17 @@ export default async function DashboardPage() {
         </div>
 
         <Link
-          href="/"
-          className="inline-block mt-4 rounded-xl bg-[#2563EB] text-white font-semibold px-6 py-3 hover:bg-[#1D4ED8] hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.98] transition-all cursor-pointer"
+          href={currentObjective?.cta.href ?? "/analise"}
+          className="inline-flex items-center gap-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-6 py-3.5 text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm"
         >
-          Fazer meu primeiro diagnóstico
+          <span>{currentObjective ? currentObjective.cta.label : "Fazer meu primeiro diagnóstico"}</span>
+          <ArrowRight className="w-4 h-4" />
         </Link>
+
+        <div className="text-left space-y-6">
+          {weeklyPlanSection}
+          {shortcutsSection}
+        </div>
       </div>
     );
   }
@@ -190,20 +357,55 @@ export default async function DashboardPage() {
   })).reverse();
 
   return (
-    <div className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8 font-sans bg-[#F8FAFC] dark:bg-[#071827] text-foreground">
-      {/* Gráfico de Evolução do Score de Aderência */}
+    <div className="px-4 sm:px-6 md:px-8 py-8 md:py-12 max-w-7xl mx-auto w-full space-y-8">
+      {/* Gráfico de Evolução */}
       <CareerScoreEvolutionChart dataPoints={scoreDataPoints} />
-      <div data-tour="dash-overview" className="animate-in fade-in duration-300">
-        <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-1.5">Visão geral</p>
-        <h1 className="text-3xl font-title font-bold tracking-tight text-[#071827] dark:text-white">
+
+      <div data-tour="dash-overview" className="space-y-1">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Minha Jornada</span>
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           {greeting}
         </h1>
-        <p className="text-[#64748B] dark:text-neutral-400 mt-1 text-sm">
-          Seu mapa da próxima oportunidade.
-        </p>
+        {currentObjective ? (
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Objetivo atual: <span className="font-semibold text-slate-800 dark:text-slate-200">{currentObjective.label}</span>
+            {deadlineLabel && <> · {deadlineLabel}</>}
+            {" · "}
+            <Link href="/onboarding" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">Editar objetivo</Link>
+          </p>
+        ) : (
+          <p className="text-slate-600 dark:text-slate-400 text-sm">
+            Seu mapa estratégico para a próxima candidatura.{" "}
+            <Link href="/onboarding" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">Definir meu objetivo</Link>
+          </p>
+        )}
       </div>
 
-      {/* Card da Dose Diária de Motivação & Meme */}
+      <section aria-labelledby="prioridade-heading" className="rounded-2xl border border-blue-200/80 bg-blue-50/60 p-5 dark:border-blue-900/60 dark:bg-blue-950/20">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Seu próximo passo</p>
+            <h2 id="prioridade-heading" className="mt-1 text-base font-bold text-slate-900 dark:text-white">
+              {currentObjective ? currentObjective.cta.label : "Escolha uma próxima ação"}
+            </h2>
+            <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+              {currentObjective
+                ? `Recomendado para seu objetivo: "${currentObjective.label}".`
+                : "Seu histórico está salvo. Você pode revisar o último match ou encontrar novas oportunidades."}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {currentObjective ? (
+              <Link href={currentObjective.cta.href} className="rounded-xl bg-blue-600 px-4 py-2.5 text-center text-xs font-semibold text-white transition-colors hover:bg-blue-700">{currentObjective.cta.label}</Link>
+            ) : (
+              <Link href={`/report/${latest.id}`} className="rounded-xl bg-slate-900 px-4 py-2.5 text-center text-xs font-semibold text-white transition-colors hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Revisar último match</Link>
+            )}
+            <Link href="/feed" className="rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-center text-xs font-semibold text-blue-700 transition-colors hover:bg-blue-50 dark:border-blue-900 dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-blue-950/40">Ver vagas recomendadas</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Card da Dose Diária */}
       <DailyMotivationCard
         initialStatus={user?.employmentStatus}
         profile={motivationProfile}
@@ -214,14 +416,14 @@ export default async function DashboardPage() {
       />
 
       {isTopPlayer && (
-        <div className="rounded-2xl border border-amber-300/70 dark:border-amber-500/20 bg-amber-50/60 dark:bg-amber-500/5 p-6 space-y-4">
+        <div className="rounded-2xl border border-amber-200/80 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 p-6 space-y-4">
           <div className="flex items-center gap-3">
-            <Trophy className="h-6 w-6 text-amber-500 shrink-0" />
+            <Trophy className="h-6 w-6 text-amber-600 dark:text-amber-400 shrink-0" />
             <div>
-              <h2 className="text-base font-title font-bold text-[#071827] dark:text-white">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Você está entre os 10 melhores do mês
               </h2>
-              <p className="text-xs text-[#64748B] dark:text-neutral-400">
+              <p className="text-xs text-slate-600 dark:text-slate-400">
                 Vagas exclusivas recomendadas com prioridade para você:
               </p>
             </div>
@@ -232,23 +434,23 @@ export default async function DashboardPage() {
               <Link
                 key={vaga.id}
                 href={`/vagas/empresa/${vaga.id}`}
-                className="group relative rounded-xl border border-amber-500/25 dark:border-amber-700/40 bg-white dark:bg-neutral-900 p-4 hover:border-amber-500 transition-colors flex flex-col justify-between"
+                className="group rounded-xl border border-amber-200/80 dark:border-amber-900/50 bg-white dark:bg-slate-900 p-4 hover:border-amber-400 transition-all shadow-sm flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 dark:text-amber-300 dark:bg-amber-950/60 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-semibold text-slate-700 bg-slate-100 dark:text-slate-300 dark:bg-slate-800 px-2 py-0.5 rounded-md">
                       {vaga.area}
                     </span>
                     <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">
                       Prioritária
                     </span>
                   </div>
-                  <h3 className="mt-2.5 font-title font-bold text-sm text-[#071827] dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors line-clamp-2 leading-tight">
+                  <h3 className="mt-2.5 font-bold text-sm text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors line-clamp-2 leading-tight">
                     {vaga.title}
                   </h3>
-                  <p className="text-xs text-[#64748B] mt-1">{vaga.company.name}</p>
+                  <p className="text-xs text-slate-500 mt-1">{vaga.company.name}</p>
                 </div>
-                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-4 inline-flex items-center gap-1">
+                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 mt-4 inline-flex items-center gap-1">
                   Ver vaga exclusiva →
                 </span>
               </Link>
@@ -257,17 +459,15 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Grid Principal de Score e Semáforo */}
+      {/* Grid de Score e Semáforo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Aderência Média */}
-        <div className="lg:col-span-2 rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
+        <div className="lg:col-span-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6 sm:gap-8 text-center sm:text-left">
           <div>
-            <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide">Aderência média às vagas</p>
-            <p className="text-4xl font-bold text-[#071827] dark:text-white mt-2">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Aderência Média às Vagas</p>
+            <p className="text-4xl font-bold text-slate-900 dark:text-white mt-2">
               {averageAdherence}%
             </p>
-            <p className="text-sm text-[#22C55E] dark:text-[#22C55E] mt-2 font-medium">
+            <p className="text-xs sm:text-sm text-emerald-600 dark:text-emerald-400 mt-2 font-medium">
               {averageAdherence >= 75
                 ? "Boa aderência, pronto para aplicar."
                 : averageAdherence >= 50
@@ -276,25 +476,25 @@ export default async function DashboardPage() {
             </p>
           </div>
           <div className="sm:ml-auto">
-            <CircularScore value={averageAdherence} size={120} strokeWidth={10} />
+            <CircularScore value={averageAdherence} size={110} strokeWidth={9} />
           </div>
         </div>
 
-        {/* Semáforo de Prioridade */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
-          <p className="text-xs font-semibold text-[#64748B] uppercase tracking-wide mb-4">Semáforo de prioridade</p>
+        {/* Semáforo */}
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Semáforo de Prioridade</p>
           <div className="space-y-2">
             {(Object.keys(STATUS_CONFIG) as (keyof typeof STATUS_CONFIG)[]).map(
               (status) => (
                 <div
                   key={status}
-                  className="flex items-center justify-between px-1 py-2 text-sm border-b border-[#E2E8F0] dark:border-neutral-800 last:border-0"
+                  className="flex items-center justify-between py-2 text-sm border-b border-slate-100 dark:border-slate-800/80 last:border-0"
                 >
-                  <span className="flex items-center gap-2 font-medium text-[#071827] dark:text-neutral-200">
+                  <span className="flex items-center gap-2 font-medium text-slate-700 dark:text-slate-300">
                     <span className={`h-2 w-2 rounded-full ${STATUS_CONFIG[status].dot}`} />
                     {STATUS_CONFIG[status].label}
                   </span>
-                  <span className="font-bold text-[#071827] dark:text-white">{priorityCounts[status]}</span>
+                  <span className="font-bold text-slate-900 dark:text-white">{priorityCounts[status]}</span>
                 </div>
               )
             )}
@@ -302,60 +502,59 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Grid de Recomendações e Últimas Análises */}
+      {/* Grid de Recomendações e Análises */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         {/* Melhores Vagas */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between space-y-4">
           <div>
-            <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#E2E8F0] dark:border-neutral-800">
-              <p className="font-title font-bold text-[#071827] dark:text-white">Melhores oportunidades</p>
-              <Link href="/history" className="text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] hover:underline">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <p className="font-bold text-slate-900 dark:text-white text-base">Melhores Oportunidades</p>
+              <Link href="/history" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
                 Ver todas →
               </Link>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-3 mt-4">
               {topAnalyses.map((a) => (
                 <Link
                   key={a.id}
                   href={`/report/${a.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] transition-colors"
+                  className="flex items-center gap-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 p-3 hover:border-slate-300 dark:hover:border-slate-700 transition-all"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-sm text-[#071827] dark:text-white truncate">{a.jobTitle}</p>
-                    <p className="text-xs text-[#64748B] mt-0.5">
+                    <p className="font-semibold text-sm text-slate-900 dark:text-white truncate">{a.jobTitle}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">
                       {TRACK_LABELS[a.careerTrack as CareerTrack]}
                     </p>
                   </div>
-                  <CircularScore value={a.overallScore} size={40} strokeWidth={4.5} />
+                  <CircularScore value={a.overallScore} size={38} strokeWidth={4} />
                 </Link>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Próximo Passo Recomendado */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between">
+        {/* Próximo Passo */}
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between space-y-4">
           <div>
-            <p className="font-title font-bold text-[#071827] dark:text-white mb-3">Próximo passo recomendado</p>
-            <p className="text-sm font-semibold text-[#071827] dark:text-white">
+            <p className="font-bold text-slate-900 dark:text-white text-base mb-2">Próximo Passo Recomendado</p>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               Ajuste para: {TRACK_LABELS[weakestAnalysis.careerTrack as CareerTrack]}
             </p>
-            <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
               {nextStep ?? "Continue analisando suas vagas para calibrar seu roteiro personalizado."}
             </p>
           </div>
-          <div className="mt-5 space-y-2">
+          <div className="space-y-2 pt-2">
             <Link
               href="/"
-              className="block text-center rounded-xl bg-[#2563EB] text-white font-semibold py-3 hover:bg-[#1D4ED8] hover:shadow-md hover:shadow-blue-500/10 active:scale-[0.98] transition-all cursor-pointer text-sm"
+              className="block text-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold py-2.5 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm text-xs sm:text-sm"
             >
-              Ajustar currículo
+              Ajustar Currículo
             </Link>
             {topRecommendedTool && (
               <Link
                 href={topRecommendedTool.href}
-                className="block text-center rounded-xl border border-[#E2E8F0] hover:border-[#2563EB] text-[#64748B] hover:text-[#2563EB] font-semibold py-3 transition-colors text-sm"
+                className="block text-center rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold py-2.5 transition-colors text-xs sm:text-sm"
               >
                 {topRecommendedTool.title}
               </Link>
@@ -364,53 +563,53 @@ export default async function DashboardPage() {
         </div>
 
         {/* Resumo do Currículo */}
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 flex flex-col justify-between">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between space-y-4">
           <div>
-            <p className="font-title font-bold text-[#071827] dark:text-white mb-3">Resumo do currículo</p>
-            <p className="text-sm font-semibold text-[#071827] dark:text-white">
+            <p className="font-bold text-slate-900 dark:text-white text-base mb-2">Resumo do Currículo</p>
+            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
               {latest.atsScore >= 75
-                ? "Seu currículo está muito bom"
+                ? "Seu currículo atende os critérios ATS"
                 : "Seu currículo possui pontos de melhoria"}
             </p>
-            <p className="text-xs text-[#64748B] mt-2 leading-relaxed">
-              Última análise com base em &quot;{latestResume.fileName}&quot;, feita em{" "}
+            <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+              Baseado em &quot;{latestResume.fileName}&quot;, analisado em{" "}
               {formatBrazilDate(latest.createdAt)}.
             </p>
           </div>
           <Link
             href={`/report/${latest.id}`}
-            className="mt-5 block text-center rounded-xl border border-[#2563EB] hover:bg-[#2563EB]/5 text-[#2563EB] font-semibold py-3 transition-all text-sm"
+            className="block text-center rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-white font-semibold py-2.5 transition-colors text-xs sm:text-sm"
           >
-            Ver análise completa
+            Ver Análise Completa
           </Link>
         </div>
       </div>
 
       {/* Perfil Comportamental */}
       {behavioralResult && (
-        <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-[#E2E8F0] dark:border-neutral-800 pb-4">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
-              <h3 className="font-title font-bold text-[#071827] dark:text-white">Seu perfil comportamental</h3>
-              <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider">Mapeamento de soft skills realizado</p>
+              <h3 className="font-bold text-slate-900 dark:text-white text-base">Perfil Comportamental</h3>
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">Mapeamento de Soft Skills</p>
             </div>
             <Link
               href="/tools/behavioral-test"
-              className="text-xs text-[#2563EB] hover:text-[#1D4ED8] hover:underline font-bold transition-colors cursor-pointer"
+              className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors"
             >
-              Refazer teste comportamental →
+              Refazer Teste →
             </Link>
           </div>
           <div className="grid gap-6 md:grid-cols-12">
             <div className="md:col-span-5 space-y-2">
-              <p className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider">Perfil Dominante</p>
-              <p className="font-bold text-base text-[#2563EB]">{behavioralResult.personalityLabel}</p>
-              <p className="text-xs text-[#64748B] leading-relaxed">
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">Perfil Dominante</p>
+              <p className="font-bold text-base text-slate-900 dark:text-white">{behavioralResult.personalityLabel}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
                 {behavioralResult.summary}
               </p>
             </div>
             <div className="md:col-span-7">
-              <p className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider mb-3">Nível de Competências</p>
+              <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Competências</p>
               {(() => {
                 let skills: Record<string, number> = {};
                 try {
@@ -424,16 +623,16 @@ export default async function DashboardPage() {
                   resolucao_problemas: "Resolução de problemas",
                 };
                 return (
-                  <div className="grid gap-3.5 sm:grid-cols-2">
+                  <div className="grid gap-3 sm:grid-cols-2">
                     {Object.entries(skills).map(([dim, score]) => (
                       <div key={dim} className="space-y-1">
-                        <div className="flex justify-between text-xs font-semibold">
-                          <span className="text-[#071827] dark:text-neutral-300">{labels[dim] || dim}</span>
-                          <span className="font-extrabold text-[#2563EB]">{score}/100</span>
+                        <div className="flex justify-between text-xs font-medium text-slate-700 dark:text-slate-300">
+                          <span>{labels[dim] || dim}</span>
+                          <span className="font-semibold text-slate-900 dark:text-white">{score}/100</span>
                         </div>
-                        <div className="h-2 w-full rounded-full bg-[#F8FAFC] dark:bg-neutral-800 overflow-hidden border border-[#E2E8F0] dark:border-neutral-700">
+                        <div className="h-2 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-[#2563EB]"
+                            className="h-full rounded-full bg-slate-900 dark:bg-white"
                             style={{ width: `${score}%` }}
                           />
                         </div>
@@ -447,228 +646,38 @@ export default async function DashboardPage() {
         </div>
       )}
 
-      {/* Prazos Próximos & Entrevistas */}
-      {(upcomingDeadlines.length > 0 || upcomingInterviews.length > 0) && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {upcomingDeadlines.length > 0 && (
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
-              <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Prazos próximos</p>
-              <div className="space-y-2">
-                {upcomingDeadlines.map((item) => {
-                  const days = Math.ceil((item.deadline!.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-                  return (
-                    <Link
-                      href="/applications"
-                      key={item.id}
-                      className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] transition-colors text-sm"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
-                        {item.company && <p className="text-xs text-[#64748B]">{item.company}</p>}
-                      </div>
-                      <span
-                        className={`text-xs font-semibold rounded-full px-2.5 py-1 shrink-0 ${
-                          days <= 3
-                            ? "bg-[#EF4444]/15 text-[#EF4444] border border-[#EF4444]/20"
-                            : days <= 7
-                            ? "bg-[#F59E0B]/15 text-[#F59E0B] border border-[#F59E0B]/20"
-                            : "bg-[#F8FAFC] text-[#64748B] dark:bg-neutral-800 dark:text-neutral-300"
-                        }`}
-                      >
-                        {days <= 0 ? "Encerra hoje" : `Encerra em ${days}d`}
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+      {/* Plano da Semana */}
+      {weeklyPlanSection}
 
-          {upcomingInterviews.length > 0 && (
-            <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
-              <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Próximas entrevistas</p>
-              <div className="space-y-2">
-                {upcomingInterviews.map((item) => (
-                  <Link
-                    href={`/interviews/${item.id}`}
-                    key={item.id}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 hover:border-[#2563EB] transition-colors text-sm"
-                  >
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
-                      {item.company && <p className="text-xs text-[#64748B]">{item.company}</p>}
-                    </div>
-                    <span className="text-xs font-semibold rounded-full px-2.5 py-1 shrink-0 bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/20">
-                      {formatBrazilDateTime(item.interviewAt!, { year: undefined })}
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+      {/* Atalhos para o seu momento */}
+      {shortcutsSection}
 
       {/* Jornada de Busca */}
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
-        <p className="font-title font-bold text-[#071827] dark:text-white mb-4">Sua jornada de busca</p>
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <p className="text-3xl font-bold text-[#071827] dark:text-white">
-              {journey.daysSearching !== null ? journey.daysSearching : "Sem dados"}
-            </p>
-            <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Dias em busca</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold text-[#071827] dark:text-white">
-              {journey.responseRate !== null ? `${journey.responseRate}%` : "Sem dados"}
-            </p>
-            <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Taxa de resposta</p>
-          </div>
-          <div>
-            <p className="text-3xl font-bold text-[#071827] dark:text-white">
-              {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "Sem dados"}
-            </p>
-            <p className="text-[10px] font-bold text-[#64748B] uppercase tracking-wider mt-1">Taxa de rejeição</p>
+      {!isStudySegment && (
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <p className="font-bold text-slate-900 dark:text-white text-base">Jornada de Busca</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {journey.daysSearching !== null ? journey.daysSearching : "-"}
+              </p>
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-1">Dias em busca</p>
+            </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {journey.responseRate !== null ? `${journey.responseRate}%` : "-"}
+              </p>
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-1">Taxa de resposta</p>
+            </div>
+            <div>
+              <p className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                {journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "-"}
+              </p>
+              <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-1">Taxa de rejeição</p>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Pipeline */}
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5 border-b border-[#E2E8F0] dark:border-neutral-800 pb-3">
-          <div>
-            <p className="font-title font-bold text-[#071827] dark:text-white">Pipeline de candidaturas</p>
-            <p className="text-xs text-[#64748B] mt-1">
-              {activeApplications} processo{activeApplications === 1 ? "" : "s"} em andamento.
-            </p>
-          </div>
-          <Link
-            href="/applications"
-            className="text-xs font-bold text-[#2563EB] hover:text-[#1D4ED8] hover:underline"
-          >
-            Abrir kanban →
-          </Link>
-        </div>
-        {applications.length === 0 ? (
-          <p className="text-xs text-[#64748B]">
-            Salve vagas do feed ou adicione candidaturas manualmente para acompanhar seu avanço.
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-            {applications.map((item) => (
-              <Link
-                href="/applications"
-                key={item.id}
-                className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 p-3 bg-[#F8FAFC] dark:bg-neutral-800 hover:border-[#2563EB] transition-colors"
-              >
-                <p className="text-sm font-semibold text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
-                <p className="text-xs text-[#64748B] mt-1 truncate">
-                  {item.company || "Sem empresa"}
-                </p>
-                {item.fitScore !== null && (
-                  <p className="text-xs text-[#22C55E] mt-2 font-bold">
-                    {item.fitScore}% de match
-                  </p>
-                )}
-              </Link>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Plano de Evolução */}
-      <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-6">
-        <p className="font-title font-bold text-[#071827] dark:text-white mb-6">Plano de evolução</p>
-        {(() => {
-          const evolutionSteps = [
-            { n: 1, label: "Diagnóstico", done: diagnosisDone, status: "Concluído" },
-            {
-              n: 2,
-              label: "Ajustes estratégicos",
-              done: adjustmentsDone,
-              status: adjustmentsDone ? "Concluído" : "Em andamento",
-            },
-            {
-              n: 3,
-              label: "Aplicações qualificadas",
-              done: false,
-              status: applicationsInProgress ? "Em andamento" : "Próximo passo",
-            },
-            { n: 4, label: "Entrevistas e ofertas", done: false, status: "Seu objetivo" },
-          ];
-          return (
-            <>
-              {/* Mobile Stepper */}
-              <div className="grid grid-cols-2 gap-4 sm:hidden">
-                {evolutionSteps.map((step) => (
-                  <div key={step.n} className="flex flex-col items-center text-center gap-2">
-                    <span
-                      className={`h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                        step.done
-                          ? "bg-[#22C55E] text-white"
-                          : step.status === "Em andamento"
-                          ? "bg-[#2563EB] text-white"
-                          : "bg-[#F8FAFC] dark:bg-neutral-800 text-[#64748B] border border-[#E2E8F0] dark:border-neutral-700"
-                      }`}
-                    >
-                      {step.done ? "✓" : step.n}
-                    </span>
-                    <p className="text-sm font-semibold leading-tight text-[#071827] dark:text-slate-200">{step.label}</p>
-                    <p
-                      className={`text-xs font-bold ${
-                        step.done
-                          ? "text-[#22C55E]"
-                          : step.status === "Em andamento"
-                          ? "text-[#2563EB]"
-                          : "text-[#64748B]"
-                      }`}
-                    >
-                      {step.status}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Desktop Stepper */}
-              <div className="hidden sm:flex items-center justify-between gap-2 overflow-x-auto pb-2">
-                {evolutionSteps.map((step, i, arr) => (
-                  <div key={step.n} className="flex items-center flex-1 last:flex-none min-w-[84px]">
-                    <div className="flex flex-col items-center text-center">
-                      <span
-                        className={`h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
-                          step.done
-                            ? "bg-[#22C55E] text-white"
-                            : step.status === "Em andamento"
-                            ? "bg-[#2563EB] text-white"
-                            : "bg-[#F8FAFC] dark:bg-neutral-800 text-[#64748B] border border-[#E2E8F0] dark:border-neutral-700"
-                        }`}
-                      >
-                        {step.done ? "✓" : step.n}
-                      </span>
-                      <p className="text-sm font-semibold mt-2 whitespace-nowrap text-[#071827] dark:text-slate-200">{step.label}</p>
-                      <p
-                        className={`text-xs mt-0.5 font-bold whitespace-nowrap ${
-                          step.done
-                            ? "text-[#22C55E]"
-                            : step.status === "Em andamento"
-                            ? "text-[#2563EB]"
-                            : "text-[#64748B]"
-                        }`}
-                      >
-                        {step.status}
-                      </p>
-                    </div>
-                    {i < arr.length - 1 && (
-                      <div className="h-0.5 flex-1 mx-2 min-w-[16px] bg-[#E2E8F0] dark:bg-neutral-800" />
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          );
-        })()}
-      </div>
+      )}
     </div>
   );
 }

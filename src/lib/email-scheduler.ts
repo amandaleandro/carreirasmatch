@@ -4,6 +4,7 @@ import {
   sendRenewalReminderEmail,
   sendSubscriptionExpiredEmail,
   sendOnboardingNudgeEmail,
+  sendObjectiveFirstStepNudgeEmail,
   sendLeadFollowUpEmail,
   sendJobAlertEmail,
   sendDiagnosticUpgradeEmail,
@@ -23,6 +24,8 @@ import {
   sendNpsSurveyEmail,
 } from "@/lib/resend";
 import { getWeekStart } from "@/lib/applications";
+import { normalizeCareerSegment } from "@/lib/career-segments";
+import { findObjective } from "@/lib/onboarding-objectives";
 import { createUrgencyCoupon } from "@/lib/coupons";
 import { sendPushToUser } from "@/lib/push";
 
@@ -111,6 +114,41 @@ async function sendOnboardingNudges(now: Date): Promise<void> {
 
     await sendOnce("onboarding_nudge", user.id, user.email, () =>
       sendOnboardingNudgeEmail(user.email!, { name: user.name })
+    );
+  }
+}
+
+/**
+ * Lembrete do primeiro passo do objetivo: quem passou pelo onboarding por objetivo
+ * (campo `objective` preenchido) 2-4 dias atrás e ainda não fez nenhuma análise recebe
+ * um lembrete específico com a ação recomendada para o objetivo escolhido. Mesma janela
+ * do onboarding_nudge genérico, mas dedupeKey e conteúdo são específicos, então os dois
+ * podem coexistir sem conflito (o EmailLog é por `type`).
+ */
+async function sendObjectiveFirstStepNudges(now: Date): Promise<void> {
+  const from = new Date(now.getTime() - 4 * DAY_MS);
+  const to = new Date(now.getTime() - 2 * DAY_MS);
+
+  const users = await prisma.user.findMany({
+    where: { createdAt: { gte: from, lte: to }, email: { not: null }, objective: { not: null } },
+    select: { id: true, name: true, email: true, careerSegment: true, objective: true },
+  });
+
+  for (const user of users) {
+    if (!user.email || !user.objective) continue;
+    const analyses = await prisma.analysis.count({ where: { resume: { userId: user.id } } });
+    if (analyses > 0) continue;
+
+    const objective = findObjective(normalizeCareerSegment(user.careerSegment), user.objective);
+    if (!objective) continue;
+
+    await sendOnce("objective_first_step_nudge", user.id, user.email, () =>
+      sendObjectiveFirstStepNudgeEmail(user.email!, {
+        name: user.name,
+        objectiveLabel: objective.label,
+        ctaLabel: objective.cta.label,
+        ctaHref: objective.cta.href,
+      })
     );
   }
 }
@@ -810,6 +848,7 @@ export async function runLifecycleEmailTick(): Promise<void> {
     ["renewal_reminders", () => sendRenewalReminders(now)],
     ["expire_subscriptions", () => expireLapsedSubscriptions(now)],
     ["onboarding_nudges", () => sendOnboardingNudges(now)],
+    ["objective_first_step_nudges", () => sendObjectiveFirstStepNudges(now)],
     ["whatsapp_optin_invites", () => sendWhatsappOptinInvites(now)],
     ["lead_followups", () => sendLeadFollowUps(now)],
     ["company_dormant_nudges", () => sendCompanyDormantNudges(now)],

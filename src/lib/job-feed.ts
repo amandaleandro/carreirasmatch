@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { compareJobs } from "@/lib/tools";
 import { resolveFreeText } from "@/lib/area-taxonomy";
+import { VOCATION_AREAS } from "@/lib/vocation-areas";
 
 type JobProfileContext = { areas: string[]; roles: string[] };
 
@@ -83,9 +84,23 @@ async function loadProfileContext(userId: string): Promise<JobProfileContext> {
     where: { id: userId },
     select: { professionalArea: true, targetProfessionalArea: true, studyCourse: true, interestedRoles: true },
   });
+  const areas = [user?.targetProfessionalArea, user?.professionalArea, user?.studyCourse]
+    .filter((value): value is string => Boolean(value?.trim()));
+
+  // Sem área explícita no perfil, usa a área do teste vocacional mais recente como
+  // sinal complementar de match — dado que hoje só é usado na própria tela do teste.
+  if (areas.length === 0) {
+    const vocationResult = await prisma.vocationTestResult.findFirst({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      select: { areaSlug: true },
+    });
+    const vocationLabel = VOCATION_AREAS.find((a) => a.slug === vocationResult?.areaSlug)?.label;
+    if (vocationLabel) areas.push(vocationLabel);
+  }
+
   return {
-    areas: [user?.targetProfessionalArea, user?.professionalArea, user?.studyCourse]
-      .filter((value): value is string => Boolean(value?.trim())),
+    areas,
     roles: readRoles(user?.interestedRoles),
   };
 }

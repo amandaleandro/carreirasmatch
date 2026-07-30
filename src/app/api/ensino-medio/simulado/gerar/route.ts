@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import { getSubjectBySlug } from "@/lib/ensino-medio";
+import { logStudyActivity } from "@/lib/study-activity";
 
 export interface GeneratedSimulado {
   title: string;
@@ -77,6 +79,10 @@ Retorne EXATAMENTE um objeto JSON válido seguindo a estrutura:
     );
 
     const parsed = JSON.parse(rawJson) as GeneratedSimulado;
+
+    const session = await auth();
+    if (session?.user?.id) void logStudyActivity(session.user.id, "simulado_enem");
+
     return NextResponse.json(parsed);
   } catch (error) {
     console.error("[API ensino-medio/simulado/gerar] Erro:", error);

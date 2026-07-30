@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
+import { logStudyActivity } from "@/lib/study-activity";
 
 type GeneratedFlashcard = {
   front: string;
@@ -38,6 +39,8 @@ QUANTIDADE DE FLASHCARDS: ${quantity || 5}`;
       userPrompt,
       0.3
     );
+
+    void logStudyActivity(session.user.id, "flashcards_concurso");
 
     return NextResponse.json({ success: true, flashcards: data.flashcards || [] });
   } catch (error) {

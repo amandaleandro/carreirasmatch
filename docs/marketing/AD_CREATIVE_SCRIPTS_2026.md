@@ -64,7 +64,36 @@ Este guia contém os scripts de anúncios, formatos de imagem, headlines e confi
 
 ---
 
-## ⚙️ 3. Como Ativar os Pixels de Medição
+## 🎯 3. Kit de Teste de Ângulos por Dor (8 criativos, 1 conjunto de anúncios)
+
+Ao contrário dos criativos A/B acima (que já vendem o "Desafio do Match" como formato),
+este kit testa qual **dor** do público converte melhor, mantendo mesma LP e mesma oferta
+("Compare seu currículo com uma vaga e descubra o que ajustar antes de enviar").
+Rodar os 8 dentro do mesmo conjunto de anúncios (Meta) para o algoritmo distribuir
+verba pela dor que mais gera `analysis_started`/`payment_confirmed`, não pela que
+tem mais cliques. Ver matriz de decisão e leitura de resultado em
+`GROWTH_EXPERIMENTS.md` (experimento 7).
+
+| # | Dor | Headline | CTA | `utm_content` |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | "Enviei vários currículos e ninguém respondeu" | Seu currículo pode estar sendo descartado antes de um humano ler. | Descubra por que antes de mandar o próximo. | `dor_sem_resposta` |
+| 2 | "Será que meu currículo passa pelo ATS?" | 9 em cada 10 currículos são filtrados antes de chegar ao recrutador. | Teste seu currículo contra o filtro em 2 minutos. | `dor_filtro_ats` (rota: `/verificador-ats`) |
+| 3 | "Encontrei uma vaga, mas não sei se meu currículo serve" | Você encontrou a vaga. Agora descubra se está pronto pra ela. | Veja seu % de match antes de se candidatar. | `dor_match_vaga` (rota: `/desafio` ou `/analise`) |
+| 4 | "Pare de mandar o mesmo currículo para vagas diferentes" | Cada vaga pede uma versão diferente de você. Seu currículo não muda nunca. | Adapte antes de enviar. | `dor_curriculo_generico` |
+| 5 | "Quero mudar de área, mas não sei apresentar minha experiência" | Sua experiência serve pra essa área nova. Seu currículo só não mostra isso. | Descubra como reposicionar sua experiência. | `dor_transicao_carreira` |
+| 6 | "A vaga pede coisas que eu tenho, mas não sei colocar no currículo" | Você já tem o que a vaga pede. Só não está escrito do jeito certo. | Veja as palavras-chave que faltam no seu. | `dor_keywords_faltando` |
+| 7 | "Tenho experiência, mas meu currículo não mostra" | Sua experiência é boa. Seu currículo é que está te vendendo mal. | Veja o que está te derrubando. | `dor_experiencia_invisivel` |
+| 8 | Controle / guarda-chuva | Antes de enviar, descubra seu match com a vaga. | Analise grátis antes de se candidatar. | `dor_controle_generico` |
+
+Regras de execução:
+
+- 1 campanha de conversão, 1 conjunto de anúncios amplo com os 8 criativos — não pré-segmentar por idade/interesse além do já definido em `CAMPAIGN_PLAYBOOK_2026.md`.
+- Mesma landing page e mesma oferta nos 8, pra isolar a variável "dor".
+- Rodar até ter volume mínimo de `analysis_started` por criativo antes de cortar (não cortar só por CTR).
+
+---
+
+## ⚙️ 4. Como Ativar os Pixels de Medição
 
 Adicione as variáveis com seus IDs reais no arquivo `.env` do servidor de produção:
 

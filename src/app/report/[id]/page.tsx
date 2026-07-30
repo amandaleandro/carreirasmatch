@@ -157,9 +157,13 @@ export default async function ReportPage({
           <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
             Relatório gerado por CarreirasMatch
           </span>
-          {unlocked && (
+          {!unlocked ? (
             <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800">
-              🎁 Sua 1ª Análise Completa é 100% Grátis!
+              Prévia gratuita do seu Match
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800">
+              Análise completa liberada
             </span>
           )}
         </div>
@@ -234,7 +238,8 @@ export default async function ReportPage({
 
       {analysis ? (
         <div className="space-y-6">
-          <AnalysisResult
+          <div id="resultado-match">
+            <AnalysisResult
             result={analysis}
             careerTrack={record.careerTrack as CareerTrack}
             jobTitle={record.jobTitle}
@@ -244,7 +249,8 @@ export default async function ReportPage({
             resumeText={record.resume.rawText}
             betterThanPercent={betterThanPercent}
             analysisId={id}
-          />
+            />
+          </div>
           <VerifiedBadgeBox analysisId={id} overallScore={record.overallScore} />
           {!subscribed && segment !== "student" && (
             <>
@@ -261,7 +267,7 @@ export default async function ReportPage({
               analysisId={id}
               segment={segment ?? undefined}
             />
-            <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
+            <div id="proximo-passo" className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
               <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
                 Próximo passo recomendado
               </p>

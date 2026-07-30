@@ -271,8 +271,13 @@ export default async function FeedPage({
         </div>
       )}
 
-      {/* Desafio e Compartilhamento */}
-      <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] dark:bg-neutral-900 p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Desafio e Compartilhamento: disponível sem competir com a lista principal */}
+      <details className="group rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] dark:bg-neutral-900">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 p-4 text-xs font-bold text-[#071827] dark:text-white [&::-webkit-details-marker]:hidden">
+          <span>Quer ganhar créditos compartilhando seus matches?</span>
+          <span className="text-[#64748B] transition-transform group-open:rotate-180">⌄</span>
+        </summary>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-[#E2E8F0] p-5">
         <div className="space-y-1">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-500">
             ⚡ Desafio Match de Carreira
@@ -289,7 +294,8 @@ export default async function FeedPage({
           <span>Participar</span>
           <span>→</span>
         </Link>
-      </div>
+        </div>
+      </details>
 
       {/* Filtros do Feed */}
       <FeedFilters

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { PublicNav, PublicNavMobile } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 
 export function ContentPage({
@@ -30,31 +31,25 @@ export function ContentPage({
   const maxWidthClassName = maxWidthClass ?? (wide ? "max-w-5xl" : "max-w-3xl");
 
   return (
-    <div className="w-full overflow-x-hidden">
-      <div className="bg-gradient-to-br from-blue-950 via-blue-900 to-slate-950">
+    <div className="w-full overflow-x-hidden min-h-screen bg-slate-50/50 dark:bg-slate-950">
+      <div className="bg-slate-900 text-white border-b border-slate-800">
         <header className="public-header max-w-7xl mx-auto px-4 md:px-8 py-4 sm:py-5 flex items-center justify-between gap-3">
           <Link href="/">
             <BrandLogo heightClassName="h-9 sm:h-12 md:h-14" onDark />
           </Link>
           <div className="flex items-center gap-2">
-            {!hideNav && (
-              <nav aria-label="Navegação institucional" className="mr-2 hidden items-center gap-4 text-sm font-semibold text-white/70 lg:flex">
-                <Link href="/sobre" className="transition-colors hover:text-white">Sobre</Link>
-                <Link href="/contato" className="transition-colors hover:text-white">Contato</Link>
-                <Link href="/privacidade" className="transition-colors hover:text-white">Privacidade</Link>
-                <Link href="/termos" className="transition-colors hover:text-white">Termos</Link>
-              </nav>
-            )}
+            {!hideNav && <PublicNav />}
+            {!hideNav && <PublicNavMobile />}
             <Link
               href={backHref ?? "/login"}
-              className="rounded-lg border border-white/20 px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-white/10 transition-colors whitespace-nowrap"
+              className="rounded-xl border border-white/20 px-4 py-2 text-xs sm:text-sm font-semibold text-white hover:bg-white/10 transition-colors whitespace-nowrap"
             >
               {backLabel ?? "Entrar"}
             </Link>
             {!backHref && (
               <Link
                 href="/register"
-                className="rounded-lg bg-white px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-semibold text-slate-950 hover:bg-blue-50 transition-colors whitespace-nowrap"
+                className="rounded-xl bg-white px-4 py-2 text-xs sm:text-sm font-semibold text-slate-900 hover:bg-slate-100 transition-colors whitespace-nowrap shadow-sm"
               >
                 Criar conta
               </Link>
@@ -62,23 +57,23 @@ export function ContentPage({
           </div>
         </header>
 
-        <div className={`${maxWidthClassName} mx-auto px-4 sm:px-6 md:px-8 pt-4 pb-12 sm:pt-6 sm:pb-14 md:pt-10 md:pb-20`}>
-          <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider rounded-full px-2.5 sm:px-3 py-0.5 sm:py-1 mb-3 sm:mb-4 bg-blue-500/15 text-blue-300 border border-blue-400/30">
+        <div className={`${maxWidthClassName} mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-14 sm:pt-8 sm:pb-16 md:pt-12 md:pb-20`}>
+          <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 bg-white/10 text-slate-200 border border-white/15">
             {eyebrow}
           </span>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
             {title}
           </h1>
           {description && (
-            <p className="text-white/70 mt-3 sm:mt-4 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed">
+            <p className="text-slate-300 mt-3 sm:mt-4 max-w-2xl text-sm md:text-base leading-relaxed font-normal">
               {description}
             </p>
           )}
         </div>
       </div>
 
-      <main className={`${maxWidthClassName} mx-auto px-3 sm:px-6 md:px-8 -mt-6 sm:-mt-8 md:-mt-10 pb-12 sm:pb-16 md:pb-20 relative z-10`}>
-        <div className="rounded-xl sm:rounded-2xl md:rounded-[2rem] border border-neutral-200/80 dark:border-neutral-800 bg-white/98 dark:bg-neutral-950/98 p-4 sm:p-6 md:p-10 shadow-xl shadow-slate-900/5">
+      <main className={`${maxWidthClassName} mx-auto px-3 sm:px-6 md:px-8 -mt-8 sm:-mt-10 md:-mt-12 pb-12 sm:pb-16 md:pb-20 relative z-10`}>
+        <div className="rounded-2xl md:rounded-3xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-8 md:p-10 shadow-sm">
           {children}
         </div>
       </main>

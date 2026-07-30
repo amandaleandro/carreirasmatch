@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authorizeFreeAiTool, releaseFreeAiToolUsage } from "@/lib/free-tool-access";
+import { prisma } from "@/lib/prisma";
 import {
   INTERVIEW_SIMULATION_QUESTIONS,
   evaluateInterviewAnswer,
@@ -7,6 +8,24 @@ import {
   type InterviewSimulatorInput,
   type InterviewTurn,
 } from "@/lib/tools";
+
+async function loadAnalysisContext(analysisId: unknown, userId: string) {
+  if (typeof analysisId !== "string" || !analysisId.trim()) return null;
+
+  const analysis = await prisma.analysis.findFirst({
+    where: { id: analysisId, resume: { userId } },
+    select: { weaknesses: true, interviewQuestions: true },
+  });
+  if (!analysis) return null;
+
+  try {
+    const focusAreas = (JSON.parse(analysis.weaknesses) as string[]).slice(0, 5);
+    const suggestedQuestions = (JSON.parse(analysis.interviewQuestions) as string[]).slice(0, 5);
+    return { focusAreas, suggestedQuestions };
+  } catch {
+    return null;
+  }
+}
 
 const MAX_FIELD_LENGTH = 200;
 const MAX_ANSWER_LENGTH = 4000;
@@ -63,6 +82,11 @@ export async function POST(req: NextRequest) {
     };
 
     if (history.length === 0) {
+      const analysisContext = await loadAnalysisContext(body.analysisId, session.user.id);
+      if (analysisContext) {
+        input.focusAreas = analysisContext.focusAreas;
+        input.suggestedQuestions = analysisContext.suggestedQuestions;
+      }
       return NextResponse.json(await startInterviewSimulation(input));
     }
 

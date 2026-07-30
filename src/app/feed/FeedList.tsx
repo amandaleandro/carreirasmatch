@@ -314,8 +314,11 @@ export function FeedList({
         {isInitialScoring ? (
           <>
             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-blue-200 border-t-blue-600" />
-            <p className="mt-3 text-sm font-semibold text-slate-700 dark:text-neutral-200">Estamos comparando seu currículo com as vagas.</p>
-            <p className="mt-1 text-xs text-slate-500 dark:text-neutral-400">O feed será atualizado automaticamente assim que o primeiro lote terminar.</p>
+            <p aria-live="polite" className="mt-3 text-sm font-semibold text-slate-700 dark:text-neutral-200">Estamos comparando seu currículo com as vagas.</p>
+            <p className="mt-1 text-xs text-slate-500 dark:text-neutral-400">O primeiro lote pode levar alguns segundos. Atualizaremos esta tela automaticamente quando terminar.</p>
+            <div className="mx-auto mt-4 h-1.5 w-48 overflow-hidden rounded-full bg-blue-100 dark:bg-blue-950">
+              <div className="h-full w-1/3 animate-[pulse_1.5s_ease-in-out_infinite] rounded-full bg-blue-600" />
+            </div>
           </>
         ) : (
           <p className="text-xs font-semibold text-slate-500 dark:text-neutral-400">Nenhuma vaga localizada para os filtros selecionados.</p>

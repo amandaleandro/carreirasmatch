@@ -50,6 +50,24 @@ Decisão:
    - Métrica principal: `landing_cta_clicked`
    - Status: não iniciado
 
+7. **Teste de ângulos por dor (8 criativos, mesma LP/oferta)** — ver `AD_CREATIVE_SCRIPTS_2026.md` seção 3
+   - Página: LP de destino de cada `utm_content` (`dor_sem_resposta`, `dor_filtro_ats`, etc.)
+   - Métrica principal: `analysis_started` e `payment_confirmed` por `utm_content`
+   - Métrica de proteção: `analysis_completed` (garantir que o clique virou análise de verdade, não só tráfego)
+   - Matriz de decisão (não mudar campanha + preço + página + produto ao mesmo tempo):
+
+     | Situação | Decisão |
+     | :--- | :--- |
+     | Gastou pouco e não vendeu | Continuar coletando dado |
+     | `landing_viewed` alto, `analysis_started` baixo | Revisar promessa do criativo/LP |
+     | `analysis_started` alto, `analysis_completed` baixo | Revisar experiência do produto (fricção no fluxo) |
+     | `analysis_completed` alto, `payment_confirmed` baixo | Revisar oferta, preview grátis e preço ([[pricing-conversao-zero-vendas]]) |
+     | `payment_confirmed` com CAC saudável | Escalar orçamento gradualmente nesse `utm_content` |
+     | Um único `utm_content` concentra vendas | Criar variações do mesmo ângulo, não abrir ângulo novo |
+     | Checkout converte mas ticket baixo | Testar oferta adicional no checkout (ver [[estrategia-ads-criativos-microvitoria]]) |
+
+   - Status: não iniciado
+
 ## Pesquisas Formbricks a configurar no painel (cloud)
 
 - Depois do resultado: "Este diagnóstico deixou claro o que ajustar?"

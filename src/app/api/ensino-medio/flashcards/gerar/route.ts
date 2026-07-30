@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import { getSubjectBySlug } from "@/lib/ensino-medio";
+import { logStudyActivity } from "@/lib/study-activity";
 
 export interface GeneratedFlashcardDeck {
   subjectName: string;
@@ -71,6 +73,10 @@ Retorne EXATAMENTE um objeto JSON válido seguindo a estrutura:
     );
 
     const parsed = JSON.parse(rawJson) as GeneratedFlashcardDeck;
+
+    const session = await auth();
+    if (session?.user?.id) void logStudyActivity(session.user.id, "flashcards_ensino_medio");
+
     return NextResponse.json(parsed);
   } catch (error) {
     console.error("[API ensino-medio/flashcards/gerar] Erro:", error);

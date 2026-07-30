@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { triggerConfetti } from "@/lib/confetti";
 import { ChecklistCard } from "@/components/checklist-card";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
@@ -1132,8 +1132,11 @@ export function ScoreHero({
   seniority: number;
   ats: number;
 }) {
+  const hasCelebrated = useRef(false);
+
   useEffect(() => {
-    if (overall >= 75) {
+    if (overall >= 75 && !hasCelebrated.current) {
+      hasCelebrated.current = true;
       triggerConfetti({ count: 70, originY: 0.4 });
     }
   }, [overall]);
@@ -1727,6 +1730,22 @@ export function AnalysisResult({
               items={result.interviewQuestions}
             />
             <InterviewSimulator questions={result.interviewQuestions} jobTitle={jobTitle} />
+            {analysisId && (
+              <div className="rounded-2xl border border-blue-200/80 dark:border-blue-900/60 bg-blue-50/60 dark:bg-blue-950/20 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold text-slate-900 dark:text-white">Quer treinar em voz alta, com perguntas de acompanhamento?</p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                    O simulador ao vivo já entra sabendo a vaga e os pontos de atenção desta análise.
+                  </p>
+                </div>
+                <Link
+                  href={`/tools/interview-simulator?analysisId=${analysisId}`}
+                  className="shrink-0 rounded-xl bg-blue-600 px-4 py-2.5 text-center text-xs font-bold text-white hover:bg-blue-700 transition-colors"
+                >
+                  Praticar no simulador ao vivo
+                </Link>
+              </div>
+            )}
           </>
         )}
 

@@ -13,6 +13,7 @@ fonte de verdade.
 
 | Necessidade | Documento |
 | --- | --- |
+| Inventário completo de funcionalidades | [FEATURES.md](FEATURES.md) |
 | Visão executiva, público e proposta de valor | [PRODUCT_AND_MARKETING_BRIEF.md](PRODUCT_AND_MARKETING_BRIEF.md) |
 | Arquitetura, integrações e domínios | [COMPLETE_ARCHITECTURE_AND_ECOSYSTEM.md](COMPLETE_ARCHITECTURE_AND_ECOSYSTEM.md) |
 | Jornadas principais | [USER_FLOWS.md](USER_FLOWS.md) |

@@ -25,6 +25,7 @@ export const ANALYTICS_EVENTS = {
   PAYMENT_CONFIRMED: "payment_confirmed",
   SUBSCRIPTION_STARTED: "subscription_started",
   SIGNUP_COMPLETED: "signup_completed",
+  ONBOARDING_COMPLETED: "onboarding_completed",
   LEAD_CAPTURED: "lead_captured",
   TOOL_USED: "tool_used",
   CHECKOUT_FAILED: "checkout_failed",

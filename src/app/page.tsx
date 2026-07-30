@@ -22,5 +22,17 @@ export default async function Home() {
     return <MarketingHome analysisCount={analysisCount} />;
   }
 
-  redirect("/analise");
+  // Depois do primeiro diagnóstico, o dashboard é a melhor porta de entrada:
+  // preserva o contexto e permite continuar de onde a pessoa parou.
+  const [analysisCount, user] = await Promise.all([
+    prisma.analysis.count({ where: { resume: { userId: session.user.id } } }),
+    prisma.user.findUnique({ where: { id: session.user.id }, select: { objective: true } }),
+  ]);
+
+  // Quem ainda não passou pelo onboarding por objetivo e nunca analisou nada
+  // começa por lá; usuários antigos sem objetivo, mas já ativos, não são
+  // forçados a voltar (evita interromper quem já está no meio da jornada).
+  if (!user?.objective && analysisCount === 0) redirect("/onboarding");
+
+  redirect(analysisCount > 0 ? "/dashboard" : "/analise");
 }

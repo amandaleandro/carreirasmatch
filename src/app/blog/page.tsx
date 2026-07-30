@@ -108,10 +108,10 @@ export default async function BlogPage({
       <div className="flex flex-wrap gap-2">
         <Link
           href="/blog"
-          className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+          className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
             !area
-              ? "bg-blue-600 text-white"
-              : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+              ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
           }`}
         >
           Todos
@@ -120,10 +120,10 @@ export default async function BlogPage({
           <Link
             key={slug}
             href={`/blog?area=${slug}`}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
+            className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
               area === slug
-                ? "bg-blue-600 text-white"
-                : "bg-neutral-100 dark:bg-neutral-900 text-neutral-600 dark:text-neutral-300 hover:bg-neutral-200 dark:hover:bg-neutral-800"
+                ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
             }`}
           >
             {label}
