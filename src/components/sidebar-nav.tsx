@@ -73,6 +73,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
       { href: "/action-plan", label: "Plano de Ação", icon: Target },
+      { href: "/evolucao", label: "Evolução Profissional", icon: TrendingUp },
       { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame, tour: "nav-desafio" },
       { href: "/jogos", label: "Jogos", icon: Gamepad2, tour: "nav-jogos" },
       { href: "/profile", label: "Desenvolvimento", icon: Sparkles },
@@ -83,6 +84,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
+      { href: "/universidade", label: "Universidade", icon: GraduationCap },
       { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
       { href: "/concursos", label: "Radar Concursos", icon: Landmark, tour: "nav-concursos" },
       { href: "/vestibulares", label: "Radar Vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
@@ -100,6 +102,7 @@ const STUDENT_NAV_GROUPS: NavGroup[] = [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
       { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico", icon: GraduationCap },
+      { href: "/universidade", label: "Universidade", icon: GraduationCap },
       { href: "/cursos-gratuitos", label: "Cursos gratuitos", icon: BookOpen, tour: "nav-tools" },
     ],
   },

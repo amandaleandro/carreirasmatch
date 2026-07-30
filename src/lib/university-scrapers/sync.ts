@@ -32,7 +32,15 @@ export async function syncUniversityCurricula() {
 
           const courses = await scraper.scrape();
           for (const course of courses) {
-            const courseSlug = slugify(`${scraper.universityName}-${course.title}`);
+            // Algumas instituições oferecem o mesmo título de curso mais de uma vez
+            // (ex: "Ciências Biológicas" em Bacharelado e Licenciatura, ou em campi
+            // diferentes) — slugify(universidade+título) sozinho colide nesses casos.
+            // O sufixo numérico extraído da URL (sempre único, é o id do curso no
+            // sistema de origem) garante slug único sem afetar o dedupe por `url`.
+            const urlIdMatch = course.url.match(/(\d+)(?:$|[^\d]*$)/);
+            const courseSlug = slugify(
+              urlIdMatch ? `${scraper.universityName}-${course.title}-${urlIdMatch[1]}` : `${scraper.universityName}-${course.title}`
+            );
             const universityCourse = await prisma.universityCourse.upsert({
               where: { url: course.url },
               create: {
@@ -56,16 +64,38 @@ export async function syncUniversityCurricula() {
               },
             });
 
-            await prisma.curriculumSubject.deleteMany({ where: { universityCourseId: universityCourse.id } });
-            if (course.subjects.length > 0) {
-              await prisma.curriculumSubject.createMany({
-                data: course.subjects.map((subject, index) => ({
-                  universityCourseId: universityCourse.id,
-                  name: subject.name,
-                  semester: subject.semester ?? null,
-                  order: index,
-                })),
-              });
+            // Reconcilia em vez de apagar tudo e recriar: CurriculumSubjectInsight tem
+            // onDelete: Cascade, então recriar a disciplina (mesmo com o mesmo nome)
+            // apagaria o insight de IA já gerado e cacheado — forçando gasto de IA de
+            // novo a cada sync. Disciplinas que já existem (mesmo nome+semestre) só têm
+            // a ordem atualizada; só entram/saem as que realmente mudaram na grade.
+            const existingSubjects = await prisma.curriculumSubject.findMany({
+              where: { universityCourseId: universityCourse.id },
+              select: { id: true, name: true, semester: true },
+            });
+            const existingByKey = new Map(existingSubjects.map((s) => [`${s.name}::${s.semester ?? ""}`, s.id]));
+            const incomingKeys = new Set(course.subjects.map((s) => `${s.name}::${s.semester ?? ""}`));
+
+            const toDelete = existingSubjects.filter((s) => !incomingKeys.has(`${s.name}::${s.semester ?? ""}`));
+            if (toDelete.length > 0) {
+              await prisma.curriculumSubject.deleteMany({ where: { id: { in: toDelete.map((s) => s.id) } } });
+            }
+
+            for (const [index, subject] of course.subjects.entries()) {
+              const key = `${subject.name}::${subject.semester ?? ""}`;
+              const existingId = existingByKey.get(key);
+              if (existingId) {
+                await prisma.curriculumSubject.update({ where: { id: existingId }, data: { order: index } });
+              } else {
+                await prisma.curriculumSubject.create({
+                  data: {
+                    universityCourseId: universityCourse.id,
+                    name: subject.name,
+                    semester: subject.semester ?? null,
+                    order: index,
+                  },
+                });
+              }
             }
             courseCount += 1;
           }

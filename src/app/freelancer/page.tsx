@@ -7,6 +7,9 @@ import {
   FolderKanban,
   ArrowRight,
   AlertCircle,
+  FileCheck2,
+  Users,
+  DollarSign,
 } from "lucide-react";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
@@ -20,10 +23,11 @@ export default async function FreelancerHubPage() {
     redirect("/freelancers");
   }
 
-  const [profile, proposalCount, projectCount] = await Promise.all([
+  const [profile, proposalCount, projectCount, contractCount] = await Promise.all([
     prisma.freelancerProfile.findUnique({ where: { userId: session.user.id } }),
     prisma.freelanceProposal.count({ where: { freelancerUserId: session.user.id } }),
     prisma.freelanceProject.count({ where: { clientUserId: session.user.id } }),
+    prisma.freelanceContract.count({ where: { freelancerUserId: session.user.id } }),
   ]);
 
   return (
@@ -177,6 +181,75 @@ export default async function FreelancerHubPage() {
 
           <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs font-bold text-blue-600 dark:text-blue-400">
             <span>Gerenciar meus projetos</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        <Link
+          href="/freelancer/contratos"
+          className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xs hover:border-blue-500/60 transition-all duration-200 space-y-4 flex flex-col justify-between"
+        >
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/10 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/20">
+              <FileCheck2 className="w-5 h-5" />
+            </div>
+
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
+              Meus Contratos
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              Você tem <strong className="text-slate-900 dark:text-white">{contractCount} contrato(s)</strong> como freelancer, com controle financeiro do que já recebeu e do que falta receber.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs font-bold text-blue-600 dark:text-blue-400">
+            <span>Ver contratos</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        <Link
+          href="/freelancer/clientes"
+          className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xs hover:border-blue-500/60 transition-all duration-200 space-y-4 flex flex-col justify-between"
+        >
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-rose-500/10 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-500/20">
+              <Users className="w-5 h-5" />
+            </div>
+
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
+              Meus Clientes
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              Histórico de quem já te contratou, consolidado a partir dos seus contratos.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs font-bold text-blue-600 dark:text-blue-400">
+            <span>Ver clientes</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </Link>
+
+        <Link
+          href="/freelancer/precificacao"
+          className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-2xs hover:border-blue-500/60 transition-all duration-200 space-y-4 flex flex-col justify-between"
+        >
+          <div className="space-y-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/20">
+              <DollarSign className="w-5 h-5" />
+            </div>
+
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
+              Precificação Inteligente
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              Descubra uma faixa de preço justa antes de enviar sua próxima proposta.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs font-bold text-blue-600 dark:text-blue-400">
+            <span>Calcular preço</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </div>
         </Link>

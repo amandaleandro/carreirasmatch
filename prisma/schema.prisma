@@ -55,6 +55,9 @@ model User {
   supportTickets              SupportTicket[]
   freeToolUsages              FreeToolUsage[]
   studyActivityLogs           StudyActivityLog[]
+  universityEnrollment        UniversityEnrollment?
+  careerGrowthPlan            CareerGrowthPlan?
+  featureUsagePeriods         FeatureUsagePeriod[]
   jobAlerts                   JobAlert[]
   pushSubscriptions           PushSubscription[]
   opportunityReports          OpportunityReport[]
@@ -63,8 +66,8 @@ model User {
   gameScores                  GameScore[]
   npsResponses                NpsResponse[]
 
-  autoApplicationSettings     AutoApplicationSettings?
-  autoApplicationQueue        AutoApplicationQueue[]
+  autoApplicationSettings AutoApplicationSettings?
+  autoApplicationQueue    AutoApplicationQueue[]
 
   // Marketplace freelancer. Um mesmo User pode ser freelancer (freelancerProfile,
   // propostas) e/ou contratante (projetos que publicou).
@@ -212,30 +215,30 @@ model Analysis {
 }
 
 model Job {
-  id            String        @id @default(cuid())
-  url           String        @unique
-  jobTitle      String
-  jobText       String
-  location      String?
-  city          String        @default("")
-  state         String        @default("")
-  source        String        @default("scrape")
-  company       String        @default("")
-  area          String        @default("")
-  subarea       String        @default("")
-  seniority     String        @default("")
-  workModel     String        @default("")
-  contractType  String        @default("")
-  entryLevel    Boolean       @default(false)
-  salaryMin     Int?
-  expiresAt     DateTime?
-  addedByUserId String?
-  addedBy       User?         @relation(fields: [addedByUserId], references: [id], onDelete: SetNull)
-  active        Boolean       @default(true)
-  createdAt     DateTime      @default(now())
-  matches       JobMatch[]
-  applications            Application[]
-  autoApplicationQueue    AutoApplicationQueue[]
+  id                   String                 @id @default(cuid())
+  url                  String                 @unique
+  jobTitle             String
+  jobText              String
+  location             String?
+  city                 String                 @default("")
+  state                String                 @default("")
+  source               String                 @default("scrape")
+  company              String                 @default("")
+  area                 String                 @default("")
+  subarea              String                 @default("")
+  seniority            String                 @default("")
+  workModel            String                 @default("")
+  contractType         String                 @default("")
+  entryLevel           Boolean                @default(false)
+  salaryMin            Int?
+  expiresAt            DateTime?
+  addedByUserId        String?
+  addedBy              User?                  @relation(fields: [addedByUserId], references: [id], onDelete: SetNull)
+  active               Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  matches              JobMatch[]
+  applications         Application[]
+  autoApplicationQueue AutoApplicationQueue[]
 
   @@index([active, createdAt])
   @@index([active, entryLevel, createdAt])
@@ -685,10 +688,12 @@ model FreeToolUsage {
   @@index([createdAt])
 }
 
-/** Log de uso das ferramentas de estudo (simulados, redação, flashcards, edital, OAB).
+/**
+ * Log de uso das ferramentas de estudo (simulados, redação, flashcards, edital, OAB).
  * Ao contrário de FreeToolUsage (1 linha por ferramenta, para gate de uso grátis),
  * aqui cada uso gera uma linha nova — é o que alimenta o "plano de estudos da semana"
- * no dashboard para quem tem objetivo de estudo (student/concurseiro/oab). */
+ * no dashboard para quem tem objetivo de estudo (student/concurseiro/oab).
+ */
 model StudyActivityLog {
   id        String   @id @default(cuid())
   userId    String
@@ -743,7 +748,8 @@ model University {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  courses UniversityCourse[]
+  courses  UniversityCourse[]
+  partners Partner[]
 
   @@index([state, city])
 }
@@ -764,7 +770,8 @@ model UniversityCourse {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  subjects CurriculumSubject[]
+  subjects    CurriculumSubject[]
+  enrollments UniversityEnrollment[]
 
   @@index([universityId])
   @@index([active, area])
@@ -780,7 +787,122 @@ model CurriculumSubject {
   order              Int              @default(0)
   createdAt          DateTime         @default(now())
 
+  insight CurriculumSubjectInsight?
+
   @@index([universityCourseId])
+}
+
+/**
+ * Conexão com carreira de uma disciplina do catálogo real (competências, profissões
+ * relacionadas, projeto sugerido), gerada por IA e cacheada aqui — como a disciplina é
+ * compartilhada entre todos os alunos do mesmo curso, gera-se uma vez só por disciplina,
+ * não por usuário.
+ */
+model CurriculumSubjectInsight {
+  id                  String            @id @default(cuid())
+  curriculumSubjectId String            @unique
+  curriculumSubject   CurriculumSubject @relation(fields: [curriculumSubjectId], references: [id], onDelete: Cascade)
+  competencies        String
+  relatedProfessions  String
+  suggestedProject    String
+  generatedAt         DateTime          @default(now())
+}
+
+/**
+ * Matrícula do usuário: curso e período atual. Quando `universityCourseId` está
+ * preenchido, o curso foi encontrado no catálogo real (SIGAA) e "minhas disciplinas"
+ * vem de `CurriculumSubject` filtrado pelo período; sem match no catálogo, o usuário
+ * cadastra as disciplinas manualmente em `UniversitySubject`.
+ */
+model UniversityEnrollment {
+  id                 String            @id @default(cuid())
+  userId             String            @unique
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  institution        String            @default("")
+  courseName         String            @default("")
+  period             String            @default("")
+  universityCourseId String?
+  universityCourse   UniversityCourse? @relation(fields: [universityCourseId], references: [id], onDelete: SetNull)
+  currentSemester    Int?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  manualSubjects UniversitySubject[]
+}
+
+/**
+ * Disciplina cadastrada manualmente (curso fora do catálogo). Insight fica aqui mesmo
+ * (por usuário) — diferente de CurriculumSubjectInsight, que é compartilhado.
+ */
+model UniversitySubject {
+  id                 String               @id @default(cuid())
+  enrollmentId       String
+  enrollment         UniversityEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  name               String
+  competencies       String?
+  relatedProfessions String?
+  suggestedProject   String?
+  generatedAt        DateTime?
+  createdAt          DateTime             @default(now())
+
+  @@index([enrollmentId])
+}
+
+/**
+ * Plano de evolução profissional dentro do emprego atual: cargo atual → próximo
+ * cargo. Diferente do restante do produto (focado em conquistar a PRÓXIMA vaga
+ * externa), isso é sobre crescer onde a pessoa já está — por isso vive fora do
+ * fluxo de Analysis/Application. Gerado por IA e cacheado por usuário (não é
+ * compartilhável entre usuários como o insight de disciplina, já que depende do
+ * cargo/senioridade específicos da pessoa).
+ */
+model CareerGrowthPlan {
+  id                       String    @id @default(cuid())
+  userId                   String    @unique
+  user                     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentRole              String
+  currentSeniority         String    @default("")
+  targetRole               String
+  competencyGaps           String?
+  developmentActions       String?
+  negotiationTalkingPoints String?
+  leadershipReadiness      String?
+  generatedAt              DateTime?
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime  @updatedAt
+}
+
+/**
+ * Núcleo do sistema de permissões do Plano Mestre 2026 (seções 15-16): consumo de
+ * feature por usuário dentro de um ciclo (mês corrente). `featureKey` usa o padrão
+ * `dominio.recurso.acao` já definido em `src/lib/commercial-plan-catalog.ts`
+ * (CommercialFeatureKey) — este model não redefine o catálogo de features (isso
+ * continua sendo código, não dado), só registra o USO real por usuário/ciclo.
+ */
+model FeatureUsagePeriod {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  periodStart DateTime
+  periodEnd   DateTime
+  createdAt   DateTime @default(now())
+
+  records FeatureUsageRecord[]
+
+  @@unique([userId, periodStart])
+  @@index([userId])
+}
+
+model FeatureUsageRecord {
+  id         String             @id @default(cuid())
+  periodId   String
+  period     FeatureUsagePeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  featureKey String
+  count      Int                @default(0)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+
+  @@unique([periodId, featureKey])
 }
 
 model CareerVideo {
@@ -1268,33 +1390,33 @@ model FreelanceProposal {
 /// Acordo criado quando uma proposta é aceita. Um por projeto. Habilita a
 /// entrega e as avaliações mútuas. Sem pagamento real por enquanto.
 model FreelanceContract {
-  id               String            @id @default(cuid())
-  projectId        String            @unique
-  project          FreelanceProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  proposalId       String            @unique
-  proposal         FreelanceProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
-  clientUserId     String
-  client           User              @relation("ClientContracts", fields: [clientUserId], references: [id], onDelete: Cascade)
-  freelancerUserId String
-  freelancer       User              @relation("FreelancerContracts", fields: [freelancerUserId], references: [id], onDelete: Cascade)
-  agreedCents      Int
+  id                    String            @id @default(cuid())
+  projectId             String            @unique
+  project               FreelanceProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  proposalId            String            @unique
+  proposal              FreelanceProposal @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  clientUserId          String
+  client                User              @relation("ClientContracts", fields: [clientUserId], references: [id], onDelete: Cascade)
+  freelancerUserId      String
+  freelancer            User              @relation("FreelancerContracts", fields: [freelancerUserId], references: [id], onDelete: Cascade)
+  agreedCents           Int
   /// Comissão da plataforma (5% do valor bruto), congelada no aceite.
-  platformFeeCents Int               @default(0)
+  platformFeeCents      Int               @default(0)
   /// Valor líquido devido ao freelancer após a comissão.
-  freelancerPayoutCents Int           @default(0)
-  paymentStatus   String            @default("pending") // pending | paid | cancelled | refunded
-  mpPaymentId     String?           @unique
-  paymentPaidAt   DateTime?
+  freelancerPayoutCents Int               @default(0)
+  paymentStatus         String            @default("pending") // pending | paid | cancelled | refunded
+  mpPaymentId           String?           @unique
+  paymentPaidAt         DateTime?
   freelancerConfirmedAt DateTime?
-  clientConfirmedAt DateTime?
-  payoutStatus    String            @default("waiting") // waiting | ready | released
-  payoutReleasedAt DateTime?
-  status           String            @default("active") // active | delivered | completed | cancelled
-  deliveredAt      DateTime?
-  completedAt      DateTime?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  reviews          FreelanceReview[]
+  clientConfirmedAt     DateTime?
+  payoutStatus          String            @default("waiting") // waiting | ready | released
+  payoutReleasedAt      DateTime?
+  status                String            @default("active") // active | delivered | completed | cancelled
+  deliveredAt           DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  reviews               FreelanceReview[]
 
   @@index([clientUserId, status])
   @@index([freelancerUserId, status])
@@ -1368,6 +1490,14 @@ model Partner {
   courses      ExternalCourse[]
   payments     PartnerPayment[]
 
+  /// Vínculo opcional e auto-declarado com uma instituição do catálogo real (scraper
+  /// SIGAA), pra habilitar o painel agregado de empregabilidade. Autodeclarado (o
+  /// parceiro busca e escolhe a própria instituição) — por isso o painel só mostra
+  /// métricas AGREGADAS (nunca aluno individual), já que não há verificação formal
+  /// desse vínculo além do já existente `status` de aprovação do parceiro.
+  universityId String?
+  university   University? @relation(fields: [universityId], references: [id], onDelete: SetNull)
+
   @@index([email])
 }
 
@@ -1426,22 +1556,22 @@ model GameScore {
 }
 
 model AutoApplicationSettings {
-  id                  String    @id @default(cuid())
-  userId              String    @unique
-  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  enabled             Boolean   @default(false)
-  minMatchScore       Int       @default(75)
-  autoTailorResume    Boolean   @default(true)
-  externalAutomationEnabled Boolean @default(false)
-  applicationProfile String    @default("{}")
-  preferredPlatforms  String    @default("[\"linkedin\", \"gupy\", \"indeed\"]")
-  dailyLimit          Int       @default(10)
-  notifyOnApplication Boolean   @default(true)
-  consentedAt         DateTime?
-  externalConsentedAt DateTime?
-  lastRunAt           DateTime?
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
+  id                        String    @id @default(cuid())
+  userId                    String    @unique
+  user                      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  enabled                   Boolean   @default(false)
+  minMatchScore             Int       @default(75)
+  autoTailorResume          Boolean   @default(true)
+  externalAutomationEnabled Boolean   @default(false)
+  applicationProfile        String    @default("{}")
+  preferredPlatforms        String    @default("[\"linkedin\", \"gupy\", \"indeed\"]")
+  dailyLimit                Int       @default(10)
+  notifyOnApplication       Boolean   @default(true)
+  consentedAt               DateTime?
+  externalConsentedAt       DateTime?
+  lastRunAt                 DateTime?
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
 }
 
 model AutoApplicationQueue {

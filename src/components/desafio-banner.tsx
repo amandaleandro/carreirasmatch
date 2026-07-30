@@ -15,7 +15,10 @@ export function DesafioBanner() {
   // browser pintar, evitando o banner "pipocar" e empurrar o hero pra baixo (CLS)
   // depois da primeira renderização para visitantes novos.
   useLayoutEffect(() => {
+    // localStorage não existe no server; ler e setar aqui (em vez de inicializar o
+    // state direto) evita mismatch de hidratação entre o HTML do server e o client.
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDismissed(Boolean(window.localStorage.getItem(STORAGE_KEY)));
     } catch {
       setDismissed(false);

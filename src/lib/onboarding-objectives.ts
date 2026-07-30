@@ -100,6 +100,14 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
       ],
     },
     {
+      value: "organize_university",
+      label: "Organizar minhas disciplinas da faculdade",
+      cta: { label: "Ir para Universidade", href: "/universidade" },
+      shortcuts: [
+        { title: "Minhas disciplinas", description: "Veja como cada disciplina do seu curso se conecta com sua carreira.", href: "/universidade" },
+      ],
+    },
+    {
       value: "faculdade_ou_tecnico",
       label: "Decidir entre faculdade e curso técnico",
       cta: { label: "Comparar faculdade e técnico", href: "/faculdade-ou-tecnico" },
@@ -157,6 +165,16 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
         { title: "Treinar entrevista com IA", description: "Simulador de entrevista com feedback.", href: "/tools/interview-simulator" },
         { title: "Perguntas de entrevista", description: "Perguntas mais comuns e como respondê-las.", href: "/tools/interview-questions" },
         { title: "Calculadora salarial", description: "Prepare-se para negociar sua próxima proposta.", href: "/tools/salary-calculator" },
+      ],
+    },
+    {
+      value: "grow_in_current_job",
+      label: "Crescer na minha empresa atual",
+      cta: { label: "Montar meu plano de evolução", href: "/evolucao" },
+      shortcuts: [
+        { title: "Plano de evolução profissional", description: "Gaps, plano de desenvolvimento e argumentos de promoção.", href: "/evolucao" },
+        { title: "Guia de crescimento de carreira", description: "Como construir o caso para a próxima promoção.", href: "/tools/career-growth-guide" },
+        { title: "Calculadora salarial", description: "Confira seu pacote antes de negociar.", href: "/tools/salary-calculator" },
       ],
     },
   ],

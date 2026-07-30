@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { PartnerShell } from "@/components/partner-shell";
 import Link from "next/link";
-import { BookOpen, Sparkles, Plus, MousePointerClick, Users, Handshake } from "lucide-react";
+import { BookOpen, Sparkles, Plus, MousePointerClick, Users, Handshake, GraduationCap } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +48,13 @@ export default async function PartnerDashboardPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <Link
+              href="/parceiro/dashboard/empregabilidade"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              <GraduationCap className="w-4 h-4 text-blue-500" />
+              <span>Empregabilidade</span>
+            </Link>
             <Link
               href="/parceiro/dashboard/leads"
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 shadow-2xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"

@@ -1,6 +1,7 @@
 import { UniversityScraper } from "./types";
 import { createSigaaCourseScraper } from "./sigaa";
 import { createSigaaBrowserCourseScraper } from "./sigaa-browser";
+import { createSigaaInstitutionScraper } from "./sigaa-institution";
 
 /**
  * Cada instituição do SIGAA publica sua matriz curricular num link próprio; não dá
@@ -117,5 +118,46 @@ export const REGISTERED_UNIVERSITY_SCRAPERS: UniversityScraper[] = [
     area: "comunicacao",
     domain: "sigaa.ufma.br",
     courseId: "85804",
+  }),
+
+  // Descoberta automática por instituição (ver sigaa-institution.ts): em vez de
+  // cadastrar curso por curso à mão, cada entrada abaixo varre sozinha TODOS os
+  // cursos de graduação presenciais da instituição, avançando alguns por execução
+  // do cron. Domínios confirmados manualmente antes de entrar aqui — só
+  // instituições onde o fluxo completo (listar cursos → abrir grade) foi validado.
+  createSigaaInstitutionScraper({
+    universityName: "Universidade Federal do Maranhão",
+    city: "São Luís",
+    state: "MA",
+    website: "https://portais.ufma.br",
+    domain: "sigaa.ufma.br",
+  }),
+  createSigaaInstitutionScraper({
+    universityName: "Universidade Federal do Rio Grande do Norte",
+    city: "Natal",
+    state: "RN",
+    website: "https://www.ufrn.br",
+    domain: "sigaa.ufrn.br",
+  }),
+  createSigaaInstitutionScraper({
+    universityName: "Universidade Federal da Bahia",
+    city: "Salvador",
+    state: "BA",
+    website: "https://www.ufba.br",
+    domain: "sigaa.ufba.br",
+  }),
+  createSigaaInstitutionScraper({
+    universityName: "Universidade Federal da Paraíba",
+    city: "João Pessoa",
+    state: "PB",
+    website: "https://www.ufpb.br",
+    domain: "sigaa.ufpb.br",
+  }),
+  createSigaaInstitutionScraper({
+    universityName: "Universidade Federal de Pernambuco",
+    city: "Recife",
+    state: "PE",
+    website: "https://www.ufpe.br",
+    domain: "sigaa.ufpe.br",
   }),
 ];

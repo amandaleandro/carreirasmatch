@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { updateApplicationStatus } from "@/app/applications/actions";
 import { triggerConfetti } from "@/lib/confetti";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 type ApplicationItem = {
   id: string;
@@ -70,6 +71,14 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
   function handleStatusChange(id: string, newStatus: string) {
     if (newStatus === "interview" || newStatus === "offer") {
       triggerConfetti({ count: 75, originY: 0.5 });
+    }
+    // Métrica de impacto: usuário avançou de verdade (entrevista marcada / proposta
+    // recebida), não só usou uma ferramenta. Ver ANALYTICS_EVENTS.
+    if (newStatus === "interview") {
+      track(ANALYTICS_EVENTS.INTERVIEW_REPORTED, { applicationId: id });
+    }
+    if (newStatus === "offer") {
+      track(ANALYTICS_EVENTS.JOB_REPORTED, { applicationId: id });
     }
     startTransition(async () => {
       const fd = new FormData();

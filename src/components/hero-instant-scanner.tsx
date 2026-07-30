@@ -21,8 +21,12 @@ export function HeroInstantScanner() {
     reduceMotionRef.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }, []);
 
+  // Contador animado via requestAnimationFrame sincronizado com `result`: não dá
+  // pra substituir por state derivado porque o valor evolui quadro a quadro ao
+  // longo do tempo, não é uma função pura de `result`.
   useEffect(() => {
     if (!result) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayScore(0);
       return;
     }

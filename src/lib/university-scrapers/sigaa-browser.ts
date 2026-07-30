@@ -7,7 +7,7 @@ const NAVIGATION_TIMEOUT_MS = 25_000;
 
 let sharedBrowser: Browser | null = null;
 
-async function getSharedBrowser(): Promise<Browser> {
+export async function getSharedBrowser(): Promise<Browser> {
   if (!sharedBrowser) {
     sharedBrowser = await chromium.launch({
       executablePath: process.env.CHROMIUM_EXECUTABLE_PATH,

@@ -51,6 +51,13 @@ export const ANALYTICS_EVENTS = {
   REFERRAL_LINK_OPENED: "referral_link_opened",
   SECOND_ANALYSIS_STARTED: "second_analysis_started",
   SURVEY_RESPONDED: "survey_responded",
+  // Métricas de impacto: o usuário avançou de fato na carreira, não só usou o
+  // produto. É a "métrica norte" do Plano Mestre 2026 — sem isso não dá pra medir
+  // se a plataforma está cumprindo a promessa, só o quanto é usada.
+  INTERVIEW_REPORTED: "interview_reported",
+  JOB_REPORTED: "job_reported",
+  INTERNSHIP_REPORTED: "internship_reported",
+  PROMOTION_REPORTED: "promotion_reported",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

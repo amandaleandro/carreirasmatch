@@ -22,6 +22,7 @@ export const journeys = [
     href: "/ensino-medio",
     items: [
       ["Ensino médio", "/ensino-medio"],
+      ["Universidade", "/universidade"],
       ["Concursos", "/concurso"],
       ["OAB", "/oab"],
       ["Ferramentas de estudo", "/tools"],
@@ -43,6 +44,7 @@ export const journeys = [
     label: "Evoluir",
     href: "/insights",
     items: [
+      ["Evolução profissional", "/evolucao"],
       ["Melhorar LinkedIn", "/tools/linkedin-optimizer"],
       ["Revisar GitHub", "/tools/github-review"],
       ["Mapa de competências", "/tools/matriz-de-skills"],
@@ -56,7 +58,8 @@ export const journeys = [
     items: [
       ["Encontrar projetos", "/projetos"],
       ["Criar perfil", "/freelancer"],
-      ["Meus contratos", "/freelancer/meus-projetos"],
+      ["Meus contratos", "/freelancer/contratos"],
+      ["Precificação inteligente", "/freelancer/precificacao"],
     ],
   },
 ] as const;

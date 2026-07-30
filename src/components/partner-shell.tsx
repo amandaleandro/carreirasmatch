@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  GraduationCap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -26,6 +27,7 @@ const navItems: NavItem[] = [
   { href: "/parceiro/dashboard", label: "Visão Geral", icon: LayoutDashboard },
   { href: "/parceiro/dashboard/cursos", label: "Meus Cursos", icon: BookOpen },
   { href: "/parceiro/dashboard/leads", label: "Leads", icon: Users },
+  { href: "/parceiro/dashboard/empregabilidade", label: "Empregabilidade", icon: GraduationCap },
   { href: "/parceiro/dashboard/perfil", label: "Instituição", icon: Settings },
   { href: "/parceiro/dashboard/faturamento", label: "Financeiro", icon: CreditCard },
   { href: "/parceiro/dashboard/anunciar", label: "Destaques & Planos", icon: Sparkles },
