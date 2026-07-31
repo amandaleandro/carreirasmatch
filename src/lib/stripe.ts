@@ -3,6 +3,7 @@ import { parseBRLToCents } from "@/lib/pricing";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { periodPlanAmountCents, periodPlanProductName } from "@/lib/billing-plans";
 import type { CareerSegment } from "@/lib/career-segments";
+import { resolveCommercialProduct } from "@/lib/commercial-products";
 
 /**
  * Inicializa a biblioteca Stripe. Segue a instrução do blueprint:
@@ -19,6 +20,7 @@ export type CreateStripeSessionOptions = {
   email: string;
   analysisId?: string;
   kind?: "diagnostic" | "subscription_monthly" | "subscription_annual" | "first_analysis";
+  productCode?: string;
   segment?: CareerSegment;
   couponCode?: string;
   originUrl: string;
@@ -36,20 +38,30 @@ export async function createStripeCheckoutSession({
   segment = "career_pro",
   couponCode,
   originUrl,
+  productCode,
 }: CreateStripeSessionOptions): Promise<Stripe.Checkout.Session> {
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
+  let currentKind: NonNullable<CreateStripeSessionOptions["kind"]> = kind ?? "diagnostic";
+
   let unitAmountCents = 990;
   let productName = "Diagnóstico Completo de Candidatura";
 
-  if (kind === "first_analysis") {
+  if (productCode) {
+    const product = await resolveCommercialProduct(productCode);
+    unitAmountCents = product.priceCents;
+    productName = product.name;
+    if (product.kind) {
+      currentKind = product.kind as NonNullable<CreateStripeSessionOptions["kind"]>;
+    }
+  } else if (currentKind === "first_analysis") {
     unitAmountCents = parseBRLToCents(offer.firstAnalysisPrice);
     productName = `1ª Análise Completa (${offer.shortTitle})`;
-  } else if (kind === "diagnostic") {
+  } else if (currentKind === "diagnostic") {
     unitAmountCents = parseBRLToCents(offer.diagnosticPrice);
     productName = `Diagnóstico Completo (${offer.shortTitle})`;
-  } else if (kind === "subscription_monthly" || kind === "subscription_annual") {
-    unitAmountCents = periodPlanAmountCents(segment, kind);
-    productName = periodPlanProductName(kind);
+  } else if (currentKind === "subscription_monthly" || currentKind === "subscription_annual") {
+    unitAmountCents = periodPlanAmountCents(segment, currentKind);
+    productName = periodPlanProductName(currentKind);
   }
 
   const successUrl = analysisId
@@ -79,9 +91,10 @@ export async function createStripeCheckoutSession({
     metadata: {
       userId: userId ?? "",
       analysisId: analysisId ?? "",
-      kind,
+      kind: currentKind,
       segment,
       couponCode: couponCode ?? "",
+      productCode: productCode ?? "",
     },
     success_url: successUrl,
     cancel_url: cancelUrl,

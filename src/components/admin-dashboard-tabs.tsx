@@ -118,6 +118,13 @@ type AdminDashboardProps = {
     user: { name: string | null; email: string | null };
     messages: Array<{ body: string; fromAdmin: boolean; createdAt: Date }>;
   }>;
+  commercialMetrics: {
+    aiCalls30d: number;
+    aiCostUsd30d: number;
+    aiTokens30d: number;
+    aiAvgLatencyMs: number;
+    commercialUsage: number;
+  };
 };
 
 const paymentStatusClasses: Record<string, string> = {
@@ -208,6 +215,7 @@ export function AdminDashboardTabs({
   recentAnalyses,
   recentPayments,
   recentSupportTickets,
+  commercialMetrics,
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<"metrics" | "jobs" | "marketing" | "coupons" | "support" | "users">(
     "metrics"
@@ -414,6 +422,20 @@ export function AdminDashboardTabs({
             <StatCard label="Currículos salvos" value={stats.totalResumes} helper="Total processados no banco" icon={FileText} color="amber" />
             <StatCard label="Feed de Vagas" value={stats.activeJobs} helper={`${stats.jobCoverage}% ativas no sistema`} icon={Briefcase} color="rose" />
             <StatCard label="Candidaturas" value={stats.totalApplications} helper="Pipeline ativo de candidatos" icon={Zap} color="blue" />
+          </section>
+
+          <section className="rounded-2xl border border-violet-200 bg-violet-50/50 p-6 dark:border-violet-900 dark:bg-violet-950/20">
+            <div>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Economia e consumo da plataforma</h2>
+              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Dados persistidos dos últimos 30 dias.</p>
+            </div>
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+              <StatCard label="Chamadas de IA" value={commercialMetrics.aiCalls30d} helper="Execuções concluídas" color="purple" />
+              <StatCard label="Custo estimado" value={`US$ ${commercialMetrics.aiCostUsd30d.toFixed(4)}`} helper="Modelos com preço conhecido" color="amber" />
+              <StatCard label="Tokens usados" value={commercialMetrics.aiTokens30d.toLocaleString("pt-BR")} helper="Entrada + saída" color="indigo" />
+              <StatCard label="Latência média" value={`${Math.round(commercialMetrics.aiAvgLatencyMs)} ms`} helper="Tempo por chamada" color="blue" />
+              <StatCard label="Uso comercial" value={commercialMetrics.commercialUsage} helper="Limites consumidos" color="emerald" />
+            </div>
           </section>
 
           <section className="rounded-2xl border border-blue-200 bg-blue-50/60 p-6 dark:border-blue-900 dark:bg-blue-950/20">

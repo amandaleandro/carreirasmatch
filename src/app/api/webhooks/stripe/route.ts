@@ -6,6 +6,7 @@ import { normalizeCareerSegment } from "@/lib/career-segments";
 import { grantSubscriptionPeriod, isPeriodPlanKind, PERIOD_PLAN_DAYS } from "@/lib/billing-plans";
 import { registerCouponUsage } from "@/lib/coupons";
 import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail, notifyAdminPurchase } from "@/lib/resend";
+import { grantCredits, resolveCommercialProduct } from "@/lib/commercial-products";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
     const metadata = session.metadata || {};
-    const { userId, analysisId, kind = "diagnostic", segment, couponCode } = metadata;
+    const { userId, analysisId, kind = "diagnostic", segment, couponCode, productCode } = metadata;
 
     const customerEmail = session.customer_email || session.customer_details?.email;
     const amountTotal = session.amount_total || 0;
@@ -68,6 +69,9 @@ export async function POST(req: NextRequest) {
       const effectiveUserId = existingUser?.id ?? userId;
 
       if (effectiveUserId) {
+        const product = productCode ? await resolveCommercialProduct(productCode) : null;
+        const existingPayment = await prisma.payment.findUnique({ where: { mpPaymentId: `stripe_${session.id}` } });
+        if (existingPayment) return NextResponse.json({ received: true });
         const paymentRecord = await prisma.payment.create({
           data: {
             userId: effectiveUserId,
@@ -80,6 +84,28 @@ export async function POST(req: NextRequest) {
             paidAt: new Date(),
           },
         });
+
+        if (product) {
+          const purchase = await prisma.purchase.create({
+            data: {
+              userId: effectiveUserId,
+              productId: product.id,
+              paymentId: paymentRecord.id,
+              status: "paid",
+              amountCents: amountTotal,
+              idempotencyKey: `payment:${paymentRecord.mpPaymentId}`,
+            },
+          });
+          if (product.creditType && product.creditQuantity) {
+            await grantCredits({
+              userId: effectiveUserId,
+              creditType: product.creditType,
+              quantity: product.creditQuantity,
+              source: `purchase:${purchase.id}`,
+              idempotencyKey: `purchase:${purchase.id}`,
+            });
+          }
+        }
 
         // 2. Se for plano por período (mensal/anual), concede o período de acesso
         if (isPeriodPlanKind(kind)) {

@@ -7,6 +7,7 @@ import {
   aiProviderDuration,
   aiTokensTotal,
 } from "@/lib/metrics";
+import { recordAiUsageLog } from "@/lib/ai-usage-log";
 
 /**
  * Camada de IA multi-provedor. Todos os provedores abaixo são compatíveis com a
@@ -545,6 +546,17 @@ export async function runJsonAcrossProviders(
           if (estimatedCost !== null && estimatedCost > 0) {
             aiEstimatedCostUsd.inc({ provider: e.id, model: e.model, operation }, estimatedCost);
           }
+          void recordAiUsageLog({
+            featureKey: operation,
+            provider: e.id,
+            model: e.model,
+            inputTokens,
+            outputTokens,
+            cachedInputTokens,
+            estimatedCostUsd: estimatedCost,
+            durationMs: Date.now() - t0,
+            success: true,
+          }).catch((logError) => console.warn("[AI] falha ao persistir custo de uso:", logError));
           console.log(
             `[AI] ok provider=${e.id} model=${e.model} attempt=${attempt + 1} ms=${Date.now() - t0}` +
             ` input_tokens=${usage?.prompt_tokens ?? "?"} output_tokens=${usage?.completion_tokens ?? "?"}` +

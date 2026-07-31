@@ -135,8 +135,8 @@ export async function POST(req: NextRequest) {
     const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await prisma.subscription.upsert({
       where: { userId },
-      create: { userId, segment, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
-      update: { segment, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
+      create: { userId, segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: payment.id },
+      update: { segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: payment.id },
     });
     await registerCouponUsage(couponId);
     // E-mail no caminho síncrono (assinatura autorizada na hora). No caminho

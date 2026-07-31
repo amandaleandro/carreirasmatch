@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authorizeFreeAiTool, releaseFreeAiToolUsage } from "@/lib/free-tool-access";
+import { requireAuth } from "@/lib/require-auth";
+import { checkFeatureAccess } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { generateInterviewAnswerDraft, type InterviewSimulatorInput, type InterviewTurn } from "@/lib/tools";
 
 const MAX_FIELD_LENGTH = 200;
@@ -24,7 +26,20 @@ function parseHistory(raw: unknown): InterviewTurn[] | null {
 }
 
 export async function POST(req: NextRequest) {
-  let freeStartUserId: string | null = null;
+  const { session, response: authResponse } = await requireAuth();
+  if (!session) return authResponse!;
+
+  // Só checa (não consome): esse rascunho é um apoio dentro de uma entrevista que
+  // já foi iniciada — quem consome a cota de `interviewComplete` é o
+  // interview-simulator no início da sessão, não cada pergunta individual.
+  const access = await checkFeatureAccess(session.user.id, COMMERCIAL_FEATURE_KEYS.interviewComplete);
+  if (!access.allowed) {
+    return NextResponse.json(
+      { error: access.plan === "free" ? "Assine um plano pago para usar esta ferramenta." : "Você atingiu o limite deste mês." },
+      { status: access.plan === "free" ? 402 : 429 }
+    );
+  }
+
   try {
     const body = await req.json();
     const targetRole = String(body.targetRole ?? "").trim();
@@ -45,10 +60,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { session, response, subscriber } = await authorizeFreeAiTool("interview-simulator", false);
-    if (!session) return response!;
-    if (!subscriber) freeStartUserId = session.user.id;
-
     const input: InterviewSimulatorInput & { question: string; mode?: "curta" | "star" | "tecnica" } = {
       targetRole: targetRole.slice(0, MAX_FIELD_LENGTH),
       area: String(body.area ?? "").trim().slice(0, MAX_FIELD_LENGTH),
@@ -60,7 +71,6 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(await generateInterviewAnswerDraft(input));
   } catch (error) {
-    if (freeStartUserId) await releaseFreeAiToolUsage(freeStartUserId, "interview-simulator");
     console.error("Erro no rascunho de resposta de entrevista:", error);
     return NextResponse.json({ error: "Erro ao processar. Tente novamente." }, { status: 500 });
   }

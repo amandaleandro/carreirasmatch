@@ -67,61 +67,33 @@ export default async function ToolsPage() {
         </span>
       </div>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden rounded-2xl bg-slate-900 text-white p-6 sm:p-10 border border-slate-800 shadow-sm">
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide rounded-full px-3.5 py-1 bg-white/10 text-slate-200 border border-white/15">
-            <Sparkles className="w-3.5 h-3.5 text-slate-300" />
-            <span>Ferramentas Especializadas</span>
-          </div>
+      {/* Clean Header */}
+      <header className="space-y-2">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Ferramentas & Recursos
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base max-w-2xl leading-relaxed">
+          Simuladores e orientadores práticos para preparar suas candidaturas e evoluir sua carreira.
+        </p>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-tight text-white">
-            Impulsione sua Carreira
-          </h1>
-
-          <p className="text-slate-300 max-w-2xl text-sm sm:text-base md:text-lg leading-relaxed font-normal">
-            Simuladores, orientadores e assistentes focados para acelerar seus resultados profissionais.
-          </p>
-
-          {segment ? (
-            <div className="pt-2 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/15">
-              <span className="text-slate-300">Momento atual:</span>
-              <strong className="text-white font-bold">{CAREER_SEGMENT_LABELS[segment]}</strong>
-              <span className="text-slate-500">•</span>
-              <Link href="/settings" className="text-slate-300 hover:text-white underline font-medium">
-                Alterar
-              </Link>
-            </div>
-          ) : (
-            <div className="pt-2 inline-flex items-center gap-2 text-xs sm:text-sm bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/15">
-              <span className="text-slate-300">Defina seu momento para ver recomendações personalizadas:</span>
-              <Link href="/settings" className="text-white underline font-bold">
-                Definir agora →
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Feature Highlights */}
-        <div className="relative z-10 mt-8 pt-6 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-300">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-            <span>Simulações Inteligentes</span>
+        {segment ? (
+          <div className="pt-2 flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <span>Momento atual:</span>
+            <span className="font-semibold text-slate-900 dark:text-white">{CAREER_SEGMENT_LABELS[segment]}</span>
+            <span>•</span>
+            <Link href="/settings" className="font-medium text-slate-900 dark:text-white hover:underline">
+              Alterar
+            </Link>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-slate-400 shrink-0" />
-            <span>Diagnósticos Imediatos</span>
+        ) : (
+          <div className="pt-2 flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+            <span>Defina seu momento profissional para ver sugestões personalizadas:</span>
+            <Link href="/settings" className="font-semibold text-slate-900 dark:text-white hover:underline">
+              Definir agora →
+            </Link>
           </div>
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-slate-400 shrink-0" />
-            <span>100% Prático</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Star className="w-4 h-4 text-slate-400 shrink-0" />
-            <span>{session?.user?.id ? "Acesso Liberado" : "Recursos Gratuitos"}</span>
-          </div>
-        </div>
-      </section>
+        )}
+      </header>
 
       {/* Humorous Banner for Free Account Users */}
       {session?.user?.id && !isPaidUser && (
@@ -131,19 +103,18 @@ export default async function ToolsPage() {
               <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-amber-500/15 border border-amber-500/30 px-3 py-0.5 rounded-full">
                 <span>☕ Alerta de Carreira no Modo Econômico</span>
               </div>
-              <h3 className="text-lg font-extrabold text-slate-900 dark:text-white leading-tight">
-                Seu currículo não merece trabalhar a meio-vapor! 🚀
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+                Potencialize suas candidaturas ao máximo 🚀
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                Você está no cadastro gratuito. Que tal sair da fila e destravar análises ilimitadas por IA, simulações de entrevista prioritárias e relatórios completos? O café é por sua conta, o emprego é por nossa! 😉
+                No plano gratuito você possui recursos limitados. Assine o Plano Pro para ter acesso ilimitado aos diagnósticos de vagas, simuladores de entrevistas e relatórios detalhados.
               </p>
             </div>
             <Link
               href="/assinar"
-              className="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs sm:text-sm px-5 py-3.5 transition-colors"
+              className="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold text-xs sm:text-sm px-5 py-3 transition-colors shadow-sm"
             >
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Quero o Plano Pro ✨</span>
+              <span>Conhecer o Plano Pro</span>
             </Link>
           </div>
         </section>

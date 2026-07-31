@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const session = await auth();
     const body = await req.json();
-    const { email, analysisId, kind, segment, couponCode } = body;
+    const { email, analysisId, kind, productCode, segment, couponCode } = body;
 
     const targetEmail = email || session?.user?.email;
     if (!targetEmail) {
@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       email: targetEmail,
       analysisId,
       kind: kind || "diagnostic",
+      productCode: typeof productCode === "string" ? productCode : undefined,
       segment: normalizedSegment,
       couponCode,
       originUrl,

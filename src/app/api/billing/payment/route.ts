@@ -16,6 +16,8 @@ import {
   notifyAdminPurchase,
 } from "@/lib/resend";
 import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
+import { resolveCommercialProduct } from "@/lib/commercial-products";
+import { grantCredits } from "@/lib/commercial-products";
 import {
   isPeriodPlanKind,
   periodPlanAmountCents,
@@ -32,7 +34,21 @@ const DEFAULT_ANON_SEGMENT = "career_pro";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const { kind, analysisId, formData, couponCode, segment: requestedSegment, attribution } = await req.json();
+  const body = await req.json();
+  let { kind } = body;
+  const { analysisId, formData, couponCode, segment: requestedSegment, attribution, productCode } = body;
+  let product: Awaited<ReturnType<typeof resolveCommercialProduct>> | null = null;
+  if (typeof productCode === "string" && productCode.trim()) {
+    try {
+      product = await resolveCommercialProduct(productCode.trim());
+      if (product.kind === "subscription") {
+        return NextResponse.json({ error: "Use o checkout de assinatura para este produto." }, { status: 400 });
+      }
+      kind = product.kind;
+    } catch (error) {
+      return NextResponse.json({ error: error instanceof Error ? error.message : "Produto inválido." }, { status: 400 });
+    }
+  }
   const tracking = {
     sessionId: typeof attribution?.sessionId === "string" ? attribution.sessionId.slice(0, 100) : "",
     source: typeof attribution?.source === "string" ? attribution.source.slice(0, 120) : "",
@@ -42,7 +58,7 @@ export async function POST(req: NextRequest) {
   };
 
   const isPeriodPlan = typeof kind === "string" && isPeriodPlanKind(kind);
-  if (kind !== "first_analysis" && kind !== "diagnostic" && !isPeriodPlan) {
+  if (kind !== "first_analysis" && kind !== "diagnostic" && kind !== "credit_pack" && !isPeriodPlan) {
     return NextResponse.json({ error: "Tipo de cobrança inválido." }, { status: 400 });
   }
   if (!formData || typeof formData !== "object") {
@@ -135,7 +151,10 @@ export async function POST(req: NextRequest) {
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
   let baseAmountCents: number;
   let productName: string;
-  if (isPeriodPlan) {
+  if (product) {
+    baseAmountCents = product.priceCents;
+    productName = product.name;
+  } else if (isPeriodPlan) {
     baseAmountCents = periodPlanAmountCents(segment, kind);
     productName = periodPlanProductName(kind);
   } else if (kind === "first_analysis") {
@@ -237,6 +256,19 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  if (product) {
+    await prisma.purchase.create({
+      data: {
+        userId,
+        productId: product.id,
+        paymentId: payment.id,
+        status,
+        amountCents,
+        idempotencyKey: `payment:${payment.mpPaymentId}`,
+      },
+    });
+  }
+
   if (status === "paid") {
     await registerCouponUsage(couponId);
     // Aprovação síncrona (cartão): reivindica a análise sem dono para o usuário,
@@ -251,8 +283,16 @@ export async function POST(req: NextRequest) {
     }
     // E-mail de confirmação no caminho síncrono (cartão). No PIX o Payment nasce
     // "pending" e o e-mail sai no webhook, o guard de lá evita envio duplicado.
-    if (isPeriodPlan) {
-      const currentPeriodEnd = await grantSubscriptionPeriod(userId, segment, PERIOD_PLAN_DAYS[kind], payment.id);
+    if (product?.creditType && product.creditQuantity) {
+      await grantCredits({
+        userId,
+        creditType: product.creditType,
+        quantity: product.creditQuantity,
+        source: `purchase:${payment.id}`,
+        idempotencyKey: `purchase:${payment.id}`,
+      });
+    } else if (isPeriodPlan) {
+      const currentPeriodEnd = await grantSubscriptionPeriod(userId, segment, PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS], payment.id);
       void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
     } else {
       void sendPaymentConfirmationEmail(email, { kind, amountCents });

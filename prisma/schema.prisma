@@ -58,6 +58,10 @@ model User {
   universityEnrollment        UniversityEnrollment?
   careerGrowthPlan            CareerGrowthPlan?
   featureUsagePeriods         FeatureUsagePeriod[]
+  featureUsageReservations    FeatureUsageReservation[]
+  creditWallets               CreditWallet[]
+  creditTransactions          CreditTransaction[]
+  purchases                   Purchase[]
   jobAlerts                   JobAlert[]
   pushSubscriptions           PushSubscription[]
   opportunityReports          OpportunityReport[]
@@ -65,6 +69,7 @@ model User {
   companyJobApplications      CompanyJobApplication[]
   gameScores                  GameScore[]
   npsResponses                NpsResponse[]
+  moodLogs                    MoodLog[]
 
   autoApplicationSettings AutoApplicationSettings?
   autoApplicationQueue    AutoApplicationQueue[]
@@ -339,12 +344,52 @@ model Payment {
   medium        String    @default("")
   campaign      String    @default("")
   content       String    @default("")
+  purchase      Purchase?
+  paymentEvents PaymentEvent[]
 
   @@index([userId])
   @@index([status])
   @@index([analysisId])
   @@index([couponId])
   @@index([campaign, createdAt])
+}
+
+model PaymentEvent {
+  id          String    @id @default(cuid())
+  provider    String
+  eventKey    String    @unique
+  eventType   String
+  resourceId  String
+  status      String    @default("received") // received | processed | failed
+  paymentId   String?
+  payment     Payment?  @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  receivedAt  DateTime  @default(now())
+  processedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([provider, resourceId])
+  @@index([status, receivedAt])
+}
+
+model AiUsageLog {
+  id                 String   @id @default(cuid())
+  userId             String?
+  featureKey         String
+  provider           String
+  model              String
+  inputTokens        Int      @default(0)
+  outputTokens       Int      @default(0)
+  cachedInputTokens  Int      @default(0)
+  estimatedCostUsd   Float?
+  durationMs         Int
+  success            Boolean
+  errorType          String?
+  createdAt          DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([featureKey, createdAt])
+  @@index([provider, model, createdAt])
 }
 
 /// Cupons de desconto de influenciadores. Um código por influenciador para rastrear origem das vendas.
@@ -391,11 +436,119 @@ model Subscription {
   userId           String    @unique
   user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   segment          String
+  planKey          String    @default("complete")
   status           String    @default("inactive") // inactive | active | expired | cancelled
   currentPeriodEnd DateTime?
   lastPaymentId    String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
+  plan             Plan?     @relation(fields: [planKey], references: [key], onDelete: Restrict)
+}
+
+model Product {
+  id             String     @id @default(cuid())
+  code           String     @unique
+  name           String
+  kind           String
+  priceCents     Int
+  recurring      Boolean    @default(false)
+  planKey        String?
+  creditType     String?
+  creditQuantity Int?
+  active         Boolean    @default(true)
+  purchases      Purchase[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+}
+
+model Purchase {
+  id             String   @id @default(cuid())
+  userId         String
+  productId      String
+  paymentId      String?  @unique
+  status         String   @default("pending")
+  amountCents    Int
+  idempotencyKey String   @unique
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product        Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  payment        Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId, status])
+  @@index([productId, status])
+}
+
+model CreditWallet {
+  id           String             @id @default(cuid())
+  userId       String
+  creditType   String
+  balance      Int                @default(0)
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions CreditTransaction[]
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  @@unique([userId, creditType])
+}
+
+model CreditTransaction {
+  id             String       @id @default(cuid())
+  userId         String
+  walletId       String
+  creditType     String
+  quantity       Int
+  balanceAfter   Int
+  type           String
+  source         String
+  idempotencyKey String       @unique
+  expiresAt      DateTime?
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wallet         CreditWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  createdAt      DateTime     @default(now())
+
+  @@index([userId, creditType])
+  @@index([walletId, createdAt])
+}
+
+model Plan {
+  id           String            @id @default(cuid())
+  key          String            @unique
+  name         String
+  priceCents   Int
+  recurring    Boolean           @default(true)
+  durationDays Int?
+  highlighted  Boolean           @default(false)
+  active       Boolean           @default(true)
+  entitlements PlanEntitlement[]
+  subscriptions Subscription[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model FeatureDefinition {
+  id           String            @id @default(cuid())
+  key          String            @unique
+  name         String
+  active       Boolean           @default(true)
+  entitlements PlanEntitlement[]
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+}
+
+model PlanEntitlement {
+  id                  String            @id @default(cuid())
+  planId              String
+  featureDefinitionId String
+  limit               Int?
+  active              Boolean           @default(true)
+  plan                Plan              @relation(fields: [planId], references: [id], onDelete: Cascade)
+  featureDefinition   FeatureDefinition @relation(fields: [featureDefinitionId], references: [id], onDelete: Cascade)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@unique([planId, featureDefinitionId])
+  @@index([featureDefinitionId])
 }
 
 model ProfileSuggestion {
@@ -888,6 +1041,7 @@ model FeatureUsagePeriod {
   createdAt   DateTime @default(now())
 
   records FeatureUsageRecord[]
+  reservations FeatureUsageReservation[]
 
   @@unique([userId, periodStart])
   @@index([userId])
@@ -903,6 +1057,27 @@ model FeatureUsageRecord {
   updatedAt  DateTime           @updatedAt
 
   @@unique([periodId, featureKey])
+}
+
+/// Reserva idempotente de consumo. A reserva fica pendente durante a operação
+/// cara e só vira uso confirmado quando a operação termina com sucesso.
+model FeatureUsageReservation {
+  id             String             @id @default(cuid())
+  userId         String
+  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  periodId       String
+  period         FeatureUsagePeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  featureKey     String
+  idempotencyKey String
+  quantity       Int
+  creditTransactionId String?
+  status         String             @default("reserved") // reserved | confirmed | cancelled
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+
+  @@unique([userId, idempotencyKey])
+  @@index([periodId, featureKey, status])
+  @@index([userId, featureKey, status])
 }
 
 model CareerVideo {
@@ -1553,6 +1728,18 @@ model GameScore {
 
   @@index([game, createdAt, score])
   @@index([userId])
+}
+
+model MoodLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mood      String // great | good | neutral | low | rough
+  dayKey    String // "YYYY-MM-DD" no fuso do usuário, garante 1 check-in por dia
+  createdAt DateTime @default(now())
+
+  @@unique([userId, dayKey])
+  @@index([userId, createdAt])
 }
 
 model AutoApplicationSettings {

@@ -47,6 +47,7 @@ export function UnlockDiagnosticButton({
           <StripeCheckoutButton
             analysisId={analysisId}
             kind="diagnostic"
+            productCode="analysis.full"
             segment={segment}
             couponCode={couponCode}
             payerEmail={payerEmail}
@@ -62,6 +63,7 @@ export function UnlockDiagnosticButton({
           <MercadoPagoPaymentBrick
             amount={amount}
             kind="diagnostic"
+            productCode="analysis.full"
             analysisId={analysisId}
             couponCode={couponCode}
             payerEmail={payerEmail}

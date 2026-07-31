@@ -1,36 +1,15 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
-import {
-  getFeatureLimit,
-  type CommercialFeatureKey,
-  type CommercialPlanKey,
-} from "@/lib/commercial-plan-catalog";
-
-/**
- * Núcleo de autorização/consumo do Plano Mestre 2026 (seções 15-16): resolve o
- * plano efetivo do usuário, checa e consome limite por feature dentro do ciclo
- * corrente, com reserva/cancelamento pra nunca cobrar uma chamada de IA que falhou.
- *
- * Simplificações conscientes em relação à especificação original (documentadas
- * pra não serem confundidas com o sistema completo):
- * - O catálogo de planos/limites (`CommercialFeatureKey`/`CommercialPlanKey`) já
- *   existe como código em `commercial-plan-catalog.ts` — não duplicado aqui como
- *   tabela `FeatureDefinition`/`PlanEntitlement`; é dado estático, não dinâmico.
- * - `resolveEffectivePlan` hoje só sabe distinguir "tem assinatura ativa" (→ pro)
- *   de "não tem" (→ free), porque a `Subscription` real ainda não tem múltiplos
- *   tiers (ver limitação documentada no Plano Mestre: seção 14, precificação).
- *   Quando a precificação em camadas existir de verdade, é só trocar esta função.
- * - O ciclo (`UsagePeriod`) usa mês calendário (dia 1 a dia 1), não aniversário da
- *   assinatura — mais simples de implementar e auditar; ajustar depois se a régua
- *   de billing exigir precisão por aniversário.
- * - Não existe `CreditWallet`/crédito avulso aqui — feature sem limite (null) é
- *   ilimitada, feature com limite esgotado bloqueia até o próximo ciclo.
- */
+import { getCommercialPlan, type CommercialFeatureKey, type CommercialPlanKey } from "@/lib/commercial-plan-catalog";
+import { ensureCommercialCatalog, getPersistedFeatureLimit } from "@/lib/commercial-catalog-db";
 
 export async function resolveEffectivePlan(userId: string): Promise<CommercialPlanKey> {
-  return (await hasActiveSubscriptionAccess(userId)) ? "pro" : "free";
+  if (!(await hasActiveSubscriptionAccess(userId))) return "free";
+  const subscription = await prisma.subscription.findUnique({ where: { userId }, select: { planKey: true } });
+  return getCommercialPlan(subscription?.planKey).key;
 }
 
 function currentCalendarPeriod(now = new Date()) {
@@ -48,106 +27,139 @@ async function getOrCreateCurrentPeriod(userId: string) {
   });
 }
 
-async function getUsageCount(periodId: string, featureKey: CommercialFeatureKey): Promise<number> {
-  const record = await prisma.featureUsageRecord.findUnique({
-    where: { periodId_featureKey: { periodId, featureKey } },
-  });
-  return record?.count ?? 0;
-}
-
 export type FeatureAccessResult = { allowed: boolean; plan: CommercialPlanKey; used: number; limit: number | null };
+type ReservationHandle = { id: string; confirm: () => Promise<void>; cancel: () => Promise<void> };
+type ReservedFeatureAccess = FeatureAccessResult & { reservation?: ReservationHandle };
 
-/** Só checa, não consome — útil pra exibir "3/10 usados" na UI sem gastar cota. */
 export async function checkFeatureAccess(userId: string, featureKey: CommercialFeatureKey): Promise<FeatureAccessResult> {
   const plan = await resolveEffectivePlan(userId);
-  const limit = getFeatureLimit(plan, featureKey);
+  const limit = await getPersistedFeatureLimit(plan, featureKey);
   if (limit === null) return { allowed: true, plan, used: 0, limit: null };
-
   const period = await getOrCreateCurrentPeriod(userId);
-  const used = await getUsageCount(period.id, featureKey);
+  const record = await prisma.featureUsageRecord.findUnique({ where: { periodId_featureKey: { periodId: period.id, featureKey } } });
+  const used = record?.count ?? 0;
   return { allowed: used < limit, plan, used, limit };
 }
 
-/**
- * Reserva (consome) uma unidade da feature ANTES de rodar a operação cara (ex:
- * chamada de IA). Se a operação falhar, chame `cancelReservation` pra devolver a
- * cota — assim o usuário nunca é cobrado por uma tentativa que não deu resultado.
- * `confirmReservation` existe só por simetria com a spec (reservar → executar →
- * confirmar); aqui o consumo já acontece na reserva, então confirmar é no-op.
- */
-export async function reserveFeature(userId: string, featureKey: CommercialFeatureKey): Promise<FeatureAccessResult> {
+/** Reserve exactly once for an idempotency key. The reservation is confirmed only after the operation succeeds. */
+export async function reserveFeature(userId: string, featureKey: CommercialFeatureKey, idempotencyKey = randomUUID()): Promise<ReservedFeatureAccess> {
   const plan = await resolveEffectivePlan(userId);
-  const limit = getFeatureLimit(plan, featureKey);
-  if (limit === null) return { allowed: true, plan, used: 0, limit: null };
-
+  await ensureCommercialCatalog();
+  const limit = await getPersistedFeatureLimit(plan, featureKey);
   const period = await getOrCreateCurrentPeriod(userId);
 
   return prisma.$transaction(async (tx) => {
-    const existing = await tx.featureUsageRecord.findUnique({
-      where: { periodId_featureKey: { periodId: period.id, featureKey } },
-    });
-    const used = existing?.count ?? 0;
-    if (used >= limit) return { allowed: false, plan, used, limit };
+    const existingReservation = await tx.featureUsageReservation.findUnique({ where: { userId_idempotencyKey: { userId, idempotencyKey } } });
+    if (existingReservation) {
+      return reservationResult(existingReservation, plan, limit);
+    }
 
+    const record = await tx.featureUsageRecord.findUnique({ where: { periodId_featureKey: { periodId: period.id, featureKey } } });
+    const used = record?.count ?? 0;
+    if (limit !== null && used >= limit) {
+      const wallet = await tx.creditWallet.findUnique({ where: { userId_creditType: { userId, creditType: featureKey } } });
+      if (!wallet || wallet.balance < 1) return { allowed: false, plan, used, limit };
+      const updatedWallet = await tx.creditWallet.update({ where: { id: wallet.id }, data: { balance: { decrement: 1 } } });
+      const creditTransaction = await tx.creditTransaction.create({
+        data: {
+          userId,
+          walletId: wallet.id,
+          creditType: featureKey,
+          quantity: -1,
+          balanceAfter: updatedWallet.balance,
+          type: "consume",
+          source: "feature_reservation",
+          idempotencyKey: `reservation:${idempotencyKey}`,
+        },
+      });
+      const reservation = await tx.featureUsageReservation.create({
+        data: { userId, periodId: period.id, featureKey, idempotencyKey, quantity: 1, creditTransactionId: creditTransaction.id },
+      });
+      return { allowed: true, plan, used, limit, reservation: handleFor(reservation.id) };
+    }
+
+    const reservation = await tx.featureUsageReservation.create({
+      data: { userId, periodId: period.id, featureKey, idempotencyKey, quantity: 1 },
+    });
+    // O contador representa uso reservado ou confirmado. Isso impede que duas
+    // chamadas concorrentes atravessem o mesmo limite; cancelamento faz a reversão.
     await tx.featureUsageRecord.upsert({
       where: { periodId_featureKey: { periodId: period.id, featureKey } },
       create: { periodId: period.id, featureKey, count: 1 },
       update: { count: { increment: 1 } },
     });
-    return { allowed: true, plan, used: used + 1, limit };
+    return {
+      allowed: true,
+      plan,
+      used: limit === null ? 0 : used + 1,
+      limit,
+      reservation: handleFor(reservation.id),
+    };
+  }, { isolationLevel: "Serializable" });
+}
+
+function reservationResult(reservation: { id: string; status: string; quantity: number }, plan: CommercialPlanKey, limit: number | null): ReservedFeatureAccess {
+  return { allowed: reservation.status !== "cancelled", plan, used: 0, limit, reservation: handleFor(reservation.id) };
+}
+
+function handleFor(id: string): ReservationHandle {
+  return { id, confirm: () => confirmReservation(id), cancel: () => cancelReservation(id) };
+}
+
+export async function confirmReservation(reservationId: string): Promise<void> {
+  const reservation = await prisma.featureUsageReservation.findUnique({ where: { id: reservationId } });
+  if (!reservation || reservation.status !== "reserved") return;
+  await prisma.$transaction(async (tx) => {
+    const updated = await tx.featureUsageReservation.updateMany({ where: { id: reservationId, status: "reserved" }, data: { status: "confirmed" } });
+    if (updated.count === 0) return;
   });
 }
 
-export async function confirmReservation(_userId: string, _featureKey: CommercialFeatureKey): Promise<void> {
-  // No-op: ver comentário de reserveFeature. Mantido pra o call site expressar a
-  // intenção (reservar → executar → confirmar) mesmo sem estado extra a mudar.
+export async function cancelReservation(reservationId: string): Promise<void> {
+  await prisma.$transaction(async (tx) => {
+    const reservation = await tx.featureUsageReservation.findUnique({ where: { id: reservationId } });
+    if (!reservation || reservation.status !== "reserved") return;
+    await tx.featureUsageReservation.update({ where: { id: reservationId }, data: { status: "cancelled" } });
+    if (reservation.creditTransactionId) {
+      const wallet = await tx.creditWallet.findUnique({ where: { userId_creditType: { userId: reservation.userId, creditType: reservation.featureKey } } });
+      if (wallet) {
+        const updatedWallet = await tx.creditWallet.update({ where: { id: wallet.id }, data: { balance: { increment: reservation.quantity } } });
+        await tx.creditTransaction.create({
+          data: {
+            userId: reservation.userId,
+            walletId: wallet.id,
+            creditType: reservation.featureKey,
+            quantity: reservation.quantity,
+            balanceAfter: updatedWallet.balance,
+            type: "reverse",
+            source: `reservation:${reservation.id}`,
+            idempotencyKey: `reverse:${reservation.id}`,
+          },
+        });
+      }
+      return;
+    }
+    await tx.featureUsageRecord.updateMany({
+      where: { periodId: reservation.periodId, featureKey: reservation.featureKey, count: { gte: reservation.quantity } },
+      data: { count: { decrement: reservation.quantity } },
+    });
+  }, { isolationLevel: "Serializable" });
 }
 
-/** Devolve a cota reservada quando a operação cara falhou depois da reserva. */
-export async function cancelReservation(userId: string, featureKey: CommercialFeatureKey): Promise<void> {
-  const period = await getOrCreateCurrentPeriod(userId);
-  await prisma.featureUsageRecord.updateMany({
-    where: { periodId: period.id, featureKey, count: { gt: 0 } },
-    data: { count: { decrement: 1 } },
-  });
-}
-
-/**
- * Helper de rota: reserva a feature e já devolve a resposta 402/429 pronta se
- * não tiver cota, ou 401 se não estiver logado. Uso típico numa API route:
- *
- *   const { session, response, release } = await reserveFeatureForRoute(req, "career.growth.plan.generate");
- *   if (!session) return response!;
- *   try { ...chamada de IA...; await release.confirm(); }
- *   catch (e) { await release.cancel(); throw e; }
- */
 export async function reserveFeatureForRoute(featureKey: CommercialFeatureKey) {
   const { session, response } = await requireAuth();
   if (!session) return { session: null, response, release: null };
-
   const result = await reserveFeature(session.user.id, featureKey);
   if (!result.allowed) {
-    return {
-      session: null,
-      response: NextResponse.json(
-        {
-          error:
-            result.plan === "free"
-              ? "Assine um plano pago para usar esta ferramenta."
-              : `Você atingiu o limite deste mês (${result.limit}). Ele renova no próximo ciclo.`,
-        },
-        { status: result.plan === "free" ? 402 : 429 }
-      ),
-      release: null,
-    };
+    return { session: null, response: NextResponse.json({ error: result.plan === "free" ? "Assine um plano pago para usar esta ferramenta." : `Você atingiu o limite deste mês (${result.limit}). Ele renova no próximo ciclo.` }, { status: result.plan === "free" ? 402 : 429 }), release: null };
   }
+  return { session, response: null, release: { confirm: () => result.reservation?.confirm() ?? Promise.resolve(), cancel: () => result.reservation?.cancel() ?? Promise.resolve() } };
+}
 
-  return {
-    session,
-    response: null,
-    release: {
-      confirm: () => confirmReservation(session.user.id, featureKey),
-      cancel: () => cancelReservation(session.user.id, featureKey),
-    },
-  };
+export async function reserveFeatureForSession(userId: string, featureKey: CommercialFeatureKey) {
+  const result = await reserveFeature(userId, featureKey);
+  if (!result.allowed) {
+    return { allowed: false as const, response: NextResponse.json({ error: result.plan === "free" ? "Assine um plano pago para usar esta ferramenta." : `Você atingiu o limite deste mês (${result.limit}). Ele renova no próximo ciclo.` }, { status: result.plan === "free" ? 402 : 429 }), release: null };
+  }
+  return { allowed: true as const, response: null, release: { confirm: () => result.reservation?.confirm() ?? Promise.resolve(), cancel: () => result.reservation?.cancel() ?? Promise.resolve() } };
 }

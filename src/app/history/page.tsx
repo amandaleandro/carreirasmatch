@@ -7,55 +7,17 @@ import { CircularScore } from "@/components/circular-score";
 import { Pagination } from "@/components/Pagination";
 import { DeleteAnalysisButton } from "@/components/delete-analysis-button";
 import type { Prisma } from "@/generated/prisma/client";
+import { ArrowLeft, Search, Calendar, Target, Briefcase, Plus, TrendingUp } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 const HISTORY_PAGE_SIZE = 12;
 
 const STATUS_CONFIG = {
-  apply_now: { label: "Aplicar agora", dot: "bg-emerald-500", text: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-50 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/50" },
-  adjust_first: { label: "Ajustar antes", dot: "bg-amber-500", text: "text-amber-600 dark:text-amber-400", bg: "bg-amber-50 dark:bg-amber-950/20 border-amber-100 dark:border-amber-900/50" },
-  deprioritize: { label: "Não priorizar", dot: "bg-red-500", text: "text-red-600 dark:text-red-400", bg: "bg-red-50 dark:bg-red-950/20 border-red-100 dark:border-red-900/50" },
+  apply_now: { label: "Aplicar agora", dot: "bg-emerald-500", text: "text-emerald-700 dark:text-emerald-300", bg: "bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800" },
+  adjust_first: { label: "Ajustar antes", dot: "bg-amber-500", text: "text-amber-700 dark:text-amber-300", bg: "bg-amber-50/60 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800" },
+  deprioritize: { label: "Não priorizar", dot: "bg-rose-500", text: "text-rose-700 dark:text-rose-300", bg: "bg-rose-50/60 dark:bg-rose-950/30 border-rose-200 dark:border-rose-800" },
 };
-
-function BriefcaseIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="20" height="14" x="2" y="7" rx="2" ry="2"/>
-      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-    </svg>
-  );
-}
-
-function CalendarIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
-      <line x1="16" x2="16" y1="2" y2="6"/>
-      <line x1="8" x2="8" y1="2" y2="6"/>
-      <line x1="3" x2="21" y1="10" y2="10"/>
-    </svg>
-  );
-}
-
-function TargetIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <circle cx="12" cy="12" r="6"/>
-      <circle cx="12" cy="12" r="2"/>
-    </svg>
-  );
-}
-
-function SearchIcon({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className={className} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"/>
-      <path d="m21 21-4.3-4.3"/>
-    </svg>
-  );
-}
 
 export default async function HistoryPage({
   searchParams,
@@ -93,35 +55,57 @@ export default async function HistoryPage({
   const totalPages = Math.max(1, Math.ceil(total / HISTORY_PAGE_SIZE));
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Histórico de diagnósticos</h1>
-          <p className="text-neutral-600 dark:text-neutral-400 mt-1">
-            Veja todas as suas simulações anteriores e compare sua aderência.
+    <main className="px-4 sm:px-6 md:px-8 py-8 md:py-12 max-w-7xl mx-auto w-full space-y-8">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/dashboard"
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Voltar ao Painel</span>
+        </Link>
+
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60">
+          <Briefcase className="w-3.5 h-3.5 text-slate-500" />
+          <span>Histórico</span>
+        </span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Histórico de Diagnósticos
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
+            Veja todas as suas simulações anteriores e compare o nível de aderência.
           </p>
         </div>
         <Link
-          href="/"
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2.5 text-sm transition-colors self-start md:self-auto shadow-sm"
+          href="/analise"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm shrink-0 self-start sm:self-auto"
         >
-          <span>Nova análise</span>
-          <span>→</span>
+          <Plus className="w-4 h-4" />
+          <span>Nova Análise</span>
         </Link>
       </div>
 
-      <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400" aria-live="polite">
+      <p className="text-xs font-medium text-slate-500 dark:text-slate-400" aria-live="polite">
         {total} {total === 1 ? "diagnóstico encontrado" : "diagnósticos encontrados"}
         {(q || track || status) && " com os filtros atuais"}.
       </p>
 
+      {/* Evolution Graph Card */}
       {seniorityTimeline.length >= 2 && (
-        <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 p-5">
-          <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <div className="flex items-center justify-between gap-4">
             <div>
-              <h2 className="font-semibold text-sm">Evolução de senioridade</h2>
-              <p className="text-xs text-neutral-500 mt-0.5">
-                Pontuação de senioridade do currículo em cada análise, da mais antiga para a mais recente.
+              <h2 className="font-bold text-slate-900 dark:text-white text-base flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-slate-500" />
+                Evolução de Senioridade
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Pontuação de senioridade do currículo em cada análise ao longo do tempo.
               </p>
             </div>
             {(() => {
@@ -131,10 +115,10 @@ export default async function HistoryPage({
               if (delta === 0) return null;
               return (
                 <span
-                  className={`shrink-0 text-xs font-semibold px-2.5 py-1 rounded-full ${
+                  className={`shrink-0 text-xs font-semibold px-3 py-1 rounded-full ${
                     delta > 0
-                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
-                      : "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400"
+                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"
+                      : "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800"
                   }`}
                 >
                   {delta > 0 ? "+" : ""}
@@ -143,24 +127,24 @@ export default async function HistoryPage({
               );
             })()}
           </div>
-          <div className="flex items-end gap-1.5 h-24">
+          <div className="flex items-end gap-2 h-24 pt-2">
             {seniorityTimeline.map((a) => (
               <div
                 key={a.id}
                 title={`${a.jobTitle}, ${a.seniorityScore}/100 (${new Date(a.createdAt).toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })})`}
-                className="flex-1 min-w-[6px] rounded-t bg-blue-500/80 dark:bg-blue-500/70 hover:bg-blue-600 transition-colors"
-                style={{ height: `${Math.max(4, a.seniorityScore)}%` }}
+                className="flex-1 min-w-[8px] rounded-t-lg bg-slate-900 dark:bg-white/80 hover:bg-slate-700 dark:hover:bg-white transition-colors"
+                style={{ height: `${Math.max(8, a.seniorityScore)}%` }}
               />
             ))}
           </div>
         </div>
       )}
 
-      {/* Filters form */}
-      <form method="GET" className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4 p-4 rounded-xl border border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/20">
+      {/* Filters Form */}
+      <form method="GET" className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm">
         <div className="relative">
-          <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-neutral-400">
-            <SearchIcon className="h-4 w-4" />
+          <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <Search className="h-4 w-4" />
           </span>
           <input
             type="search"
@@ -168,7 +152,7 @@ export default async function HistoryPage({
             defaultValue={q || ""}
             placeholder="Buscar por vaga..."
             aria-label="Buscar por vaga"
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full pl-10 pr-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all"
           />
         </div>
 
@@ -176,7 +160,7 @@ export default async function HistoryPage({
           <select
             name="track"
             defaultValue={track || ""}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-white text-sm focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all"
           >
             <option value="">Todas as trilhas</option>
             {Object.entries(TRACK_LABELS).map(([val, label]) => (
@@ -191,7 +175,7 @@ export default async function HistoryPage({
           <select
             name="status"
             defaultValue={status || ""}
-            className="w-full px-3 py-2 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 text-slate-900 dark:text-white text-sm focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all"
           >
             <option value="">Todos os status</option>
             {Object.entries(STATUS_CONFIG).map(([val, cfg]) => (
@@ -205,14 +189,14 @@ export default async function HistoryPage({
         <div className="flex gap-2">
           <button
             type="submit"
-            className="flex-1 bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-100 dark:hover:bg-neutral-200 dark:text-neutral-950 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+            className="flex-1 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 dark:text-slate-900 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors shadow-sm"
           >
             Filtrar
           </button>
           {(q || track || status) && (
             <Link
               href="/history"
-              className="flex items-center justify-center border border-neutral-300 dark:border-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg px-3 py-2 text-sm font-medium transition-colors"
+              className="flex items-center justify-center border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors"
             >
               Limpar
             </Link>
@@ -220,18 +204,19 @@ export default async function HistoryPage({
         </div>
       </form>
 
+      {/* Analysis Grid */}
       {analyses.length === 0 ? (
-        <div className="text-center py-16 rounded-xl border border-dashed border-neutral-300 dark:border-neutral-800">
-          <BriefcaseIcon className="h-10 w-10 text-neutral-400 mx-auto mb-3" />
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 font-medium">
+        <div className="text-center py-16 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <Briefcase className="h-10 w-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+          <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
             Nenhuma análise encontrada com os filtros selecionados.
           </p>
-          <Link href="/" className="inline-block mt-4 text-sm text-blue-600 dark:text-blue-400 hover:underline">
-            Fazer um novo diagnóstico agora
+          <Link href="/analise" className="inline-block mt-4 text-sm font-semibold text-slate-900 dark:text-white hover:underline">
+            Fazer um novo diagnóstico agora →
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {analyses.map((a) => {
             const statusCfg = STATUS_CONFIG[a.applicationStatus as keyof typeof STATUS_CONFIG];
             const parsedKeywordsFound: string[] = JSON.parse(a.keywordsFound || "[]");
@@ -246,72 +231,72 @@ export default async function HistoryPage({
             return (
               <div
                 key={a.id}
-                className="group relative flex flex-col justify-between rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-5 hover:shadow-md transition-shadow"
+                className="group flex flex-col justify-between rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:border-slate-300 dark:hover:border-slate-700 transition-all space-y-4"
               >
                 <div>
                   <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-1">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold border ${statusCfg?.bg || ""} ${statusCfg?.text || ""}`}>
+                    <div className="space-y-1.5">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${statusCfg?.bg || ""} ${statusCfg?.text || ""}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${statusCfg?.dot || ""}`} />
                         {statusCfg?.label || a.applicationStatus}
                       </span>
-                      <h2 className="font-bold text-lg group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mt-2">
+                      <h2 className="font-bold text-lg text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors mt-2">
                         {a.jobTitle}
                       </h2>
                     </div>
                     <div className="shrink-0 flex flex-col items-center gap-2">
-                      <CircularScore value={a.overallScore} size={50} strokeWidth={5} />
+                      <CircularScore value={a.overallScore} size={48} strokeWidth={4.5} />
                       <DeleteAnalysisButton analysisId={a.id} jobTitle={a.jobTitle} />
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 text-xs text-neutral-500">
+                  <div className="flex flex-wrap gap-x-4 gap-y-2 mt-4 text-xs text-slate-500 dark:text-slate-400">
                     <span className="flex items-center gap-1.5">
-                      <TargetIcon className="h-3.5 w-3.5" />
+                      <Target className="h-3.5 w-3.5" />
                       {TRACK_LABELS[a.careerTrack as CareerTrack]}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <CalendarIcon className="h-3.5 w-3.5" />
+                      <Calendar className="h-3.5 w-3.5" />
                       {dateStr}
                     </span>
                   </div>
 
-                  {/* Quick stats on keywords */}
-                  <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-neutral-100 dark:border-neutral-900 text-xs">
+                  {/* Keywords & ATS Stats */}
+                  <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-xs">
                     <div>
-                      <p className="text-neutral-500 font-medium">Palavras-chave:</p>
-                      <p className="mt-0.5 text-neutral-800 dark:text-neutral-200">
+                      <p className="text-slate-500 font-medium">Palavras-chave:</p>
+                      <p className="mt-0.5 text-slate-700 dark:text-slate-300">
                         <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
                           {parsedKeywordsFound.length}
                         </span>{" "}
                         encontradas ·{" "}
-                        <span className="text-red-600 dark:text-red-400 font-semibold">
+                        <span className="text-rose-600 dark:text-rose-400 font-semibold">
                           {parsedKeywordsMissing.length}
                         </span>{" "}
                         ausentes
                       </p>
                     </div>
                     <div>
-                      <p className="text-neutral-500 font-medium">ATS / Currículo:</p>
-                      <p className="mt-0.5 font-semibold text-neutral-800 dark:text-neutral-200">
+                      <p className="text-slate-500 font-medium">Score ATS:</p>
+                      <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">
                         {a.atsScore}%
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-3 mt-6 pt-3 border-t border-neutral-100 dark:border-neutral-900">
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                   <Link
                     href={`/report/${a.id}`}
-                    className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                    className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white hover:underline"
                   >
-                    Ver Relatório completo →
+                    Ver Relatório Completo →
                   </Link>
                   <Link
                     href={`/report/${a.id}/map`}
-                    className="text-xs text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 underline"
+                    className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
                   >
-                    Ver Mapa de Oportunidade
+                    Mapa de Oportunidade
                   </Link>
                 </div>
               </div>

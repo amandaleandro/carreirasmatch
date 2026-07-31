@@ -157,6 +157,7 @@ export function BillingSection({
             <MercadoPagoPaymentBrick
               amount={amountCents / 100}
               kind={plan === "annual" ? "subscription_annual" : "subscription_monthly"}
+              productCode={plan === "annual" ? "plan.pro.annual" : "plan.pro.monthly"}
               payerEmail={payerEmail}
               couponCode={couponCode}
               onSuccess={() => window.location.reload()}

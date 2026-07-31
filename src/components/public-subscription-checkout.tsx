@@ -345,6 +345,7 @@ export function PublicSubscriptionCheckout({
                 amount={amountCents}
                 payerEmail={email}
                 kind={plan === "annual" ? "subscription_annual" : "subscription_monthly"}
+                productCode={plan === "annual" ? "plan.pro.annual" : "plan.pro.monthly"}
                 segment={segment}
                 couponCode={couponCode}
                 onSuccess={() => {}}

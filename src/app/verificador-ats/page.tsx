@@ -62,8 +62,8 @@ export default function VerificadorAtsPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header Principal */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-xs">
-            <span>✨</span> Verificador ATS 100% Gratuito
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs border border-slate-200 dark:border-slate-700">
+            Verificador ATS Gratuito
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white tracking-tight">
             Seu currículo consegue ser lido pelo robô do ATS?

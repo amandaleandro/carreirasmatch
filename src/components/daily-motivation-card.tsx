@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Smile,
   Zap,
@@ -18,12 +18,14 @@ import type { DailyMotivationProfile } from "@/lib/daily-motivation";
 interface DailyMotivationCardProps {
   initialStatus?: string | null;
   profile?: DailyMotivationProfile;
+  mood?: string | null;
   onStatusChange?: (newStatus: string) => Promise<void>;
 }
 
 export function DailyMotivationCard({
   initialStatus,
   profile,
+  mood,
   onStatusChange,
 }: DailyMotivationCardProps) {
   const [currentStatus, setCurrentStatus] = useState<EmploymentStatusKey>(
@@ -33,8 +35,25 @@ export function DailyMotivationCard({
   const [liked, setLiked] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [today, setToday] = useState(() => new Date().toDateString());
 
-  const motivation = getDailyMotivation(currentStatus, profile);
+  useEffect(() => {
+    function refreshIfNewDay() {
+      const current = new Date().toDateString();
+      setToday((prev) => (prev === current ? prev : current));
+    }
+    // PWAs instalados costumam voltar de segundo plano sem recarregar a
+    // página (bfcache), então o app precisa checar a data ao ganhar foco
+    // para não travar a frase do dia anterior na tela.
+    document.addEventListener("visibilitychange", refreshIfNewDay);
+    window.addEventListener("focus", refreshIfNewDay);
+    return () => {
+      document.removeEventListener("visibilitychange", refreshIfNewDay);
+      window.removeEventListener("focus", refreshIfNewDay);
+    };
+  }, []);
+
+  const motivation = getDailyMotivation(currentStatus, profile, mood);
   const config = EMPLOYMENT_STATUS_CONFIG[currentStatus] || EMPLOYMENT_STATUS_CONFIG.unemployed_active;
 
   async function handleSelectStatus(statusKey: EmploymentStatusKey) {
@@ -53,7 +72,7 @@ export function DailyMotivationCard({
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 p-6 space-y-5">
+    <div key={today} className="rounded-2xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-900/60 p-6 space-y-5">
       {/* Header com Situação Atual e Seletor */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-neutral-800/80">
         <div>

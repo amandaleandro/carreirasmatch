@@ -15,6 +15,7 @@ import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
 import { DataPrivacySection } from "@/components/data-privacy-section";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { ArrowLeft, User, Shield, CreditCard, Award, Bell, Eye, Phone, Lock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -89,44 +90,67 @@ export default async function SettingsPage({
   }
 
   return (
-    <main className="max-w-2xl mx-auto px-4 md:px-8 py-12 w-full space-y-6">
-      <Link href="/dashboard" className="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-        ← Voltar ao Painel
-      </Link>
-      <header>
-        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-3 bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
-          Sua conta
+    <main className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12 w-full space-y-8">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/dashboard"
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Voltar ao Painel</span>
+        </Link>
+
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60">
+          <User className="w-3.5 h-3.5 text-slate-500" />
+          <span>Minha Conta</span>
         </span>
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Perfil</h1>
-        <p className="text-neutral-600 dark:text-neutral-400 mt-2">
-          Atualize o seu momento de carreira e área de atuação para receber recomendações mais precisas.
+      </div>
+
+      <header className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+          Configurações do Perfil
+        </h1>
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
+          Gerencie suas preferências, dados pessoais e orientações de carreira.
         </p>
       </header>
 
       {upgrade === "1" && (
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-4 text-sm text-blue-900 dark:text-blue-200">
-          Essa ferramenta faz parte do plano mensal. Assine abaixo para continuar.
+        <div className="rounded-2xl border border-amber-200/80 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 p-4 text-xs sm:text-sm text-slate-800 dark:text-slate-200">
+          Essa ferramenta faz parte do plano PRO. Atualize a sua assinatura abaixo para continuar aproveitando.
         </div>
       )}
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-        <h2 className="text-lg font-semibold mb-4">Dados pessoais</h2>
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <User className="w-4 h-4 text-slate-500" />
+          Dados Pessoais
+        </h2>
         <ProfileForm
           initialName={user?.name ?? session.user.name ?? ""}
           initialImage={user?.image ?? null}
         />
       </section>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-        <h2 className="text-lg font-semibold mb-1">Segurança & Senha</h2>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
-          Altere a senha da sua conta a qualquer momento.
-        </p>
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Lock className="w-4 h-4 text-slate-500" />
+            Segurança & Senha
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Altere a senha da sua conta para manter seus acessos protegidos.
+          </p>
+        </div>
         <ChangePasswordForm />
       </section>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-        <h2 className="text-lg font-semibold mb-4">Momento de carreira</h2>
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+          <Award className="w-4 h-4 text-slate-500" />
+          Momento de Carreira
+        </h2>
         <SettingsForm
           initialSegment={normalizeCareerSegment(user?.careerSegment)}
           initialArea={user?.professionalArea ?? null}
@@ -139,13 +163,16 @@ export default async function SettingsPage({
         />
       </section>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <InterestedRolesForm initialRoles={interestedRoles} initialArea={user?.professionalArea ?? null} />
       </section>
 
       {offer && (
-        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-          <h2 className="text-lg font-semibold mb-4">Pagamento</h2>
+        <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-slate-500" />
+            Plano & Assinatura
+          </h2>
           <BillingSection
             monthlyPrice={offer.monthlyPrice}
             monthlyName={offer.monthlyName}
@@ -156,19 +183,19 @@ export default async function SettingsPage({
         </section>
       )}
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <CourseListForm courses={courses} professionalArea={user?.professionalArea ?? null} />
       </section>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <JobAlertManager initialAlerts={jobAlerts} />
       </section>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <DiscoverableToggle initialValue={user?.discoverable ?? false} />
       </section>
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <WhatsappOptInToggle
           initialValue={user?.whatsappMarketingOptIn ?? false}
           initialPhone={user?.phone ?? null}
@@ -176,7 +203,7 @@ export default async function SettingsPage({
       </section>
 
       {(user?.discoverable || contactRequests.length > 0) && (
-        <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
+        <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
           <ContactRequestsInbox
             initialRequests={contactRequests.map((r) => ({
               id: r.id,
@@ -190,11 +217,16 @@ export default async function SettingsPage({
         </section>
       )}
 
-      <section className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
-        <h2 className="text-lg font-semibold mb-1">Seus dados e privacidade</h2>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-4">
-          Baixe uma cópia dos seus dados ou exclua sua conta permanentemente, conforme a LGPD.
-        </p>
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <Shield className="w-4 h-4 text-slate-500" />
+            Dados & Privacidade (LGPD)
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Exporte seus dados ou gerencie os privilégios da sua conta.
+          </p>
+        </div>
         <DataPrivacySection hasPassword={Boolean(user?.passwordHash)} />
       </section>
     </main>

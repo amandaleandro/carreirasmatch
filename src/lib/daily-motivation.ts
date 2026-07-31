@@ -127,6 +127,16 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
       memePunchline: "Eu: 'Ah, sabe como é... resolvi dar um upgrade no meu visual na terça-feira!' 🤫💼",
       memeTag: "Modo Furtivo",
     },
+    {
+      id: 3,
+      quote: "Trocar de emprego não é traição com quem te contratou, é lealdade com quem você quer ser.",
+      author: "Estratégia Profissional",
+      tip: "Peça feedback 360° discretamente com colegas de confiança para saber onde você já está pronto(a) para o próximo passo.",
+      memeTitle: "Entrevista no horário de almoço",
+      memeSetup: "Eu: 'Só vou dar uma esticada no almoço hoje, com licença.'",
+      memePunchline: "70 minutos depois, de terno debaixo do casaco: 'Trânsito, viu...' 🕐🧥",
+      memeTag: "Operação Sigilo",
+    },
   ],
   career_transition: [
     {
@@ -148,6 +158,16 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
       memeSetup: "Amigos: 'Que incrível sua coragem de mudar de profissão!'",
       memePunchline: "Eu estudando a nova área de madrugada com 3 xícaras de café: 'Corajoso(a) ou louco(a)?' ☕😵‍💫",
       memeTag: "Vida Real",
+    },
+    {
+      id: 3,
+      quote: "Sua experiência anterior não foi tempo perdido, foi o alicerce que ninguém mais tem na área nova.",
+      author: "Reposicionamento de Carreira",
+      tip: "Escreva 3 conquistas da sua área antiga traduzidas para o vocabulário da área nova — isso vira ouro na entrevista.",
+      memeTitle: "Currículo em dois mundos",
+      memeSetup: "Recrutador da área nova: 'Mas você não tem experiência no nosso setor...'",
+      memePunchline: "Eu: 'Não tenho experiência NO setor, tenho experiência PRA CARAMBA que serve pro setor.' 💼➡️🎯",
+      memeTag: "Tradução de Carreira",
     },
   ],
   student: [
@@ -171,6 +191,16 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
       memePunchline: "Eu na faculdade: 'Se eu tivesse 5 anos de experiência não era estágio, era a diretoria!' 😅🎓",
       memeTag: "Vida de Universitário",
     },
+    {
+      id: 3,
+      quote: "Nota alta na prova é bom. Portfólio pronto quando a vaga aparecer é o que paga as contas.",
+      author: "Foco no Mercado",
+      tip: "Transforme um trabalho da faculdade em um case simples de 1 página para mostrar em entrevistas.",
+      memeTitle: "Grupo de trabalho da faculdade",
+      memeSetup: "Grupo no WhatsApp: '3 pessoas online, 1 apresentação pra amanhã.'",
+      memePunchline: "Eu terminando o slide sozinho(a) às 2h: 'Trabalho em equipe é uma jornada solo com créditos coletivos.' 😴📊",
+      memeTag: "Rotina de Universitário",
+    },
   ],
   high_school_student: [
     {
@@ -192,6 +222,16 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
       memeSetup: "Currículo: 'Campo de Experiência Profissional (Obrigatório)'",
       memePunchline: "Eu: 'Fui líder de grupo na feira de ciências e ajudei na quermesse da escola... conta como gestão de projetos?' 😂💼",
       memeTag: "Primeiros Passos",
+    },
+    {
+      id: 3,
+      quote: "Ninguém espera que você já saiba tudo aos 16, 17 anos. Espera-se que você comece.",
+      author: "Primeiros Passos",
+      tip: "Pesquise 2 cursos técnicos ou faculdades que combinam com o que você curte fazer, mesmo sem certeza total ainda.",
+      memeTitle: "Pergunta clássica da família",
+      memeSetup: "Tio no almoço: 'E aí, já sabe o que vai fazer da vida?'",
+      memePunchline: "Eu, 16 anos: 'Ainda não decidi entre 4 profissões e um surto existencial, tio.' 😅🍽️",
+      memeTag: "Clássico de Ensino Médio",
     },
   ],
   first_job: [
@@ -313,14 +353,21 @@ function personalizeMotivation(motivation: DailyMotivation, profile?: DailyMotiv
   };
 }
 
-export function getDailyMotivation(status?: string | null, profile?: DailyMotivationProfile): DailyMotivation {
+const LOW_MOOD_TIP =
+  "Hoje pode ser só sobre continuar de pé. Escolha uma única ação pequena — nem precisa ser sobre carreira — e conte isso como vitória do dia.";
+
+export function getDailyMotivation(
+  status?: string | null,
+  profile?: DailyMotivationProfile,
+  mood?: string | null
+): DailyMotivation {
   const validStatus: EmploymentStatusKey =
     status && status in MOTIVATION_CATALOG
       ? (status as EmploymentStatusKey)
       : "unemployed_active";
 
   const catalog = MOTIVATION_CATALOG[validStatus] || MOTIVATION_CATALOG.unemployed_active;
-  
+
   // Seed determinístico por dia do ano (ex: 2026-07-24)
   const today = new Date();
   const dayOfYear = Math.floor(
@@ -328,5 +375,10 @@ export function getDailyMotivation(status?: string | null, profile?: DailyMotiva
   );
 
   const index = dayOfYear % catalog.length;
-  return personalizeMotivation(catalog[index], profile);
+  const personalized = personalizeMotivation(catalog[index], profile);
+
+  if (mood === "low" || mood === "rough") {
+    return { ...personalized, tip: LOW_MOOD_TIP };
+  }
+  return personalized;
 }

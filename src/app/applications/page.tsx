@@ -11,10 +11,9 @@ import {
   updateWeeklyGoal,
 } from "./actions";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
-
 import { ApplicationsKanban } from "@/components/applications-kanban";
 import { AutoApplySettingsCard } from "@/components/auto-apply-card";
-
+import { ArrowLeft, Layers, Plus, Calendar, Target, AlertTriangle } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -29,9 +28,9 @@ function daysUntil(date: Date, referenceDate: Date) {
 }
 
 function deadlineBadgeClass(days: number) {
-  if (days <= 3) return "bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-400";
-  if (days <= 7) return "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400";
-  return "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300";
+  if (days <= 3) return "bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800";
+  if (days <= 7) return "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200 dark:border-amber-800";
+  return "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
 }
 
 export default async function ApplicationsPage() {
@@ -96,63 +95,82 @@ export default async function ApplicationsPage() {
   const journeyStats = [
     {
       label: "Dias em busca",
-      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "Sem dados",
-      tone: "text-neutral-900 dark:text-neutral-100",
+      value: journey.daysSearching !== null ? `${journey.daysSearching}` : "-",
+      tone: "text-slate-900 dark:text-white",
     },
     {
       label: "Taxa de resposta",
-      value: journey.responseRate !== null ? `${journey.responseRate}%` : "Sem dados",
+      value: journey.responseRate !== null ? `${journey.responseRate}%` : "-",
       tone: "text-emerald-600 dark:text-emerald-400",
     },
     {
       label: "Taxa de rejeição",
-      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "Sem dados",
-      tone: "text-neutral-500 dark:text-neutral-400",
+      value: journey.rejectionRate !== null ? `${journey.rejectionRate}%` : "-",
+      tone: "text-slate-500 dark:text-slate-400",
     },
     {
       label: "Candidaturas na semana",
       value: `${appliedThisWeek}`,
-      tone: "text-blue-600 dark:text-blue-400",
+      tone: "text-slate-900 dark:text-white",
     },
   ];
 
   return (
-    <main className="px-4 md:px-8 py-8 max-w-6xl mx-auto w-full space-y-8 font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div>
-          <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
-            Pipeline de Vagas
-          </span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">Candidaturas</h1>
-          <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-            Gerencie visualmente suas candidaturas por etapa do processo seletivo.
+    <main className="px-4 sm:px-6 md:px-8 py-8 md:py-12 max-w-6xl mx-auto w-full space-y-8">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <Link
+          href="/dashboard"
+          className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors inline-flex items-center gap-1.5"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Voltar ao Painel</span>
+        </Link>
+
+        <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60">
+          <Layers className="w-3.5 h-3.5 text-slate-500" />
+          <span>Pipeline</span>
+        </span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Gerenciador de Candidaturas
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base">
+            Acompanhe e organize visualmente cada etapa dos seus processos seletivos.
           </p>
         </div>
         <Link
           href="/feed"
-          className="inline-flex items-center justify-center rounded-xl bg-blue-600 hover:bg-blue-700 px-5 py-2.5 text-xs sm:text-sm font-semibold text-white shadow-md shadow-blue-500/20 transition-all shrink-0"
+          className="inline-flex items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm shrink-0 self-start sm:self-auto"
         >
-          Buscar vagas no feed
+          Buscar Vagas no Feed
         </Link>
       </div>
 
-      {/* Piloto Automático de Candidatura Inteligente */}
+      {/* Warning Box for Upcoming Deadlines */}
       {upcomingDeadlines.length > 0 && (
-        <section aria-labelledby="deadlines-heading" className="rounded-3xl border border-amber-200 bg-amber-50/70 p-5 dark:border-amber-900/60 dark:bg-amber-950/20">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400">Atenção</p>
-              <h2 id="deadlines-heading" className="mt-1 text-sm font-bold text-slate-900 dark:text-white">Você tem prazo próximo</h2>
+        <section aria-labelledby="deadlines-heading" className="rounded-2xl border border-amber-200/80 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/20 p-5 shadow-sm space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <h2 id="deadlines-heading" className="text-sm font-bold text-slate-900 dark:text-white">
+                Prazos Próximos de Encerramento
+              </h2>
             </div>
-            <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">{upcomingDeadlines.length} processo{upcomingDeadlines.length === 1 ? "" : "s"}</span>
+            <span className="text-xs font-semibold text-amber-700 dark:text-amber-300">
+              {upcomingDeadlines.length} processo{upcomingDeadlines.length === 1 ? "" : "s"}
+            </span>
           </div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <div className="grid gap-2 sm:grid-cols-3">
             {upcomingDeadlines.map((item) => {
               const days = daysUntil(item.deadline!, now);
               return (
-                <div key={item.id} className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-amber-200/80 bg-white/70 px-3 py-2 dark:border-amber-900/50 dark:bg-slate-900/50">
-                  <p className="truncate text-xs font-semibold text-slate-800 dark:text-slate-200">{item.jobTitle}</p>
-                  <span className={`shrink-0 rounded-lg px-2 py-1 text-[10px] font-bold ${deadlineBadgeClass(days)}`}>
+                <div key={item.id} className="flex min-w-0 items-center justify-between gap-2 rounded-xl border border-amber-200/80 dark:border-amber-900/50 bg-white dark:bg-slate-900 p-3 shadow-sm">
+                  <p className="truncate text-xs font-semibold text-slate-900 dark:text-white">{item.jobTitle}</p>
+                  <span className={`shrink-0 rounded-lg px-2.5 py-0.5 text-[10px] font-bold ${deadlineBadgeClass(days)}`}>
                     {days <= 0 ? "Hoje" : `${days}d`}
                   </span>
                 </div>
@@ -165,20 +183,19 @@ export default async function ApplicationsPage() {
       <AutoApplySettingsCard />
 
       {/* Kanban Board Visual */}
-
       <section className="space-y-4">
-        <h2 className="text-base font-extrabold text-slate-900 dark:text-white">Quadro Kanban de Processos</h2>
+        <h2 className="text-base font-bold text-slate-900 dark:text-white">Quadro Kanban de Processos</h2>
         <ApplicationsKanban items={applications} />
       </section>
 
       {/* Jornada de Busca */}
-      <section className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40">
-        <h2 className="text-sm font-bold text-[#071827] dark:text-white">Sua jornada de busca</h2>
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <h2 className="text-base font-bold text-slate-900 dark:text-white">Jornada de Busca</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           {journeyStats.map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800/80 bg-[#F8FAFC]/50 dark:bg-white/[0.02] px-4 py-3">
-              <p className={`text-2xl font-bold tracking-tight tabular-nums ${stat.tone}`}>{stat.value}</p>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mt-1">{stat.label}</p>
+            <div key={stat.label} className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-4 py-3">
+              <p className={`text-2xl font-bold tracking-tight ${stat.tone}`}>{stat.value}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mt-1">{stat.label}</p>
             </div>
           ))}
         </div>
@@ -191,115 +208,89 @@ export default async function ApplicationsPage() {
           return (
             <div
               key={metric.label}
-              className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-4.5 bg-[#FFFFFF] dark:bg-neutral-900/40"
+              className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-3"
             >
               <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-bold text-[#64748B]">
+                <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                   {metric.label}
                 </p>
-                <p className="text-xs font-bold text-[#071827] dark:text-white">
+                <p className="text-xs font-bold text-slate-900 dark:text-white">
                   {metric.done}/{metric.target}
                 </p>
               </div>
-              <div className="mt-3.5 h-2 rounded-full bg-neutral-100 dark:bg-neutral-800 overflow-hidden">
-                <div className="h-full bg-emerald-500 rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
+              <div className="h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+                <div className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-500" style={{ width: `${progress}%` }} />
               </div>
             </div>
           );
         })}
       </section>
 
-      {upcomingDeadlines.length > 0 && (
-        <section className="hidden">
-          <h2 className="text-sm font-bold text-[#071827] dark:text-white">Prazos próximos</h2>
-          <div className="mt-3 space-y-2">
-            {upcomingDeadlines.map((item) => {
-              const days = daysUntil(item.deadline!, now);
-              return (
-                <div key={item.id} className="flex items-center justify-between gap-3 text-xs p-2 rounded-xl bg-[#F8FAFC]/50 dark:bg-white/[0.01]">
-                  <div className="min-w-0">
-                    <p className="font-bold text-[#071827] dark:text-white truncate">{item.jobTitle}</p>
-                    {item.company && <p className="text-[10px] text-[#64748B] mt-0.5">{item.company}</p>}
-                  </div>
-                  <span className={`text-[10px] font-bold rounded-lg px-2.5 py-1 shrink-0 ${deadlineBadgeClass(days)}`}>
-                    {days <= 0 ? "Encerra hoje" : `Encerra em ${days}d`}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          <p className="text-[10px] text-[#64748B] mt-3 italic">
-            * Fique de olho no site da empresa: a gente não envia lembrete por e-mail.
-          </p>
-        </section>
-      )}
-
       {/* Formulários Grid */}
-      <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-4">
+      <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-5">
         <form
           action={createApplication}
-          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 space-y-4"
+          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4"
         >
           <div>
-            <h2 className="text-sm font-bold text-[#071827] dark:text-white">Adicionar candidatura</h2>
-            <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
-              Use para registrar vagas que você achou fora do feed ou processos que já começou.
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Adicionar Candidatura Externa</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
+              Registre oportunidades de outros sites para manter seu controle unificado.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="jobTitle" required placeholder="Cargo" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400" />
-            <input name="company" placeholder="Empresa" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400" />
-            <input name="jobUrl" type="url" placeholder="Link da vaga" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400 md:col-span-2" />
-            <select name="status" defaultValue="saved" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900 px-3 py-2 text-xs font-semibold text-neutral-850 dark:text-neutral-200 outline-none focus:border-[#2563EB] transition-all cursor-pointer">
+            <input name="jobTitle" required placeholder="Cargo" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
+            <input name="company" placeholder="Empresa" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
+            <input name="jobUrl" type="url" placeholder="Link da vaga (opcional)" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all md:col-span-2" />
+            <select name="status" defaultValue="saved" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all cursor-pointer">
               {APPLICATION_STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {APPLICATION_STATUS_CONFIG[status].label}
                 </option>
               ))}
             </select>
-            <input name="notes" placeholder="Nota rápida" className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-neutral-800 dark:text-neutral-250 outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 transition-all placeholder:text-neutral-400" />
-            <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] md:col-span-2 space-y-1">
-              Prazo de inscrição (opcional)
-              <input name="deadline" type="date" className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+            <input name="notes" placeholder="Observações rápidas" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
+            <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 md:col-span-2 space-y-1">
+              Prazo de Inscrição (opcional)
+              <input name="deadline" type="date" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
             </label>
           </div>
-          <button type="submit" className="rounded-xl bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-4 py-2.5 text-xs font-bold shadow-sm shadow-[#2563EB]/25 transition-all cursor-pointer active:scale-[0.98]">
-            Salvar candidatura
+          <button type="submit" className="rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-2.5 text-xs sm:text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
+            Salvar Candidatura
           </button>
         </form>
 
         <form
           action={updateWeeklyGoal}
-          className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 p-5 bg-[#FFFFFF] dark:bg-neutral-900/40 space-y-4 flex flex-col justify-between"
+          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4 flex flex-col justify-between"
         >
           <div className="space-y-3.5">
             <div>
-              <h2 className="text-sm font-bold text-[#071827] dark:text-white">Metas da semana</h2>
-              <p className="text-xs text-[#64748B] mt-0.5 leading-relaxed">
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">Metas da Semana</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">
                 Semana iniciada em {weekStart.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" })}.
               </p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] space-y-1">
-                Aplicações <span className="text-[#64748B]/60 text-[9px]">({appliedThisWeek})</span>
-                <input name="targetApplications" type="number" min="1" defaultValue={currentGoal.targetApplications} className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+              <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 space-y-1">
+                Aplicações <span className="text-slate-400 text-[10px]">({appliedThisWeek})</span>
+                <input name="targetApplications" type="number" min="1" defaultValue={currentGoal.targetApplications} className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all" />
               </label>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] space-y-1">
-                Ajustes <span className="text-[#64748B]/60 text-[9px]">({resumeTweaksThisWeek})</span>
-                <input name="targetResumeTweaks" type="number" min="0" defaultValue={currentGoal.targetResumeTweaks} className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+              <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 space-y-1">
+                Ajustes <span className="text-slate-400 text-[10px]">({resumeTweaksThisWeek})</span>
+                <input name="targetResumeTweaks" type="number" min="0" defaultValue={currentGoal.targetResumeTweaks} className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all" />
               </label>
-              <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] space-y-1">
-                Entrevistas <span className="text-[#64748B]/60 text-[9px]">({interviewsActive})</span>
-                <input name="targetInterviews" type="number" min="0" defaultValue={currentGoal.targetInterviews} className="mt-1 w-full rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC]/50 dark:bg-neutral-900/50 px-3 py-2 text-xs font-semibold text-[#071827] dark:text-white outline-none focus:border-[#2563EB] transition-all" />
+              <label className="text-[11px] font-semibold text-slate-700 dark:text-slate-300 space-y-1">
+                Entrevistas <span className="text-slate-400 text-[10px]">({interviewsActive})</span>
+                <input name="targetInterviews" type="number" min="0" defaultValue={currentGoal.targetInterviews} className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3 py-2 text-xs font-semibold text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none transition-all" />
               </label>
             </div>
           </div>
-          <button type="submit" className="rounded-xl border border-[#2563EB] px-4 py-2.5 text-xs font-bold text-[#2563EB] hover:bg-[#2563EB]/5 transition-all cursor-pointer mt-4 active:scale-[0.98]">
-            Atualizar metas
+          <button type="submit" className="rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white transition-colors mt-4">
+            Atualizar Metas
           </button>
         </form>
       </section>
-
     </main>
   );
 }

@@ -15,7 +15,9 @@ import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { Trophy, ArrowRight, Sparkles, Target, CheckCircle2 } from "lucide-react";
 import { CareerScoreEvolutionChart } from "@/components/career-score-evolution-chart";
 import { DailyMotivationCard } from "@/components/daily-motivation-card";
-import { updateEmploymentStatusAction } from "./actions";
+import { MoodCheckInCard } from "@/components/mood-check-in-card";
+import { getMoodDayKey } from "@/lib/mood";
+import { updateEmploymentStatusAction, saveMoodAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +65,10 @@ export default async function DashboardPage() {
       select: { userId: true },
     }),
   ]);
+
+  const todaysMood = await prisma.moodLog.findUnique({
+    where: { userId_dayKey: { userId: session.user.id, dayKey: getMoodDayKey() } },
+  });
 
   const isTopPlayer =
     topMonthlyScores.some((s) => s.userId === session.user.id) &&
@@ -280,10 +286,18 @@ export default async function DashboardPage() {
           </p>
         )}
 
-        <div className="text-left">
+        <div className="text-left space-y-4">
+          <MoodCheckInCard
+            initialMood={todaysMood?.mood}
+            onSelectMood={async (mood) => {
+              "use server";
+              await saveMoodAction(mood);
+            }}
+          />
           <DailyMotivationCard
             initialStatus={user?.employmentStatus}
             profile={motivationProfile}
+            mood={todaysMood?.mood}
             onStatusChange={async (newStatus) => {
               "use server";
               await updateEmploymentStatusAction(newStatus);
@@ -405,10 +419,18 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* Card da Dose Diária */}
+      {/* Check-in de humor + Card da Dose Diária */}
+      <MoodCheckInCard
+        initialMood={todaysMood?.mood}
+        onSelectMood={async (mood) => {
+          "use server";
+          await saveMoodAction(mood);
+        }}
+      />
       <DailyMotivationCard
         initialStatus={user?.employmentStatus}
         profile={motivationProfile}
+        mood={todaysMood?.mood}
         onStatusChange={async (newStatus) => {
           "use server";
           await updateEmploymentStatusAction(newStatus);

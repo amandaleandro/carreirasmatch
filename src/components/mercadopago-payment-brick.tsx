@@ -23,6 +23,7 @@ export function MercadoPagoPaymentBrick({
   payerEmail,
   couponCode,
   segment,
+  productCode,
   onSuccess,
   freelanceContractId,
 }: {
@@ -33,6 +34,7 @@ export function MercadoPagoPaymentBrick({
   payerEmail?: string;
   couponCode?: string;
   segment?: string;
+  productCode?: string;
   onSuccess: () => void;
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +84,7 @@ export function MercadoPagoPaymentBrick({
           body: JSON.stringify(
             freelanceContractId
               ? { formData }
-              : { kind, analysisId, formData, couponCode, segment, attribution: getStoredAttribution() }
+              : { kind, productCode, analysisId, formData, couponCode, segment, attribution: getStoredAttribution() }
           ),
         });
         const data = await res.json();
@@ -110,7 +112,7 @@ export function MercadoPagoPaymentBrick({
         throw err;
       }
     },
-    [kind, onSuccess, freelanceContractId],
+    [kind, onSuccess, freelanceContractId, productCode],
   );
 
   const handleError = useCallback(

@@ -63,7 +63,7 @@ const ecosystemCards = [
 
 const audienceCards = [
   ["Descobrir", "Estou escolhendo uma profissão", "Teste vocacional, comparação de profissões e o caminho entre faculdade e curso técnico.", "/faculdade-ou-tecnico"],
-  ["Aprender", "Estou estudando", "Ensino médio, concursos, OAB e ferramentas de estudo com tutor por IA.", "/concurso"],
+  ["Aprender", "Estou estudando", "Ensino médio, concursos, OAB e ferramentas completas de apoio aos estudos.", "/concurso"],
   ["Conquistar", "Quero estágio", "Transforme projetos da faculdade e cursos em experiência que conta.", "/estagio"],
   ["Conquistar", "Quero meu primeiro emprego", "Crie uma candidatura consistente e mostre seu valor mesmo sem carteira assinada.", "/primeiro-emprego"],
   ["Conquistar", "Quero melhorar minhas candidaturas", "Analise seu currículo contra a vaga e descubra exatamente o que ajustar.", "/analise"],

@@ -18,6 +18,7 @@ import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod, periodPlan
 import { grantScreeningCredits, activateCompanyPlan } from "@/lib/company-billing";
 import { grantPartnerCredits } from "@/lib/partner-billing";
 import { sendCompanySubscriptionConfirmationEmail, sendCompanySubscriptionCancelledEmail } from "@/lib/resend";
+import { grantCredits } from "@/lib/commercial-products";
 
 async function userEmail(userId: string): Promise<string | null> {
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
@@ -41,6 +42,18 @@ export async function POST(req: NextRequest) {
   }
   if (!dataId) return NextResponse.json({ ok: true });
 
+  const eventKey = `mercadopago:${type ?? "unknown"}:${dataId}`;
+  const webhookEvent = await prisma.paymentEvent.upsert({
+    where: { eventKey },
+    create: { provider: "mercadopago", eventKey, eventType: type ?? "unknown", resourceId: dataId },
+    update: {},
+  });
+  if (webhookEvent.status === "processed") return NextResponse.json({ ok: true });
+  const markProcessed = (paymentId?: string) => prisma.paymentEvent.update({
+    where: { id: webhookEvent.id },
+    data: { status: "processed", processedAt: new Date(), paymentId },
+  });
+
   if (type === "payment") {
     const freelanceContract = await prisma.freelanceContract.findUnique({ where: { mpPaymentId: dataId } });
     if (freelanceContract) {
@@ -56,6 +69,7 @@ export async function POST(req: NextRequest) {
         where: { id: freelanceContract.id },
         data: { paymentStatus, paymentPaidAt: paymentStatus === "paid" ? freelanceContract.paymentPaidAt ?? new Date() : freelanceContract.paymentPaidAt },
       });
+      await markProcessed();
       return NextResponse.json({ ok: true });
     }
     const payment = await prisma.payment.findUnique({ where: { mpPaymentId: dataId } });
@@ -119,6 +133,7 @@ export async function POST(req: NextRequest) {
           });
         }
       }
+      await markProcessed();
       return NextResponse.json({ ok: true });
     }
 
@@ -136,6 +151,23 @@ export async function POST(req: NextRequest) {
       where: { id: payment.id },
       data: { status, paidAt: status === "paid" ? new Date() : payment.paidAt },
     });
+
+    const purchase = await prisma.purchase.findUnique({
+      where: { paymentId: payment.id },
+      include: { product: true },
+    });
+    if (purchase && purchase.status !== status) {
+      await prisma.purchase.update({ where: { id: purchase.id }, data: { status } });
+      if (status === "paid" && purchase.product.creditType && purchase.product.creditQuantity) {
+        await grantCredits({
+          userId: purchase.userId,
+          creditType: purchase.product.creditType,
+          quantity: purchase.product.creditQuantity,
+          source: `purchase:${purchase.id}`,
+          idempotencyKey: `purchase:${purchase.id}`,
+        });
+      }
+    }
 
     // Só age na transição para "paid" (o webhook pode reenviar o mesmo evento).
     // O PIX nasce "pending" e só confirma aqui, então é este o ponto que conta o
@@ -236,7 +268,10 @@ export async function POST(req: NextRequest) {
     if (!payment) {
       // Pode ser a assinatura recorrente de uma empresa (plano ilimitado).
       const companyPayment = await prisma.companyPayment.findUnique({ where: { mpPaymentId: dataId } });
-      if (!companyPayment) return NextResponse.json({ ok: true });
+      if (!companyPayment) {
+        await markProcessed();
+        return NextResponse.json({ ok: true });
+      }
 
       const preapproval = await getPreapproval(dataId);
       const status =
@@ -260,6 +295,7 @@ export async function POST(req: NextRequest) {
           );
         }
       }
+      await markProcessed();
       return NextResponse.json({ ok: true });
     }
 
@@ -283,12 +319,14 @@ export async function POST(req: NextRequest) {
         create: {
           userId: payment.userId,
           segment: payment.segment,
+          planKey: "complete",
           status: "active",
           currentPeriodEnd,
           lastPaymentId: payment.id,
         },
         update: {
           segment: payment.segment,
+          planKey: "complete",
           status: "active",
           currentPeriodEnd,
           lastPaymentId: payment.id,
@@ -331,5 +369,6 @@ export async function POST(req: NextRequest) {
     }
   }
 
+  await markProcessed();
   return NextResponse.json({ ok: true });
 }

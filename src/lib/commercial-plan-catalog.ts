@@ -18,6 +18,11 @@ export const COMMERCIAL_FEATURE_KEYS = {
   universitySubjectInsight: "university.subject.insight",
   careerGrowthPlan: "career.growth.plan.generate",
   jobApplications: "job.application.create",
+  /** Ferramentas de estudo/concurso/vestibular que geram conteúdo por IA (simulado,
+   * plano de estudo, mapa de prova, nota de corte, etc.) — corresponde à linha
+   * "Estudos" da matriz de planos do Plano Mestre (seção 15), como um bucket único
+   * em vez de uma key por ferramenta. */
+  studyTool: "study.tool.use",
 } as const;
 
 export type CommercialFeatureKey = (typeof COMMERCIAL_FEATURE_KEYS)[keyof typeof COMMERCIAL_FEATURE_KEYS];
@@ -40,11 +45,15 @@ const baseLimits = {
   [COMMERCIAL_FEATURE_KEYS.aiSimpleAction]: 5,
   [COMMERCIAL_FEATURE_KEYS.analysisFull]: 0,
   [COMMERCIAL_FEATURE_KEYS.resumeByJob]: 0,
-  [COMMERCIAL_FEATURE_KEYS.interviewComplete]: 0,
+  // 1 (não 0): preserva o "experimente de graça uma vez" que já existia via
+  // authorizeFreeAiTool antes desta migração — só que agora renova por ciclo em
+  // vez de ser 1 única vez pra sempre (mais generoso, não uma regressão de UX).
+  [COMMERCIAL_FEATURE_KEYS.interviewComplete]: 1,
   [COMMERCIAL_FEATURE_KEYS.githubAnalysis]: 0,
   [COMMERCIAL_FEATURE_KEYS.universitySubjectInsight]: 0,
   [COMMERCIAL_FEATURE_KEYS.careerGrowthPlan]: 0,
   [COMMERCIAL_FEATURE_KEYS.jobApplications]: 5,
+  [COMMERCIAL_FEATURE_KEYS.studyTool]: 10,
 } satisfies Record<CommercialFeatureKey, PlanLimit>;
 
 export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
@@ -69,6 +78,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
       [COMMERCIAL_FEATURE_KEYS.universitySubjectInsight]: 2,
       [COMMERCIAL_FEATURE_KEYS.careerGrowthPlan]: 1,
       [COMMERCIAL_FEATURE_KEYS.jobApplications]: unlimited,
+      [COMMERCIAL_FEATURE_KEYS.studyTool]: 40,
     },
   },
   pro: {
@@ -87,6 +97,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
       [COMMERCIAL_FEATURE_KEYS.universitySubjectInsight]: 10,
       [COMMERCIAL_FEATURE_KEYS.careerGrowthPlan]: 3,
       [COMMERCIAL_FEATURE_KEYS.jobApplications]: unlimited,
+      [COMMERCIAL_FEATURE_KEYS.studyTool]: 150,
     },
   },
   complete: {
@@ -104,6 +115,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
       [COMMERCIAL_FEATURE_KEYS.universitySubjectInsight]: 25,
       [COMMERCIAL_FEATURE_KEYS.careerGrowthPlan]: 10,
       [COMMERCIAL_FEATURE_KEYS.jobApplications]: unlimited,
+      [COMMERCIAL_FEATURE_KEYS.studyTool]: unlimited,
     },
   },
   sprint: {
@@ -121,6 +133,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
       [COMMERCIAL_FEATURE_KEYS.universitySubjectInsight]: 3,
       [COMMERCIAL_FEATURE_KEYS.careerGrowthPlan]: 1,
       [COMMERCIAL_FEATURE_KEYS.jobApplications]: unlimited,
+      [COMMERCIAL_FEATURE_KEYS.studyTool]: 40,
     },
   },
 };

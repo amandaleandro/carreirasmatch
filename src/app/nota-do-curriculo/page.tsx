@@ -4,17 +4,17 @@ import { SeoAnalyzeLanding } from "@/components/seo-analyze-landing";
 export const metadata: Metadata = {
   title: "Nota do Currículo: analise seu currículo grátis e veja sua pontuação",
   description:
-    "Descubra a nota do seu currículo de 0 a 100 comparado a uma vaga real. Análise gratuita por IA: pontos fortes, lacunas, palavras-chave e o que corrigir antes de se candidatar.",
+    "Descubra a nota do seu currículo de 0 a 100 comparado a uma vaga real. Análise completa: pontos fortes, lacunas, palavras-chave e o que corrigir antes de se candidatar.",
   alternates: { canonical: "/nota-do-curriculo" },
 };
 
 export default function NotaDoCurriculoPage() {
   return (
     <SeoAnalyzeLanding
-      badge="Análise gratuita por IA"
+      badge="Análise Gratuita de Aderência"
       title="Qual é a nota do seu currículo?"
       highlight="nota do seu currículo"
-      subtitle="Envie seu currículo e a vaga que você quer: nossa IA dá uma nota de 0 a 100 e mostra o que está pesando contra você — palavras-chave ausentes, falta de resultados quantificados, estrutura e senioridade. Compare-se com milhares de outros candidatos."
+      subtitle="Envie seu currículo e a vaga desejada: nosso sistema gera uma nota de 0 a 100 e mostra o que está pesando contra você — palavras-chave ausentes, falta de resultados quantificados, estrutura e senioridade."
       bullets={[
         { label: "Nota 0-100", desc: "Técnica, experiência e ATS" },
         { label: "Comparativo", desc: "Sua posição entre candidatos" },

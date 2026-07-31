@@ -58,8 +58,8 @@ export async function grantSubscriptionPeriod(
 
   await prisma.subscription.upsert({
     where: { userId },
-    create: { userId, segment, status: "active", currentPeriodEnd, lastPaymentId: paymentId },
-    update: { segment, status: "active", currentPeriodEnd, lastPaymentId: paymentId },
+    create: { userId, segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: paymentId },
+    update: { segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: paymentId },
   });
 
   return currentPeriodEnd;

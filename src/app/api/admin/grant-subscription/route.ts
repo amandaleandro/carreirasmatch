@@ -36,8 +36,8 @@ export async function POST(req: NextRequest) {
 
   await prisma.subscription.upsert({
     where: { userId },
-    create: { userId, segment, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
-    update: { segment, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
+    create: { userId, segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: payment.id },
+    update: { segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: payment.id },
   });
 
   return NextResponse.json({ ok: true, currentPeriodEnd: currentPeriodEnd.toISOString() });

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authorizeFreeAiTool, releaseFreeAiToolUsage } from "@/lib/free-tool-access";
+import { requireAuth } from "@/lib/require-auth";
+import { checkFeatureAccess, reserveFeature, confirmReservation, cancelReservation } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { prisma } from "@/lib/prisma";
 import {
   INTERVIEW_SIMULATION_QUESTIONS,
@@ -52,28 +54,47 @@ function parseHistory(raw: unknown): InterviewTurn[] | null {
 }
 
 export async function POST(req: NextRequest) {
-  let freeStartUserId: string | null = null;
-  try {
-    const body = await req.json();
-    const targetRole = String(body.targetRole ?? "").trim();
+  const { session, response: authResponse } = await requireAuth();
+  if (!session) return authResponse!;
 
-    if (!targetRole) {
-      return NextResponse.json({ error: "Informe o cargo-alvo." }, { status: 400 });
-    }
+  const body = await req.json();
+  const targetRole = String(body.targetRole ?? "").trim();
 
-    const history = parseHistory(body.history ?? []);
-    if (!history) {
+  if (!targetRole) {
+    return NextResponse.json({ error: "Informe o cargo-alvo." }, { status: 400 });
+  }
+
+  const history = parseHistory(body.history ?? []);
+  if (!history) {
+    return NextResponse.json(
+      { error: "Não consegui ler o histórico da entrevista. Recomece a simulação." },
+      { status: 400 }
+    );
+  }
+
+  // Só a primeira chamada (início da entrevista) consome cota — as respostas
+  // seguintes fazem parte da mesma sessão já paga/reservada.
+  const isStart = history.length === 0;
+  const featureKey = COMMERCIAL_FEATURE_KEYS.interviewComplete;
+  let reservationId: string | undefined;
+
+  if (isStart) {
+    const reserved = await reserveFeature(session.user.id, featureKey);
+    if (!reserved.allowed) {
       return NextResponse.json(
-        { error: "Não consegui ler o histórico da entrevista. Recomece a simulação." },
-        { status: 400 }
+        { error: reserved.plan === "free" ? "Assine um plano pago para usar esta ferramenta." : "Você atingiu o limite deste mês." },
+        { status: reserved.plan === "free" ? 402 : 429 }
       );
     }
+    reservationId = reserved.reservation?.id;
+  } else {
+    const access = await checkFeatureAccess(session.user.id, featureKey);
+    if (!access.allowed) {
+      return NextResponse.json({ error: "Você atingiu o limite deste mês." }, { status: 429 });
+    }
+  }
 
-    const isStart = history.length === 0;
-    const { session, response, subscriber } = await authorizeFreeAiTool("interview-simulator", isStart);
-    if (!session) return response!;
-    if (isStart && !subscriber) freeStartUserId = session.user.id;
-
+  try {
     const input: InterviewSimulatorInput = {
       targetRole: targetRole.slice(0, MAX_FIELD_LENGTH),
       area: String(body.area ?? "").trim().slice(0, MAX_FIELD_LENGTH),
@@ -81,18 +102,20 @@ export async function POST(req: NextRequest) {
       history,
     };
 
-    if (history.length === 0) {
+    if (isStart) {
       const analysisContext = await loadAnalysisContext(body.analysisId, session.user.id);
       if (analysisContext) {
         input.focusAreas = analysisContext.focusAreas;
         input.suggestedQuestions = analysisContext.suggestedQuestions;
       }
-      return NextResponse.json(await startInterviewSimulation(input));
+      const result = await startInterviewSimulation(input);
+      if (reservationId) await confirmReservation(reservationId);
+      return NextResponse.json(result);
     }
 
     return NextResponse.json(await evaluateInterviewAnswer(input));
   } catch (error) {
-    if (freeStartUserId) await releaseFreeAiToolUsage(freeStartUserId, "interview-simulator");
+    if (isStart && reservationId) await cancelReservation(reservationId);
     console.error("Erro no simulador de entrevista:", error);
     return NextResponse.json(
       { error: "Erro ao processar. Tente novamente." },

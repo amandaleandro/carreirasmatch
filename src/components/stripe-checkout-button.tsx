@@ -10,6 +10,7 @@ export function StripeCheckoutButton({
   segment = "career_pro",
   couponCode = "",
   payerEmail = "",
+  productCode,
   label = "Pagar com Cartão (Stripe)",
 }: {
   analysisId?: string;
@@ -17,6 +18,7 @@ export function StripeCheckoutButton({
   segment?: string;
   couponCode?: string;
   payerEmail?: string;
+  productCode?: string;
   label?: string;
 }) {
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,7 @@ export function StripeCheckoutButton({
         body: JSON.stringify({
           analysisId,
           kind,
+          productCode,
           segment,
           couponCode,
           email: payerEmail,
