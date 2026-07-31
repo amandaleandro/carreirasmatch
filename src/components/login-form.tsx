@@ -4,6 +4,7 @@ import { useState, FormEvent } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const router = useRouter();
@@ -13,6 +14,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const { notify } = useFeedback();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -28,10 +30,12 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
     if (res?.error) {
       setLoading(false);
       setError("E-mail ou senha incorretos.");
+      notify("error", "E-mail ou senha incorretos.");
       return;
     }
 
     setSuccess(true);
+    notify("success", "Login realizado. Abrindo seu painel...");
     setTimeout(() => {
       router.push("/dashboard");
       router.refresh();

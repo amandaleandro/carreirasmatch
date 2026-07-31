@@ -10,14 +10,15 @@ import { toolsForSegment } from "@/lib/tools-catalog";
 import { STUDY_ACTIVITY_TOOLS, type StudyActivityTool } from "@/lib/study-activity";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { computeJourneyMetrics, getWeekStart } from "@/lib/applications";
-import { formatBrazilDate, formatBrazilDateTime, getBrazilGreeting } from "@/lib/brazil";
+import { formatBrazilDate, getBrazilGreeting } from "@/lib/brazil";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
-import { Trophy, ArrowRight, Sparkles, Target, CheckCircle2 } from "lucide-react";
+import { Trophy, ArrowRight, CheckCircle2 } from "lucide-react";
 import { CareerScoreEvolutionChart } from "@/components/career-score-evolution-chart";
 import { DailyMotivationCard } from "@/components/daily-motivation-card";
 import { MoodCheckInCard } from "@/components/mood-check-in-card";
 import { getMoodDayKey } from "@/lib/mood";
 import { updateEmploymentStatusAction, saveMoodAction } from "./actions";
+import { JourneyStepper } from "@/components/journey-stepper";
 
 export const dynamic = "force-dynamic";
 
@@ -86,22 +87,6 @@ export default async function DashboardPage() {
   const isStudySegment = segment === "student" || segment === "concurseiro" || segment === "oab";
   const weekStart = getWeekStart();
 
-  const applications = await prisma.application.findMany({
-    where: { userId: session.user.id },
-    orderBy: { updatedAt: "desc" },
-    take: 5,
-  });
-  const upcomingDeadlines = await prisma.application.findMany({
-    where: { userId: session.user.id, deadline: { gte: now } },
-    orderBy: { deadline: "asc" },
-    take: 3,
-  });
-  const upcomingInterviews = await prisma.application.findMany({
-    where: { userId: session.user.id, interviewAt: { gte: now } },
-    orderBy: { interviewAt: "asc" },
-    take: 3,
-  });
-
   const [studyScheduleItems, studyActivitiesThisWeek] = isStudySegment
     ? await Promise.all([
         prisma.studyScheduleItem.findMany({
@@ -146,6 +131,7 @@ export default async function DashboardPage() {
     select: { status: true, createdAt: true },
   });
   const journey = computeJourneyMetrics(allApplicationsForMetrics);
+  const journeyStage = allApplicationsForMetrics.length > 0 ? "tracking" : analyses.length > 0 ? "preparation" : "analysis";
   const currentObjective = findObjective(segment, user?.objective ?? "");
   const deadlineLabel = OBJECTIVE_DEADLINE_OPTIONS.find((o) => o.value === user?.objectiveDeadline)?.label ?? null;
   const userAreaSlug = matchAreaSlug(user?.targetProfessionalArea || user?.professionalArea || user?.studyCourse);
@@ -355,13 +341,6 @@ export default async function DashboardPage() {
       ? `Busque vagas de "${weakestBridgeRoles[0]}", o cargo-ponte mais acessível até seu objetivo.`
       : fixes[0];
 
-  const diagnosisDone = analyses.length > 0;
-  const adjustmentsDone = priorityCounts.adjust_first === 0;
-  const applicationsInProgress = priorityCounts.apply_now > 0;
-  const activeApplications = applications.filter((item) =>
-    ["applied", "interview", "technical_test", "offer"].includes(item.status)
-  ).length;
-
   const scoreDataPoints = analyses.map((a) => ({
     id: a.id,
     jobTitle: a.jobTitle,
@@ -371,9 +350,11 @@ export default async function DashboardPage() {
   })).reverse();
 
   return (
-    <div className="px-4 sm:px-6 md:px-8 py-8 md:py-12 max-w-7xl mx-auto w-full space-y-8">
+    <div className="px-4 sm:px-6 md:px-8 py-7 md:py-10 max-w-7xl mx-auto w-full space-y-6">
       {/* Gráfico de Evolução */}
-      <CareerScoreEvolutionChart dataPoints={scoreDataPoints} />
+      <div className="hidden md:block">
+        <CareerScoreEvolutionChart dataPoints={scoreDataPoints} />
+      </div>
 
       <div data-tour="dash-overview" className="space-y-1">
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Minha Jornada</span>
@@ -418,6 +399,8 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      <JourneyStepper current={journeyStage} />
 
       {/* Check-in de humor + Card da Dose Diária */}
       <MoodCheckInCard

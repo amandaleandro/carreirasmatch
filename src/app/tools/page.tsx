@@ -8,11 +8,8 @@ import {
   Sparkles,
   Lock,
   ArrowRight,
-  CheckCircle2,
-  Zap,
   Wrench,
   Star,
-  Award,
   Compass,
   Mic,
   FilePlus,
@@ -50,9 +47,9 @@ export default async function ToolsPage() {
   const displayTools = [...recommended, ...others];
 
   return (
-    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 w-full space-y-10">
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-7 w-full space-y-8">
       {/* Top Header / Breadcrumb */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/dashboard"
           className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors inline-flex items-center gap-1.5"
@@ -77,7 +74,7 @@ export default async function ToolsPage() {
         </p>
 
         {segment ? (
-          <div className="pt-2 flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+          <div className="pt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
             <span>Momento atual:</span>
             <span className="font-semibold text-slate-900 dark:text-white">{CAREER_SEGMENT_LABELS[segment]}</span>
             <span>•</span>
@@ -86,7 +83,7 @@ export default async function ToolsPage() {
             </Link>
           </div>
         ) : (
-          <div className="pt-2 flex items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+          <div className="pt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
             <span>Defina seu momento profissional para ver sugestões personalizadas:</span>
             <Link href="/settings" className="font-semibold text-slate-900 dark:text-white hover:underline">
               Definir agora →
@@ -158,7 +155,7 @@ function ToolGrid({
   isLoggedIn?: boolean;
 }) {
   return (
-    <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {tools.map((tool) => {
         const belongsToSegment = !segment || tool.segments.includes(segment);
         const isLocked = Boolean(locked) || (!tool.free && (!belongsToSegment || (!tool.accountFree && !isPaidUser)));
@@ -209,7 +206,7 @@ function ToolGrid({
           return (
             <div
               key={tool.href}
-              className="group relative flex flex-col justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-6 opacity-60 cursor-not-allowed"
+              className="group relative flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/40 p-5 opacity-60 cursor-not-allowed"
             >
               <div className="space-y-3">
                 <div className="flex items-start justify-between gap-2">
@@ -237,13 +234,13 @@ function ToolGrid({
           <Link
             key={tool.href}
             href={tool.href}
-            className={`group relative flex flex-col justify-between rounded-2xl border p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl ${
+            className={`group relative flex flex-col justify-between rounded-xl border p-5 transition-colors duration-200 ${
               highlight
                 ? "border-blue-200 dark:border-blue-900/60 bg-white dark:bg-slate-900 hover:border-blue-500 dark:hover:border-blue-600 shadow-sm"
                 : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-400 dark:hover:border-slate-600 shadow-sm"
             }`}
           >
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               <div className="flex items-start justify-between gap-2">
                 <ToolIconBadge icon={tool.icon} color={tool.color} />
                 {badge}
@@ -258,7 +255,7 @@ function ToolGrid({
               </p>
             </div>
 
-            <div className="mt-5 pt-3.5 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
+            <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-blue-400">
               <span>Acessar Ferramenta</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>

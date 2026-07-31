@@ -5,6 +5,7 @@ import { JobAlertForm } from "@/components/job-alert-form";
 import { PushOptIn } from "@/components/push-opt-in";
 import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 import { Trash2, Bell, MapPin, Calendar } from "lucide-react";
+import { useFeedback } from "@/components/feedback-provider";
 
 type Alert = {
   id: string;
@@ -16,6 +17,7 @@ type Alert = {
 
 export function JobAlertManager({ initialAlerts }: { initialAlerts: Alert[] }) {
   const [alerts, setAlerts] = useState(initialAlerts);
+  const { notify } = useFeedback();
 
   function addAlert(alert: Alert) {
     setAlerts((current) => [alert, ...current]);
@@ -26,6 +28,9 @@ export function JobAlertManager({ initialAlerts }: { initialAlerts: Alert[] }) {
     if (response.ok) {
       track(ANALYTICS_EVENTS.JOB_ALERT_DELETED);
       setAlerts((current) => current.filter((alert) => alert.id !== id));
+      notify("success", "Alerta removido.");
+    } else {
+      notify("error", "Não foi possível remover o alerta.");
     }
   }
 

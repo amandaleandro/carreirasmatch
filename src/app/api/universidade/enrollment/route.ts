@@ -14,6 +14,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Informe o nome do curso." }, { status: 400 });
   }
 
+  const linkedCourseId = typeof universityCourseId === "string" && universityCourseId.trim() ? universityCourseId.trim() : null;
+  if (linkedCourseId) {
+    const linkedCourse = await prisma.universityCourse.findUnique({ where: { id: linkedCourseId }, select: { id: true, active: true } });
+    if (!linkedCourse || !linkedCourse.active) {
+      return NextResponse.json({ error: "Curso de catálogo não encontrado." }, { status: 400 });
+    }
+  }
+
+  if (currentSemester !== undefined && currentSemester !== null && (!Number.isInteger(currentSemester) || currentSemester < 1 || currentSemester > 20)) {
+    return NextResponse.json({ error: "Período atual inválido." }, { status: 400 });
+  }
+
   const enrollment = await prisma.universityEnrollment.upsert({
     where: { userId: session.user.id },
     create: {
@@ -21,14 +33,14 @@ export async function POST(req: NextRequest) {
       institution: typeof institution === "string" ? institution.trim() : "",
       courseName: courseName.trim(),
       period: typeof period === "string" ? period.trim() : "",
-      universityCourseId: typeof universityCourseId === "string" && universityCourseId.trim() ? universityCourseId.trim() : null,
+      universityCourseId: linkedCourseId,
       currentSemester: Number.isInteger(currentSemester) ? currentSemester : null,
     },
     update: {
       institution: typeof institution === "string" ? institution.trim() : "",
       courseName: courseName.trim(),
       period: typeof period === "string" ? period.trim() : "",
-      universityCourseId: typeof universityCourseId === "string" && universityCourseId.trim() ? universityCourseId.trim() : null,
+      universityCourseId: linkedCourseId,
       currentSemester: Number.isInteger(currentSemester) ? currentSemester : null,
     },
   });

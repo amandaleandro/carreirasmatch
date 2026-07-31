@@ -13,7 +13,8 @@ import {
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
 import { ApplicationsKanban } from "@/components/applications-kanban";
 import { AutoApplySettingsCard } from "@/components/auto-apply-card";
-import { ArrowLeft, Layers, Plus, Calendar, Target, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Layers, AlertTriangle } from "lucide-react";
+import { FormSubmitButton } from "@/components/form-submit-button";
 
 export const dynamic = "force-dynamic";
 
@@ -116,9 +117,9 @@ export default async function ApplicationsPage() {
   ];
 
   return (
-    <main className="px-4 sm:px-6 md:px-8 py-8 md:py-12 max-w-6xl mx-auto w-full space-y-8">
+    <main className="px-4 sm:px-6 md:px-8 py-7 md:py-10 max-w-6xl mx-auto w-full space-y-6">
       {/* Top Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
           href="/dashboard"
           className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors inline-flex items-center gap-1.5"
@@ -189,7 +190,7 @@ export default async function ApplicationsPage() {
       </section>
 
       {/* Jornada de Busca */}
-      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <section className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Jornada de Busca</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
           {journeyStats.map((stat) => (
@@ -230,7 +231,7 @@ export default async function ApplicationsPage() {
       <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-5">
         <form
           action={createApplication}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4"
+          className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4"
         >
           <div>
             <h2 className="text-base font-bold text-slate-900 dark:text-white">Adicionar Candidatura Externa</h2>
@@ -255,14 +256,14 @@ export default async function ApplicationsPage() {
               <input name="deadline" type="date" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
             </label>
           </div>
-          <button type="submit" className="rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-2.5 text-xs sm:text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm">
+          <FormSubmitButton pendingLabel="Salvando..." className="ds-button-primary inline-flex items-center justify-center">
             Salvar Candidatura
-          </button>
+          </FormSubmitButton>
         </form>
 
         <form
           action={updateWeeklyGoal}
-          className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4 flex flex-col justify-between"
+          className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4 flex flex-col justify-between"
         >
           <div className="space-y-3.5">
             <div>
@@ -286,9 +287,9 @@ export default async function ApplicationsPage() {
               </label>
             </div>
           </div>
-          <button type="submit" className="rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 px-4 py-2.5 text-xs sm:text-sm font-semibold text-slate-900 dark:text-white transition-colors mt-4">
+          <FormSubmitButton pendingLabel="Atualizando..." className="ds-button-quiet mt-4">
             Atualizar Metas
-          </button>
+          </FormSubmitButton>
         </form>
       </section>
     </main>

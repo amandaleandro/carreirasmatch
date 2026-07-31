@@ -11,6 +11,7 @@ import {
 import { updateApplicationStatus } from "@/app/applications/actions";
 import { triggerConfetti } from "@/lib/confetti";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { useFeedback } from "@/components/feedback-provider";
 
 type ApplicationItem = {
   id: string;
@@ -67,6 +68,7 @@ const KANBAN_COLUMNS = [
 
 export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
   const [isPending, startTransition] = useTransition();
+  const { notify } = useFeedback();
 
   function handleStatusChange(id: string, newStatus: string) {
     if (newStatus === "interview" || newStatus === "offer") {
@@ -83,7 +85,12 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
     startTransition(async () => {
       const fd = new FormData();
       fd.append("status", newStatus);
-      await updateApplicationStatus(id, fd);
+      try {
+        await updateApplicationStatus(id, fd);
+        notify("success", "Etapa da candidatura atualizada.");
+      } catch (error) {
+        notify("error", error instanceof Error ? error.message : "Não foi possível atualizar a candidatura.");
+      }
     });
   }
 
@@ -163,6 +170,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                           <select
                             value={item.status}
                             disabled={isPending}
+                            aria-busy={isPending}
                             onChange={(e) => handleStatusChange(item.id, e.target.value)}
                             className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 py-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer hover:border-blue-500 transition-colors max-w-[130px]"
                           >

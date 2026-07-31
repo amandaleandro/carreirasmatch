@@ -1,14 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { NextRequest } from "next/server";
 
-const { authMock, upsertMock } = vi.hoisted(() => ({
+const { authMock, upsertMock, courseFindUniqueMock } = vi.hoisted(() => ({
   authMock: vi.fn(),
   upsertMock: vi.fn(),
+  courseFindUniqueMock: vi.fn(),
 }));
 
 vi.mock("@/auth", () => ({ auth: authMock }));
 vi.mock("@/lib/prisma", () => ({
-  prisma: { universityEnrollment: { upsert: upsertMock } },
+  prisma: { universityEnrollment: { upsert: upsertMock }, universityCourse: { findUnique: courseFindUniqueMock } },
 }));
 
 import { POST } from "./route";
@@ -25,8 +26,10 @@ describe("POST /api/universidade/enrollment", () => {
   beforeEach(() => {
     authMock.mockReset();
     upsertMock.mockReset();
+    courseFindUniqueMock.mockReset();
     authMock.mockResolvedValue({ user: { id: "user-1" } });
     upsertMock.mockResolvedValue({ id: "enrollment-1", userId: "user-1" });
+    courseFindUniqueMock.mockResolvedValue({ id: "course-1", active: true });
   });
 
   it("requires authentication", async () => {
@@ -77,4 +80,3 @@ describe("POST /api/universidade/enrollment", () => {
     });
   });
 });
-

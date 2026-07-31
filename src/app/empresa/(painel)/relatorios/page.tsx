@@ -82,7 +82,7 @@ export default async function CompanyReportsPage() {
   ];
 
   return (
-    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-7 space-y-6 font-sans">
       {/* Header Banner */}
       <div className="pb-4 border-b border-slate-200 dark:border-slate-800">
         <span className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
@@ -98,11 +98,11 @@ export default async function CompanyReportsPage() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
         {cards.map((c) => {
           const Icon = c.icon;
           return (
-            <div key={c.label} className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs space-y-2">
+            <div key={c.label} className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs space-y-2">
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {c.label}

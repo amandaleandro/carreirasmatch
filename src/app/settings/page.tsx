@@ -15,7 +15,7 @@ import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
 import { DataPrivacySection } from "@/components/data-privacy-section";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
-import { ArrowLeft, User, Shield, CreditCard, Award, Bell, Eye, Phone, Lock } from "lucide-react";
+import { ArrowLeft, User, Shield, CreditCard, Award, Lock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -90,7 +90,7 @@ export default async function SettingsPage({
   }
 
   return (
-    <main className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-8 md:py-12 w-full space-y-8">
+    <main className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8 py-7 md:py-10 w-full space-y-6">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <Link
@@ -122,7 +122,7 @@ export default async function SettingsPage({
         </div>
       )}
 
-      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <section className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <User className="w-4 h-4 text-slate-500" />
           Dados Pessoais
@@ -133,7 +133,7 @@ export default async function SettingsPage({
         />
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <section className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
         <div>
           <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <Lock className="w-4 h-4 text-slate-500" />
@@ -146,7 +146,7 @@ export default async function SettingsPage({
         <ChangePasswordForm />
       </section>
 
-      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <section className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Award className="w-4 h-4 text-slate-500" />
           Momento de Carreira

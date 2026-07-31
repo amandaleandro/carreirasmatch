@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 interface Flashcard {
   front: string;
@@ -17,9 +18,13 @@ export default function FlashcardsAnkiPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [error, setError] = useState("");
+  const { notify } = useFeedback();
 
   const handleGenerate = async () => {
-    if (!subject.trim()) return;
+    if (!subject.trim()) {
+      notify("error", "Informe uma disciplina para gerar os flashcards.");
+      return;
+    }
     setLoading(true);
     setError("");
     setFlashcards([]);
@@ -35,11 +40,14 @@ export default function FlashcardsAnkiPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        notify("error", data.error || "Não foi possível gerar os flashcards.");
         setError(data.error || "Erro ao gerar flashcards.");
       } else {
+        notify("success", "Flashcards gerados. Bom estudo!");
         setFlashcards(data.flashcards);
       }
     } catch {
+      notify("error", "Erro de conexão. Tente novamente.");
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);

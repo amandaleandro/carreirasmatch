@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 type SkillEquivalency = {
   previousSkill: string;
@@ -23,9 +24,13 @@ export default function MatrizDeSkillsPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<SkillMatrixResult | null>(null);
   const [error, setError] = useState("");
+  const { notify } = useFeedback();
 
   const handleGenerate = async () => {
-    if (!previousRole.trim() || !targetRole.trim()) return;
+    if (!previousRole.trim() || !targetRole.trim()) {
+      notify("error", "Informe o cargo anterior e o novo objetivo profissional.");
+      return;
+    }
     setLoading(true);
     setError("");
     setResult(null);
@@ -39,11 +44,14 @@ export default function MatrizDeSkillsPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        notify("error", data.error || "Não foi possível gerar a matriz.");
         setError(data.error || "Erro ao gerar matriz.");
       } else {
+        notify("success", "Matriz gerada. Confira suas competências transferíveis.");
         setResult(data.matrix);
       }
     } catch {
+      notify("error", "Erro de conexão. Tente novamente.");
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);

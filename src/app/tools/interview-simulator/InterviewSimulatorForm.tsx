@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 const TOTAL_QUESTIONS = 5;
 
@@ -69,6 +70,7 @@ export function InterviewSimulatorForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
+  const { notify } = useFeedback();
 
   const finished = started && currentQuestion === null;
 
@@ -78,7 +80,8 @@ export function InterviewSimulatorForm({
     const SpeechRecognition =
       speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Seu navegador não suporta reconhecimento de fala. Por favor, use o Google Chrome ou Edge.");
+      notify("error", "Seu navegador não suporta reconhecimento de fala. Use Chrome ou Edge.");
+      notify("error", "Seu navegador não suporta reconhecimento de fala. Use Chrome ou Edge.");
       return;
     }
     const recognition = new SpeechRecognition();
@@ -141,6 +144,7 @@ export function InterviewSimulatorForm({
       setTurns([]);
       setAnswer("");
     } catch (err) {
+      notify("error", err instanceof Error ? err.message : "Erro inesperado.");
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
       setLoading(false);

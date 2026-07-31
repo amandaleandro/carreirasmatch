@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 type Result = {
   overallImpression: string;
@@ -16,6 +17,7 @@ export function LinkedInReviewForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
+  const { notify } = useFeedback();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -40,8 +42,11 @@ export function LinkedInReviewForm() {
       if (!res.ok) throw new Error(data.error ?? "Erro ao processar.");
 
       setResult(data as Result);
+      notify("success", "Análise concluída. Suas sugestões de perfil estão prontas.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }

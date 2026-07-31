@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useFeedback } from "@/components/feedback-provider";
 
 interface Settings {
   enabled: boolean;
@@ -55,6 +56,7 @@ export function AutoApplySettingsCard() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const { notify } = useFeedback();
 
   const load = useCallback(async () => {
     const response = await fetch("/api/auto-apply/settings", { cache: "no-store" });
@@ -92,12 +94,15 @@ export function AutoApplySettingsCard() {
       if (!response.ok) throw new Error(data.error ?? "Não foi possível salvar.");
       setSettings(data.settings);
       if (data.run?.applied) {
+        notify("success", `${data.run.applied} candidatura(s) enviada(s) automaticamente.`);
         setMessage(`${data.run.applied} candidatura(s) enviada(s) automaticamente.`);
       } else {
+        notify("success", data.settings.enabled ? "Piloto automático atualizado." : "Piloto automático pausado.");
         setMessage(data.settings.enabled ? "Piloto automático atualizado." : "Piloto automático pausado.");
       }
       await load();
     } catch (error) {
+      notify("error", error instanceof Error ? error.message : "Não foi possível salvar.");
       setMessage(error instanceof Error ? error.message : "Não foi possível salvar.");
     } finally {
       setSaving(false);
@@ -116,6 +121,7 @@ export function AutoApplySettingsCard() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Não foi possível executar.");
       const result = data.run;
+      notify("success", result.applied ? `${result.applied} candidatura(s) enviada(s) agora.` : "Nenhuma nova vaga interna elegível neste momento.");
       setMessage(
         result.applied
           ? `${result.applied} candidatura(s) enviada(s) agora.`
@@ -123,6 +129,7 @@ export function AutoApplySettingsCard() {
       );
       await load();
     } catch (error) {
+      notify("error", error instanceof Error ? error.message : "Não foi possível executar.");
       setMessage(error instanceof Error ? error.message : "Não foi possível executar.");
     } finally {
       setSaving(false);

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { CircularScore } from "@/components/circular-score";
+import { useFeedback } from "@/components/feedback-provider";
 
 type StudyPlanPhased = { essential: string[]; niceToHave: string[]; later: string[] };
 type PriorityGap = { skill: string; proficiency: number };
@@ -124,6 +125,7 @@ export function ActionPlan({
   transitionNarrative?: string | null;
   whyCareerChangeAnswer?: string | null;
 }) {
+  const { notify } = useFeedback();
   const today: PlanItem[] = fixes.slice(0, 2).map((f, i) => ({
     key: `today-${i}`,
     title: f,
@@ -190,13 +192,17 @@ export function ActionPlan({
   async function persist(next: Set<string>) {
     setSaving(true);
     try {
-      await fetch(`/api/action-plan/${analysisId}`, {
+      const response = await fetch(`/api/action-plan/${analysisId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ checked: Array.from(next) }),
       });
+      if (!response.ok) throw new Error("Não foi possível salvar o progresso agora.");
       setSaved(true);
+      notify("success", "Progresso do plano salvo.");
       setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      notify("error", error instanceof Error ? error.message : "Não foi possível salvar o progresso.");
     } finally {
       setSaving(false);
     }

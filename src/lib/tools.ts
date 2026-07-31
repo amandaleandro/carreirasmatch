@@ -1137,6 +1137,62 @@ ${truncate(resumeText, MAX_RESUME_CHARS)}`;
   return runToolJsonPrompt<CoverLetterResult>("cover_letter", systemPrompt, userMessage);
 }
 
+// --- Resposta para pergunta de candidatura ---
+
+export type ApplicationAnswerLength = "curta" | "media" | "longa";
+export type ApplicationAnswerTone = "direto" | "caloroso" | "formal";
+
+const APPLICATION_ANSWER_LENGTH_GUIDE: Record<ApplicationAnswerLength, string> = {
+  curta: "2 a 3 frases, direto ao ponto.",
+  media: "um parágrafo de 4 a 6 frases.",
+  longa: "dois parágrafos curtos.",
+};
+
+const APPLICATION_ANSWER_TONE_GUIDE: Record<ApplicationAnswerTone, string> = {
+  direto: "objetivo, sem floreio, foco no que importa.",
+  caloroso: "mais pessoal, deixando a motivação aparecer.",
+  formal: "equilibrado e profissional, sem rigidez.",
+};
+
+export type ApplicationAnswerResult = {
+  answer: string;
+};
+
+export async function generateApplicationAnswer(
+  profileText: string,
+  jobText: string,
+  question: string,
+  length: ApplicationAnswerLength,
+  tone: ApplicationAnswerTone
+): Promise<ApplicationAnswerResult> {
+  const systemPrompt = `Você é um assistente de candidaturas que escreve a resposta de uma pergunta de formulário de vaga, em primeira pessoa, como se fosse o próprio candidato.
+${BASE_RULES}
+Se o perfil não tiver algo que a pergunta pede, trabalhe com o que existe e seja honesto, jamais preencha com invenção.
+Nunca prometa ou garanta resultados, nem fale em nome da empresa.
+Proibido jargão vazio: sinergia, proatividade, vestir a camisa, profissional 360, mão na massa como muleta, "sempre em busca de novos desafios".
+Tamanho: ${APPLICATION_ANSWER_LENGTH_GUIDE[length]}
+Tom: ${APPLICATION_ANSWER_TONE_GUIDE[tone]}
+Formato de resposta:
+{
+  "answer": string (a resposta pronta para colar no formulário, sem preâmbulo, sem "aqui está", sem aspas ao redor)
+}`;
+
+  const userMessage = `PERFIL DO CANDIDATO:
+${truncate(profileText, MAX_RESUME_CHARS)}
+
+VAGA:
+${truncate(jobText, MAX_RESUME_CHARS)}
+
+PERGUNTA DA CANDIDATURA:
+${question}`;
+
+  return runToolJsonPrompt<ApplicationAnswerResult>(
+    "application_answer",
+    systemPrompt,
+    userMessage
+  );
+}
+
 // --- Teste comportamental (soft skills + personalidade) ---
 
 export type BehavioralSummaryResult = {

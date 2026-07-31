@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useState } from "react";
+import { useFeedback } from "@/components/feedback-provider";
 
 function repairMojibake(value: string): string {
   if (!/[ÃÂâð�]/.test(value)) return value;
@@ -388,6 +389,7 @@ export function InterviewPrep({
   questions: string[];
   initialProgress: Record<string, QuestionProgress>;
 }) {
+  const { notify } = useFeedback();
   const [questions, setQuestions] = useState<string[]>(initialQuestions);
   const [progress, setProgress] = useState<Record<string, QuestionProgress>>(initialProgress);
   const [expanded, setExpanded] = useState<number | null>(0);
@@ -443,8 +445,11 @@ export function InterviewPrep({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ progress: nextProgress }),
       });
+      notify("success", "Simulação concluída. Seu feedback está pronto.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setFinalizing(false);
     }
@@ -463,8 +468,11 @@ export function InterviewPrep({
       setDrafts({});
       setAnswerDrafts({});
       setExpanded(0);
+      notify("success", "Novas perguntas geradas para esta entrevista.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setRegenerating(false);
     }
@@ -497,8 +505,11 @@ export function InterviewPrep({
       if (!res.ok) throw new Error(data.error ?? "Erro ao gerar rascunho.");
 
       setAnswerDrafts((current) => ({ ...current, [index]: data.answerDraft ?? "" }));
+      notify("success", "Rascunho de resposta gerado.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setDraftingIndex(null);
     }
@@ -528,6 +539,7 @@ export function InterviewPrep({
 
     navigator.clipboard.writeText(repairMojibake(reportText));
     setCopied(true);
+    notify("success", "Relatório copiado para a área de transferência.");
     setTimeout(() => setCopied(false), 3000);
   }
 

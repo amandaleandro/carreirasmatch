@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { triggerConfetti } from "@/lib/confetti";
 import { ChecklistCard } from "@/components/checklist-card";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
+import { useFeedback } from "@/components/feedback-provider";
 
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
@@ -307,6 +308,7 @@ function ClarifyingQuestionsCard({
   analysisId: string;
   questions: ClarifyingQuestion[] | null;
 }) {
+  const { notify } = useFeedback();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [result, setResult] = useState<{
@@ -336,8 +338,10 @@ function ClarifyingQuestionsCard({
       const data = await res.json();
       setResult(data);
       setStatus("done");
+      notify("success", "Análise atualizada com suas respostas.");
     } catch {
       setStatus("error");
+      notify("error", "Não foi possível atualizar a análise. Tente novamente.");
     }
   }
 

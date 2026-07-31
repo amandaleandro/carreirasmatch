@@ -120,6 +120,7 @@ type AdminDashboardProps = {
   }>;
   commercialMetrics: {
     aiCalls30d: number;
+    aiSuccessRate30d: number;
     aiCostUsd30d: number;
     aiTokens30d: number;
     aiAvgLatencyMs: number;
@@ -429,8 +430,9 @@ export function AdminDashboardTabs({
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">Economia e consumo da plataforma</h2>
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Dados persistidos dos últimos 30 dias.</p>
             </div>
-            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
               <StatCard label="Chamadas de IA" value={commercialMetrics.aiCalls30d} helper="Execuções concluídas" color="purple" />
+              <StatCard label="Sucesso da IA" value={`${commercialMetrics.aiSuccessRate30d}%`} helper="Últimos 30 dias" color="emerald" />
               <StatCard label="Custo estimado" value={`US$ ${commercialMetrics.aiCostUsd30d.toFixed(4)}`} helper="Modelos com preço conhecido" color="amber" />
               <StatCard label="Tokens usados" value={commercialMetrics.aiTokens30d.toLocaleString("pt-BR")} helper="Entrada + saída" color="indigo" />
               <StatCard label="Latência média" value={`${Math.round(commercialMetrics.aiAvgLatencyMs)} ms`} helper="Tempo por chamada" color="blue" />

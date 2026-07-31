@@ -15,6 +15,7 @@ import { UnlockDiagnosticButton } from "@/components/unlock-diagnostic-button";
 import { LeadGate, getStoredLeadContact } from "@/components/lead-gate";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { AnalysisTour } from "@/components/onboarding/analysis-tour";
+import { useFeedback } from "@/components/feedback-provider";
 
 type AnalysisWithId =
   | ({ id: string; unlocked: true; diagnosticPrice: string; loggedIn: boolean } & Analysis)
@@ -262,6 +263,7 @@ export function AnalyzeVagaPage({
   /** Landing pages SEO têm hero/h1 próprios; esconde o cabeçalho interno para não duplicar h1. */
   hideHero?: boolean;
 } = {}) {
+  const { notify } = useFeedback();
   const initialDraft = getInitialDraft();
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -293,12 +295,13 @@ export function AnalyzeVagaPage({
   const currentStep = !step1Done ? 1 : 2;
   const selectedTrackMeta = careerTrack ? TRACK_META[careerTrack] : null;
 
-  function saveDraft() {
+  function saveDraft(showFeedback = true) {
     localStorage.setItem(
       DRAFT_KEY,
       JSON.stringify({ careerTrack, jobTitle, jobText, jobLink, pastFeedback, savedAt: Date.now() })
     );
     setDraftSaved(true);
+    if (showFeedback) notify("success", "Rascunho salvo neste dispositivo.");
     setTimeout(() => setDraftSaved(false), 2000);
   }
 
@@ -386,6 +389,7 @@ export function AnalyzeVagaPage({
       setResultTrack(careerTrack);
       setResultJobTitle(jobTitle);
       track(ANALYTICS_EVENTS.ANALYSIS_COMPLETED, { careerTrack, analysisId: data.id });
+      notify("success", "Análise concluída. Seu resultado de Match está pronto.");
       track(ANALYTICS_EVENTS.DIAGNOSTIC_TEASER_VIEWED, {
         careerTrack,
         analysisId: data.id,
@@ -393,8 +397,9 @@ export function AnalyzeVagaPage({
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erro inesperado.";
       track(ANALYTICS_EVENTS.ANALYSIS_FAILED, { careerTrack, error: errorMsg });
-      saveDraft();
+      saveDraft(false);
       setError(errorMsg);
+      notify("error", errorMsg);
     } finally {
       setLoading(false);
     }
@@ -568,7 +573,7 @@ export function AnalyzeVagaPage({
   }
 
   return (
-    <div className="px-4 md:px-8 py-6 max-w-[1200px] mx-auto w-full space-y-5 font-sans bg-[#F8FAFC] dark:bg-[#071827] text-foreground">
+    <div className="px-4 md:px-8 py-5 max-w-[1200px] mx-auto w-full space-y-4 font-sans bg-[#F8FAFC] dark:bg-[#071827] text-foreground">
       {!isAuthenticated && !hideHero && (
         <a href="/gratuito" className="text-xs font-bold text-[#2563EB] hover:underline">
           ← Voltar para recursos gratuitos
@@ -577,7 +582,7 @@ export function AnalyzeVagaPage({
 
       {/* Cabeçalho Unificado (Banner Limpo) */}
       {!hideHero && (
-      <div className="relative overflow-hidden rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5.5">
+      <div className="relative overflow-hidden rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-white dark:bg-neutral-900/60 px-5 py-5">
         <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
 
@@ -587,9 +592,9 @@ export function AnalyzeVagaPage({
             <p className="max-w-2xl text-xs leading-relaxed text-[#64748B]">
               Envie seu currículo e a descrição da oportunidade. Veja seu Match, as lacunas mais importantes e o que ajustar antes de se candidatar.
             </p>
-            <div className="flex flex-wrap gap-2 pt-1">
+            <div className="flex flex-wrap gap-1.5 pt-1">
               {["PDF de até 5 MB", "Match inicial grátis", "Qualquer profissão"].map((item) => (
-                <span key={item} className="rounded-xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-800 px-3 py-1.5 text-[10px] font-bold text-[#64748B] shadow-sm">
+                <span key={item} className="rounded-lg border border-[#E2E8F0] dark:border-neutral-800 bg-[#F8FAFC] dark:bg-neutral-800 px-2.5 py-1 text-[10px] font-semibold text-[#64748B]">
                   {item}
                 </span>
               ))}
@@ -790,6 +795,7 @@ export function AnalyzeVagaPage({
                 elementos-alvo (#curriculo-upload, #vaga-input, #analisar-button). */}
             <section
               ref={step2Ref}
+              role="group"
               aria-disabled={!step1Done}
               className={`relative rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/60 p-5 md:p-6 space-y-4 transition-opacity ${
                 step1Done ? "" : "opacity-40 pointer-events-none select-none"
@@ -931,7 +937,7 @@ export function AnalyzeVagaPage({
                 <div className="flex gap-3 w-full sm:w-auto">
                   <button
                     type="button"
-                    onClick={saveDraft}
+                    onClick={() => saveDraft()}
                     className="flex-1 sm:flex-none rounded-xl border border-[#E2E8F0] bg-white text-[#64748B] font-semibold px-5 py-2 text-xs transition-all hover:bg-[#F8FAFC] active:scale-[0.98] cursor-pointer"
                   >
                     {draftSaved ? "Salvo ✓" : "Salvar Rascunho"}

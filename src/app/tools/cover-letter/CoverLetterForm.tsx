@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 type Tone = "formal" | "direto" | "entusiasmado";
 
@@ -25,6 +26,7 @@ export function CoverLetterForm() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [copied, setCopied] = useState(false);
+  const { notify } = useFeedback();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -50,8 +52,11 @@ export function CoverLetterForm() {
       if (!res.ok) throw new Error(data.error ?? "Erro ao processar.");
 
       setResult(data as Result);
+      notify("success", "Carta gerada. Revise o conteúdo antes de enviar.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }
@@ -61,6 +66,7 @@ export function CoverLetterForm() {
     if (!result) return;
     await navigator.clipboard.writeText(result.coverLetter);
     setCopied(true);
+    notify("success", "Carta copiada para a área de transferência.");
     setTimeout(() => setCopied(false), 2000);
   }
 

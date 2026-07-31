@@ -1,6 +1,8 @@
 import { PublicSubscriptionCheckout } from "@/components/public-subscription-checkout";
 import { isCareerSegment, type CareerSegment } from "@/lib/career-segments";
 import type { Metadata } from "next";
+import { prisma } from "@/lib/prisma";
+import { CommercialPlanCards } from "@/components/commercial-plan-cards";
 
 export const metadata: Metadata = {
   title: "Planos para o seu momento profissional",
@@ -18,6 +20,11 @@ export default async function SubscribePage({
   const requested = params.segment && isCareerSegment(params.segment) ? params.segment : "career_pro";
   // Faculdade/técnico ainda não tem assinatura mensal; vende só o diagnóstico avulso.
   const segment: CareerSegment = requested === "student" ? "career_pro" : requested;
+  const plans = await prisma.plan.findMany({
+    where: { active: true },
+    orderBy: { priceCents: "asc" },
+    include: { entitlements: { where: { active: true }, include: { featureDefinition: { select: { name: true } } } } },
+  });
 
-  return <PublicSubscriptionCheckout initialSegment={segment} initialCouponCode={params.coupon?.trim() ?? ""} />;
+  return <><CommercialPlanCards plans={plans} /><PublicSubscriptionCheckout initialSegment={segment} initialCouponCode={params.coupon?.trim() ?? ""} /></>;
 }

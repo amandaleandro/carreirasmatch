@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building2, Mail, Lock, ArrowRight, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
+import { useFeedback } from "@/components/feedback-provider";
 
 export default function CompanyLoginPage() {
   const router = useRouter();
@@ -13,6 +14,7 @@ export default function CompanyLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { notify } = useFeedback();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -23,9 +25,12 @@ export default function CompanyLoginPage() {
       const res = await signIn("company-credentials", { email, password, redirect: false });
       if (res?.error) throw new Error("E-mail ou senha inválidos.");
       router.push("/empresa");
+      notify("success", "Login realizado. Abrindo o painel da empresa...");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }

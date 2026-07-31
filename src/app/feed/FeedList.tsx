@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { saveFeedMatchAsApplication } from "@/app/applications/actions";
 import { discardFeedMatch } from "./actions";
@@ -34,6 +35,15 @@ function CheckIcon({ className }: { className?: string }) {
     <svg viewBox="0 0 24 24" fill="none" className={className}>
       <path d="M5 12.5 9.5 17 19 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
+  );
+}
+
+function FeedActionButton({ children, pendingLabel, className, title }: { children: React.ReactNode; pendingLabel: string; className: string; title?: string }) {
+  const { pending } = useFormStatus();
+  return (
+    <button type="submit" disabled={pending} aria-busy={pending} title={title} className={className}>
+      {pending ? pendingLabel : children}
+    </button>
   );
 }
 
@@ -330,7 +340,7 @@ export function FeedList({
   return (
     <div className="space-y-4">
       {/* BARRA SUPERIOR DE MÉTRICAS & ALTERNADOR DE VISUALIZAÇÃO */}
-      <div className="rounded-2xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+      <div className="rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         
         {/* Métricas do Feed */}
         <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-slate-600 dark:text-neutral-300">
@@ -412,7 +422,7 @@ export function FeedList({
 
       {/* LISTAGEM DE CARDS OU LISTA COMPACTA */}
       {viewMode === "detailed" ? (
-        <div className="space-y-4 md:space-y-5">
+        <div className="space-y-3 md:space-y-4">
           {matches.map((match) => (
             <FeedCard
               key={match.id}
@@ -425,7 +435,7 @@ export function FeedList({
           ))}
         </div>
       ) : (
-        <div className="rounded-3xl border border-slate-200/80 dark:border-neutral-800/90 bg-white dark:bg-neutral-900/60 divide-y divide-slate-100 dark:divide-neutral-800/80 overflow-hidden shadow-2xs">
+        <div className="rounded-2xl border border-slate-200/80 dark:border-neutral-800/90 bg-white dark:bg-neutral-900/60 divide-y divide-slate-100 dark:divide-neutral-800/80 overflow-hidden">
           {matches.map((match) => (
             <CompactFeedRow
               key={match.id}
@@ -535,7 +545,7 @@ function FeedCard({
   const cleanDescription = stripHtmlFromText(match.job.jobText);
 
   return (
-    <div className={`group rounded-3xl border ${isSelected ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-200/80 dark:border-neutral-800/90"} bg-white dark:bg-neutral-900/60 p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] dark:shadow-none hover:shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:border-slate-300 dark:hover:border-neutral-700 transition-all duration-300 space-y-4`}>
+    <div className={`group rounded-2xl border ${isSelected ? "border-blue-500 ring-2 ring-blue-500/20" : "border-slate-200/80 dark:border-neutral-800/90"} bg-white dark:bg-neutral-900/60 p-5 md:p-5 hover:border-slate-300 dark:hover:border-neutral-700 transition-colors duration-200 space-y-4`}>
       
       {/* Cabeçalho do Card */}
       <div className="flex items-start justify-between gap-3">
@@ -747,35 +757,26 @@ function FeedCard({
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
           {/* Salvar Kanban */}
           <form action={saveFeedMatchAsApplication.bind(null, match.id, null)} className="w-full">
-            <button
-              type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-200 font-semibold text-xs border border-slate-200/90 dark:border-neutral-700 shadow-2xs hover:border-slate-300 transition-all cursor-pointer active:scale-[0.98]"
-            >
+            <FeedActionButton pendingLabel="Salvando..." className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-white dark:bg-neutral-900 hover:bg-slate-50 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-200 font-semibold text-xs border border-slate-200/90 dark:border-neutral-700 shadow-2xs hover:border-slate-300 transition-all cursor-pointer active:scale-[0.98] disabled:opacity-60">
               <BookmarkIcon className="w-3.5 h-3.5 text-slate-500" />
               <span>Salvar Kanban</span>
-            </button>
+            </FeedActionButton>
           </form>
 
           {/* Ajustar CV */}
           <form action={saveFeedMatchAsApplication.bind(null, match.id, "tailor_resume")} className="w-full">
-            <button
-              type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-bold text-xs border border-amber-500/25 transition-colors cursor-pointer active:scale-[0.98]"
-            >
+            <FeedActionButton pendingLabel="Preparando..." className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 font-bold text-xs border border-amber-500/25 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60">
               <WandIcon className="w-3.5 h-3.5 text-amber-500" />
               <span>Ajustar CV</span>
-            </button>
+            </FeedActionButton>
           </form>
 
           {/* Candidatou-se */}
           <form action={saveFeedMatchAsApplication.bind(null, match.id, "applied")} className="w-full">
-            <button
-              type="submit"
-              className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-bold text-xs border border-blue-500/25 transition-colors cursor-pointer active:scale-[0.98]"
-            >
+            <FeedActionButton pendingLabel="Registrando..." className="w-full inline-flex items-center justify-center gap-2 h-9 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 text-blue-700 dark:text-blue-400 font-bold text-xs border border-blue-500/25 transition-colors cursor-pointer active:scale-[0.98] disabled:opacity-60">
               <CheckCircleIcon className="w-3.5 h-3.5 text-blue-500" />
               <span>Candidatou-se</span>
-            </button>
+            </FeedActionButton>
           </form>
         </div>
 
@@ -816,14 +817,10 @@ function FeedCard({
             <span className="text-slate-300 dark:text-neutral-700">•</span>
 
             <form action={discardFeedMatch.bind(null, match.id)}>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-1 font-semibold text-slate-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors cursor-pointer"
-                title="Descartar esta vaga"
-              >
+              <FeedActionButton pendingLabel="Descartando..." className="inline-flex items-center gap-1 font-semibold text-slate-400 hover:text-rose-600 dark:text-neutral-500 dark:hover:text-rose-400 transition-colors cursor-pointer disabled:opacity-60" title="Descartar esta vaga">
                 <TrashIcon className="w-3.5 h-3.5" />
                 <span>Descartar</span>
-              </button>
+              </FeedActionButton>
             </form>
           </div>
 

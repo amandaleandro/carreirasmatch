@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/feedback-provider";
 
 const MAX_DIMENSION = 320;
 
@@ -41,6 +42,7 @@ export function ProfileForm({
   initialName: string;
   initialImage: string | null;
 }) {
+  const { notify } = useFeedback();
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState(initialName);
@@ -63,6 +65,7 @@ export function ProfileForm({
 
     if (!file.type.startsWith("image/")) {
       setError("Selecione um arquivo de imagem.");
+      notify("error", "Selecione um arquivo de imagem válido.");
       return;
     }
     if (file.size > 8_000_000) {
@@ -76,7 +79,9 @@ export function ProfileForm({
       setImage(dataUrl);
       setSaved(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao processar a imagem.");
+      const message = err instanceof Error ? err.message : "Erro ao processar a imagem.";
+      setError(message);
+      notify("error", message);
     }
   }
 
@@ -101,9 +106,12 @@ export function ProfileForm({
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar.");
 
       setSaved(true);
+      notify("success", "Perfil atualizado.");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setSaving(false);
     }

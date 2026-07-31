@@ -47,7 +47,7 @@ export default async function CompanyVagasPage({
   ];
 
   return (
-    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-7 space-y-6 font-sans">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
         <div>
@@ -73,20 +73,20 @@ export default async function CompanyVagasPage({
       </div>
 
       {/* Grid de KPIs de Gestão */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 p-4 shadow-2xs backdrop-blur-xs">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white/60 dark:bg-slate-900/60 p-4">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total de Vagas</p>
           <p className="text-2xl font-bold text-slate-900 dark:text-white mt-1">{totalVagas}</p>
         </div>
-        <div className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-4 shadow-2xs">
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
           <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Vagas Abertas</p>
           <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">{vagasAbertasCount}</p>
         </div>
-        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/40 p-4 shadow-2xs">
+        <div className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/40 p-4">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Vagas Encerradas</p>
           <p className="text-2xl font-bold text-slate-700 dark:text-slate-300 mt-1">{vagasFechadasCount}</p>
         </div>
-        <div className="rounded-2xl border border-blue-500/20 bg-blue-500/5 p-4 shadow-2xs">
+        <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4">
           <p className="text-xs font-semibold text-blue-700 dark:text-blue-400">Candidatos Ranqueados</p>
           <p className="text-2xl font-bold text-blue-600 dark:text-blue-400 mt-1">{totalCandidatosRanqueados}</p>
         </div>
@@ -154,7 +154,7 @@ export default async function CompanyVagasPage({
               <Link
                 key={vaga.id}
                 href={`/empresa/vagas/${vaga.id}`}
-                className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-2xs hover:border-blue-500/60 hover:shadow-md transition-all duration-200"
+                className="group relative flex flex-col sm:flex-row sm:items-center justify-between gap-5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 hover:border-blue-500/60 transition-colors duration-200"
               >
                 <div className="min-w-0 space-y-2.5 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

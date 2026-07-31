@@ -1,0 +1,42 @@
+import { Check, Sparkles } from "lucide-react";
+
+type Plan = {
+  key: string;
+  name: string;
+  priceCents: number;
+  recurring: boolean;
+  durationDays: number | null;
+  highlighted: boolean;
+  entitlements: Array<{ limit: number | null; featureDefinition: { name: string } }>;
+};
+
+function formatPrice(cents: number) {
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
+}
+
+export function CommercialPlanCards({ plans }: { plans: Plan[] }) {
+  return (
+    <section className="mx-auto max-w-6xl px-4 pt-8">
+      <div className="mx-auto max-w-2xl text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Planos oficiais</p>
+        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Escolha a profundidade da sua jornada</h2>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Os limites abaixo são controlados pelo backend e podem evoluir com o produto.</p>
+      </div>
+      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        {plans.map((plan) => {
+          const highlights = plan.entitlements.filter((item) => item.limit !== 0).slice(0, 4);
+          return (
+            <article key={plan.key} className={`relative rounded-3xl border p-5 ${plan.highlighted ? "border-blue-500 bg-blue-50/70 shadow-lg shadow-blue-500/10 dark:bg-blue-950/30" : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900"}`}>
+              {plan.highlighted && <span className="absolute -top-3 left-5 inline-flex items-center gap-1 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white"><Sparkles className="h-3 w-3" />Mais escolhido</span>}
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">{plan.name}</h3>
+              <p className="mt-3 text-2xl font-extrabold text-slate-900 dark:text-white">{formatPrice(plan.priceCents)}<span className="text-xs font-medium text-slate-500">{plan.recurring ? "/mês" : plan.durationDays ? `/${plan.durationDays} dias` : ""}</span></p>
+              <ul className="mt-5 space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                {highlights.map((item) => <li key={item.featureDefinition.name} className="flex gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" /><span>{item.featureDefinition.name}: {item.limit === null ? "sem limite mensal" : `${item.limit}/mês`}</span></li>)}
+              </ul>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}

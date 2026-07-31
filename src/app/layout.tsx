@@ -8,6 +8,7 @@ import { AdsenseScript } from "@/components/adsense-script";
 import { AccessTracker } from "@/components/access-tracker";
 import { DashSanitizer } from "@/components/dash-sanitizer";
 import { JsonLd } from "@/components/json-ld";
+import { FeedbackProvider } from "@/components/feedback-provider";
 import { BASE_URL, SITE_NAME, organizationJsonLd, softwareApplicationJsonLd, webSiteJsonLd } from "@/lib/seo";
 import { Suspense } from "react";
 import Script from "next/script";
@@ -85,7 +86,9 @@ export default async function RootLayout({
             __html: `(function(){try{var t=localStorage.getItem('theme');document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light');}catch(e){}})();`,
           }}
         />
-        <AppShell>{children}</AppShell>
+        <FeedbackProvider>
+          <AppShell>{children}</AppShell>
+        </FeedbackProvider>
         <Analytics />
         <MarketingPixels />
         <Suspense fallback={null}>

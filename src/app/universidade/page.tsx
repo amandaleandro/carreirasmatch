@@ -33,6 +33,10 @@ export default async function UniversityPage() {
   const catalogSubjects = enrollment?.universityCourse
     ? enrollment.universityCourse.subjects.filter((s) => s.semester === enrollment.currentSemester || enrollment.currentSemester === null)
     : [];
+  const subjectProgress = {
+    total: catalogSubjects.length,
+    connected: catalogSubjects.filter((s) => s.insight !== null).length,
+  };
 
   return (
     <UniversityHub
@@ -76,6 +80,7 @@ export default async function UniversityPage() {
               : null,
         })) ?? []
       }
+      subjectProgress={subjectProgress}
     />
   );
 }

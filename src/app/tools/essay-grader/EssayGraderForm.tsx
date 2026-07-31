@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 import type { EssayGradeResult } from "@/lib/tools";
 
 function ResultView({ result }: { result: EssayGradeResult }) {
@@ -51,6 +52,7 @@ export function EssayGraderForm() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<EssayGradeResult | null>(null);
   const [showForm, setShowForm] = useState(true);
+  const { notify } = useFeedback();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -76,8 +78,11 @@ export function EssayGraderForm() {
 
       setResult(data as EssayGradeResult);
       setShowForm(false);
+      notify("success", "Redação corrigida. Confira a nota e as prioridades de melhoria.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }

@@ -194,7 +194,7 @@ export default async function ParceiroLandingPage() {
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 md:px-8 py-14 md:py-20 space-y-16">
+      <main className="max-w-6xl mx-auto px-4 md:px-8 py-10 md:py-14 space-y-12">
         <section>
           <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Tudo para gerenciar sua divulgação num painel só

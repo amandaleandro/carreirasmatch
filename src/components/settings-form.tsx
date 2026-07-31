@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { COMMON_PROFESSIONAL_AREAS, COMMON_STUDY_AREAS } from "@/lib/course-catalog";
 import { MONITORED_CAREER_AREAS } from "@/lib/monitored-career-catalog";
+import { useFeedback } from "@/components/feedback-provider";
 
 const PROFILE_AREA_OPTIONS = Array.from(new Set([
   ...MONITORED_CAREER_AREAS.map((option) => option.label),
@@ -35,6 +36,7 @@ export function SettingsForm({
   initialCity: string | null;
   initialState: string | null;
 }) {
+  const { notify } = useFeedback();
   const router = useRouter();
   const [segment, setSegment] = useState<CareerSegment | "">(initialSegment ?? "");
   const [area, setArea] = useState(cleanAreaValue(initialArea));
@@ -90,9 +92,12 @@ export function SettingsForm({
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar.");
 
       setSaved(true);
+      notify("success", "Preferências de carreira salvas.");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setSaving(false);
     }

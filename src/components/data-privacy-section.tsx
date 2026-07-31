@@ -3,9 +3,11 @@
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Download, AlertCircle, Trash2 } from "lucide-react";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function DataPrivacySection({ hasPassword }: { hasPassword: boolean }) {
   const router = useRouter();
+  const { notify } = useFeedback();
   const [exporting, setExporting] = useState(false);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
   const [password, setPassword] = useState("");
@@ -27,8 +29,11 @@ export function DataPrivacySection({ hasPassword }: { hasPassword: boolean }) {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      notify("success", "Seus dados foram exportados.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao exportar dados.");
+      const message = err instanceof Error ? err.message : "Erro ao exportar dados.";
+      setError(message);
+      notify("error", message);
     } finally {
       setExporting(false);
     }
@@ -40,6 +45,7 @@ export function DataPrivacySection({ hasPassword }: { hasPassword: boolean }) {
 
     if (confirmation !== "EXCLUIR") {
       setError('Digite "EXCLUIR" para confirmar.');
+      notify("error", 'Digite "EXCLUIR" para confirmar.');
       return;
     }
 
@@ -55,7 +61,9 @@ export function DataPrivacySection({ hasPassword }: { hasPassword: boolean }) {
 
       router.push("/login");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao excluir a conta.");
+      const message = err instanceof Error ? err.message : "Erro ao excluir a conta.";
+      setError(message);
+      notify("error", message);
       setDeleting(false);
     }
   }

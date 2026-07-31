@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 import { Bell, MapPin, Briefcase, Calendar } from "lucide-react";
+import { useFeedback } from "@/components/feedback-provider";
 
 type CreatedAlert = { id: string; query: string; city: string; state: string; frequency: string };
 
@@ -12,6 +13,7 @@ export function JobAlertForm({ initialQuery = "", initialCity = "", initialState
   initialState?: string;
   onCreated?: (alert: CreatedAlert) => void;
 }) {
+  const { notify } = useFeedback();
   const [query, setQuery] = useState(initialQuery);
   const [city, setCity] = useState(initialCity);
   const [state, setState] = useState(initialState);
@@ -38,6 +40,7 @@ export function JobAlertForm({ initialQuery = "", initialCity = "", initialState
       if (response.ok) {
         track(ANALYTICS_EVENTS.JOB_ALERT_CREATED, { frequency });
         onCreated?.(data.alert);
+        notify("success", "Alerta criado. Você receberá atualizações sobre vagas relevantes.");
         setQuery("");
         setCity("");
         setState("");

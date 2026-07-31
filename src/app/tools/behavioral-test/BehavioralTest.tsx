@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 import {
   BEHAVIORAL_QUESTIONS,
   SOFT_SKILL_LABELS,
@@ -53,6 +54,7 @@ export function BehavioralTest() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
+  const { notify } = useFeedback();
 
   const answeredCount = Object.keys(answers).length;
 
@@ -79,8 +81,11 @@ export function BehavioralTest() {
       if (!res.ok) throw new Error(data.error ?? "Erro ao processar.");
 
       setResult(data as Result);
+      notify("success", "Avaliação concluída. Seu perfil está pronto.");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }

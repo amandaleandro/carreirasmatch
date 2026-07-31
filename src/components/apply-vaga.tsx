@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function ApplyVaga({
   vagaId,
@@ -13,6 +14,7 @@ export function ApplyVaga({
   state: "guest" | "company" | "candidate" | "applied";
 }) {
   const router = useRouter();
+  const { notify } = useFeedback();
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,9 +55,12 @@ export function ApplyVaga({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao se candidatar.");
       setDone(true);
+      notify("success", "Candidatura enviada. A empresa recebeu seus dados de contato.");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setLoading(false);
     }
@@ -76,7 +81,8 @@ export function ApplyVaga({
         type="button"
         onClick={apply}
         disabled={loading}
-        className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700 transition-colors disabled:opacity-50"
+        aria-busy={loading}
+        className="ds-button-primary inline-flex items-center justify-center gap-2"
       >
         {loading ? "Enviando..." : "Candidatar-se"}
       </button>

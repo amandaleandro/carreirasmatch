@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building2, Mail, Lock, MapPin, FileText, ArrowRight, ShieldCheck } from "lucide-react";
 import { AuthShell } from "@/components/auth-shell";
+import { useFeedback } from "@/components/feedback-provider";
 
 export default function CompanyRegisterPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function CompanyRegisterPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { notify } = useFeedback();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -38,9 +40,12 @@ export default function CompanyRegisterPage() {
       }
 
       router.push("/empresa");
+      notify("success", "Empresa cadastrada. Abrindo seu painel...");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }

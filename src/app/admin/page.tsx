@@ -187,13 +187,14 @@ export default async function AdminPage() {
 
   const revenueTotal = paidPayments._sum.amount ?? 0;
   const revenue24h = payments24h._sum.amount ?? 0;
-  const [aiUsage30d, aiCalls30d, commercialUsage30d] = await Promise.all([
+  const [aiUsage30d, aiCalls30d, aiSuccess30d, commercialUsage30d] = await Promise.all([
     prisma.aiUsageLog.aggregate({
       where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } },
       _sum: { estimatedCostUsd: true, inputTokens: true, outputTokens: true },
       _avg: { durationMs: true },
     }),
     prisma.aiUsageLog.count({ where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) } } }),
+    prisma.aiUsageLog.count({ where: { createdAt: { gte: new Date(now.getTime() - 30 * 86400000) }, success: true } }),
     prisma.featureUsageRecord.aggregate({ _sum: { count: true } }),
   ]);
   const conversionRate = pct(activeSubscriptions, totalUsers);
@@ -334,6 +335,7 @@ export default async function AdminPage() {
         recentSupportTickets={recentSupportTickets}
         commercialMetrics={{
           aiCalls30d,
+          aiSuccessRate30d: aiCalls30d ? Math.round((aiSuccess30d / aiCalls30d) * 100) : 0,
           aiCostUsd30d: aiUsage30d._sum.estimatedCostUsd ?? 0,
           aiTokens30d: (aiUsage30d._sum.inputTokens ?? 0) + (aiUsage30d._sum.outputTokens ?? 0),
           aiAvgLatencyMs: aiUsage30d._avg.durationMs ?? 0,

@@ -41,7 +41,7 @@ export default async function CompanyDashboardPage() {
   ];
 
   return (
-    <main className="max-w-6xl mx-auto px-4 md:px-8 py-8 space-y-8 font-sans">
+    <main className="max-w-6xl mx-auto px-4 md:px-8 py-7 space-y-6 font-sans">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>

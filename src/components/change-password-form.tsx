@@ -2,8 +2,10 @@
 
 import { useState, FormEvent } from "react";
 import { KeyRound, Check, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function ChangePasswordForm() {
+  const { notify } = useFeedback();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -44,11 +46,14 @@ export function ChangePasswordForm() {
       }
 
       setSuccess("Sua senha foi alterada com sucesso!");
+      notify("success", "Sua senha foi alterada com sucesso.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao alterar a senha.");
+      const message = err instanceof Error ? err.message : "Erro ao alterar a senha.";
+      setError(message);
+      notify("error", message);
     } finally {
       setLoading(false);
     }

@@ -79,7 +79,7 @@ export function PartnerShell({
     });
 
   const creditsCard = (onNavigate?: () => void) => (
-    <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-900 p-4 shadow-lg shadow-blue-950/40">
+    <div className="relative overflow-hidden rounded-xl bg-blue-700 p-4 shadow-sm">
       <div className="absolute -right-4 -top-6 h-20 w-20 rounded-full bg-amber-400/20 blur-xl" />
       <p className="text-sm font-semibold relative">Destaques disponíveis</p>
       <p className="text-2xl font-bold text-white mt-0.5 relative">{credits}</p>
@@ -137,7 +137,7 @@ export function PartnerShell({
               // eslint-disable-next-line @next/next/no-img-element
               <img src={logoUrl} alt={partnerName} className="h-7 w-7 rounded-full object-cover" />
             ) : (
-              <span className="h-7 w-7 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-xs font-semibold">
+              <span className="h-7 w-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-semibold">
                 {partnerName.slice(0, 1).toUpperCase()}
               </span>
             )}

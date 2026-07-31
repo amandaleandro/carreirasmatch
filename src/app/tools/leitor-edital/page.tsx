@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 type EditalSubject = {
   name: string;
@@ -32,9 +33,13 @@ export default function LeitorEditalPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EditalAnalysisResult | null>(null);
   const [error, setError] = useState("");
+  const { notify } = useFeedback();
 
   const handleAnalyze = async () => {
-    if (!editalText.trim()) return;
+    if (!editalText.trim()) {
+      notify("error", "Cole o conteúdo do edital antes de analisar.");
+      return;
+    }
     setLoading(true);
     setError("");
     setResult(null);
@@ -48,11 +53,14 @@ export default function LeitorEditalPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        notify("error", data.error || "Não foi possível analisar o edital.");
         setError(data.error || "Erro ao analisar edital.");
       } else {
+        notify("success", "Edital analisado. Seu ciclo de estudos está pronto.");
         setResult(data.parsedData);
       }
     } catch {
+      notify("error", "Erro de conexão. Tente novamente.");
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);

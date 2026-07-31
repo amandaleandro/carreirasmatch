@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { formatBrazilPhone, isValidBrazilPhone, normalizeBrazilPhone } from "@/lib/contact-validation";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function WhatsappOptInToggle({
   initialValue,
@@ -12,6 +13,7 @@ export function WhatsappOptInToggle({
   initialPhone: string | null;
 }) {
   const router = useRouter();
+  const { notify } = useFeedback();
   const [enabled, setEnabled] = useState(initialValue);
   const [phone, setPhone] = useState(initialPhone ?? "");
   const [saving, setSaving] = useState(false);
@@ -40,10 +42,13 @@ export function WhatsappOptInToggle({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar.");
+      notify("success", next ? "Dicas por WhatsApp ativadas." : "Dicas por WhatsApp desativadas.");
       router.refresh();
     } catch (err) {
       setEnabled(!next);
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setSaving(false);
     }

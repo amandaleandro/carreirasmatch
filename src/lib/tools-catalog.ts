@@ -92,6 +92,15 @@ export const TOOLS_CATALOG: ToolCatalogEntry[] = [
     accountFree: true,
   },
   {
+    href: "/tools/application-answer",
+    title: "Resposta para pergunta de candidatura",
+    description: "Gere uma resposta pronta para colar nas perguntas de formulários de vaga.",
+    segments: ["first_job", "internship", "apprentice", "student", "career_change", "career_pro"],
+    icon: "pen",
+    color: "blue",
+    accountFree: true,
+  },
+  {
     href: "/tools/interview-guide",
     title: "Guia de entrevista: postura, portfólio e dress code",
     description: "Como funciona uma entrevista, como se portar, montar portfólio e se vestir.",

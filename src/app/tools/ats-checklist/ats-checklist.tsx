@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckSquare, Sparkles, FileCheck } from "lucide-react";
+import { ArrowLeft, Sparkles, FileCheck } from "lucide-react";
 
 const ITEMS = [
   ["Contato", "Nome, telefone, e-mail profissional e cidade aparecem no topo."],

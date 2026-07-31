@@ -574,6 +574,14 @@ export async function runJsonAcrossProviders(
             { provider: e.id, model: e.model, operation, outcome: "error" },
             (Date.now() - t0) / 1000
           );
+          void recordAiUsageLog({
+            featureKey: operation,
+            provider: e.id,
+            model: e.model,
+            durationMs: Date.now() - t0,
+            success: false,
+            errorType: String(statusOf(err) ?? "provider_error"),
+          }).catch((logError) => console.warn("[AI] falha ao persistir erro de uso:", logError));
           const retry = attempt < retries && isRetryable(err);
           console.warn(`[AI] falha provider=${e.id} model=${e.model} attempt=${attempt + 1} ms=${Date.now() - t0} status=${statusOf(err)}${retry ? ", repetindo" : ", tentando próximo"}`);
           if (!retry) break;

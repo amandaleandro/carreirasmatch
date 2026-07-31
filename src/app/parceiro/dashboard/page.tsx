@@ -31,7 +31,7 @@ export default async function PartnerDashboardPage() {
 
   return (
     <PartnerShell partnerName={partner.name} logoUrl={partner.logoUrl} credits={partner.credits}>
-      <main className="p-6 md:p-8 space-y-8 max-w-6xl mx-auto font-sans">
+      <main className="p-5 md:p-7 space-y-6 max-w-6xl mx-auto font-sans">
         {/* Header Banner */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
           <div>

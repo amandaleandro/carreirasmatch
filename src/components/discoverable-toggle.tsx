@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function DiscoverableToggle({ initialValue }: { initialValue: boolean }) {
   const router = useRouter();
+  const { notify } = useFeedback();
   const [enabled, setEnabled] = useState(initialValue);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,10 +26,13 @@ export function DiscoverableToggle({ initialValue }: { initialValue: boolean }) 
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar.");
+      notify("success", next ? "Seu perfil agora pode ser encontrado por empresas." : "Seu perfil deixou de aparecer para empresas.");
       router.refresh();
     } catch (err) {
       setEnabled(!next);
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setSaving(false);
     }

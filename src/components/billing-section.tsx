@@ -5,6 +5,7 @@ import { MercadoPagoSubscriptionBrick } from "@/components/mercadopago-subscript
 import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
 import { CouponCodeInput } from "@/components/coupon-code-input";
 import { parseBRLToCents, formatCentsToBRL } from "@/lib/pricing";
+import { useFeedback } from "@/components/feedback-provider";
 
 type PlanId = "card_recurring" | "monthly_oneoff" | "annual";
 
@@ -26,6 +27,7 @@ export function BillingSection({
   const [showManage, setShowManage] = useState(false);
   const [manageBusy, setManageBusy] = useState(false);
   const [manageMessage, setManageMessage] = useState<string | null>(null);
+  const { notify } = useFeedback();
 
   async function manageSubscription(action: "pause" | "cancel") {
     setManageBusy(true);
@@ -38,8 +40,10 @@ export function BillingSection({
       });
       const data = await res.json();
       if (!res.ok) {
+        notify("error", data.error ?? "Não foi possível atualizar a renovação.");
         setManageMessage(data.error ?? "Não foi possível concluir. Tente novamente.");
       } else {
+        notify("success", action === "pause" ? "Renovação pausada." : "Renovação cancelada.");
         setManageMessage(
           action === "pause"
             ? "Renovação pausada. Seu acesso continua até o fim do período já pago, e você reativa quando quiser."
@@ -47,6 +51,7 @@ export function BillingSection({
         );
       }
     } catch {
+      notify("error", "Falha de conexão. Tente novamente.");
       setManageMessage("Falha de conexão. Tente novamente.");
     } finally {
       setManageBusy(false);

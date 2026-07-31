@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { MONITORED_CAREER_AREAS } from "@/lib/monitored-career-catalog";
+import { useFeedback } from "@/components/feedback-provider";
 
 export function InterestedRolesForm({
   initialRoles,
@@ -13,6 +14,7 @@ export function InterestedRolesForm({
   initialArea: string | null;
 }) {
   const router = useRouter();
+  const { notify } = useFeedback();
   const [roles, setRoles] = useState<string[]>(initialRoles);
   const initialAreaSlug = (() => {
     const text = (initialArea ?? "").toLowerCase();
@@ -45,9 +47,12 @@ export function InterestedRolesForm({
       if (!res.ok) throw new Error(data.error ?? "Erro ao salvar.");
       setRoles(next);
       setSaved(true);
+      notify("success", "Preferências de cargos atualizadas.");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const message = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(message);
+      notify("error", message);
     } finally {
       setSaving(false);
     }

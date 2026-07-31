@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useFeedback } from "@/components/feedback-provider";
 
 type LinkedInOptimization = {
   headlineOptions: string[];
@@ -18,9 +19,13 @@ export default function LinkedinOptimizerPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LinkedInOptimization | null>(null);
   const [error, setError] = useState("");
+  const { notify } = useFeedback();
 
   const handleOptimize = async () => {
-    if (!targetRole.trim()) return;
+    if (!targetRole.trim()) {
+      notify("error", "Informe o cargo desejado para otimizar seu perfil.");
+      return;
+    }
     setLoading(true);
     setError("");
     setResult(null);
@@ -34,11 +39,14 @@ export default function LinkedinOptimizerPage() {
 
       const data = await res.json();
       if (!res.ok) {
+        notify("error", data.error || "Não foi possível otimizar o perfil.");
         setError(data.error || "Erro ao otimizar perfil.");
       } else {
+        notify("success", "Perfil otimizado. Revise as sugestões antes de publicar.");
         setResult(data.linkedin);
       }
     } catch {
+      notify("error", "Erro de conexão. Tente novamente.");
       setError("Erro de conexão. Tente novamente.");
     } finally {
       setLoading(false);

@@ -9,6 +9,7 @@ import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segment
 import { COMMON_PROFESSIONAL_AREAS, COMMON_STUDY_AREAS } from "@/lib/course-catalog";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { formatBrazilPhone } from "@/lib/contact-validation";
+import { useFeedback } from "@/components/feedback-provider";
 
 const MOMENT_TIPS: Record<string, string> = {
   apprentice: "✨ Encontre vagas de aprendizagem, prepare seu primeiro currículo e descubra áreas para começar.",
@@ -37,6 +38,7 @@ export default function RegisterPage() {
   const [coupon, setCoupon] = useState((searchParams.get("cupom") ?? "").toUpperCase());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const { notify } = useFeedback();
 
   const needsTargetArea = ["apprentice", "first_job", "student", "career_change", "career_pro"].includes(careerSegment);
   const showAreaField = needsTargetArea || careerSegment === "internship";
@@ -82,10 +84,13 @@ export default function RegisterPage() {
       }
 
       track(ANALYTICS_EVENTS.SIGNUP_COMPLETED, { careerSegment: careerSegment || "unknown" });
+      notify("success", "Conta criada. Vamos personalizar sua experiência...");
       router.push("/onboarding");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro inesperado.");
+      const feedback = err instanceof Error ? err.message : "Erro inesperado.";
+      setError(feedback);
+      notify("error", feedback);
     } finally {
       setLoading(false);
     }

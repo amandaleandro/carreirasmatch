@@ -95,11 +95,13 @@ export function UniversityHub({
   availableSemesters,
   catalogSubjects,
   manualSubjects,
+  subjectProgress,
 }: {
   enrollment: Enrollment;
   availableSemesters: number[];
   catalogSubjects: CatalogSubject[];
   manualSubjects: ManualSubject[];
+  subjectProgress: { total: number; connected: number };
 }) {
   const [editing, setEditing] = useState(!enrollment);
   const [institution, setInstitution] = useState(enrollment?.institution ?? "");
@@ -353,6 +355,17 @@ export function UniversityHub({
 
       {enrollment && !editing && (
         <div className="space-y-4">
+          <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-5 dark:border-blue-900 dark:bg-blue-950/20">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">Progresso profissional</p>
+                <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Conecte as disciplinas do período a competências, profissões e projetos.</p>
+              </div>
+              <strong className="text-lg text-blue-700 dark:text-blue-300">{subjectProgress.total ? Math.round((subjectProgress.connected / subjectProgress.total) * 100) : 0}%</strong>
+            </div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-blue-100 dark:bg-blue-900/60"><div className="h-full rounded-full bg-blue-600 transition-all" style={{ width: `${subjectProgress.total ? (subjectProgress.connected / subjectProgress.total) * 100 : 0}%` }} /></div>
+            <p className="mt-2 text-[11px] text-slate-500 dark:text-slate-400">{subjectProgress.connected} de {subjectProgress.total} disciplinas conectadas</p>
+          </div>
           <h2 className="text-sm font-bold text-slate-900 dark:text-white">Minhas disciplinas</h2>
 
           {enrollment.universityCourseId ? (

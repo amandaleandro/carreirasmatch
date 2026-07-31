@@ -92,7 +92,7 @@ export default async function PartnerCoursesPage() {
 
   return (
     <PartnerShell partnerName={partner.name} logoUrl={partner.logoUrl} credits={partner.credits}>
-      <div className="p-6 md:p-8 space-y-8 max-w-7xl mx-auto">
+      <div className="p-5 md:p-7 space-y-6 max-w-7xl mx-auto">
         <header>
           <h1 className="text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight">
             Meus Cursos
@@ -102,7 +102,7 @@ export default async function PartnerCoursesPage() {
           </p>
         </header>
 
-        <div className="grid gap-8 lg:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-3">
           {/* Form de Cadastro */}
           <div className="lg:col-span-1">
             <PartnerCourseForm createCourseAction={createCourse} />
@@ -137,7 +137,7 @@ export default async function PartnerCoursesPage() {
                 {courses.map((course) => (
                   <div
                     key={course.id}
-                    className={`rounded-2xl border bg-white dark:bg-neutral-900 p-5 shadow-sm transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                    className={`rounded-xl border bg-white dark:bg-neutral-900 p-5 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                       course.featured ? "border-amber-300 dark:border-amber-500/30 ring-1 ring-amber-400/20" : "border-neutral-200 dark:border-neutral-800"
                     }`}
                   >

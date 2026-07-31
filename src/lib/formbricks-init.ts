@@ -15,7 +15,7 @@ export function initFormbricks() {
 
   if (!environmentId) {
     if (process.env.NODE_ENV !== "production") {
-      throw new Error(
+      console.warn(
         "NEXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID variable required by Formbricks is missing or un-configured, this causes surveys to be silently disabled. This error stops appearing once NEXT_PUBLIC_FORMBRICKS_ENVIRONMENT_ID is configured",
       );
     }
