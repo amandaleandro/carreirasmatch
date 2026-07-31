@@ -31,6 +31,22 @@ function readRoles(value: string | null | undefined): string[] {
   }
 }
 
+// "TI & Suporte" no armazenamento da vaga (feed-tags.ts) é um balde genérico
+// que cobre tanto suporte técnico de TI quanto atendimento ao cliente comum
+// (call center, SAC). Resolver esse texto direto pela taxonomia faz qualquer
+// vaga de atendimento "casar" com a área de Tecnologia do perfil, por causa
+// da subárea "Suporte Técnico" de TI. Só tratamos como TI de fato quando o
+// texto da vaga também cita algo tecnicamente TI.
+const TECH_SUPPORT_TERMS = /suporte t[eé]cnico|help ?desk|infraestrutura de ti|analista de sistemas|administrador de rede|service desk|noc\b/i;
+
+function resolveJobArea(job: { area: string; jobTitle: string; jobText: string }) {
+  if (job.area === "TI & Suporte") {
+    const text = `${job.jobTitle} ${job.jobText}`;
+    if (!TECH_SUPPORT_TERMS.test(text)) return null;
+  }
+  return resolveFreeText(job.area);
+}
+
 function profileAlignment(
   job: { jobTitle: string; jobText: string; area: string; subarea: string },
   context: JobProfileContext
@@ -39,7 +55,7 @@ function profileAlignment(
 
   const title = normalize(job.jobTitle);
   const jobText = normalize(`${job.jobTitle} ${job.jobText} ${job.area} ${job.subarea}`);
-  const jobArea = resolveFreeText(job.area);
+  const jobArea = resolveJobArea(job);
   const profileAreas = context.areas.map(resolveFreeText).filter((item): item is NonNullable<typeof item> => Boolean(item));
   const areaMatch = profileAreas.some((area) => Boolean(jobArea && area.areaSlug === jobArea.areaSlug));
   const roleMatch = context.roles.some((role) => {
@@ -63,13 +79,17 @@ function profileAlignment(
   return 50;
 }
 
-function applyProfileAlignment<T extends { fitScore: number; reason: string; job: { jobTitle: string; jobText: string; area: string; subarea: string } }>(
+export function applyProfileAlignment<T extends { fitScore: number; reason: string; job: { jobTitle: string; jobText: string; area: string; subarea: string } }>(
   match: T,
   context: JobProfileContext
 ): T {
   const alignment = profileAlignment(match.job, context);
   if (alignment === null) return match;
-  const fitScore = Math.max(0, Math.min(100, Math.round(match.fitScore * 0.75 + alignment * 0.25)));
+  // Mismatch confirmado (área conhecida do perfil e da vaga não batem, e nem
+  // o cargo bate) pesa mais forte: a nota da IA sozinha não pode "salvar"
+  // uma vaga de área errada, mesmo achando o texto parecido.
+  const weight = alignment <= 25 ? 0.6 : 0.25;
+  const fitScore = Math.max(0, Math.min(100, Math.round(match.fitScore * (1 - weight) + alignment * weight)));
   const focus = context.roles[0] || context.areas[0];
   const reason = alignment <= 25
     ? `${match.reason} A nota foi reduzida porque a vaga está fora da área escolhida.`
