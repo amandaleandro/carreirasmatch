@@ -160,7 +160,7 @@ function AllJobCard({ job }: { job: Job }) {
       {/* Cabeçalho */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-3.5 min-w-0 flex-1">
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border border-blue-200/60 dark:border-blue-800/40 flex items-center justify-center font-extrabold text-sm text-blue-600 dark:text-blue-400 shrink-0 shadow-2xs mt-0.5">
+          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-800/40 flex items-center justify-center font-extrabold text-sm text-blue-600 dark:text-blue-400 shrink-0 shadow-2xs mt-0.5">
             {companyInitial ? (
               <span>{companyInitial}</span>
             ) : (

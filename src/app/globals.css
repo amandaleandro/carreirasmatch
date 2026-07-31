@@ -332,6 +332,277 @@ button:disabled,
   }
 }
 
+/* ---------------------------------------------------------------------------
+   ENSINO MÉDIO: mesma base do workspace de ferramentas, com leitura escolar
+--------------------------------------------------------------------------- */
+
+.ensino-medio-workspace {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.ensino-medio-workspace [data-ensino-nav] {
+  background: var(--surface);
+  border-color: var(--border-color);
+  box-shadow: none;
+}
+
+.ensino-medio-workspace [data-ensino-nav] > div {
+  min-height: 3.5rem;
+}
+
+.ensino-medio-workspace [data-ensino-nav] a {
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+}
+
+.ensino-medio-workspace [data-ensino-nav] a:not([class*="bg-blue-600"]):hover {
+  background: color-mix(in srgb, var(--color-primary) 7%, transparent);
+}
+
+.ensino-medio-workspace main {
+  max-width: 72rem;
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+
+.ensino-medio-workspace main > header h1,
+.ensino-medio-workspace main h1 {
+  color: var(--foreground);
+  letter-spacing: -0.04em;
+}
+
+.ensino-medio-workspace main > header p,
+.ensino-medio-workspace main p {
+  line-height: 1.6;
+}
+
+.ensino-medio-workspace main section[class*="bg-white"],
+.ensino-medio-workspace main div[class*="rounded-2xl"][class*="border"],
+.ensino-medio-workspace main div[class*="rounded-3xl"][class*="border"] {
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.ensino-medio-workspace main section[class*="bg-white"],
+.ensino-medio-workspace main div[class*="bg-white"] {
+  background: var(--surface);
+}
+
+.ensino-medio-workspace main input:not([type="radio"]):not([type="checkbox"]),
+.ensino-medio-workspace main select,
+.ensino-medio-workspace main textarea {
+  border-color: var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: none;
+}
+
+.ensino-medio-workspace main input:not([type="radio"]):not([type="checkbox"]):focus,
+.ensino-medio-workspace main select:focus,
+.ensino-medio-workspace main textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.ensino-medio-workspace main button {
+  border-radius: var(--radius-md);
+}
+
+.ensino-medio-workspace main [class*="bg-gradient"] {
+  background-image: none;
+}
+
+@media (max-width: 640px) {
+  .ensino-medio-workspace main {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   JOGOS: controles consistentes, tabuleiros preservados
+--------------------------------------------------------------------------- */
+
+.jogos-workspace {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.jogos-workspace main {
+  max-width: 72rem;
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+
+.jogos-workspace main > a:first-child {
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.jogos-workspace main > a:first-child:hover {
+  color: var(--color-primary);
+}
+
+.jogos-workspace main h1,
+.jogos-workspace main h2,
+.jogos-workspace main h3 {
+  letter-spacing: -0.035em;
+}
+
+.jogos-workspace main div[class*="rounded-2xl"][class*="border"],
+.jogos-workspace main div[class*="rounded-3xl"][class*="border"],
+.jogos-workspace main section[class*="rounded-2xl"][class*="border"],
+.jogos-workspace main section[class*="rounded-3xl"][class*="border"] {
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.jogos-workspace main input,
+.jogos-workspace main select,
+.jogos-workspace main textarea {
+  border-radius: var(--radius-md);
+}
+
+.jogos-workspace main input:focus,
+.jogos-workspace main select:focus,
+.jogos-workspace main textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.jogos-workspace main button {
+  border-radius: var(--radius-md);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.jogos-workspace main button:active {
+  transform: scale(0.985);
+}
+
+.jogos-workspace main [class*="bg-gradient"] {
+  background-image: none;
+}
+
+@media (max-width: 640px) {
+  .jogos-workspace main {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   APP AUTENTICADO: base compartilhada para dashboard e áreas de trabalho
+--------------------------------------------------------------------------- */
+
+.app-workspace {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* ---------------------------------------------------------------------------
+   PÚBLICO: base compartilhada sem apagar a identidade das páginas de marca
+--------------------------------------------------------------------------- */
+
+.public-workspace {
+  min-height: 100%;
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.public-workspace .public-header {
+  border-color: var(--border-color);
+}
+
+.public-workspace main h1,
+.public-workspace main h2,
+.public-workspace main h3,
+.public-workspace header h1,
+.public-workspace header h2,
+.public-workspace header h3 {
+  letter-spacing: -0.035em;
+}
+
+.public-workspace input,
+.public-workspace select,
+.public-workspace textarea {
+  border-radius: var(--radius-md);
+  border-color: var(--border-color);
+}
+
+.public-workspace input:focus,
+.public-workspace select:focus,
+.public-workspace textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.public-workspace button {
+  border-radius: var(--radius-md);
+}
+
+.public-workspace .content-page main > div,
+.public-workspace main div[class*="rounded-3xl"][class*="border"],
+.public-workspace main div[class*="rounded-2xl"][class*="border"] {
+  border-color: var(--border-color);
+}
+
+.app-workspace > * {
+  max-width: 100%;
+}
+
+.app-workspace main,
+.app-workspace section,
+.app-workspace article {
+  border-color: var(--border-color);
+}
+
+.app-workspace h1,
+.app-workspace h2,
+.app-workspace h3,
+.app-workspace h4 {
+  letter-spacing: -0.035em;
+}
+
+.app-workspace input,
+.app-workspace select,
+.app-workspace textarea {
+  border-color: var(--border-color);
+  border-radius: var(--radius-md);
+}
+
+.app-workspace input:focus,
+.app-workspace select:focus,
+.app-workspace textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+  outline: none;
+}
+
+.app-workspace button {
+  border-radius: var(--radius-md);
+}
+
+.app-workspace [class*="rounded-3xl"][class*="border"],
+.app-workspace [class*="rounded-2xl"][class*="border"] {
+  border-color: var(--border-color);
+}
+
+@media (max-width: 640px) {
+  .app-workspace main {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
 .feedback-toast {
   pointer-events: auto;
   display: flex;
@@ -400,6 +671,146 @@ button:disabled,
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   TOOLS WORKSPACE: uma linguagem única para todas as ferramentas
+--------------------------------------------------------------------------- */
+
+.tools-workspace {
+  min-height: 100%;
+  background: var(--background);
+}
+
+.tools-workspace-content {
+  min-height: 100%;
+}
+
+.tools-workspace main {
+  max-width: 62rem;
+  padding-top: 2.5rem;
+  padding-bottom: 4rem;
+}
+
+.tools-workspace main > header {
+  max-width: 48rem;
+}
+
+.tools-workspace main > header h1,
+.tools-workspace main > h1 {
+  color: var(--foreground);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+}
+
+.tools-workspace main > header p,
+.tools-workspace main > p {
+  color: var(--muted-foreground);
+  line-height: 1.65;
+}
+
+.tools-workspace main > a:first-child {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.tools-workspace main > a:first-child:hover {
+  color: var(--color-primary);
+}
+
+/* Etiquetas de contexto: informativas, sem aparência de marketing. */
+.tools-workspace main header span[class*="rounded-full"],
+.tools-workspace main > span[class*="rounded-full"] {
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-primary) 7%, transparent);
+  border-color: color-mix(in srgb, var(--color-primary) 18%, var(--border-color));
+  color: var(--color-primary);
+  letter-spacing: 0.08em;
+}
+
+/* Formulários: uma superfície de trabalho consistente em todas as ferramentas. */
+.tools-workspace main > form {
+  margin-top: 2rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.tools-workspace main form label {
+  color: var(--foreground);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.tools-workspace main input:not([type="radio"]):not([type="checkbox"]),
+.tools-workspace main select,
+.tools-workspace main textarea {
+  border-color: var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: none;
+}
+
+.tools-workspace main input:not([type="radio"]):not([type="checkbox"]):hover,
+.tools-workspace main select:hover,
+.tools-workspace main textarea:hover {
+  border-color: var(--border-hover);
+}
+
+.tools-workspace main input:not([type="radio"]):not([type="checkbox"]):focus,
+.tools-workspace main select:focus,
+.tools-workspace main textarea:focus {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+
+.tools-workspace main button {
+  border-radius: var(--radius-md);
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.tools-workspace main button:active {
+  transform: scale(0.985);
+}
+
+/* Cards de resultado e blocos informativos. */
+.tools-workspace main div[class*="rounded-2xl"][class*="border"],
+.tools-workspace main div[class*="rounded-3xl"][class*="border"] {
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.tools-workspace main div[class*="rounded-2xl"][class*="bg-white"],
+.tools-workspace main div[class*="rounded-3xl"][class*="bg-white"] {
+  background: var(--surface);
+}
+
+/* Evita o conjunto de efeitos decorativos repetidos que fazia cada ferramenta
+   parecer uma landing page independente. */
+.tools-workspace [class*="bg-gradient"],
+.tools-workspace [class*="backdrop-blur"] {
+  backdrop-filter: none;
+}
+
+@media (max-width: 640px) {
+  .tools-workspace main {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .tools-workspace main > form {
+    margin-top: 1.5rem;
+  }
 }
 
 /* Native select popup styling */

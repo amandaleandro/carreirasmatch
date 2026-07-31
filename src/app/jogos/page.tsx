@@ -134,7 +134,7 @@ export default async function GamesHubPage({
         
         {/* Cabeçalho Premium */}
         <header className="text-center max-w-2xl mx-auto space-y-3.5">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/15 px-3 py-1 text-[10px] font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 rounded-md bg-[#2563EB]/10 text-[#2563EB] border border-[#2563EB]/15 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider">
             <Trophy className="h-3 w-3" />
             Playground CarreirasMatch
           </div>

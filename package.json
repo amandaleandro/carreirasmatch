@@ -36,7 +36,7 @@
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^2.4.5",
     "pg": "^8.22.0",
-    "playwright": "^1.61.1",
+    "playwright": "1.62.0",
     "playwright-extra": "^4.3.6",
     "posthog-js": "^1.407.6",
     "prisma": "^7.9.0",
@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^5.2.1",
-    "@playwright/test": "^1.62.0",
+    "@playwright/test": "1.62.0",
     "@storybook/addon-a11y": "^10.5.5",
     "@storybook/addon-docs": "^10.5.5",
     "@storybook/addon-mcp": "^0.7.0",

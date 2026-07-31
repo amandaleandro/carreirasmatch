@@ -2,21 +2,21 @@
 # porque o estágio final precisa do Chromium para o scraper do Indeed
 # (src/lib/job-sources/indeed.ts) e módulos nativos (better-sqlite3) compilados
 # em outra libc (ex.: Alpine/musl) não rodam nela.
-FROM mcr.microsoft.com/playwright:v1.61.1-noble AS deps
+FROM mcr.microsoft.com/playwright:v1.62.0-noble AS deps
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
-FROM mcr.microsoft.com/playwright:v1.61.1-noble AS prod-deps
+FROM mcr.microsoft.com/playwright:v1.62.0-noble AS prod-deps
 RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev
 
-FROM mcr.microsoft.com/playwright:v1.61.1-noble AS builder
+FROM mcr.microsoft.com/playwright:v1.62.0-noble AS builder
 WORKDIR /app
 # Limita o heap do Next durante o build para caber na memória da VPS e usar a swap.
 ENV NODE_OPTIONS=--max-old-space-size=2048
@@ -51,7 +51,7 @@ ENV NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY=$NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY \
 RUN npx prisma generate
 RUN npm run build
 
-FROM mcr.microsoft.com/playwright:v1.61.1-noble AS runner
+FROM mcr.microsoft.com/playwright:v1.62.0-noble AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000

@@ -251,7 +251,7 @@ export default async function FeedPage({
 
       {/* Banners Comportamental e Desafio (Surgem apenas quando necessários) */}
       {!behavioralResult && (
-        <div className="rounded-3xl border border-[#2563EB]/25 bg-gradient-to-r from-[#2563EB]/5 to-indigo-500/5 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+        <div className="rounded-3xl border border-[#2563EB]/25 bg-blue-50/50 dark:bg-blue-950/20 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
           <div className="space-y-1">
             <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-[#2563EB]/15 text-[#2563EB]">
               🧠 Quiz de Soft Skills

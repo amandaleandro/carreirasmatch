@@ -31,7 +31,7 @@ export function ContentPage({
   const maxWidthClassName = maxWidthClass ?? (wide ? "max-w-5xl" : "max-w-3xl");
 
   return (
-    <div className="w-full overflow-x-hidden min-h-screen bg-slate-50/50 dark:bg-slate-950">
+    <div className="content-page w-full overflow-x-hidden min-h-screen bg-slate-50/50 dark:bg-slate-950">
       <div className="bg-slate-900 text-white border-b border-slate-800">
         <header className="public-header max-w-7xl mx-auto px-4 md:px-8 py-4 sm:py-5 flex items-center justify-between gap-3">
           <Link href="/">
@@ -58,7 +58,7 @@ export function ContentPage({
         </header>
 
         <div className={`${maxWidthClassName} mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-14 sm:pt-8 sm:pb-16 md:pt-12 md:pb-20`}>
-          <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider rounded-full px-3 py-1 mb-4 bg-white/10 text-slate-200 border border-white/15">
+          <span className="inline-flex items-center gap-1.5 text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider rounded-md px-3 py-1.5 mb-4 bg-white/10 text-slate-200 border border-white/15">
             {eyebrow}
           </span>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">

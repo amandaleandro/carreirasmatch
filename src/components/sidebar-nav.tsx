@@ -62,7 +62,6 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
       { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
       { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
-      { href: "/tools/clipper", label: "Clipper de Vagas ✂️", icon: Wrench },
       { href: "/tools/compare-jobs", label: "Comparador de Vagas 📊", icon: BarChart3 },
       { href: "/freelancer", label: "Freelancer", icon: Handshake, tour: "nav-freelancer" },
     ],

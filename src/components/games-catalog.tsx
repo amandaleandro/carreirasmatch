@@ -54,7 +54,7 @@ const ALL_GAMES: GameItem[] = [
     icon: Flame,
     iconBg: "bg-amber-500/10",
     iconColor: "text-amber-500",
-    buttonBg: "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700",
+    buttonBg: "bg-amber-500 hover:bg-amber-600",
     stages: ["ensino-medio", "primeiro-emprego", "profissional"],
     isNew: true,
   },
@@ -66,7 +66,7 @@ const ALL_GAMES: GameItem[] = [
     icon: Zap,
     iconBg: "bg-cyan-500/10",
     iconColor: "text-cyan-500",
-    buttonBg: "bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700",
+    buttonBg: "bg-cyan-600 hover:bg-cyan-700",
     stages: ["ensino-medio", "primeiro-emprego", "profissional"],
     isNew: true,
   },
@@ -78,7 +78,7 @@ const ALL_GAMES: GameItem[] = [
     icon: Swords,
     iconBg: "bg-purple-500/10",
     iconColor: "text-purple-500",
-    buttonBg: "bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700",
+    buttonBg: "bg-purple-600 hover:bg-purple-700",
     stages: ["ensino-medio", "primeiro-emprego", "profissional"],
     isNew: true,
   },
@@ -227,7 +227,7 @@ export function GamesCatalog({
   return (
     <div className="space-y-8">
       {profile.segment && (profile.area || profile.studyCourse) ? (
-        <div className="rounded-3xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 dark:border-blue-900/60 dark:from-blue-950/40 dark:to-indigo-950/30">
+        <div className="rounded-3xl border border-blue-200 bg-blue-50/70 p-5 dark:border-blue-900/60 dark:bg-blue-950/30">
           <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">Jogos recomendados para você</p>
           <h2 className="mt-1 text-lg font-extrabold text-blue-950 dark:text-white">{profile.area ?? profile.studyCourse}</h2>
           <p className="mt-1 text-xs leading-relaxed text-blue-800/80 dark:text-blue-200/80">

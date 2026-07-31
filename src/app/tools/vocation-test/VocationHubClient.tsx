@@ -124,7 +124,7 @@ export function VocationHubClient({
           className={`relative rounded-3xl p-6 transition-all border-2 ${
             initialHasCompleted
               ? "border-emerald-500/40 bg-emerald-50/50 dark:bg-emerald-950/20"
-              : "border-blue-500 bg-gradient-to-br from-blue-50/80 to-indigo-50/50 dark:from-blue-950/40 dark:to-indigo-950/20 shadow-md"
+              : "border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 shadow-md"
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-3">
@@ -259,7 +259,7 @@ export function VocationHubClient({
 
       {/* Área do Dia Showcase */}
       {areaOfTheDay && (
-        <div className="rounded-3xl border-2 border-amber-200 dark:border-amber-900/50 bg-gradient-to-r from-amber-50/80 to-orange-50/50 dark:from-amber-950/30 dark:to-orange-950/20 p-6 space-y-3">
+        <div className="rounded-3xl border-2 border-amber-200 dark:border-amber-900/50 bg-amber-50/70 dark:bg-amber-950/30 p-6 space-y-3">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-200/70 dark:bg-amber-900/60 rounded-full px-3 py-1">

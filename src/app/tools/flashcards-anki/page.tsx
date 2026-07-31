@@ -122,7 +122,7 @@ export default function FlashcardsAnkiPage() {
 
           <div
             onClick={() => setIsFlipped(!isFlipped)}
-            className="cursor-pointer min-h-[220px] p-8 rounded-2xl border-2 border-indigo-200 dark:border-indigo-900/60 bg-gradient-to-br from-indigo-50/40 via-white to-purple-50/30 dark:from-indigo-950/30 dark:via-neutral-900 dark:to-purple-950/20 flex flex-col items-center justify-center text-center shadow-md hover:border-indigo-400 transition-all"
+            className="cursor-pointer min-h-[220px] p-8 rounded-2xl border-2 border-indigo-200 dark:border-indigo-900/60 bg-indigo-50/40 dark:bg-indigo-950/30 flex flex-col items-center justify-center text-center shadow-md hover:border-indigo-400 transition-all"
           >
             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-2">
               {isFlipped ? "RESPOSTA / VERSO" : "PERGUNTA / FRENTE"}

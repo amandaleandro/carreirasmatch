@@ -353,7 +353,7 @@ export function ComparadorVagasClient() {
                   key={idx}
                   className={`p-5 md:p-6 rounded-3xl border space-y-4 flex flex-col justify-between transition-all ${
                     isWinner
-                      ? "bg-gradient-to-b from-amber-50/50 via-white to-white dark:from-amber-950/20 dark:via-neutral-900 dark:to-neutral-900 border-amber-300 dark:border-amber-700/60 shadow-md ring-2 ring-amber-400/20"
+                      ? "bg-amber-50/50 dark:bg-amber-950/20 border-amber-300 dark:border-amber-700/60 shadow-md ring-2 ring-amber-400/20"
                       : "bg-white dark:bg-neutral-900 border-slate-200 dark:border-neutral-800 shadow-sm"
                   }`}
                 >

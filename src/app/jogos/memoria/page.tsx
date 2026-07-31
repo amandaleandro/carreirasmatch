@@ -295,7 +295,7 @@ export default function MemoryGamePage() {
 
         {/* Estatísticas */}
         {memorizing && (
-          <div className="mx-auto max-w-xl rounded-3xl border border-violet-200 bg-gradient-to-r from-violet-50 via-blue-50 to-cyan-50 p-4 text-center shadow-sm dark:border-violet-900/60 dark:from-violet-950/40 dark:via-blue-950/30 dark:to-cyan-950/30">
+          <div className="mx-auto max-w-xl rounded-3xl border border-violet-200 bg-violet-50/70 p-4 text-center shadow-sm dark:border-violet-900/60 dark:bg-violet-950/30">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-violet-600 dark:text-violet-300">Memorize os pares</p>
             <p className="mt-1 text-sm font-bold text-violet-950 dark:text-white">Os cards serão virados em {memorizeSeconds}s</p>
             <p className="mt-1 text-xs text-violet-700/80 dark:text-violet-200/80">Observe o termo e sua definição. Depois encontre os pares com o menor número de erros.</p>
@@ -328,7 +328,7 @@ export default function MemoryGamePage() {
                       ? card.isMatched
                         ? "border-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300 scale-95"
                         : memorizing
-                        ? "border-violet-300 bg-gradient-to-br from-violet-100 via-blue-50 to-cyan-100 text-blue-900 shadow-lg shadow-violet-500/10 dark:border-violet-700 dark:from-violet-950/60 dark:via-blue-950/40 dark:to-cyan-950/40 dark:text-blue-100"
+                        ? "border-violet-300 bg-violet-100 text-blue-900 shadow-lg shadow-violet-500/10 dark:border-violet-700 dark:bg-violet-950/60 dark:text-blue-100"
                         : "border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 text-blue-700 dark:text-blue-200 shadow-inner"
                       : "cursor-pointer border-neutral-200 bg-white hover:-translate-y-1 hover:border-blue-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 text-transparent dark:text-transparent"
                   }`}

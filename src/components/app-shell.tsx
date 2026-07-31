@@ -26,7 +26,9 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <SubscriptionNudgeProvider enabled segment="career_pro">
         <DesafioBanner />
-        {children}
+        <div className="public-workspace" data-public-workspace>
+          {children}
+        </div>
       </SubscriptionNudgeProvider>
     );
   }
@@ -40,7 +42,9 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <div data-authenticated>
         <DesafioBanner />
-        {children}
+        <div className="public-workspace" data-public-workspace>
+          {children}
+        </div>
       </div>
     );
   }
@@ -71,7 +75,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
             {/* data-authenticated: o app já tem Topbar + Sidebar, então o CSS esconde
                 o header público (.public-header) das páginas de marketing/conteúdo
                 renderizadas aqui dentro, evitando barra de navegação duplicada. */}
-            <main className="flex-1" data-authenticated>
+            <main className="flex-1 app-workspace" data-authenticated>
               {children}
             </main>
           </div>

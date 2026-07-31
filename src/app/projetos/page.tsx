@@ -198,7 +198,6 @@ export default async function ProjectsPage({ searchParams }: Props) {
         {/* Projects List */}
         {projects.length === 0 ? (
           <div className="rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-8 sm:p-12 text-center shadow-sm relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none" />
             <div className="relative z-10 max-w-md mx-auto space-y-4">
               <div className="w-16 h-16 rounded-2xl bg-blue-100 dark:bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto shadow-inner">
                 <Briefcase className="w-8 h-8" />

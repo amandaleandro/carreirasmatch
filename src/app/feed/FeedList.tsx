@@ -561,7 +561,7 @@ function FeedCard({
           />
 
           {/* Avatar / Badge de Logo da Empresa */}
-          <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/50 dark:to-indigo-950/50 border border-blue-200/60 dark:border-blue-800/40 flex items-center justify-center font-extrabold text-sm text-blue-600 dark:text-blue-400 shrink-0 shadow-2xs mt-0.5">
+          <div className="w-11 h-11 rounded-2xl bg-blue-50 dark:bg-blue-950/50 border border-blue-200/60 dark:border-blue-800/40 flex items-center justify-center font-extrabold text-sm text-blue-600 dark:text-blue-400 shrink-0 shadow-2xs mt-0.5">
             {companyInitial ? (
               <span>{companyInitial}</span>
             ) : (
@@ -700,7 +700,7 @@ function FeedCard({
       </div>
 
       {/* Análise de Aderência AI com Diagnóstico Integrado */}
-      <div className="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-gradient-to-br from-blue-50/40 via-slate-50/50 to-indigo-50/30 dark:from-neutral-950/60 dark:via-neutral-900/40 dark:to-indigo-950/20 p-4 space-y-3 shadow-2xs">
+      <div className="rounded-2xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/40 dark:bg-neutral-950/60 p-4 space-y-3 shadow-2xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="p-1 rounded-lg bg-blue-600/10 text-blue-600 dark:text-blue-400">
@@ -731,7 +731,7 @@ function FeedCard({
             type="button"
             onClick={handleFullAnalysis}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold px-4 py-2 text-xs shadow-sm shadow-blue-500/20 transition-all hover:shadow-md active:scale-95 cursor-pointer shrink-0 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 text-xs shadow-sm shadow-blue-500/20 transition-all hover:shadow-md active:scale-95 cursor-pointer shrink-0 disabled:opacity-50"
           >
             {loading ? (
               <>

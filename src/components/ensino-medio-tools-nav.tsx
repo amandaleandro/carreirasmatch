@@ -10,7 +10,6 @@ import {
   Bot,
   HelpCircle,
   Calculator,
-  Sparkles,
   Award,
   Trophy,
   FileText,
@@ -24,27 +23,27 @@ export function EnsinoMedioToolsNav() {
 
   const links = [
     { href: "/ensino-medio", label: "Matérias & Jogos", icon: BookOpen },
-    { href: "/ensino-medio/simulado", label: "Simulado por Ano 🏆", icon: Trophy },
-    { href: "/ensino-medio/flashcards", label: "Flashcards 3D ⚡", icon: Zap },
-    { href: "/ensino-medio/foco", label: "Temporizador Foco ⏱️", icon: Timer },
-    { href: "/ensino-medio/mapa-mental", label: "Mapas Mentais 🧠", icon: GitBranch },
+    { href: "/ensino-medio/simulado", label: "Simulado por ano", icon: Trophy },
+    { href: "/ensino-medio/flashcards", label: "Flashcards", icon: Zap },
+    { href: "/ensino-medio/foco", label: "Temporizador", icon: Timer },
+    { href: "/ensino-medio/mapa-mental", label: "Mapas mentais", icon: GitBranch },
     { href: "/ensino-medio/exercicios", label: "Lista de Exercícios", icon: FileText },
     { href: "/ensino-medio/redacao", label: "Corretor Redação", icon: FileEdit },
     { href: "/ensino-medio/redacao-nota-1000", label: "Redações Nota 1000", icon: Award },
     { href: "/ensino-medio/calculadora-enem", label: "Calculadora ENEM", icon: Calculator },
     { href: "/ensino-medio/cronograma", label: "Cronograma de Estudos", icon: Calendar },
     { href: "/ensino-medio/comparador", label: "Faculdade vs Técnico", icon: Scale },
-    { href: "/ensino-medio/tutor", label: "Tutor AI 24h", icon: Bot },
-    { href: "/ensino-medio/questao-do-dia", label: "Questão do Dia", icon: HelpCircle },
+    { href: "/ensino-medio/tutor", label: "Tutor de estudos", icon: Bot },
+    { href: "/ensino-medio/questao-do-dia", label: "Questão do dia", icon: HelpCircle },
   ];
 
   return (
-    <nav className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 sticky top-0 z-20 shadow-2xs">
+    <nav data-ensino-nav className="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 sticky top-0 z-20 shadow-2xs">
       <div className="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between overflow-x-auto no-scrollbar py-2.5 gap-2">
         <div className="flex items-center gap-1.5 shrink-0 pr-4 border-r border-neutral-200 dark:border-neutral-800">
-          <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+          <BookOpen className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           <span className="text-xs font-bold uppercase tracking-wider text-neutral-900 dark:text-white">
-            Ensino Médio AI
+            Ensino Médio
           </span>
         </div>
 

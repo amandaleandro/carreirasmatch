@@ -45,7 +45,7 @@ export function EnsinoMedioHubClient() {
     <div className="space-y-12">
       {/* Hero Header */}
       <header className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-indigo-500/10 border border-blue-500/20 px-3.5 py-1 text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+        <div className="inline-flex items-center gap-1.5 rounded-md bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
           <Sparkles className="h-3.5 w-3.5" />
           Suíte Completa do Ensino Médio por Anos (1º, 2º, 3º & ENEM)
         </div>

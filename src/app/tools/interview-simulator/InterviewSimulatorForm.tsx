@@ -351,7 +351,7 @@ export function InterviewSimulatorForm({
           {currentQuestion && (
             <form
               onSubmit={handleAnswer}
-              className="rounded-3xl border border-[#2563EB]/20 bg-gradient-to-r from-[#2563EB]/5 to-indigo-500/5 p-5 space-y-4"
+              className="rounded-3xl border border-[#2563EB]/20 bg-blue-50/50 dark:bg-blue-950/20 p-5 space-y-4"
             >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-xs font-bold text-[#071827] dark:text-white leading-normal">{currentQuestion}</p>

@@ -574,19 +574,25 @@ export function InterviewPrep({
 
   return (
     <div data-interview-prep className="px-4 md:px-8 py-8 max-w-7xl mx-auto w-full space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-neutral-900 via-indigo-950 to-slate-900 p-6 md:p-8 text-white shadow-xl shadow-indigo-950/10 border border-white/10">
-        <div className="absolute top-0 right-0 -mt-8 -mr-8 w-64 h-64 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10 space-y-3">
-          <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider rounded-full px-3 py-1 bg-white/10 text-blue-200 border border-white/15 backdrop-blur-md">
-            <SparklesIcon className="h-3.5 w-3.5 text-blue-300" /> Acelerador de Carreira & Entrevistas
-          </span>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tight">
-            Prepare-se para a entrevista
-          </h1>
-          <p className="text-neutral-300 max-w-2xl text-sm md:text-base leading-relaxed">
-            Treine para a vaga de **{jobTitle}**. Veja a sua resposta e o feedback da IA **lado a lado**, salve seu resultado no histórico e exporte seu relatório em PDF.
-          </p>
+      {/* Header */}
+      <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900 md:p-8">
+        <div className="absolute inset-y-0 left-0 w-1 bg-blue-600" />
+        <div className="relative flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-3xl space-y-3">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-blue-600 dark:text-blue-400">
+              Preparação para entrevista
+            </p>
+            <h1 className="text-2xl font-bold tracking-tight text-neutral-950 dark:text-white md:text-3xl">
+              Treine para a vaga de {jobTitle}
+            </h1>
+            <p className="max-w-2xl text-sm leading-relaxed text-neutral-600 dark:text-neutral-400 md:text-base">
+              Responda às perguntas no seu ritmo e revise os pontos que podem deixar sua resposta mais clara e convincente.
+            </p>
+          </div>
+          <div className="shrink-0 border-t border-neutral-200 pt-4 dark:border-neutral-800 md:border-l md:border-t-0 md:pl-6 md:pt-0">
+            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">Formato</p>
+            <p className="mt-1 text-sm font-semibold text-neutral-900 dark:text-white">Simulação guiada</p>
+          </div>
         </div>
       </div>
 

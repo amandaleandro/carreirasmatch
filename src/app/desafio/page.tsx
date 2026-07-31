@@ -29,7 +29,6 @@ export default async function DesafioPage({
   return (
     <main className="min-h-screen bg-[#F8FAFC] dark:bg-[#071827] text-foreground font-sans relative overflow-hidden">
       {/* Background Decorativo */}
-      <div className="absolute top-0 inset-x-0 h-80 bg-gradient-to-b from-[#2563EB]/5 to-transparent pointer-events-none" />
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-full max-w-7xl h-80 bg-[#2563EB]/5 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="relative max-w-4xl mx-auto px-4 py-10 sm:py-12 space-y-10 animate-in fade-in duration-300">
