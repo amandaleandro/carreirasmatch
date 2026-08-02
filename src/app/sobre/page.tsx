@@ -5,7 +5,7 @@ import { ContentPage } from "@/components/content-page";
 
 export const metadata: Metadata = {
   title: "Sobre o CarreirasMatch",
-  description: "Conheça a missão, os princípios e a forma de trabalho do CarreirasMatch.",
+  description: "O CarreirasMatch acompanha toda a sua carreira: escolha de profissão, estudos, primeiro emprego, recolocação e trabalho freelancer, em um só lugar.",
   alternates: { canonical: "/sobre" },
 };
 
@@ -31,24 +31,24 @@ export default function SobrePage() {
   return (
     <ContentPage
       eyebrow="Sobre o CarreirasMatch"
-      title="Mais clareza entre a vaga que você encontrou e a candidatura que vai enviar."
-      description="Transformamos uma comparação difícil em ajustes práticos para você decidir e agir com mais confiança."
+      title="Sua carreira inteira, do primeiro passo à próxima conquista, em um só lugar."
+      description="Escolher profissão, estudar para concurso ou vestibular, conseguir estágio, entrar no mercado, mudar de área ou trabalhar por conta: cada momento tem uma resposta diferente, e é isso que oferecemos."
       wide
     >
       <div className="grid gap-8 lg:grid-cols-[1.1fr_.9fr] lg:items-start">
         <div className="space-y-4 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Por que existimos</h2>
-          <p>Muita gente tem capacidade para uma oportunidade, mas não consegue tornar essa capacidade visível no currículo ou na entrevista. Uma descrição genérica, a ausência das palavras certas e a falta de preparação podem esconder experiências relevantes.</p>
-          <p>O CarreirasMatch compara o currículo com uma vaga real e transforma o diagnóstico em ações: requisitos encontrados, lacunas que ainda precisam ser comprovadas, palavras-chave, sugestões de texto e preparação para entrevista.</p>
-          <p>Não prometemos contratação. Entregamos contexto para você melhorar sua apresentação sem distorcer sua história.</p>
+          <p>Carreira não é um único problema, é uma sequência deles: qual profissão seguir, como passar num concurso ou vestibular, como conseguir o primeiro estágio, como se candidatar sem perder o que já foi construído, como mudar de área sem começar do zero. A maioria das ferramentas resolve só um pedaço disso.</p>
+          <p>O CarreirasMatch reúne teste vocacional, radar de concurso e vestibular, comparação de currículo com vaga real, candidatura automática, marketplace freelancer e acompanhamento de evolução, para que a pessoa não precise trocar de plataforma a cada fase da carreira.</p>
+          <p>O diagnóstico entre currículo e vaga segue sendo o ponto de entrada mais usado: requisitos encontrados, lacunas que ainda precisam ser comprovadas, palavras-chave e preparação para entrevista. Mas é uma ferramenta dentro de um acompanhamento maior, não o produto inteiro.</p>
         </div>
         <aside className="rounded-2xl bg-slate-900 p-6 text-white shadow-sm border border-slate-800 space-y-4">
           <span className="inline-flex rounded-xl bg-white/10 p-3 text-slate-200 border border-white/15"><Target className="h-6 w-6" /></span>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400">Nossa missão</p>
-            <p className="mt-2 text-lg sm:text-xl font-bold leading-snug text-white">Ajudar cada pessoa a apresentar melhor o que realmente sabe fazer.</p>
+            <p className="mt-2 text-lg sm:text-xl font-bold leading-snug text-white">Ser o lugar em que carreira é pensada, do primeiro passo à próxima conquista.</p>
           </div>
-          <p className="text-xs sm:text-sm leading-relaxed text-slate-300">Da primeira oportunidade a uma mudança de carreira, com orientação específica para o momento vivido.</p>
+          <p className="text-xs sm:text-sm leading-relaxed text-slate-300">Escolha, estudo, candidatura, entrevista e evolução, com orientação específica para o momento vivido.</p>
         </aside>
       </div>
 
@@ -65,6 +65,17 @@ export default function SobrePage() {
               <p className="text-xs sm:text-sm leading-relaxed text-slate-600 dark:text-slate-400">{description}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="mt-10 border-t border-slate-200/80 pt-10 dark:border-slate-800 space-y-4">
+        <div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Metodologia editorial</span>
+          <h2 className="mt-1 text-xl font-bold text-slate-900 dark:text-white">Como produzimos o conteúdo do blog</h2>
+        </div>
+        <div className="space-y-3 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
+          <p>Os artigos do blog são redigidos com apoio de IA a partir de diretrizes editoriais definidas pela equipe do CarreirasMatch: cada texto precisa trazer um ângulo específico sobre a carreira tratada, evitar generalidades e citar situações concretas da rotina profissional em vez de repetir um roteiro genérico.</p>
+          <p>Não atribuímos os textos a autores individuais fictícios nem inventamos credenciais — a responsabilidade editorial é da equipe do CarreirasMatch como um todo, identificada em cada artigo. Erros, imprecisões ou desatualizações podem ser reportados por qualquer leitor através da <Link href="/contato" className="font-medium underline">página de contato</Link>, e o conteúdo é corrigido a partir desse retorno.</p>
         </div>
       </section>
 

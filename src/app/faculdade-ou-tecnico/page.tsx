@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Faculdade, curso técnico ou outro caminho?",
@@ -9,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function StudentLandingPage() {
-  return <NicheLandingPage initialNiche="estudante" />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Faculdade ou técnico", path: "/faculdade-ou-tecnico" }])} />
+      <NicheLandingPage initialNiche="estudante" />
+    </>
+  );
 }

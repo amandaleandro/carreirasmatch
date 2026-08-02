@@ -530,6 +530,19 @@ const FIRST_JOB_PATH_OPTIONS: { key: FirstJobPath; label: string }[] = [
 ];
 
 const NICHE_ORDER = Object.keys(NICHES) as NicheSlug[];
+
+// Rota dedicada de cada nicho: usado para linkar (crawlable, não só troca de aba)
+// entre as landing pages dedicadas e reforçar que são o mesmo produto.
+const NICHE_ROUTES: Record<NicheSlug, string> = {
+  estagiarios: "/estagio",
+  "menor-aprendiz": "/jovem-aprendiz",
+  "primeiro-emprego": "/primeiro-emprego",
+  estudante: "/faculdade-ou-tecnico",
+  oab: "/oab",
+  recolocacao: "/recolocacao",
+  "transicao-de-carreira": "/transicao",
+  concurseiro: "/concurso",
+};
 const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: string }> = {
   estagiarios: {
     headline: "Seu primeiro estágio pode começar com o que você já sabe.",
@@ -1485,6 +1498,28 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               >
                 Assinar e ver guia completo
               </Link>
+            </div>
+          </section>
+        )}
+
+        {/* Outros momentos: links crawláveis (não abas client-side) entre as
+            landing pages dedicadas, para reforçar que é a mesma plataforma
+            cobrindo toda a carreira, não uma ferramenta isolada. */}
+        {isDedicatedLanding && (
+          <section className="reveal py-12 border-t border-neutral-100 dark:border-neutral-900">
+            <p className="text-center text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-5">
+              O CarreirasMatch também ajuda em outros momentos
+            </p>
+            <div className="flex flex-wrap justify-center gap-2.5">
+              {NICHE_ORDER.filter((slug) => slug !== activeSlug).map((slug) => (
+                <Link
+                  key={slug}
+                  href={NICHE_ROUTES[slug]}
+                  className="rounded-full border border-neutral-200 dark:border-neutral-800 px-4 py-2 text-xs font-semibold text-neutral-600 dark:text-neutral-300 hover:border-blue-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  {NICHES[slug].tabLabel}
+                </Link>
+              ))}
             </div>
           </section>
         )}

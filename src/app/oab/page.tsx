@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Preparação para 1ª e 2ª fase da OAB",
@@ -9,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function OabLandingPage() {
-  return <NicheLandingPage initialNiche="oab" />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "OAB", path: "/oab" }])} />
+      <NicheLandingPage initialNiche="oab" />
+    </>
+  );
 }

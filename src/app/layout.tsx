@@ -27,10 +27,10 @@ const manrope = Manrope({
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "CarreirasMatch | compare seu currículo com a vaga",
+    default: "CarreirasMatch | sua carreira inteira, em um só lugar",
     template: `%s | ${SITE_NAME}`,
   },
-  description: "Descubra sua aderência real a uma vaga e como se preparar para a entrevista.",
+  description: "Escolha de profissão, concurso e vestibular, currículo, entrevista, primeiro emprego, recolocação e freelancer: acompanhe cada etapa da sua carreira com inteligência artificial.",
   applicationName: SITE_NAME,
   openGraph: {
     type: "website",

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Planeje sua transição de carreira",
@@ -9,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function CareerChangeLandingPage() {
-  return <NicheLandingPage initialNiche="transicao-de-carreira" />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Transição de carreira", path: "/transicao" }])} />
+      <NicheLandingPage initialNiche="transicao-de-carreira" />
+    </>
+  );
 }

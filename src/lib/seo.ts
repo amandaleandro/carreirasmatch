@@ -23,7 +23,7 @@ export function organizationJsonLd() {
     url: BASE_URL,
     logo: absoluteUrl("/logos/icon-light.png"),
     description:
-      "Copiloto de carreira que compara currículo e vaga, mostra as lacunas que mais importam e transforma o diagnóstico em ações.",
+      "Plataforma de carreira completa: escolha de profissão, estudos para concurso e vestibular, estágio, primeiro emprego, recolocação, transição de carreira e trabalho freelancer, tudo com apoio de inteligência artificial.",
   };
 }
 
@@ -37,7 +37,7 @@ export function softwareApplicationJsonLd() {
     operatingSystem: "Web",
     url: BASE_URL,
     description:
-      "Plataforma que compara currículo e vaga, identifica lacunas, palavras-chave ATS e gera um kit de candidatura.",
+      "Acompanha cada etapa da carreira: teste vocacional, radar de concurso e vestibular, comparação de currículo com vaga real, candidatura automática, marketplace freelancer e preparação para entrevista.",
   };
 }
 

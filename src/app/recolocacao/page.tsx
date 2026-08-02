@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Análise de currículo para recolocação",
@@ -9,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function ReemploymentLandingPage() {
-  return <NicheLandingPage initialNiche="recolocacao" />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Recolocação", path: "/recolocacao" }])} />
+      <NicheLandingPage initialNiche="recolocacao" />
+    </>
+  );
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { NicheLandingPage } from "@/components/niche-landing";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Plano de estudos para concurso público",
@@ -9,5 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default function PublicExamLandingPage() {
-  return <NicheLandingPage initialNiche="concurseiro" />;
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Concurso público", path: "/concurso" }])} />
+      <NicheLandingPage initialNiche="concurseiro" />
+    </>
+  );
 }
