@@ -755,6 +755,7 @@ model Post {
   coverEmoji  String
   gradientIdx Int      @default(0)
   contentJson String // JSON.stringify(ContentBlock[])
+  published   Boolean  @default(true)
   publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())
 

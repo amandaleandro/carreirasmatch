@@ -30,7 +30,7 @@ export default async function BlogPage({
 }) {
   const { area, page: pageParam } = await searchParams;
 
-  const where = area ? { areaSlug: area } : undefined;
+  const where = area ? { areaSlug: area, published: true } : { published: true };
   const parsedPage = Number.parseInt(pageParam ?? "1", 10);
 
   const total = await prisma.post.count({ where });
@@ -48,6 +48,7 @@ export default async function BlogPage({
   });
 
   const areaRows = await prisma.post.findMany({
+    where: { published: true },
     distinct: ["areaSlug"],
     select: { areaSlug: true, areaLabel: true },
     orderBy: { areaSlug: "asc" },

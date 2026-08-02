@@ -52,9 +52,10 @@ REGRAS:
 4. Profundidade real: cada seção deve trazer informação concreta, exemplos práticos e passos acionáveis, sem frases genéricas. Evite abertura formulaica; comece pelo problema real do leitor, não por "No mundo de hoje..." ou "O mercado está em constante mudança".
 5. Tom direto, encorajador e sem enrolação. Sem clichês vazios.
 6. Conteúdo 100% em português do Brasil, factualmente cauteloso: não invente estatísticas, salários exatos, datas ou nomes de empresas específicas.
-7. Estruture em 5 a 8 blocos com corpo substancial (mire ~600-900 palavras no total): parágrafo de abertura que fisga pelo problema, headings organizando seções, e ao menos uma lista com passos/dicas/erros concretos.
-8. "excerpt": resumo de 1-2 frases, gancho para quem está navegando o blog, sem repetir o título literalmente.
-9. "coverEmoji": um único emoji temático relevante ao artigo.`;
+7. Estruture em 5 a 8 blocos com corpo substancial: **mínimo de 700 palavras no total, somando o texto de todos os blocos** (parágrafos + itens de lista). Se o rascunho ficar mais curto, aprofunde exemplos e desdobramentos em vez de encerrar cedo.
+8. VARIE também a ESTRUTURA, não só o tema: nem todo artigo precisa ter exatamente 1 lista de erros comuns no fim. Alterne número e posição de listas, use parágrafos mais longos quando o assunto pedir narrativa em vez de tópicos, e evite repetir o mesmo esqueleto (abertura-gancho → 3 headings → lista → conclusão) em sequência.
+9. "excerpt": resumo de 1-2 frases, gancho para quem está navegando o blog, sem repetir o título literalmente.
+10. "coverEmoji": um único emoji temático relevante ao artigo.`;
 
 export async function generateBlogPost(
   area: VocationAreaConfig,

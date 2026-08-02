@@ -12,7 +12,8 @@ import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 async function getPost(slug: string) {
-  return prisma.post.findUnique({ where: { slug } });
+  const post = await prisma.post.findUnique({ where: { slug } });
+  return post?.published ? post : null;
 }
 
 export async function generateMetadata({
@@ -56,7 +57,7 @@ export default async function BlogPostPage({
   const gradient = COVER_GRADIENTS[post.gradientIdx] ?? COVER_GRADIENTS[0];
 
   const relatedPosts = await prisma.post.findMany({
-    where: { areaSlug: post.areaSlug, id: { not: post.id } },
+    where: { areaSlug: post.areaSlug, id: { not: post.id }, published: true },
     orderBy: { publishedAt: "desc" },
     take: 3,
   });
@@ -99,6 +100,18 @@ export default async function BlogPostPage({
         </Link>
         <span className="text-[11px] text-neutral-400">{formatDate(post.publishedAt)}</span>
       </div>
+
+      <p className="text-[11px] text-neutral-500 dark:text-neutral-400 mb-6 -mt-4">
+        Por{" "}
+        <Link href="/sobre" className="font-medium text-neutral-700 dark:text-neutral-300 hover:underline">
+          Equipe Editorial CarreirasMatch
+        </Link>
+        . Conteúdo com apoio de IA, revisado seguindo nossa{" "}
+        <Link href="/sobre" className="font-medium text-neutral-700 dark:text-neutral-300 hover:underline">
+          metodologia editorial
+        </Link>
+        .
+      </p>
 
       <article className="space-y-4 text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
         {blocks.map((block, i) => {
