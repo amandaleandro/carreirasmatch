@@ -3,6 +3,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { locationSlug } from "@/lib/location-slug";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -43,6 +45,7 @@ export default async function LaborMarketPage() {
 
   return (
     <ContentPage eyebrow="Dados do mercado" title="Onde estão as oportunidades" description="Painel atualizado a partir das vagas e boletins coletados em fontes públicas." wide>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Mercado de trabalho", path: "/mercado-de-trabalho" }])} />
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border p-5 dark:border-neutral-800"><p className="text-xs text-neutral-500">Cidades monitoradas</p><p className="mt-2 text-3xl font-bold">{cities.length}</p></div>
         <div className="rounded-2xl border p-5 dark:border-neutral-800"><p className="text-xs text-neutral-500">Cargos identificados</p><p className="mt-2 text-3xl font-bold">{titles.length}</p></div>
@@ -75,6 +78,17 @@ export default async function LaborMarketPage() {
           </div>
         </section>
       </div>
+
+      <section className="mt-8 rounded-2xl border p-5 dark:border-neutral-800">
+        <h2 className="font-bold">Use esses dados para agir</h2>
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+          Encontrou a cidade ou o cargo certo? O CarreirasMatch ajuda no próximo passo:{" "}
+          <Link href="/analise" className="font-semibold text-blue-600 hover:underline">compare seu currículo com uma vaga real</Link>,{" "}
+          <Link href="/cursos-gratuitos" className="font-semibold text-blue-600 hover:underline">feche uma lacuna com um curso gratuito</Link>{" "}
+          ou veja o{" "}
+          <Link href="/concursos" className="font-semibold text-blue-600 hover:underline">radar de concursos e vestibulares</Link>.
+        </p>
+      </section>
     </ContentPage>
   );
 }

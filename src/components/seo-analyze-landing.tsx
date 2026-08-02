@@ -1,5 +1,15 @@
+import Link from "next/link";
 import { AnalyzeVagaPage } from "@/components/analyze-vaga";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+
+const RELATED_LINKS = [
+  { label: "Estágio", href: "/estagio" },
+  { label: "Primeiro emprego", href: "/primeiro-emprego" },
+  { label: "Recolocação", href: "/recolocacao" },
+  { label: "Transição de carreira", href: "/transicao" },
+  { label: "Concurso público", href: "/concurso" },
+  { label: "Currículo grátis", href: "/curriculo-gratis" },
+] as const;
 
 export type LandingFaq = { question: string; answer: string };
 
@@ -94,6 +104,23 @@ export function SeoAnalyzeLanding({
               <p className="text-sm text-[#64748B] dark:text-slate-400 mt-2 leading-relaxed">{item.answer}</p>
             </details>
           ))}
+        </section>
+
+        <section className="max-w-2xl mx-auto space-y-3 text-center">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#64748B] dark:text-slate-400">
+            O CarreirasMatch também ajuda em outros momentos
+          </p>
+          <div className="flex flex-wrap justify-center gap-2">
+            {RELATED_LINKS.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-full border border-[#E2E8F0] dark:border-neutral-800 px-3.5 py-1.5 text-xs font-semibold text-[#64748B] dark:text-slate-300 hover:border-[#2563EB]/40 hover:text-[#2563EB] transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </section>
       </div>
     </main>

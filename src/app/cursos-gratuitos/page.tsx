@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { ContentPage } from "@/components/content-page";
 import { Pagination } from "@/components/Pagination";
 import { Sparkles } from "lucide-react";
 import { PartnerCourseActions } from "@/components/partner-course-actions";
+import { JsonLd } from "@/components/json-ld";
+import { breadcrumbJsonLd } from "@/lib/seo";
 
 const COURSES_PER_PAGE = 12;
 
@@ -70,6 +73,7 @@ export default async function FreeCoursesPage({
 
   return (
     <ContentPage eyebrow="Qualificação" title="Cursos gratuitos verificados" description="Escolha uma área e encontre cursos gratuitos para fortalecer seu currículo." wide>
+      <JsonLd data={breadcrumbJsonLd([{ name: "Início", path: "/" }, { name: "Cursos gratuitos", path: "/cursos-gratuitos" }])} />
       <form className="grid gap-3 rounded-2xl border border-neutral-200 p-4 dark:border-neutral-800 sm:grid-cols-[1fr_1fr_1fr_auto]">
         <input name="q" defaultValue={q} placeholder="Curso, habilidade ou instituição" className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100" />
         <select name="area" defaultValue={area} className="rounded-xl border bg-transparent px-3 py-2.5 text-sm dark:border-neutral-700 dark:bg-neutral-900 text-neutral-800 dark:text-neutral-100">
@@ -157,6 +161,17 @@ export default async function FreeCoursesPage({
           searchParams={{ q, area, subarea }}
         />
       </div>
+
+      <section className="mt-8 rounded-2xl border p-5 dark:border-neutral-800">
+        <h2 className="font-bold">Depois do curso, o próximo passo</h2>
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+          Terminou um curso? Coloque ele no currículo e veja se já fecha o que falta:{" "}
+          <Link href="/analise" className="font-semibold text-blue-600 hover:underline">compare seu currículo com uma vaga real</Link>{" "}
+          no CarreirasMatch, ou confira{" "}
+          <Link href="/mercado-de-trabalho" className="font-semibold text-blue-600 hover:underline">onde estão as oportunidades</Link>{" "}
+          na sua área.
+        </p>
+      </section>
     </ContentPage>
   );
 }

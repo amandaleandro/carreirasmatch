@@ -79,10 +79,15 @@ function toFetchedJob(job: GupyJob): FetchedJob | null {
   };
 }
 
-export async function fetchGupyJobs(query = "Assistente Administrativo"): Promise<FetchedJob[]> {
+export async function fetchGupyJobs(
+  queries: string | string[] = "Assistente Administrativo",
+): Promise<FetchedJob[]> {
+  const terms = [...new Set(Array.isArray(queries) ? queries : [queries])].filter(Boolean);
   const jobsById = new Map<string | number, GupyJob>();
-  const pages = await fetchAllPages(query);
-  for (const job of pages) jobsById.set(job.id, job);
+  const pagesByTerm = await Promise.all(terms.map((term) => fetchAllPages(term)));
+  for (const pages of pagesByTerm) {
+    for (const job of pages) jobsById.set(job.id, job);
+  }
 
   const jobs: FetchedJob[] = [];
   for (const job of jobsById.values()) {

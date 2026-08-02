@@ -37,6 +37,34 @@ function toSourceError(sourceName: string, reason: unknown): string {
   return `${sourceName}: ${message}`;
 }
 
+// A Gupy tem uma API pública, sem chave e paginada (sem rate-limit próprio conhecido), diferente
+// das outras fontes que dependem do termo único que gira no scheduler (1 termo a cada execução,
+// ~1 semana pra cobrir os 20 termos). Aqui buscamos várias categorias amplas em paralelo a cada
+// execução, então a Gupy não fica presa ao mesmo rodízio lento das fontes mais restritas.
+// Lista bem menor que a da Gupy: a busca "guest" do LinkedIn não é uma API pública documentada,
+// então cada termo extra é uma sequência de até 6 chamadas de página + até 40 de detalhe (ver
+// linkedin.ts, que já roda os termos em série com pausa, nunca em paralelo). Mais que uns poucos
+// termos por execução aumentaria o risco de bloqueio sem necessidade.
+const LINKEDIN_EXTRA_QUERIES = ["Estágio", "Atendimento ao Cliente"];
+
+const GUPY_QUERIES = [
+  "Assistente Administrativo",
+  "Atendimento ao Cliente",
+  "Vendedor",
+  "Estágio",
+  "Jovem Aprendiz",
+  "Auxiliar Administrativo",
+  "Analista",
+  "Desenvolvedor",
+  "Recepcionista",
+  "Assistente Financeiro",
+  "Auxiliar de Logística",
+  "Recursos Humanos",
+  "Marketing",
+  "Operador de Caixa",
+  "Motorista",
+];
+
 function fingerprint(job: { jobTitle: string; company?: string; location?: string | null }): string {
   return [job.jobTitle, job.company ?? "", job.location ?? ""]
     .join("|")
@@ -60,7 +88,14 @@ export async function fetchNewJobsFromAllSources(
   const sources: { name: string; fetch: () => Promise<FetchedJob[]> }[] = [
     { name: "arbeitnow", fetch: () => fetchArbeitnowJobs(filterKeywords) },
     { name: "remoteok", fetch: () => fetchRemoteOkJobs(filterKeywords) },
-    { name: "linkedin", fetch: () => fetchLinkedInJobs(searchTerms, location) },
+    {
+      name: "linkedin",
+      fetch: () => {
+        const primary = searchTerms?.titlePt || searchTerms?.titleEn || "";
+        const terms = primary ? [primary, ...LINKEDIN_EXTRA_QUERIES] : LINKEDIN_EXTRA_QUERIES;
+        return fetchLinkedInJobs(terms, location);
+      },
+    },
     { name: "themuse", fetch: () => fetchTheMuseJobs(filterKeywords) },
     { name: "himalayas", fetch: () => fetchHimalayasJobs(filterKeywords) },
     { name: "remotejobsorg", fetch: () => fetchRemoteJobsOrgJobs(filterKeywords) },
@@ -76,7 +111,10 @@ export async function fetchNewJobsFromAllSources(
   }
   sources.push({
     name: "gupy",
-    fetch: () => fetchGupyJobs(searchTerms?.titlePt),
+    fetch: () =>
+      fetchGupyJobs(
+        searchTerms?.titlePt ? [searchTerms.titlePt, ...GUPY_QUERIES] : GUPY_QUERIES,
+      ),
   });
   sources.push({
     name: "inhire",

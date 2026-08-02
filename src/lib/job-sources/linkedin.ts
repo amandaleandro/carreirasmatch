@@ -85,16 +85,47 @@ async function mapWithConcurrency<T, R>(
   return results;
 }
 
-export async function fetchLinkedInJobs(searchTerms?: JobSearchTerms, location = "Brasil"): Promise<FetchedJob[]> {
-  const keywords = searchTerms?.titlePt || searchTerms?.titleEn || "";
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
-  const candidatesByUrl = new Map<string, LinkedInCandidate>();
+// Diferente da Gupy (API pública documentada, sem sinal de bloqueio conhecido), a busca "guest" do
+// LinkedIn é não-oficial e tem detecção agressiva de bot. Rodar vários termos aqui NÃO usa paralelismo
+// como na Gupy: os termos são buscados um de cada vez, com uma pausa entre eles, pra não multiplicar
+// de forma abrupta o volume de chamadas contra o LinkedIn e arriscar bloquear o scraping que já funciona.
+const BETWEEN_TERMS_DELAY_MS = 2000;
+
+async function fetchCandidatesForTerm(
+  keywords: string,
+  location: string,
+): Promise<LinkedInCandidate[]> {
+  const candidates: LinkedInCandidate[] = [];
   for (let page = 0; page < MAX_PAGES; page++) {
     const pageCandidates = await fetchSearchPage(keywords, location, page * RESULTS_PER_PAGE);
     if (pageCandidates.length === 0) break;
-    for (const candidate of pageCandidates) {
+    candidates.push(...pageCandidates);
+  }
+  return candidates;
+}
+
+export async function fetchLinkedInJobs(
+  searchTerms?: JobSearchTerms | string | string[],
+  location = "Brasil",
+): Promise<FetchedJob[]> {
+  const keywordsList = Array.isArray(searchTerms)
+    ? searchTerms
+    : typeof searchTerms === "string"
+      ? [searchTerms]
+      : [searchTerms?.titlePt || searchTerms?.titleEn || ""];
+  const terms = [...new Set(keywordsList)];
+
+  const candidatesByUrl = new Map<string, LinkedInCandidate>();
+  for (let index = 0; index < terms.length; index++) {
+    const termCandidates = await fetchCandidatesForTerm(terms[index], location);
+    for (const candidate of termCandidates) {
       if (!candidatesByUrl.has(candidate.url)) candidatesByUrl.set(candidate.url, candidate);
     }
+    if (index < terms.length - 1) await sleep(BETWEEN_TERMS_DELAY_MS);
   }
 
   const candidates = [...candidatesByUrl.values()].slice(0, MAX_DETAIL_FETCHES);

@@ -546,35 +546,35 @@ const NICHE_ROUTES: Record<NicheSlug, string> = {
 const DEDICATED_HERO_COPY: Record<NicheSlug, { headline: string; subheadline: string }> = {
   estagiarios: {
     headline: "Seu primeiro estágio pode começar com o que você já sabe.",
-    subheadline: "Transforme projetos, cursos e atividades em evidências que uma empresa consegue enxergar. Descubra o ajuste que falta antes de aplicar.",
+    subheadline: "Transforme projetos, cursos e atividades em evidências que uma empresa consegue enxergar. Descubra com o CarreirasMatch o ajuste que falta antes de aplicar.",
   },
   "primeiro-emprego": {
     headline: "Seu primeiro emprego não precisa parecer impossível.",
-    subheadline: "Mostre cursos, projetos e responsabilidades do jeito certo para a vaga. Sem inventar experiência e sem se diminuir.",
+    subheadline: "Com o CarreirasMatch, mostre cursos, projetos e responsabilidades do jeito certo para a vaga. Sem inventar experiência e sem se diminuir.",
   },
   "transicao-de-carreira": {
     headline: "Mudar de área não apaga a experiência que você construiu.",
-    subheadline: "Encontre as habilidades transferíveis que já aproximam você da nova carreira e aprenda a contar essa mudança com segurança.",
+    subheadline: "Encontre as habilidades transferíveis que já aproximam você da nova carreira e aprenda, com o CarreirasMatch, a contar essa mudança com segurança.",
   },
   recolocacao: {
     headline: "Volte ao mercado com uma história que faz sentido.",
-    subheadline: "Organize sua experiência, explique pausas com segurança e ajuste sua apresentação para a vaga que você quer agora.",
+    subheadline: "Organize sua experiência, explique pausas com segurança e ajuste, com o CarreirasMatch, sua apresentação para a vaga que você quer agora.",
   },
   "menor-aprendiz": {
     headline: "Você já tem mais para mostrar do que imagina.",
-    subheadline: "Monte um currículo claro para Jovem Aprendiz usando escola, cursos, atividades e responsabilidade, mesmo sem experiência.",
+    subheadline: "Monte com o CarreirasMatch um currículo claro para Jovem Aprendiz usando escola, cursos, atividades e responsabilidade, mesmo sem experiência.",
   },
   estudante: {
     headline: "Pare de escolher seu futuro no achismo.",
-    subheadline: "Entenda qual caminho combina com seus interesses, rotina e objetivos, enquanto recebe ajuda para estudar melhor todos os dias.",
+    subheadline: "Entenda qual caminho combina com seus interesses, rotina e objetivos, enquanto o CarreirasMatch te ajuda a estudar melhor todos os dias.",
   },
   concurseiro: {
     headline: "Pare de estudar tudo e continuar sem saber se está avançando.",
-    subheadline: "Transforme o edital em prioridades, treine com simulados e acompanhe o que realmente aproxima você da aprovação.",
+    subheadline: "Transforme o edital em prioridades, treine com simulados e acompanhe, com o CarreirasMatch, o que realmente aproxima você da aprovação.",
   },
   oab: {
     headline: "Na OAB, estudar mais não basta. Você precisa estudar certo.",
-    subheadline: "Treine no padrão da FGV, corrija seus erros e siga um plano claro para a fase em que você está.",
+    subheadline: "Treine no padrão da FGV, corrija seus erros e siga, com o CarreirasMatch, um plano claro para a fase em que você está.",
   },
 };
 const ECOSYSTEM_CARDS = [

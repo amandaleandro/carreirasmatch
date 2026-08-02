@@ -99,7 +99,7 @@ export function applyProfileAlignment<T extends { fitScore: number; reason: stri
   return { ...match, fitScore, reason };
 }
 
-async function loadProfileContext(userId: string): Promise<JobProfileContext> {
+export async function loadProfileContext(userId: string): Promise<JobProfileContext> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { professionalArea: true, targetProfessionalArea: true, studyCourse: true, interestedRoles: true },
