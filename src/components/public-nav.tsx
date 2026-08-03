@@ -9,7 +9,7 @@ export const journeys = [
   { label: "Aprender", href: "/ensino-medio", items: [["Ensino médio", "/ensino-medio"], ["Universidade", "/universidade"], ["Concursos", "/concurso"], ["OAB", "/oab"], ["Ferramentas de estudo", "/tools"]] },
   { label: "Conquistar", href: "/analise", items: [["Analisar currículo e vaga", "/analise"], ["Criar currículo", "/curriculo-gratis"], ["Verificar ATS", "/verificador-ats"], ["Encontrar vagas", "/todas-as-vagas"], ["Preparar entrevista", "/tools/interview-simulator"], ["Acompanhar candidaturas", "/applications"]] },
   { label: "Evoluir", href: "/insights", items: [["Evolução profissional", "/evolucao"], ["Melhorar LinkedIn", "/tools/linkedin-optimizer"], ["Revisar GitHub", "/tools/github-review"], ["Mapa de competências", "/tools/matriz-de-skills"], ["Plano de ação", "/action-plan"], ["Transição de carreira", "/transicao"]] },
-  { label: "Freelancer", href: "/freelancers", items: [["Encontrar projetos", "/projetos"], ["Criar perfil", "/freelancer"], ["Meus contratos", "/freelancer/contratos"], ["Precificação inteligente", "/freelancer/precificacao"]] },
+  { label: "Trabalhar por conta", href: "/freelancers", items: [["Encontrar projetos", "/projetos"], ["Criar perfil", "/freelancer"], ["Meus contratos", "/freelancer/contratos"], ["Precificação inteligente", "/freelancer/precificacao"]] },
 ] as const;
 
 export const institutional = [["Para empresas", "/empresas"], ["Para instituições", "/parceiro"]] as const;

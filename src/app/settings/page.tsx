@@ -14,7 +14,7 @@ import { WhatsappOptInToggle } from "@/components/whatsapp-optin-toggle";
 import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
 import { DataPrivacySection } from "@/components/data-privacy-section";
 import { normalizeCareerSegment } from "@/lib/career-segments";
-import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";\nimport { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 import { ArrowLeft, User, Shield, CreditCard, Award, Lock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -174,7 +174,7 @@ export default async function SettingsPage({
             Plano & Assinatura
           </h2>
           <BillingSection
-            monthlyPrice={offer.monthlyPrice}
+            monthlyPrice={`R$ ${(COMMERCIAL_PLANS.pro.priceCents / 100).toFixed(2).replace(".", ",")}/mês`}
             monthlyName={offer.monthlyName}
             subscriptionStatus={subscription?.status ?? null}
             currentPeriodEnd={subscription?.currentPeriodEnd?.toISOString() ?? null}

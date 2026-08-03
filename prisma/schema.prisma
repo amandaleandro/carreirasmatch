@@ -70,6 +70,7 @@ model User {
   gameScores                  GameScore[]
   npsResponses                NpsResponse[]
   moodLogs                    MoodLog[]
+  professionalEvidences       ProfessionalEvidence[]
 
   autoApplicationSettings AutoApplicationSettings?
   autoApplicationQueue    AutoApplicationQueue[]
@@ -305,6 +306,22 @@ model ApplicationActivity {
   createdAt     DateTime    @default(now())
 
   @@index([applicationId, createdAt])
+}
+
+model ProfessionalEvidence {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    String
+  title       String
+  description String
+  metrics     String?
+  verifiedAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId, category])
+  @@index([userId, createdAt])
 }
 
 model UserCourse {
@@ -1303,8 +1320,12 @@ model Company {
   screeningCount       Int                    @default(0)
   /// Créditos de triagem comprados; consumidos quando o teto gratuito acaba.
   screeningCredits     Int                    @default(0)
-  /// Plano recorrente (vagas + triagens ilimitadas). "inactive" | "active" | "cancelled".
+  /// Plano recorrente (vagas + triagens dentro da cota mensal). "inactive" | "active" | "cancelled".
   planStatus           String                 @default("inactive")
+  /// "starter" | "pro". Null quando planStatus é "inactive".
+  planKind             String?
+  /// Triagens já usadas dentro da cota do plano no ciclo atual; zera a cada renovação.
+  planScreeningsUsed   Int                    @default(0)
   planCurrentPeriodEnd DateTime?
   /// Página pública da empresa (marca empregadora). slug único quando ativa.
   slug                 String?                @unique

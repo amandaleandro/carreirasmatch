@@ -341,15 +341,18 @@ export async function sendCompanyMemberInviteEmail(
   );
 }
 
-/** Confirma a ativação do plano recorrente da empresa (vagas + triagens ilimitadas). */
-export async function sendCompanySubscriptionConfirmationEmail(to: string, opts: { currentPeriodEnd: Date }) {
+/** Confirma a ativação do plano recorrente da empresa (vagas ilimitadas + cota mensal de triagens). */
+export async function sendCompanySubscriptionConfirmationEmail(
+  to: string,
+  opts: { currentPeriodEnd: Date; planLabel: string; screeningsIncluded: number }
+) {
   const renew = formatBrazilDate(opts.currentPeriodEnd);
   await send(
     to,
-    "Plano Ilimitado ativado 🚀",
+    `${opts.planLabel} ativado 🚀`,
     `
-      <h2 style="font-size: 20px;">Seu Plano Ilimitado está ativo 🚀</h2>
-      <p>Tudo certo! Agora sua empresa publica vagas e roda triagens de currículo por IA sem limite de créditos.</p>
+      <h2 style="font-size: 20px;">Seu ${opts.planLabel} está ativo 🚀</h2>
+      <p>Tudo certo! Agora sua empresa publica vagas sem limite e tem ${opts.screeningsIncluded} triagens de currículo por IA neste ciclo.</p>
       <p>Próxima renovação em <strong>${renew}</strong>. Você pode gerenciar ou cancelar quando quiser em Faturamento.</p>
       ${button(`${APP_URL}/empresa/billing`, "Ver meu plano")}
     `
@@ -357,13 +360,13 @@ export async function sendCompanySubscriptionConfirmationEmail(to: string, opts:
 }
 
 /** Avisa a empresa que o plano recorrente foi cancelado. */
-export async function sendCompanySubscriptionCancelledEmail(to: string) {
+export async function sendCompanySubscriptionCancelledEmail(to: string, opts: { planLabel: string }) {
   await send(
     to,
-    "👋 Seu Plano Ilimitado foi cancelado",
+    `👋 Seu ${opts.planLabel} foi cancelado`,
     `
       <h2 style="font-size: 20px;">👋 Plano cancelado</h2>
-      <p>Confirmamos o cancelamento do Plano Ilimitado da sua empresa. Não faremos novas cobranças.</p>
+      <p>Confirmamos o cancelamento do ${opts.planLabel} da sua empresa. Não faremos novas cobranças.</p>
       <p>Sua empresa continua com acesso até o fim do período já pago. Depois disso, a triagem volta a consumir os créditos avulsos do seu saldo.</p>
       ${button(`${APP_URL}/empresa/billing`, "Reativar plano")}
     `

@@ -58,13 +58,49 @@ const KANBAN_COLUMNS = [
     dot: "bg-purple-500",
   },
   {
+    id: "technical_test",
+    label: "Teste tÃ©cnico",
+    desc: "Desafios, cases e provas em andamento",
+    color: "bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-200 dark:bg-fuchsia-950/40 dark:text-fuchsia-400 dark:border-fuchsia-900/60",
+    dot: "bg-fuchsia-500",
+  },
+  {
     id: "offer",
     label: "Proposta",
     desc: "Oferta de trabalho recebida",
     color: "bg-emerald-500/10 text-emerald-600 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/60",
     dot: "bg-emerald-500",
   },
+  {
+    id: "rejected",
+    label: "Finalizadas",
+    desc: "Processos encerrados para aprender com o resultado",
+    color: "bg-slate-500/10 text-slate-600 border-slate-200 dark:bg-slate-900/60 dark:text-slate-400 dark:border-slate-800",
+    dot: "bg-slate-500",
+  },
 ];
+
+function nextActionFor(status: string) {
+  switch (status) {
+    case "saved":
+      return "Analisar a vaga e decidir se vale o esforço";
+    case "resume_review":
+    case "tailor_resume":
+      return "Ajustar o currículo com base no Match";
+    case "applied":
+      return "Acompanhar a resposta e preparar o follow-up";
+    case "interview":
+      return "Treinar as perguntas prováveis da entrevista";
+    case "technical_test":
+      return "Revisar os requisitos e concluir o teste";
+    case "offer":
+      return "Avaliar a proposta e preparar a negociação";
+    case "rejected":
+      return "Registrar o aprendizado para a próxima candidatura";
+    default:
+      return "Definir o próximo passo";
+  }
+}
 
 export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
   const [isPending, startTransition] = useTransition();
@@ -159,6 +195,13 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                           </div>
                         )}
 
+                        <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-2.5 dark:border-blue-900/50 dark:bg-blue-950/30">
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">PrÃ³xima aÃ§Ã£o</p>
+                          <p className="mt-1 text-[11px] font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
+                            {nextActionFor(item.status)}
+                          </p>
+                        </div>
+
                         {item.notes && (
                           <p className="text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl text-[11px] leading-relaxed">
                             {item.notes}
@@ -194,7 +237,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                               </a>
                             )}
                             <Link
-                              href="/analise"
+                              href={item.analysisId ? `/report/${item.analysisId}` : "/analise"}
                               className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
                             >
                               <span>IA</span>

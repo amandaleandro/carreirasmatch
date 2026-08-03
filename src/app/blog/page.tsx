@@ -62,15 +62,15 @@ export default async function BlogPage({
     return (
       <ContentPage
         eyebrow="Blog"
-        title="Conteúdo direto ao ponto sobre currículo, entrevistas e carreira."
-        description="Estamos preparando os primeiros artigos, dicas práticas para cada momento: estágio, primeiro emprego, transição de carreira, recolocação e jovem aprendiz."
+        title="Um guia prático para tomar decisões melhores na carreira."
+        description="Orientações originais para currículo, formação, entrevistas e busca de trabalho. Cada guia parte de uma situação real e termina com um próximo passo aplicável."
       >
         <div className="rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 bg-neutral-50/60 dark:bg-neutral-900/40 p-5 text-sm text-neutral-500 dark:text-neutral-400">
-          Em breve por aqui. Enquanto isso, veja abaixo o que já estamos preparando.
+          Comece pelo problema que você precisa resolver hoje: entrar no mercado, mudar de área, voltar a procurar trabalho ou comprovar uma habilidade.
         </div>
 
         <div className="mt-8">
-          <h2 className="text-base font-bold text-neutral-900 dark:text-white mb-4">O que vem por aí</h2>
+          <h2 className="text-base font-bold text-neutral-900 dark:text-white mb-4">Guias para o próximo passo</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {FALLBACK_TOPICS.map(({ icon, topic }) => (
               <div
@@ -88,6 +88,14 @@ export default async function BlogPage({
           </div>
         </div>
 
+        <section className="mt-8 border-t border-neutral-100 pt-8 dark:border-neutral-900">
+          <h2 className="text-lg font-bold text-neutral-900 dark:text-white">Como transformar informação em ação</h2>
+          <div className="mt-3 space-y-3 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+            <p>Uma lista de vagas ou cursos é apenas o ponto de partida. Compare os requisitos com sua experiência, separe o que já pode ser comprovado e escolha uma única lacuna para desenvolver nesta semana.</p>
+            <p>Use os guias para organizar essa decisão e as ferramentas para revisar o resultado. Recomendações editoriais são orientações práticas, não promessas de contratação, salário ou aprovação.</p>
+          </div>
+        </section>
+
         <p className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-900 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
           Enquanto isso, você já pode ver dicas por área direto nas ferramentas de carreira:{" "}
           <Link href="/tools" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
@@ -102,7 +110,7 @@ export default async function BlogPage({
   return (
     <ContentPage
       eyebrow="Blog"
-      title="Conteúdo direto ao ponto sobre currículo, entrevistas e carreira."
+      title="Um guia prático para tomar decisões melhores na carreira."
       description="Artigos práticos gerados para cada área profissional, estágio, primeiro emprego, transição de carreira, recolocação e crescimento."
       wide
     >

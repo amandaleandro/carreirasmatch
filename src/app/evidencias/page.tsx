@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ShieldCheck, Plus, Sparkles, CheckCircle2, Award, Briefcase, Trash2, ArrowLeft } from "lucide-react";
 
@@ -40,6 +40,16 @@ export default function EvidenciasPage() {
   const [description, setDescription] = useState("");
   const [metrics, setMetrics] = useState("");
 
+  useEffect(() => {
+    void fetch("/api/evidencias")
+      .then(async (response) => {
+        if (!response.ok) throw new Error("NÃ£o foi possÃ­vel carregar suas evidÃªncias.");
+        const data = (await response.json()) as { items: EvidenceItem[] };
+        setItems(data.items);
+      })
+      .catch(() => undefined);
+  }, []);
+
   function handleAddEvidence(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
@@ -54,6 +64,16 @@ export default function EvidenciasPage() {
     };
 
     setItems([newItem, ...items]);
+    void fetch("/api/evidencias", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        category: newItem.category,
+        title: newItem.title,
+        description: newItem.description,
+        metrics: newItem.metrics,
+      }),
+    });
     setTitle("");
     setDescription("");
     setMetrics("");
@@ -62,6 +82,11 @@ export default function EvidenciasPage() {
 
   function handleDelete(id: string) {
     setItems(items.filter((item) => item.id !== id));
+    void fetch("/api/evidencias", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
   }
 
   return (

@@ -9,6 +9,7 @@ import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import { createPreapproval } from "@/lib/mercadopago";
 import { parseBRLToCents } from "@/lib/pricing";
 import { NextRequest, NextResponse } from "next/server";
+import { COMMERCIAL_PLANS, type CommercialPlanKey } from "@/lib/commercial-plan-catalog";
 
 function getAppUrl(req: NextRequest) {
   return process.env.APP_URL ?? req.nextUrl.origin;
@@ -16,7 +17,12 @@ function getAppUrl(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const session = await auth();
-  const { token, couponCode, payerEmail, segment: requestedSegment, attribution } = await req.json();
+  const { token, couponCode, payerEmail, segment: requestedSegment, attribution, planKey: requestedPlanKey } = await req.json();
+  const planKey = typeof requestedPlanKey === "string" && requestedPlanKey in COMMERCIAL_PLANS ? requestedPlanKey as CommercialPlanKey : "pro";
+  const selectedPlan = COMMERCIAL_PLANS[planKey];
+  if (!selectedPlan.recurring || planKey === "free") {
+    return NextResponse.json({ error: "Este plano não usa assinatura mensal no cartão." }, { status: 400 });
+  }
   const tracking = {
     sessionId: typeof attribution?.sessionId === "string" ? attribution.sessionId.slice(0, 100) : "",
     source: typeof attribution?.source === "string" ? attribution.source.slice(0, 120) : "",
@@ -79,7 +85,7 @@ export async function POST(req: NextRequest) {
   }
 
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
-  const baseAmountCents = parseBRLToCents(offer.monthlyPrice);
+  const baseAmountCents = selectedPlan.priceCents;
 
   let amountCents = baseAmountCents;
   let discountCents = 0;
@@ -100,7 +106,7 @@ export async function POST(req: NextRequest) {
     result = await createPreapproval({
       cardTokenId: token,
       transactionAmount: amountCents / 100,
-      reason: offer.monthlyName,
+      reason: selectedPlan.name,
       payerEmail: email,
       externalReference: `${userId}:subscription`,
       backUrl: session?.user?.id
@@ -135,15 +141,15 @@ export async function POST(req: NextRequest) {
     const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
     await prisma.subscription.upsert({
       where: { userId },
-      create: { userId, segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: payment.id },
-      update: { segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: payment.id },
+      create: { userId, segment, planKey, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
+      update: { segment, planKey, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
     });
     await registerCouponUsage(couponId);
     // E-mail no caminho síncrono (assinatura autorizada na hora). No caminho
     // assíncrono o e-mail sai no webhook, com guard para não duplicar.
     void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
-    void notifyAdminPurchase({ product: offer.monthlyName, amountCents, email });
-    void notifyAdminPurchaseWhatsapp({ product: offer.monthlyName, amountCents, email });
+    void notifyAdminPurchase({ product: selectedPlan.name, amountCents, email });
+    void notifyAdminPurchaseWhatsapp({ product: selectedPlan.name, amountCents, email });
     await prisma.funnelEvent.create({
       data: {
         name: "subscription_confirmed",

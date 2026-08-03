@@ -28,11 +28,15 @@ function SubjectCard({
   onGenerate,
   onDelete,
   generating,
+  onAddToPortfolio,
+  portfolioAdded,
 }: {
   name: string;
   insight: Insight | null;
   onGenerate: () => void;
   onDelete?: () => void;
+  onAddToPortfolio?: () => void;
+  portfolioAdded?: boolean;
   generating: boolean;
 }) {
   return (
@@ -119,6 +123,7 @@ export function UniversityHub({
   const [localManualSubjects, setLocalManualSubjects] = useState(manualSubjects);
   const [newSubjectName, setNewSubjectName] = useState("");
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [portfolioAdded, setPortfolioAdded] = useState<Record<string, boolean>>({});
 
   async function searchCourses(q: string) {
     setCourseQuery(q);
@@ -219,6 +224,14 @@ export function UniversityHub({
     }
   }
 
+  async function addInsightToPortfolio(subjectName: string, insight: Insight) {
+    const res = await fetch("/api/freelance/profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: insight.suggestedProject, description: `Projeto inspirado na disciplina ${subjectName}. Competências praticadas: ${insight.competencies.join(", ")}.`, skills: insight.competencies }),
+    });
+    if (res.ok || res.status === 409) setPortfolioAdded((prev) => ({ ...prev, [subjectName]: true }));
+  }
   async function generateCatalogInsight(id: string) {
     setGeneratingId(id);
     try {
@@ -376,6 +389,8 @@ export function UniversityHub({
                     key={s.id}
                     name={s.name}
                     insight={s.insight}
+                    onAddToPortfolio={s.insight ? () => addInsightToPortfolio(s.name, s.insight!) : undefined}
+                    portfolioAdded={portfolioAdded[s.name]}
                     onGenerate={() => generateCatalogInsight(s.id)}
                     generating={generatingId === s.id}
                   />
@@ -408,7 +423,9 @@ export function UniversityHub({
                       key={s.id}
                       name={s.name}
                       insight={s.insight}
-                      onGenerate={() => generateManualInsight(s.id)}
+                      onAddToPortfolio={s.insight ? () => addInsightToPortfolio(s.name, s.insight!) : undefined}
+                    portfolioAdded={portfolioAdded[s.name]}
+                    onGenerate={() => generateManualInsight(s.id)}
                       onDelete={() => deleteManualSubject(s.id)}
                       generating={generatingId === s.id}
                     />

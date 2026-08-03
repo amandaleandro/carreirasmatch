@@ -5,9 +5,24 @@ export const COMMERCIAL_PRODUCTS = {
   firstAnalysis: { code: "analysis.first", name: "Primeira análise", kind: "first_analysis", priceCents: 4900 },
   fullAnalysis: { code: "analysis.full", name: "Análise completa", kind: "diagnostic", priceCents: 990 },
   analysisCredits: { code: "credits.analysis.5", name: "5 análises completas", kind: "credit_pack", priceCents: 3990, creditType: "analysis.job.full", creditQuantity: 5 },
+  essentialMonthly: { code: "plan.essential.monthly", name: "Essencial mensal (30 dias)", kind: "subscription_monthly", priceCents: 1490 },
+  essentialAnnual: { code: "plan.essential.annual", name: "Essencial anual (365 dias)", kind: "subscription_annual", priceCents: 14900 },
   proMonthly: { code: "plan.pro.monthly", name: "Pro mensal (30 dias)", kind: "subscription_monthly", priceCents: 2990 },
   proAnnual: { code: "plan.pro.annual", name: "Pro anual (365 dias)", kind: "subscription_annual", priceCents: 29900 },
+  completeMonthly: { code: "plan.complete.monthly", name: "Completo mensal (30 dias)", kind: "subscription_monthly", priceCents: 4990 },
+  completeAnnual: { code: "plan.complete.annual", name: "Completo anual (365 dias)", kind: "subscription_annual", priceCents: 49900 },
 } as const;
+
+const AVULSO_PRODUCT_CODE_BY_PLAN_KEY: Record<string, { monthly: string; annual: string }> = {
+  essential: { monthly: "plan.essential.monthly", annual: "plan.essential.annual" },
+  pro: { monthly: "plan.pro.monthly", annual: "plan.pro.annual" },
+  complete: { monthly: "plan.complete.monthly", annual: "plan.complete.annual" },
+};
+
+export function avulsoProductCode(planKey: string, cycle: "monthly" | "annual"): string {
+  const codes = AVULSO_PRODUCT_CODE_BY_PLAN_KEY[planKey] ?? AVULSO_PRODUCT_CODE_BY_PLAN_KEY.pro;
+  return codes[cycle];
+}
 
 export type CommercialProductCode = string;
 
@@ -18,8 +33,8 @@ export async function ensureCommercialProducts() {
   for (const plan of Object.values(COMMERCIAL_PLANS)) {
     await prisma.product.upsert({
       where: { code: `plan.${plan.key}` },
-      create: { code: `plan.${plan.key}`, name: plan.name, kind: "subscription", priceCents: plan.priceCents, recurring: plan.recurring, planKey: plan.key },
-      update: { name: plan.name, priceCents: plan.priceCents, recurring: plan.recurring, planKey: plan.key, active: true },
+      create: { code: `plan.${plan.key}`, name: plan.name, kind: plan.recurring ? "subscription" : "subscription_monthly", priceCents: plan.priceCents, recurring: plan.recurring, planKey: plan.key },
+      update: { name: plan.name, kind: plan.recurring ? "subscription" : "subscription_monthly", priceCents: plan.priceCents, recurring: plan.recurring, planKey: plan.key, active: true },
     });
   }
 }

@@ -147,3 +147,27 @@ export function getFeatureLimit(planKey: string | null | undefined, featureKey: 
   return getCommercialPlan(planKey).limits[featureKey];
 }
 
+const FEATURE_LABELS: Record<CommercialFeatureKey, string> = {
+  [COMMERCIAL_FEATURE_KEYS.analysisFull]: "análises completas de vaga por mês",
+  [COMMERCIAL_FEATURE_KEYS.resumeByJob]: "currículos adaptados por vaga por mês",
+  [COMMERCIAL_FEATURE_KEYS.interviewComplete]: "simulados de entrevista completos por mês",
+  [COMMERCIAL_FEATURE_KEYS.githubAnalysis]: "análises de perfil GitHub por mês",
+  [COMMERCIAL_FEATURE_KEYS.universitySubjectInsight]: "insights de disciplina universitária por mês",
+  [COMMERCIAL_FEATURE_KEYS.careerGrowthPlan]: "planos de evolução de carreira por mês",
+  [COMMERCIAL_FEATURE_KEYS.jobApplications]: "candidaturas registradas",
+  [COMMERCIAL_FEATURE_KEYS.studyTool]: "usos de ferramentas de estudo por mês",
+  [COMMERCIAL_FEATURE_KEYS.aiSimpleAction]: "ações rápidas de IA por mês",
+};
+
+/** Lista legível do que o plano inclui, derivada dos limites reais (nunca hardcoded por fora do catálogo). */
+export function getPlanFeatureList(planKey: string | null | undefined): string[] {
+  const plan = getCommercialPlan(planKey);
+  return (Object.keys(FEATURE_LABELS) as CommercialFeatureKey[])
+    .filter((featureKey) => (plan.limits[featureKey] ?? 0) !== 0)
+    .map((featureKey) => {
+      const limit = plan.limits[featureKey];
+      const quantity = limit === null ? "Ilimitadas" : limit;
+      return `${quantity} ${FEATURE_LABELS[featureKey]}`;
+    });
+}
+

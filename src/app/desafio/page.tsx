@@ -114,7 +114,7 @@ export default async function DesafioPage({
               </div>
               <h4 className="text-xs font-bold text-[#071827] dark:text-white">Indique & Ganhe Desconto</h4>
               <p className="text-[11px] text-[#64748B] leading-relaxed">
-                A cada 3 amigos que entrarem pelo seu link, você ganha 1 Diagnóstico Completo grátis + Desconto Exclusivo na Assinatura Mensal! (Assinantes ativos possuem 100% de desconto e análises ilimitadas).
+                A cada 3 amigos que entrarem pelo seu link, você ganha 1 Diagnóstico Completo grátis + Desconto Exclusivo na Assinatura Mensal! (Assinantes ativos possuem 100% de desconto e análises dentro da cota do plano).
               </p>
             </div>
           </div>

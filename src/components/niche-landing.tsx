@@ -6,7 +6,7 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import type { CareerTrack } from "@/components/analysis-display";
-import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";\nimport { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 import type { CareerSegment } from "@/lib/career-segments";
 import { FIRST_JOB_GUIDE_BY_PATH, type FirstJobPath } from "@/lib/first-job-tips";
 
@@ -1313,7 +1313,7 @@ export function NicheLandingPage({ initialNiche }: { initialNiche?: NicheSlug })
               </span>
               <p className="text-[11px] font-semibold uppercase tracking-wide text-neutral-400">Assinatura mensal</p>
               <p className="text-lg font-bold mt-1">{offer.monthlyName}</p>
-              <p className={`mt-2 text-3xl font-extrabold ${theme.accentText}`}>{offer.monthlyPrice}</p>
+              <p className={`mt-2 text-3xl font-extrabold ${theme.accentText}`}>{`R$ ${(COMMERCIAL_PLANS.pro.priceCents / 100).toFixed(2).replace(".", ",")}/mês`}</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-2">
                 Resolve toda a sua busca, não só uma vaga.
               </p>

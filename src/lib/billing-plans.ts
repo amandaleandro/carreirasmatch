@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { parseBRLToCents } from "@/lib/pricing";
-import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
+
 import type { CareerSegment } from "@/lib/career-segments";
 
 /**
@@ -27,7 +27,7 @@ export function isPeriodPlanKind(kind: string): kind is PeriodPlanKind {
 
 /** Preço do plano em centavos: mensal = 1 mensalidade; anual = 10 mensalidades (2 grátis). */
 export function periodPlanAmountCents(segment: CareerSegment, kind: PeriodPlanKind): number {
-  const monthlyCents = parseBRLToCents(CAREER_OFFER_BY_SEGMENT[segment].monthlyPrice);
+  const monthlyCents = COMMERCIAL_PLANS.pro.priceCents;
   return kind === "subscription_annual" ? monthlyCents * 10 : monthlyCents;
 }
 
@@ -46,7 +46,8 @@ export async function grantSubscriptionPeriod(
   userId: string,
   segment: CareerSegment,
   days: number,
-  paymentId: string
+  paymentId: string,
+  planKey = "complete"
 ): Promise<Date> {
   const now = new Date();
   const existing = await prisma.subscription.findUnique({ where: { userId } });
@@ -58,8 +59,8 @@ export async function grantSubscriptionPeriod(
 
   await prisma.subscription.upsert({
     where: { userId },
-    create: { userId, segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: paymentId },
-    update: { segment, planKey: "complete", status: "active", currentPeriodEnd, lastPaymentId: paymentId },
+    create: { userId, segment, planKey, status: "active", currentPeriodEnd, lastPaymentId: paymentId },
+    update: { segment, planKey, status: "active", currentPeriodEnd, lastPaymentId: paymentId },
   });
 
   return currentPeriodEnd;

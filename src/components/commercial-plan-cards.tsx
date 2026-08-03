@@ -14,6 +14,18 @@ function formatPrice(cents: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
 }
 
+const FEATURE_LABELS: Record<string, string> = {
+  "ai.simple_action": "Ações simples de IA",
+  "analysis.job.full": "Análises completas",
+  "resume.by_job": "Currículo por vaga",
+  "interview.complete": "Entrevistas completas",
+  "profile.github.analysis": "Revisões de GitHub",
+  "university.subject.insight": "Insights por disciplina",
+  "career.growth.plan.generate": "Planos de desenvolvimento",
+  "job.application.create": "Candidaturas",
+  "study.tool.use": "Ferramentas de estudo",
+};
+
 export function CommercialPlanCards({ plans }: { plans: Plan[] }) {
   return (
     <section className="mx-auto max-w-6xl px-4 pt-8">
@@ -31,7 +43,7 @@ export function CommercialPlanCards({ plans }: { plans: Plan[] }) {
               <h3 className="text-base font-bold text-slate-900 dark:text-white">{plan.name}</h3>
               <p className="mt-3 text-2xl font-extrabold text-slate-900 dark:text-white">{formatPrice(plan.priceCents)}<span className="text-xs font-medium text-slate-500">{plan.recurring ? "/mês" : plan.durationDays ? `/${plan.durationDays} dias` : ""}</span></p>
               <ul className="mt-5 space-y-2 text-xs text-slate-600 dark:text-slate-300">
-                {highlights.map((item) => <li key={item.featureDefinition.name} className="flex gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" /><span>{item.featureDefinition.name}: {item.limit === null ? "sem limite mensal" : `${item.limit}/mês`}</span></li>)}
+                {highlights.map((item) => <li key={item.featureDefinition.name} className="flex gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" /><span>{FEATURE_LABELS[item.featureDefinition.name] ?? item.featureDefinition.name}: {item.limit === null ? "sem limite" : `${item.limit}/ciclo`}</span></li>)}
               </ul>
             </article>
           );

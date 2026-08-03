@@ -62,6 +62,7 @@ export function MercadoPagoSubscriptionBrick({
   segment,
   couponCode,
   endpoint = "/api/billing/subscription",
+  extraBody,
   onSuccess,
 }: {
   amount: number;
@@ -70,6 +71,8 @@ export function MercadoPagoSubscriptionBrick({
   couponCode?: string;
   /** Rota que processa a assinatura. Default: assinatura de candidato. */
   endpoint?: string;
+  /** Campos extras enviados junto no corpo da requisição (ex.: planKind). */
+  extraBody?: Record<string, string>;
   onSuccess: (registerUrl?: string) => void;
 }) {
   const [cardholderName, setCardholderName] = useState("");
@@ -116,6 +119,7 @@ export function MercadoPagoSubscriptionBrick({
           segment,
           couponCode,
           attribution: getStoredAttribution(),
+          ...extraBody,
         }),
       });
       const data = await res.json();

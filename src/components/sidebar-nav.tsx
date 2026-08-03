@@ -420,7 +420,7 @@ export function SidebarNav({
             🏆 Plano Profissional
           </p>
           <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-            Acesso ilimitado a todas as análises e simuladores.
+            Acesso ampliado a análises e simuladores, conforme a cota do plano.
           </p>
           <Link
             href="/tools"

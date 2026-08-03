@@ -104,7 +104,7 @@ export default async function ToolsPage() {
                 Potencialize suas candidaturas ao máximo 🚀
               </h3>
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-                No plano gratuito você possui recursos limitados. Assine o Plano Pro para ter acesso ilimitado aos diagnósticos de vagas, simuladores de entrevistas e relatórios detalhados.
+                No plano gratuito você possui recursos limitados. Assine o Plano Pro para ter acesso ampliado aos diagnósticos de vagas, simuladores de entrevistas e relatórios detalhados, conforme a cota do plano.
               </p>
             </div>
             <Link

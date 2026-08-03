@@ -5,6 +5,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { prisma } from "@/lib/prisma";
+import { COMPANY_PLANS } from "@/lib/company-billing";
 import {
   Search,
   KanbanSquare,
@@ -30,7 +31,7 @@ const FAQ = [
   {
     question: "Postar vaga é grátis?",
     answer:
-      "Sim. Cadastrar a empresa e publicar vagas no feed público é gratuito, sem cartão de crédito. Você paga apenas se quiser triagens extras de currículo por IA além da cota gratuita, ou o Plano Ilimitado para vagas e triagens sem limite.",
+      "Sim. Cadastrar a empresa e publicar vagas no feed público é gratuito, sem cartão de crédito. Você paga apenas se quiser triagens extras de currículo por IA além da cota gratuita, ou um plano recorrente (Starter ou Pro) com cota mensal de triagens inclusa.",
   },
   {
     question: "Como funciona o recrutamento com IA?",
@@ -48,9 +49,9 @@ const FAQ = [
       "Sim, o banco de talentos permite buscar por palavra-chave e pedir contato diretamente a candidatos que optaram por ser encontrados, mesmo sem uma vaga aberta.",
   },
   {
-    question: "O que é o Plano Ilimitado?",
+    question: "O que são os planos Starter e Pro?",
     answer:
-      "É a assinatura mensal que remove o limite de créditos de triagem por IA, além das vagas publicadas no feed já serem ilimitadas por padrão. Pode ser cancelado quando quiser.",
+      "São assinaturas mensais com cota de triagens por IA inclusa (30/mês no Starter, 150/mês no Pro), além de vagas publicadas ilimitadas no feed. Pode ser cancelado quando quiser.",
   },
 ];
 
@@ -113,6 +114,10 @@ const ECOSYSTEM_CARDS = [
     href: "/parceiro",
   },
 ] as const;
+
+function formatBRL(cents: number) {
+  return (cents / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 export default async function EmpresasLandingPage() {
   const analysisCount = await prisma.analysis.count().catch(() => 0);
@@ -257,7 +262,7 @@ export default async function EmpresasLandingPage() {
           <h2 className="text-center text-2xl md:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
             Comece grátis, cresça quando precisar
           </h2>
-          <div className="mt-10 grid sm:grid-cols-2 gap-5 max-w-3xl mx-auto">
+          <div className="mt-10 grid sm:grid-cols-3 gap-5 max-w-4xl mx-auto">
             <div className="rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6">
               <p className="text-xs font-bold uppercase tracking-wider text-neutral-500">Grátis</p>
               <p className="mt-2 text-3xl font-extrabold text-neutral-900 dark:text-white">R$ 0</p>
@@ -270,18 +275,26 @@ export default async function EmpresasLandingPage() {
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border-2 border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 p-6">
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Plano Ilimitado</p>
-              <p className="mt-2 text-3xl font-extrabold text-neutral-900 dark:text-white">R$ 199<span className="text-base font-semibold text-neutral-500">/mês</span></p>
-              <ul className="mt-4 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-400">
-                {["Triagens de currículo por IA sem limite", "Tudo do plano grátis incluso", "Cancele quando quiser"].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            {(["starter", "pro"] as const).map((key) => {
+              const plan = COMPANY_PLANS[key];
+              return (
+                <div key={key} className="rounded-2xl border-2 border-blue-500 bg-blue-50/60 dark:bg-blue-950/30 p-6">
+                  <p className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">{plan.label}</p>
+                  <p className="mt-2 text-3xl font-extrabold text-neutral-900 dark:text-white">
+                    {formatBRL(plan.priceCents)}
+                    <span className="text-base font-semibold text-neutral-500">/mês</span>
+                  </p>
+                  <ul className="mt-4 space-y-1.5 text-sm text-neutral-600 dark:text-neutral-400">
+                    {[`${plan.screeningsIncluded} triagens de currículo por IA/mês`, "Vagas ilimitadas incluso", "Cancele quando quiser"].map((item) => (
+                      <li key={item} className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 shrink-0 text-blue-600 dark:text-blue-400" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </section>
 

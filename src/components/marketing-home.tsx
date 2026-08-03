@@ -21,12 +21,29 @@ import { BrandLogo } from "@/components/brand-logo";
 import { PublicNav, PublicNavMobile } from "@/components/public-nav";
 import { SiteFooter } from "@/components/site-footer";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { CommercialPlanCards } from "@/components/commercial-plan-cards";
+import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 
+
+const PUBLIC_PLAN_CARDS = Object.values(COMMERCIAL_PLANS).map((plan) => ({
+  key: plan.key,
+  name: plan.name,
+  priceCents: plan.priceCents,
+  recurring: plan.recurring,
+  durationDays: plan.durationDays ?? null,
+  highlighted: Boolean(plan.highlighted),
+  entitlements: Object.entries(plan.limits).map(([featureKey, limit]) => ({ limit, featureDefinition: { name: featureKey } })),
+}));
 const steps = [
   ["01", "Envie seu currículo", "Cole o texto ou envie seu PDF atual. A análise respeita tudo o que você já construiu."],
   ["02", "Cole a vaga desejada", "Insira o texto ou o link da oportunidade para a qual você quer se candidatar."],
   ["03", "Descubra seu Match", "Entenda a aderência real, ajuste pontos-chave e aumente suas chances de entrevista."],
 ];
+
+const journeySteps = [
+  ...steps,
+  ["04", "Prepare sua candidatura", "Use o diagnostico para revisar seu curriculo, organizar os proximos passos e treinar para a entrevista."],
+] as const;
 
 const deliverables = [
   "Diagnóstico claro de aderência técnica por requisito",
@@ -69,7 +86,7 @@ const audienceCards = [
   ["Conquistar", "Quero melhorar minhas candidaturas", "Analise seu currículo contra a vaga e descubra exatamente o que ajustar.", "/analise"],
   ["Evoluir", "Quero mudar de carreira", "Identifique as habilidades que você já possui e aproximam você da nova área.", "/transicao"],
   ["Conquistar", "Quero voltar ao mercado", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
-  ["Freelancer", "Quero trabalhar por conta", "Monte seu perfil, envie propostas e acompanhe contratos em um só lugar.", "/freelancers"],
+  ["Trabalhar por conta", "Quero trabalhar por conta", "Monte seu perfil, envie propostas e acompanhe contratos em um só lugar.", "/freelancers"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -162,11 +179,11 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-14">
           <div className="space-y-6">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Sua carreira inteira, em um só lugar.
+              Da vaga encontrada à entrevista.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              Descubra caminhos, desenvolva competências, prepare-se para oportunidades e acompanhe sua evolução profissional com inteligência artificial.
+              O CarreirasMatch é seu copiloto da candidatura: compare currículo e vaga, descubra o que ajustar, prepare seus documentos e treine para a entrevista.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
@@ -263,8 +280,8 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               </h2>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-3">
-              {steps.map(([number, title, description]) => (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {journeySteps.map(([number, title, description]) => (
                 <Card key={number} variant="default" className="p-6 space-y-4">
                   <span className="w-10 h-10 rounded-full bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center shadow-xs">
                     {number}
@@ -325,99 +342,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </div>
         </section>
 
-        {/* PLANOS E PREÇOS - GANHOS REAIS E BRINDES BÔNUS */}
-        <section id="preco" className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 py-20">
-          <div className="mx-auto max-w-6xl px-4 md:px-8 space-y-12">
-            <div className="text-center space-y-3 max-w-2xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-                Invista na sua carreira com retorno garantido
-              </h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
-                Escolha a opção ideal para o seu momento. Todos os planos pagos contêm brindes e bônus inclusos sem custo adicional.
-              </p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
-              {/* Card 1: Grátis */}
-              <Card className="p-6 flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gratuito</span>
-                  <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Análise Inicial</h3>
-                  <p className="text-xs text-slate-500">Ideal para testar seu Match e entender como a vaga lê o seu perfil.</p>
-                  <p className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 0</p>
-                  <div className="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Diagnóstico de aderência inicial</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Mapeamento simples de requisitos</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Dicas rápidas de ajuste</p>
-                  </div>
-                </div>
-                <Link href="/analise" className="w-full text-center py-3 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                  Testar grátis
-                </Link>
-              </Card>
-
-              {/* Card 2: Kit Candidatura */}
-              <Card className="p-6 flex flex-col justify-between space-y-6 border-blue-500/50 relative shadow-md bg-blue-50/20 dark:bg-blue-950/20">
-                <div className="space-y-4">
-                  <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Opção Mais Recomendada</span>
-                  <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Kit Candidatura</h3>
-                  <p className="text-xs text-slate-500">Tudo pronto para enviar sua candidatura para a vaga dos seus sonhos.</p>
-                  <p className="text-3xl font-extrabold text-blue-600">R$ 9,90 <span className="text-xs font-normal text-slate-400">/ vaga</span></p>
-                  
-                  <div className="border-t border-blue-100 dark:border-blue-900/60 pt-4 space-y-2.5 text-xs text-slate-700 dark:text-slate-200 font-medium">
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Currículo 100% otimizado pronto em PDF</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Palavras-chave exatas para robôs ATS</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" /> Roteiro com perguntas da entrevista</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" /> Análise detalhada de pontos fortes</p>
-                    
-                    {/* GIFT BONUS */}
-                    <div className="mt-3 rounded-xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 p-3 space-y-1">
-                      <p className="text-[11px] font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
-                        <Gift className="h-4 w-4 text-amber-500 shrink-0" /> BRINDE BÔNUS INCLUSO:
-                      </p>
-                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
-                        Modelo de Mensagem Pronta para enviar direto ao Recrutador no LinkedIn ou E-mail.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Link href="/analise" className="w-full text-center py-3.5 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700 transition-all shadow-sm">
-                  Gerar meu kit completo
-                </Link>
-              </Card>
-
-              {/* Card 3: Profissional */}
-              <Card className="p-6 flex flex-col justify-between space-y-6">
-                <div className="space-y-4">
-                  <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Acesso Ilimitado</span>
-                  <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Plano Profissional</h3>
-                  <p className="text-xs text-slate-500">Para quem quer se candidatar a várias vagas por mês com velocidade máxima.</p>
-                  <p className="text-3xl font-extrabold text-slate-900 dark:text-white">R$ 29,90 <span className="text-xs font-normal text-slate-400">/ mês</span></p>
-
-                  <div className="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-2.5 text-xs text-slate-600 dark:text-slate-300 font-medium">
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Análises e Kits de vaga ilimitados</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Simulador de entrevistas interativo por IA</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Radar e alertas de vagas em tempo real</p>
-                    <p className="flex items-center gap-2"><CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0" /> Central completa de gestão de candidaturas</p>
-
-                    {/* GIFT BONUS */}
-                    <div className="mt-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900 p-3 space-y-1">
-                      <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
-                        <Gift className="h-4 w-4 text-amber-500 shrink-0" /> BRINDES EXCLUSIVOS:
-                      </p>
-                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-snug">
-                        Guia de Negociação Salarial + 5 Modelos de Carta de Apresentação Profissional.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <Link href="/assinar" className="w-full text-center py-3 rounded-full border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                  Assinar Plano Profissional
-                </Link>
-              </Card>
-            </div>
-          </div>
-        </section>
+        <CommercialPlanCards plans={PUBLIC_PLAN_CARDS} />
 
         {/* FAQ */}
         <section className="mx-auto max-w-4xl px-4 py-20 md:px-8 space-y-8">

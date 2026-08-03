@@ -18,6 +18,7 @@ import {
 import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import { resolveCommercialProduct } from "@/lib/commercial-products";
 import { grantCredits } from "@/lib/commercial-products";
+import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 import {
   isPeriodPlanKind,
   periodPlanAmountCents,
@@ -292,7 +293,8 @@ export async function POST(req: NextRequest) {
         idempotencyKey: `purchase:${payment.id}`,
       });
     } else if (isPeriodPlan) {
-      const currentPeriodEnd = await grantSubscriptionPeriod(userId, segment, PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS], payment.id);
+      const periodDays = product?.planKey && COMMERCIAL_PLANS[product.planKey as keyof typeof COMMERCIAL_PLANS]?.durationDays ?? PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS];
+      const currentPeriodEnd = await grantSubscriptionPeriod(userId, segment, periodDays ?? 30, payment.id, product?.planKey ?? "complete");
       void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
     } else {
       void sendPaymentConfirmationEmail(email, { kind, amountCents });

@@ -7,6 +7,7 @@ import { grantSubscriptionPeriod, isPeriodPlanKind, PERIOD_PLAN_DAYS } from "@/l
 import { registerCouponUsage } from "@/lib/coupons";
 import { sendPaymentConfirmationEmail, sendSubscriptionConfirmationEmail, notifyAdminPurchase } from "@/lib/resend";
 import { grantCredits, resolveCommercialProduct } from "@/lib/commercial-products";
+import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -110,12 +111,8 @@ export async function POST(req: NextRequest) {
         // 2. Se for plano por período (mensal/anual), concede o período de acesso
         if (isPeriodPlanKind(kind)) {
           const days = PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS] || 30;
-          const currentPeriodEnd = await grantSubscriptionPeriod(
-            effectiveUserId,
-            normalizedSegment,
-            days,
-            paymentRecord.id
-          );
+          const periodDays = product?.planKey && COMMERCIAL_PLANS[product.planKey as keyof typeof COMMERCIAL_PLANS]?.durationDays ?? days;
+          const currentPeriodEnd = await grantSubscriptionPeriod(effectiveUserId, normalizedSegment, periodDays, paymentRecord.id, product?.planKey ?? "complete");
           if (customerEmail) {
             void sendSubscriptionConfirmationEmail(customerEmail, { currentPeriodEnd });
           }

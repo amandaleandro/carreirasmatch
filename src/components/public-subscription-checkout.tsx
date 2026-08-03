@@ -5,8 +5,10 @@ import { CouponCodeInput } from "@/components/coupon-code-input";
 import { MercadoPagoSubscriptionBrick } from "@/components/mercadopago-subscription-brick";
 import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { COMMERCIAL_PLANS, getPlanFeatureList, type CommercialPlanKey } from "@/lib/commercial-plan-catalog";
+import { avulsoProductCode } from "@/lib/commercial-products";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
-import { parseBRLToCents, formatCentsToBRL } from "@/lib/pricing";
+import { formatCentsToBRL } from "@/lib/pricing";
 import { ANALYTICS_EVENTS, track } from "@/lib/analytics";
 import { Check, RefreshCw, Target, TrendingUp, Sparkles, ShieldCheck, Zap } from "lucide-react";
 
@@ -15,18 +17,22 @@ type PlanId = "card_recurring" | "monthly_oneoff" | "annual";
 export function PublicSubscriptionCheckout({
   initialSegment,
   initialCouponCode = "",
+  initialPlanKey = "pro",
 }: {
   initialSegment: CareerSegment;
   initialCouponCode?: string;
+  initialPlanKey?: string;
 }) {
   const [segment, setSegment] = useState<CareerSegment>(initialSegment);
   const [email, setEmail] = useState("");
   const [couponCode, setCouponCode] = useState(initialCouponCode.toUpperCase());
-  const [plan, setPlan] = useState<PlanId>("card_recurring");
+  const [plan, setPlan] = useState<PlanId>(initialPlanKey === "sprint" ? "monthly_oneoff" : "card_recurring");
   const [showBrick, setShowBrick] = useState(false);
+  const initialCommercialPlan = initialPlanKey in COMMERCIAL_PLANS && initialPlanKey !== "free" ? initialPlanKey as CommercialPlanKey : "pro";
+  const [commercialPlanKey, setCommercialPlanKey] = useState<CommercialPlanKey>(initialCommercialPlan);
 
   const offer = CAREER_OFFER_BY_SEGMENT[segment];
-  const monthlyCents = useMemo(() => parseBRLToCents(offer.monthlyPrice), [offer.monthlyPrice]);
+  const monthlyCents = useMemo(() => COMMERCIAL_PLANS[commercialPlanKey].priceCents, [commercialPlanKey]);
   const annualCents = monthlyCents * 10; // 12 meses pagando 10 (2 grátis)
 
   const plans: { id: PlanId; title: string; price: string; note: string }[] = [
@@ -124,8 +130,8 @@ export function PublicSubscriptionCheckout({
         {[
           [
             RefreshCw,
-            "Análises de Vaga Ilimitadas",
-            "Ajuste seu currículo palavra por palavra para quantas vagas quiser sem custo adicional por análise.",
+            "Mais Análises de Vaga por Mês",
+            "Ajuste seu currículo palavra por palavra para cada vaga que você aplicar, dentro da cota mensal do seu plano.",
           ],
           [
             Target,
@@ -167,8 +173,8 @@ export function PublicSubscriptionCheckout({
         <div className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/60 dark:bg-blue-950/30 p-6 shadow-2xs space-y-2">
           <p className="text-xs font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400">Faça a conta</p>
           <p className="text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-            2 kits avulsos custam <strong>R$ 25,80</strong>. A assinatura custa menos que isso e libera análises e kits
-            <strong> ilimitados</strong>. Quem busca ativamente aplica em 10+ vagas por mês.
+            2 kits avulsos custam <strong>R$ 25,80</strong>. A assinatura custa menos que isso e libera um volume bem
+            <strong> maior de análises e kits</strong> por mês. Quem busca ativamente aplica em 10+ vagas por mês.
           </p>
         </div>
       </section>
@@ -181,12 +187,16 @@ export function PublicSubscriptionCheckout({
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/50 px-2.5 py-1 rounded">
               {offer.title}
             </span>
-            <h2 className="mt-3 text-2xl font-extrabold text-slate-900 dark:text-white">{offer.monthlyName}</h2>
+            <h2 className="mt-3 text-2xl font-extrabold text-slate-900 dark:text-white">
+              Plano {COMMERCIAL_PLANS[commercialPlanKey].name}
+            </h2>
             <div className="mt-2 flex items-baseline gap-2">
               <span className="text-3xl font-extrabold text-blue-600 dark:text-blue-400">
                 {formatCentsToBRL(monthlyCents)}
               </span>
-              <span className="text-xs font-semibold text-slate-500">/mês (ou R$ 0,83/dia)</span>
+              <span className="text-xs font-semibold text-slate-500">
+                /mês (ou {formatCentsToBRL(Math.round(monthlyCents / 30))}/dia)
+              </span>
             </div>
             <p className="mt-2 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
               Ideal para quem quer agir com constância na busca do novo emprego.
@@ -195,10 +205,10 @@ export function PublicSubscriptionCheckout({
 
           <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
             <p className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
-              <Zap className="w-4 h-4 text-blue-600" /> O que está incluído no seu acesso
+              <Zap className="w-4 h-4 text-blue-600" /> O que está incluído no {COMMERCIAL_PLANS[commercialPlanKey].name}
             </p>
             <div className="space-y-2.5">
-              {offer.monthlyFeatures.map((feature) => (
+              {getPlanFeatureList(commercialPlanKey).map((feature) => (
                 <div key={feature} className="flex items-start gap-2.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                   <span>{feature}</span>
@@ -254,10 +264,21 @@ export function PublicSubscriptionCheckout({
               </div>
 
               <fieldset className="space-y-3">
+                <legend className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">2. Escolha o plano</legend>
+                {Object.values(COMMERCIAL_PLANS).filter((candidate) => candidate.key !== "free").map((candidate) => (
+                  <label key={candidate.key} className={`flex items-center gap-3 rounded-2xl border p-4 cursor-pointer ${commercialPlanKey === candidate.key ? "border-blue-500 bg-blue-50/60 dark:bg-blue-950/30" : "border-slate-200 dark:border-slate-800"}`}>
+                    <input type="radio" name="commercialPlan" checked={commercialPlanKey === candidate.key} onChange={() => { setCommercialPlanKey(candidate.key); setPlan(candidate.recurring ? "card_recurring" : "monthly_oneoff"); }} className="accent-blue-600" />
+                    <span className="flex-1"><span className="font-bold text-sm text-slate-900 dark:text-white">{candidate.name}</span><span className="ml-2 text-sm font-extrabold text-blue-600 dark:text-blue-400">{formatCentsToBRL(candidate.priceCents)}{candidate.recurring ? "/mês" : ""}</span></span>
+                    {candidate.highlighted && <span className="text-[10px] font-bold uppercase text-blue-600">Mais escolhido</span>}
+                  </label>
+                ))}
+              </fieldset>
+
+              <fieldset className="space-y-3">
                 <legend className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                  2. Escolha o seu plano
+                  3. Escolha como pagar
                 </legend>
-                {plans.map((p) => (
+                {plans.filter((p) => p.id === "card_recurring" || (p.id === "monthly_oneoff" ? commercialPlanKey === "sprint" || commercialPlanKey === "pro" : commercialPlanKey === "pro")).map((p) => (
                   <label
                     key={p.id}
                     className={`flex items-start gap-3 rounded-2xl border p-4 cursor-pointer transition-all ${
@@ -289,7 +310,7 @@ export function PublicSubscriptionCheckout({
 
               <div className="space-y-2">
                 <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  3. E-mail de cadastro
+                  4. E-mail de cadastro
                 </label>
                 <input
                   type="email"
@@ -329,6 +350,7 @@ export function PublicSubscriptionCheckout({
                 payerEmail={email}
                 segment={segment}
                 couponCode={couponCode}
+                extraBody={{ planKey: commercialPlanKey }}
                 onSuccess={() => {}}
               />
             </div>
@@ -345,7 +367,7 @@ export function PublicSubscriptionCheckout({
                 amount={amountCents}
                 payerEmail={email}
                 kind={plan === "annual" ? "subscription_annual" : "subscription_monthly"}
-                productCode={plan === "annual" ? "plan.pro.annual" : "plan.pro.monthly"}
+                productCode={avulsoProductCode(commercialPlanKey, plan === "annual" ? "annual" : "monthly")}
                 segment={segment}
                 couponCode={couponCode}
                 onSuccess={() => {}}

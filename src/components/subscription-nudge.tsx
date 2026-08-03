@@ -20,22 +20,22 @@ const COPY: Record<NudgeReason, { eyebrow: string; title: string; body: string }
   engagement: {
     eyebrow: "Aceleração de carreira",
     title: "Conheça o Plano Profissional",
-    body: "Análises ilimitadas de currículo, simulador interativo de entrevistas no modelo STAR e acompanhamento de vagas.",
+    body: "Mais análises de currículo por mês, simulador interativo de entrevistas no modelo STAR e acompanhamento de vagas.",
   },
   exit: {
     eyebrow: "Plano Profissional",
     title: "Potencialize suas candidaturas",
-    body: "Destrave análises ilimitadas de currículo, simulador de entrevistas e acompanhamento completo. Cancele quando quiser.",
+    body: "Destrave mais análises de currículo por mês, simulador de entrevistas e acompanhamento completo. Cancele quando quiser.",
   },
   limit: {
     eyebrow: "Limite atingido",
-    title: "Continue analisando sem limites",
+    title: "Continue analisando",
     body: "Sua análise gratuita foi concluída. Assine o Plano Profissional para repetir o processo em cada vaga que desejar.",
   },
 };
 
 const BENEFITS = [
-  "Análises de vaga e match ilimitados",
+  "Mais análises de vaga e match por mês",
   "Simulador interativo de perguntas de entrevista",
   "Ajustes de palavras-chave para passar nos robôs (ATS)",
   "Modelos de mensagem direta para recrutadores",

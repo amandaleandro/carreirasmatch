@@ -68,6 +68,27 @@ const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; lab
   ],
 };
 
+const DEFAULT_EXTRA_MOBILE_LINKS = [
+  { href: "/evidencias", label: "Banco de Evidências" },
+  { href: "/radar", label: "Alertas de vagas" },
+  { href: "/todas-as-vagas", label: "Todas as Vagas" },
+  { href: "/applications", label: "Candidaturas" },
+  { href: "/tools/compare-jobs", label: "Comparador de Vagas" },
+  { href: "/freelancer", label: "Freelancer" },
+  { href: "/interviews", label: "Entrevistas" },
+  { href: "/evolucao", label: "Evolução Profissional" },
+  { href: "/jogos", label: "Jogos" },
+  { href: "/profile", label: "Desenvolvimento" },
+  { href: "/ensino-medio", label: "Ensino Médio & ENEM" },
+  { href: "/universidade", label: "Universidade" },
+  { href: "/mentorias", label: "Mentorias" },
+  { href: "/concursos", label: "Radar Concursos" },
+  { href: "/vestibulares", label: "Radar Vestibulares" },
+  { href: "/history", label: "Relatórios" },
+  { href: "/suporte", label: "Suporte" },
+  { href: "/settings", label: "Perfil" },
+] as const;
+
 export function Topbar({
   userName,
   userEmail,
@@ -217,6 +238,13 @@ export function Topbar({
                 >
                   Dashboard
                 </Link>
+                <Link
+                  href="/tools"
+                  onClick={() => setMobileNavOpen(false)}
+                  className="block px-3 py-2 text-sm text-slate-200 hover:bg-white/10 rounded-xl font-semibold"
+                >
+                  Ferramentas
+                </Link>
                 {segment
                   ? MOBILE_LINKS_BY_SEGMENT[segment]?.map((link) => (
                       <Link
@@ -229,6 +257,35 @@ export function Topbar({
                       </Link>
                     ))
                   : null}
+                {(!segment || segment === "career_change" || segment === "career_pro") &&
+                  DEFAULT_EXTRA_MOBILE_LINKS.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      {link.label}
+                    </Link>
+                  ))}
+                {segment && segment !== "career_change" && segment !== "career_pro" && (
+                  <>
+                    <Link
+                      href="/suporte"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      Suporte
+                    </Link>
+                    <Link
+                      href="/settings"
+                      onClick={() => setMobileNavOpen(false)}
+                      className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                    >
+                      Perfil
+                    </Link>
+                  </>
+                )}
                 {(!segment || segment === "career_change" || segment === "career_pro") && (
                   <>
                     <Link

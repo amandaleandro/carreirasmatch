@@ -541,9 +541,9 @@ export function AnalyzeVagaPage({
               <p className="text-[10px] text-[#64748B]">
                 Vai aplicar para várias vagas?{" "}
                 <a href="/assinar?segment=career_pro" className="font-bold text-[#2563EB] hover:underline">
-                  Assine o Profissional por R$ 24,90/mês
+                  Assine o Profissional por R$ 29,90/mês
                 </a>{" "}
-                e libere análises e kits ilimitados.
+                e libere análises e kits dentro da cota do plano.
               </p>
               <p className="text-[10px] text-[#64748B]">
                 Sem cadastro prévio: você paga e cria sua conta em seguida para acessar. Já tem conta?{" "}
@@ -561,9 +561,9 @@ export function AnalyzeVagaPage({
               <p className="text-[10px] text-[#64748B]">
                 Vai aplicar para várias vagas?{" "}
                 <a href="/assinar?segment=career_pro" className="font-bold text-[#2563EB] hover:underline">
-                  Assine o Profissional por R$ 24,90/mês
+                  Assine o Profissional por R$ 29,90/mês
                 </a>{" "}
-                e libere análises e kits ilimitados desta e das próximas vagas.
+                e libere análises e kits dentro da cota do plano desta e das próximas vagas.
               </p>
             </LockedDeliverablesUpsell>
           </AnalysisTeaserView>

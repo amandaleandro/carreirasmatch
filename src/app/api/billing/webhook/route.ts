@@ -15,7 +15,7 @@ import {
 import { notifyAdminPurchaseWhatsapp } from "@/lib/evolution";
 import { normalizeCareerSegment } from "@/lib/career-segments";
 import { isPeriodPlanKind, PERIOD_PLAN_DAYS, grantSubscriptionPeriod, periodPlanProductName } from "@/lib/billing-plans";
-import { grantScreeningCredits, activateCompanyPlan } from "@/lib/company-billing";
+import { grantScreeningCredits, activateCompanyPlan, COMPANY_PLANS, type CompanyPlanKind } from "@/lib/company-billing";
 import { grantPartnerCredits } from "@/lib/partner-billing";
 import { sendCompanySubscriptionConfirmationEmail, sendCompanySubscriptionCancelledEmail } from "@/lib/resend";
 import { grantCredits } from "@/lib/commercial-products";
@@ -266,12 +266,15 @@ export async function POST(req: NextRequest) {
   } else if (type === "subscription_preapproval") {
     const payment = await prisma.payment.findUnique({ where: { mpPaymentId: dataId } });
     if (!payment) {
-      // Pode ser a assinatura recorrente de uma empresa (plano ilimitado).
+      // Pode ser a assinatura recorrente de uma empresa (Starter/Pro).
       const companyPayment = await prisma.companyPayment.findUnique({ where: { mpPaymentId: dataId } });
       if (!companyPayment) {
         await markProcessed();
         return NextResponse.json({ ok: true });
       }
+
+      const companyPlanKind: CompanyPlanKind = companyPayment.kind === COMPANY_PLANS.starter.kind ? "starter" : "pro";
+      const companyPlan = COMPANY_PLANS[companyPlanKind];
 
       const preapproval = await getPreapproval(dataId);
       const status =
@@ -281,9 +284,14 @@ export async function POST(req: NextRequest) {
         const currentPeriodEnd = await activateCompanyPlan(companyPayment.id);
         if (currentPeriodEnd) {
           const company = await prisma.company.findUnique({ where: { id: companyPayment.companyId }, select: { email: true } });
-          if (company?.email) void sendCompanySubscriptionConfirmationEmail(company.email, { currentPeriodEnd });
-          void notifyAdminPurchase({ product: "Plano Ilimitado (empresa)", amountCents: companyPayment.amount, email: company?.email ?? null });
-          void notifyAdminPurchaseWhatsapp({ product: "Plano Ilimitado (empresa)", amountCents: companyPayment.amount, email: company?.email ?? null });
+          if (company?.email)
+            void sendCompanySubscriptionConfirmationEmail(company.email, {
+              currentPeriodEnd,
+              planLabel: companyPlan.label,
+              screeningsIncluded: companyPlan.screeningsIncluded,
+            });
+          void notifyAdminPurchase({ product: `${companyPlan.label} (empresa)`, amountCents: companyPayment.amount, email: company?.email ?? null });
+          void notifyAdminPurchaseWhatsapp({ product: `${companyPlan.label} (empresa)`, amountCents: companyPayment.amount, email: company?.email ?? null });
         }
       } else if (status === "cancelled" && companyPayment.status !== "cancelled") {
         await prisma.companyPayment.update({ where: { id: companyPayment.id }, data: { status: "cancelled" } });
@@ -291,7 +299,7 @@ export async function POST(req: NextRequest) {
         const company = await prisma.company.findUnique({ where: { id: companyPayment.companyId }, select: { email: true } });
         if (company?.email) {
           void sendOnce("company_subscription_cancelled", companyPayment.mpPaymentId, company.email, () =>
-            sendCompanySubscriptionCancelledEmail(company.email)
+            sendCompanySubscriptionCancelledEmail(company.email, { planLabel: companyPlan.label })
           );
         }
       }

@@ -15,6 +15,33 @@ export async function GET() {
   return NextResponse.json({ profile });
 }
 
+export async function POST(req: Request) {
+  const { session, response } = await requireAuth();
+  if (!session) return response;
+
+  let body: { title?: string; description?: string; skills?: unknown };
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Requisição inválida." }, { status: 400 }); }
+  const title = (body.title ?? "").trim().slice(0, 140);
+  const description = (body.description ?? "").trim().slice(0, 2000);
+  if (!title || !description) return NextResponse.json({ error: "Informe o nome e a descrição do projeto." }, { status: 400 });
+
+  const profile = await prisma.freelancerProfile.findUnique({ where: { userId: session.user.id } });
+  const portfolioItems = parsePortfolio(profile?.portfolio ?? "[]");
+  if (portfolioItems.some((item) => item.title.toLowerCase() === title.toLowerCase())) {
+    return NextResponse.json({ error: "Esse projeto já está no seu portfólio." }, { status: 409 });
+  }
+  if (portfolioItems.length >= 12) return NextResponse.json({ error: "Seu portfólio já atingiu o limite de 12 projetos." }, { status: 400 });
+
+  const skills = normalizeSkills(body.skills);
+  const nextPortfolio = [...portfolioItems, { title, url: "", imageUrl: "", description }];
+  const saved = await prisma.freelancerProfile.upsert({
+    where: { userId: session.user.id },
+    create: { userId: session.user.id, portfolio: JSON.stringify(nextPortfolio), skills: JSON.stringify(skills) },
+    update: { portfolio: JSON.stringify(nextPortfolio) },
+  });
+  return NextResponse.json({ profile: saved });
+}
+
 export async function PUT(req: Request) {
   const { session, response } = await requireAuth();
   if (!session) return response;

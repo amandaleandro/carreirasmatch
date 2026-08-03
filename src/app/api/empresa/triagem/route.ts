@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { requireCompanyApi, FREE_SCREENING_LIMIT } from "@/lib/company-auth";
 import { rankCandidates, type CandidateInput } from "@/lib/tools";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { hasActiveCompanyPlan } from "@/lib/company-billing";
+import { remainingPlanScreenings } from "@/lib/company-billing";
 
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 const MAX_FILES = 30;
@@ -22,13 +22,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // Plano ilimitado: pula a checagem de crédito por completo.
-  const unlimited = hasActiveCompanyPlan(company);
+  // Plano ativo: consome a cota mensal antes de cair em gratuita/crédito comprado.
+  const planQuotaLeft = remainingPlanScreenings(company);
+  const usesPlanQuota = planQuotaLeft > 0;
 
   // Permitido se ainda há triagem gratuita OU crédito comprado.
   const hasFreeScreening = company.screeningCount < FREE_SCREENING_LIMIT;
   const usesPaidCredit = !hasFreeScreening && company.screeningCredits > 0;
-  if (!unlimited && !hasFreeScreening && !usesPaidCredit) {
+  if (!usesPlanQuota && !hasFreeScreening && !usesPaidCredit) {
     return NextResponse.json(
       { error: "Seus créditos de triagem acabaram. Compre um pacote para continuar.", code: "no_credits" },
       { status: 402 }
@@ -130,8 +131,11 @@ export async function POST(req: NextRequest) {
         },
       },
     });
-    if (unlimited) {
-      // Plano ilimitado: não consome nem crédito nem cota gratuita.
+    if (usesPlanQuota) {
+      await tx.company.update({
+        where: { id: company.id },
+        data: { planScreeningsUsed: { increment: 1 } },
+      });
     } else if (hasFreeScreening) {
       await tx.company.update({
         where: { id: company.id },

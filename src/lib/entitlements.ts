@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { hasFullAccessUserId } from "@/lib/full-access-users";
 import { isInfluencerUser } from "@/lib/influencer";
-import { normalizeCareerSegment } from "@/lib/career-segments";
-import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+
+import { getCommercialPlan, COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { randomUUID } from "node:crypto";
 
 // Must match SUBSCRIPTION_PERIOD_DAYS in src/app/api/billing/webhook/route.ts, which sets
@@ -41,8 +41,7 @@ export async function canViewFullDiagnostic(userId: string, analysisId: string):
 
   const subscription = await getActiveSubscription(userId);
   if (subscription) {
-    const segment = normalizeCareerSegment(subscription.segment);
-    const limit = segment ? CAREER_OFFER_BY_SEGMENT[segment].monthlyAnalysisLimit : null;
+    const limit = getCommercialPlan(subscription.planKey).limits[COMMERCIAL_FEATURE_KEYS.analysisFull];
 
     if (limit === null) return true;
 
