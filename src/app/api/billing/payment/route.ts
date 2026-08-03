@@ -293,7 +293,9 @@ export async function POST(req: NextRequest) {
         idempotencyKey: `purchase:${payment.id}`,
       });
     } else if (isPeriodPlan) {
-      const periodDays = product?.planKey && COMMERCIAL_PLANS[product.planKey as keyof typeof COMMERCIAL_PLANS]?.durationDays ?? PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS];
+      const periodDays = product?.planKey
+        ? COMMERCIAL_PLANS[product.planKey as keyof typeof COMMERCIAL_PLANS]?.durationDays
+        : PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS];
       const currentPeriodEnd = await grantSubscriptionPeriod(userId, segment, periodDays ?? 30, payment.id, product?.planKey ?? "complete");
       void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });
     } else {

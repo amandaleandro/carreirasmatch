@@ -14,7 +14,8 @@ import { WhatsappOptInToggle } from "@/components/whatsapp-optin-toggle";
 import { ContactRequestsInbox } from "@/components/contact-requests-inbox";
 import { DataPrivacySection } from "@/components/data-privacy-section";
 import { normalizeCareerSegment } from "@/lib/career-segments";
-import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";\nimport { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
+import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 import { ArrowLeft, User, Shield, CreditCard, Award, Lock } from "lucide-react";
 
 export const dynamic = "force-dynamic";

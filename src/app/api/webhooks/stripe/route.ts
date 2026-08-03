@@ -111,7 +111,9 @@ export async function POST(req: NextRequest) {
         // 2. Se for plano por período (mensal/anual), concede o período de acesso
         if (isPeriodPlanKind(kind)) {
           const days = PERIOD_PLAN_DAYS[kind as keyof typeof PERIOD_PLAN_DAYS] || 30;
-          const periodDays = product?.planKey && COMMERCIAL_PLANS[product.planKey as keyof typeof COMMERCIAL_PLANS]?.durationDays ?? days;
+          const periodDays = product?.planKey
+            ? COMMERCIAL_PLANS[product.planKey as keyof typeof COMMERCIAL_PLANS]?.durationDays ?? days
+            : days;
           const currentPeriodEnd = await grantSubscriptionPeriod(effectiveUserId, normalizedSegment, periodDays, paymentRecord.id, product?.planKey ?? "complete");
           if (customerEmail) {
             void sendSubscriptionConfirmationEmail(customerEmail, { currentPeriodEnd });

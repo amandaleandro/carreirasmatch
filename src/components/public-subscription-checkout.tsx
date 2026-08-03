@@ -6,7 +6,7 @@ import { MercadoPagoSubscriptionBrick } from "@/components/mercadopago-subscript
 import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { COMMERCIAL_PLANS, getPlanFeatureList, type CommercialPlanKey } from "@/lib/commercial-plan-catalog";
-import { avulsoProductCode } from "@/lib/commercial-products";
+import { avulsoProductCode } from "@/lib/commercial-product-codes";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { formatCentsToBRL } from "@/lib/pricing";
 import { ANALYTICS_EVENTS, track } from "@/lib/analytics";

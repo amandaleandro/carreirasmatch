@@ -6,7 +6,8 @@ import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
 import { SiteFooter } from "@/components/site-footer";
 import type { CareerTrack } from "@/components/analysis-display";
-import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";\nimport { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
+import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
+import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 import type { CareerSegment } from "@/lib/career-segments";
 import { FIRST_JOB_GUIDE_BY_PATH, type FirstJobPath } from "@/lib/first-job-tips";
 
