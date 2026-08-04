@@ -100,6 +100,7 @@ export type Analysis = {
   keywordEvidence?: { keyword: string; found: boolean; quote: string | null }[];
   suggestedSummary: string;
   currentSummary?: string;
+  experienceApprovals?: ExperienceApproval[];
   strengths: string[];
   weaknesses: string[];
   fixes: string[];
@@ -123,6 +124,7 @@ export type Analysis = {
   structureFeedback?: string | null;
   missingBasicInfo?: string[] | string | null;
   jobDecoded?: JobDecodedTerm[] | string | null;
+  inferredRequirements?: InferredRequirement[] | string | null;
   jobRedFlags?: string[] | string | null;
   clarifyingQuestions?: ClarifyingQuestion[] | string | null;
 };
@@ -131,6 +133,12 @@ export type JobDecodedTerm = {
   termo: string;
   significa: string;
   ouSeja: string;
+};
+
+export type InferredRequirement = {
+  skill: string;
+  confidence: "high" | "medium" | "low";
+  reason: string;
 };
 
 export type ClarifyingQuestion = {
@@ -253,14 +261,17 @@ function parseMaybeJson<T>(value: T | string | null | undefined): T | null {
 
 function JobDecodedCard({
   jobDecoded,
+  inferredRequirements,
   jobRedFlags,
 }: {
   jobDecoded: JobDecodedTerm[] | null;
+  inferredRequirements: InferredRequirement[] | null;
   jobRedFlags: string[] | null;
 }) {
   const hasDecoded = jobDecoded && jobDecoded.length > 0;
+  const hasInferred = inferredRequirements && inferredRequirements.length > 0;
   const hasRedFlags = jobRedFlags && jobRedFlags.length > 0;
-  if (!hasDecoded && !hasRedFlags) return null;
+  if (!hasDecoded && !hasInferred && !hasRedFlags) return null;
 
   return (
     <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900/40 p-5 space-y-4">
@@ -282,6 +293,26 @@ function JobDecodedCard({
             </li>
           ))}
         </ul>
+      )}
+
+      {hasInferred && (
+        <div className="space-y-3">
+          <div>
+            <h4 className="text-xs font-bold text-[#071827] dark:text-white">Competências provavelmente necessárias</h4>
+            <p className="mt-1 text-[11px] text-[#64748B] dark:text-neutral-400">Inferências baseadas nas responsabilidades da vaga, não exigências oficiais do anúncio.</p>
+          </div>
+          <ul className="space-y-2">
+            {inferredRequirements!.map((item) => (
+              <li key={item.skill} className="rounded-2xl border border-violet-200/80 bg-violet-50/50 p-3 dark:border-violet-900/50 dark:bg-violet-950/20">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-[#071827] dark:text-white">{item.skill}</span>
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-violet-700 dark:bg-neutral-900 dark:text-violet-300">confiança {item.confidence}</span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-[#64748B] dark:text-neutral-300">{item.reason}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {hasRedFlags && (
@@ -1123,18 +1154,20 @@ export function ScoreHero({
   status,
   reason,
   overall,
-  technical,
-  experience,
   seniority,
   ats,
+  requirements,
+  evidence,
+  communication,
 }: {
   status: ApplicationStatus;
   reason: string;
   overall: number;
-  technical: number;
-  experience: number;
   seniority: number;
   ats: number;
+  requirements: number;
+  evidence: number;
+  communication: number;
 }) {
   const hasCelebrated = useRef(false);
 
@@ -1147,10 +1180,11 @@ export function ScoreHero({
 
   const config = STATUS_CONFIG[status];
   const subScores = [
-    { label: "Técnica", value: technical },
-    { label: "Experiência", value: experience },
+    { label: "Leitura técnica", value: ats },
+    { label: "Requisitos", value: requirements },
+    { label: "Evidências", value: evidence },
     { label: "Senioridade", value: seniority },
-    { label: "Currículo / ATS", value: ats },
+    { label: "Comunicação", value: communication },
   ];
   return (
     <div
@@ -1176,7 +1210,7 @@ export function ScoreHero({
         </div>
       </div>
 
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4 relative z-10">
+      <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-5 relative z-10">
         {subScores.map((s) => (
           <div
             key={s.label}
@@ -1223,7 +1257,7 @@ export function AnalysisResult({
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
-  const [experienceApprovals, setExperienceApprovals] = useState<ExperienceApproval[]>([]);
+  const [experienceApprovals, setExperienceApprovals] = useState<ExperienceApproval[]>(result.experienceApprovals ?? []);
   const approvedExperienceSuggestions = applyApprovals(
     result.experienceSuggestions ?? [],
     experienceApprovals
@@ -1232,6 +1266,15 @@ export function AnalysisResult({
   useEffect(() => {
     if (analysisId) track(ANALYTICS_EVENTS.RESULT_VIEWED, { analysisId });
   }, [analysisId]);
+
+  useEffect(() => {
+    if (!analysisId || experienceApprovals.length === 0) return;
+    void fetch(`/api/resume/${analysisId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ experienceApprovals }),
+    });
+  }, [analysisId, experienceApprovals]);
 
   const tabs = [
     { id: "overview", label: "Visão Geral", icon: BarChart3 },
@@ -1276,10 +1319,15 @@ export function AnalysisResult({
               status={result.applicationStatus}
               reason={result.applicationStatusReason}
               overall={result.overallScore}
-              technical={result.technicalScore}
-              experience={result.experienceScore}
               seniority={result.seniorityScore}
               ats={result.atsScore}
+              requirements={result.keywordsFound.length + result.keywordsMissing.length > 0
+                ? Math.round((result.keywordsFound.length / (result.keywordsFound.length + result.keywordsMissing.length)) * 100)
+                : result.technicalScore}
+              evidence={result.keywordEvidence && result.keywordEvidence.length > 0
+                ? Math.round((result.keywordEvidence.filter((item) => item.found && Boolean(item.quote)).length / result.keywordEvidence.length) * 100)
+                : result.experienceScore}
+              communication={bulletAnalysis?.score ?? result.atsScore}
             />
 
             {/* Resumo visual: o que pesa a favor e contra o match */}
@@ -1296,9 +1344,10 @@ export function AnalysisResult({
             />
 
             <ScoreBeforeAfter
-              initialScore={Math.max(35, result.overallScore - 32)}
+              currentSummary={result.currentSummary}
+              suggestedSummary={result.suggestedSummary}
               optimizedScore={result.overallScore}
-              requirementsMetCount={result.keywordsFound?.length || 5}
+              requirementsStrengthened={result.keywordsFound?.length || 0}
             />
 
             <ShareMatchCard
@@ -1428,6 +1477,7 @@ export function AnalysisResult({
 
             <JobDecodedCard
               jobDecoded={parseMaybeJson<JobDecodedTerm[]>(result.jobDecoded)}
+              inferredRequirements={parseMaybeJson<InferredRequirement[]>(result.inferredRequirements)}
               jobRedFlags={parseMaybeJson<string[]>(result.jobRedFlags)}
             />
 

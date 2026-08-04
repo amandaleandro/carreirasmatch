@@ -34,6 +34,11 @@ export const resumeAnalysisSchema = z.object({
   jobDecoded: z.array(z.object({
     termo: text, significa: text, ouSeja: text,
   })).optional(),
+  inferredRequirements: z.array(z.object({
+    skill: text,
+    confidence: z.enum(["high", "medium", "low"]),
+    reason: text,
+  })).max(5).optional(),
   jobRedFlags: textArray.optional(),
   clarifyingQuestions: z.array(z.object({
     question: text, why: text, targetKeyword: text,

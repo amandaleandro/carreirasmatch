@@ -6,8 +6,6 @@ import { HeroInstantScanner } from "@/components/hero-instant-scanner";
 import {
   ArrowRight,
   Check,
-  FileCheck2,
-  FileSearch,
   ShieldCheck,
   CheckCircle2,
   TrendingUp,
@@ -15,7 +13,6 @@ import {
   Radar,
   Briefcase,
   LayoutGrid,
-  Gift,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { PublicNav, PublicNavMobile } from "@/components/public-nav";
@@ -54,7 +51,7 @@ const deliverables = [
   "Plano de ação simples com os próximos passos",
 ];
 
-const faqs = [
+export const marketingFaqs = [
   ["A análise gratuita já mostra o resultado?", "Sim. Você recebe o resultado inicial de aderência. O Kit Candidatura reúne a versão otimizada em PDF, a análise de palavras-chave e a preparação para entrevista."],
   ["A plataforma inventa qualificações no meu currículo?", "Não. As sugestões reorganizam e tornam mais claras apenas as informações fornecidas por você. Nada deve ser incluído sem corresponder à sua trajetória real."],
   ["O mesmo currículo serve para todas as vagas?", "Não. Cada empresa valoriza palavras-chave e prioridades diferentes. Adaptar o currículo para a vaga aumenta significativamente sua taxa de resposta."],
@@ -351,12 +348,24 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </div>
 
           <div className="space-y-4">
-            {faqs.map(([q, a]) => (
+            {marketingFaqs.map(([q, a]) => (
               <Card key={q} className="p-6">
                 <h3 className="text-sm font-bold text-slate-900 dark:text-white">{q}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{a}</p>
               </Card>
             ))}
+          </div>
+        </section>
+
+        <section className="mx-auto w-full max-w-5xl px-4 pb-20 md:px-8">
+          <div className="rounded-3xl bg-blue-600 px-6 py-10 text-center shadow-xl shadow-blue-600/15 sm:px-10">
+            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Pronto para entender sua próxima candidatura?</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
+              Compare seu currículo com uma vaga real e descubra quais ajustes fazem sentido para o seu perfil.
+            </p>
+            <Link href="/analise" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-50">
+              Analisar meu currículo <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </section>
       </main>

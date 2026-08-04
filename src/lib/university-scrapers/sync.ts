@@ -13,7 +13,7 @@ export async function syncUniversityCurricula() {
 
     try {
       for (const scraper of REGISTERED_UNIVERSITY_SCRAPERS) {
-        const source = `sigaa:${slugify(scraper.universityName)}`;
+        const source = scraper.source ?? `sigaa:${slugify(scraper.universityName)}`;
         try {
           const universitySlug = slugify(scraper.universityName);
           const university = await prisma.university.upsert({

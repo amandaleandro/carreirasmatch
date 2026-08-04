@@ -229,6 +229,7 @@ export type ResumeAnalysis = {
   missingBasicInfo?: string[];
   // Tradução da vaga: termos de "corporativês" decodificados + red flags do anúncio.
   jobDecoded?: JobDecodedTerm[];
+  inferredRequirements?: InferredRequirement[];
   jobRedFlags?: string[];
   // Perguntas para o candidato preencher lacunas que o PDF não mostra (não é
   // erro do currículo, é experiência real que não foi escrita).
@@ -421,6 +422,18 @@ export type CandidateContext = {
   professionalArea?: string | null;
   hasFormalEducation?: boolean | null;
   courses?: string[];
+  evidences?: {
+    category: string;
+    title: string;
+    description: string;
+    metrics?: string | null;
+  }[];
+};
+
+export type InferredRequirement = {
+  skill: string;
+  confidence: "high" | "medium" | "low";
+  reason: string;
 };
 
 /** Reduz o currículo estruturado a um bloco compacto de sinais objetivos (skills, certificações, idiomas), sem repetir as experiências (já cobertas pelo texto cru do currículo). */
@@ -490,6 +503,7 @@ export async function analyzeResumeAgainstJob(
 ): Promise<ResumeAnalysis> {
   resumeText = normalizeForPrompt(resumeText, MAX_RESUME_CHARS);
   jobText = normalizeForPrompt(jobText, MAX_JOB_TEXT_CHARS);
+  jobText += "\n\nINSTRUCAO DE LEITURA DA VAGA: se o anuncio nao citar tecnologias ou competencias especificas, infira no maximo 5 competencias provaveis a partir das responsabilidades. Diferencie-as das exigencias explicitas, informe confianca e justificativa, e nao trate inferencia como requisito oficial. Se nao houver base suficiente, retorne lista vazia.";
   if (pastFeedback) pastFeedback = normalizeForPrompt(pastFeedback, MAX_JOB_TEXT_CHARS);
 
   const extraFields = [...TRACK_EXTRA_FIELDS[careerTrack]];
@@ -536,16 +550,26 @@ ${extraFieldsInstructions ? `\n${extraFieldsInstructions}\n\nInclua esses campos
   "experienceSuggestions": [{ "role": string, "company": string, "current": string, "suggested": string }] (2-3 itens),
   "atsChecklist": [{ "key": "formatting"|"clarity"|"keywords"|"results"|"seniority"|"links", "label": string, "description": string, "status": "pass"|"warning"|"fail" }] (as 6 categorias fixas),
   "jobDecoded": [{ "termo": string, "significa": string, "ouSeja": string }] (3-6, [] se a vaga já for direta),
+  "inferredRequirements": [{ "skill": string, "confidence": "high"|"medium"|"low", "reason": string }] (0-5, apenas quando a vaga exigir inferência),
   "jobRedFlags": string[] (0-3, [] se não houver),
   "clarifyingQuestions": [{ "question": string, "why": string, "targetKeyword": string }] (3-5)${
     extraFieldsJson ? ",\n" + extraFieldsJson.replace(/,$/, "") : ""
   }
 }`;
 
-  const feedbackBlock =
-    pastFeedback && pastFeedback.trim()
-      ? `\n\nPAST_FEEDBACK (feedbacks recebidos em entrevistas anteriores):\n${pastFeedback}`
+  const evidenceBlock =
+    candidateContext?.evidences && candidateContext.evidences.length > 0
+      ? `\n\nBANCO_DE_EVIDENCIAS (registros fornecidos pelo candidato; use somente quando forem pertinentes à vaga):\n${candidateContext.evidences
+          .slice(0, 40)
+          .map((e) => `- [${e.category}] ${e.title}: ${e.description}${e.metrics ? ` | Métrica: ${e.metrics}` : ""}`)
+          .join("\n")}\n\nREGRA DE EVIDÊNCIAS: não transforme uma evidência em experiência, certificação ou métrica diferente do que foi informado. Se a vaga exigir algo sem evidência no currículo ou neste banco, mantenha a lacuna.`
       : "";
+
+  const feedbackBlock =
+    evidenceBlock +
+    (pastFeedback && pastFeedback.trim()
+      ? `\n\nPAST_FEEDBACK (feedbacks recebidos em entrevistas anteriores):\n${pastFeedback}`
+      : "");
 
   const areaBlock = professionalAreaBlock(candidateContext?.professionalArea);
 
@@ -666,9 +690,16 @@ export async function tailorResumeForJob(
   structured: StructuredResume,
   jobTitle: string,
   company: string,
-  jobText: string
+  jobText: string,
+  evidences: CandidateContext["evidences"] = []
 ): Promise<TailoredResumeContent> {
   jobText = normalizeForPrompt(jobText, MAX_JOB_TEXT_CHARS);
+  if (evidences.length > 0) {
+    jobText += `\n\nEVIDÊNCIAS PROFISSIONAIS DO CANDIDATO:\n${evidences
+      .slice(0, 40)
+      .map((e) => `- ${e.title}: ${e.description}${e.metrics ? ` | Métrica: ${e.metrics}` : ""}`)
+      .join("\n")}\nUse essas evidências apenas para reforçar fatos compatíveis com o currículo original.`;
+  }
   const jsonTemplate = `{
   "summary": string,
   "skills": string[],

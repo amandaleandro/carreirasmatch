@@ -1,67 +1,45 @@
 "use client";
 
-import { TrendingUp, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 
 interface ScoreBeforeAfterProps {
-  initialScore: number;
+  currentSummary?: string;
+  suggestedSummary: string;
   optimizedScore: number;
-  requirementsMetCount?: number;
+  requirementsStrengthened?: number;
 }
 
 export function ScoreBeforeAfter({
-  initialScore,
+  currentSummary,
+  suggestedSummary,
   optimizedScore,
-  requirementsMetCount = 5,
+  requirementsStrengthened = 0,
 }: ScoreBeforeAfterProps) {
-  const diff = Math.max(0, optimizedScore - initialScore);
-
   return (
-    <div className="rounded-2xl border border-blue-500/20 bg-slate-950 p-6 md:p-8 text-white space-y-6">
+    <div className="space-y-6 rounded-2xl border border-blue-500/20 bg-slate-950 p-6 text-white md:p-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-200 bg-blue-500/20 px-3 py-1 rounded-full border border-blue-400/30">
-          <ShieldCheck className="w-4 h-4 text-blue-400" />
-          Sem alucinação de dados (100% fiel à sua história)
-        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-blue-300">Antes e depois</p>
+          <p className="mt-1 text-sm font-semibold text-white">Veja o que a vaga muda na comunicação do seu currículo.</p>
+        </div>
+        <span className="rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-bold text-emerald-300">Match analisado: {optimizedScore}%</span>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 items-center justify-between gap-6 py-2">
-        {/* Antes */}
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-4 text-center space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Score Atual
-          </span>
-          <div className="text-4xl font-extrabold text-slate-300">{initialScore}%</div>
-          <p className="text-[11px] text-slate-400">Antes dos ajustes</p>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_auto_1fr] md:items-stretch">
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+          <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">Resumo atual</span>
+          <p className="mt-3 text-sm leading-relaxed text-slate-300">{currentSummary || "Nenhum resumo profissional encontrado no currículo."}</p>
         </div>
-
-        {/* Ganho */}
-        <div className="flex flex-col items-center justify-center text-center space-y-1">
-          <div className="inline-flex items-center gap-1 text-2xl font-bold text-emerald-400 bg-emerald-500/10 px-4 py-1.5 rounded-2xl border border-emerald-500/30">
-            +{diff}%
-          </div>
-          <span className="text-xs font-medium text-slate-300">
-            +{requirementsMetCount} requisitos fortalecidos
-          </span>
-        </div>
-
-        {/* Depois */}
-        <div className="rounded-2xl bg-emerald-600/15 border border-emerald-400/40 p-4 text-center space-y-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">
-            Match Otimizado
-          </span>
-          <div className="text-4xl font-bold text-emerald-300">{optimizedScore}%</div>
-          <p className="text-[11px] text-emerald-200/80 font-medium">Após aplicar o Kit</p>
+        <div className="flex items-center justify-center text-blue-300"><ArrowRight className="h-5 w-5 rotate-90 md:rotate-0" /></div>
+        <div className="rounded-2xl border border-emerald-400/40 bg-emerald-600/15 p-4">
+          <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">Sugestão para esta vaga</span>
+          <p className="mt-3 text-sm leading-relaxed text-emerald-50">{suggestedSummary}</p>
         </div>
       </div>
 
-      <div className="pt-2 border-t border-white/10 flex flex-wrap items-center justify-between text-xs text-slate-300 gap-2">
-        <span className="flex items-center gap-1.5">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          Formatado para leitura perfeita em leitores automáticos (ATS)
-        </span>
-        <span className="text-slate-400 text-[11px]">
-          Baseado na análise da vaga
-        </span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-2 text-xs text-slate-300">
+        <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-emerald-400" />{requirementsStrengthened > 0 ? `${requirementsStrengthened} requisito(s) fortalecidos na sugestão` : "Sugestão baseada nos requisitos identificados"}</span>
+        <span className="text-[11px] text-slate-400">Revise e aprove as alterações antes de exportar.</span>
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ const PUBLIC_PATHS = [
   "/register",
   "/gratuito",
   "/assinar",
+  "/agosto",
   "/report",
   "/comece",
   "/estagio",

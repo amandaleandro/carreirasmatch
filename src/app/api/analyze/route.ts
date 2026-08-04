@@ -64,6 +64,7 @@ function analysisRecordToResumeAnalysis(record: {
   structureFeedback: string | null;
   missingBasicInfo: string | null;
   jobDecoded: string | null;
+  inferredRequirements: string | null;
   jobRedFlags: string | null;
   clarifyingQuestions: string | null;
   keywordEvidence: string | null;
@@ -103,6 +104,7 @@ function analysisRecordToResumeAnalysis(record: {
     ...(record.structureFeedback ? { structureFeedback: record.structureFeedback } : {}),
     ...(record.missingBasicInfo ? { missingBasicInfo: JSON.parse(record.missingBasicInfo) } : {}),
     ...(record.jobDecoded ? { jobDecoded: JSON.parse(record.jobDecoded) } : {}),
+    ...(record.inferredRequirements ? { inferredRequirements: JSON.parse(record.inferredRequirements) } : {}),
     ...(record.jobRedFlags ? { jobRedFlags: JSON.parse(record.jobRedFlags) } : {}),
     ...(record.clarifyingQuestions ? { clarifyingQuestions: JSON.parse(record.clarifyingQuestions) } : {}),
     ...(record.keywordEvidence ? { keywordEvidence: JSON.parse(record.keywordEvidence) } : {}),
@@ -256,7 +258,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const [candidate, userCourses] = userId
+    const [candidate, userCourses, userEvidences] = userId
       ? await Promise.all([
           prisma.user.findUnique({
             where: { id: userId },
@@ -266,8 +268,14 @@ export async function POST(req: NextRequest) {
             where: { userId },
             select: { title: true, provider: true },
           }),
+          prisma.professionalEvidence.findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+            take: 40,
+            select: { category: true, title: true, description: true, metrics: true },
+          }),
         ])
-      : [null, []];
+      : [null, [], []];
 
     // Paid users must be analyzed under the "momento profissional" set on their profile,
     // regardless of what the client submitted (the form UI already enforces this, but a
@@ -314,6 +322,7 @@ export async function POST(req: NextRequest) {
             professionalArea: candidate?.professionalArea ?? null,
             hasFormalEducation: candidate?.hasFormalEducation ?? null,
             courses: userCourses.map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title)),
+            evidences: userEvidences,
           },
           carriedResumeStructured
         ),
@@ -414,6 +423,7 @@ export async function POST(req: NextRequest) {
         structureFeedback: analysis.structureFeedback ?? null,
         missingBasicInfo: analysis.missingBasicInfo ? JSON.stringify(analysis.missingBasicInfo) : null,
         jobDecoded: analysis.jobDecoded ? JSON.stringify(analysis.jobDecoded) : null,
+        inferredRequirements: analysis.inferredRequirements ? JSON.stringify(analysis.inferredRequirements) : "[]",
         jobRedFlags: analysis.jobRedFlags ? JSON.stringify(analysis.jobRedFlags) : null,
         clarifyingQuestions: analysis.clarifyingQuestions ? JSON.stringify(analysis.clarifyingQuestions) : null,
         keywordEvidence: analysis.keywordEvidence

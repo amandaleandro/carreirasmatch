@@ -3,6 +3,9 @@ import { MarketingHome } from "@/components/marketing-home";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/json-ld";
+import { marketingFaqs } from "@/components/marketing-home";
+import { faqJsonLd } from "@/lib/seo";
 
 export const metadata: Metadata = {
   // A home é o mesmo segmento do layout raiz, então o title.template não a
@@ -19,7 +22,15 @@ export default async function Home() {
   if (!session?.user) {
     // Contador real para prova social; se o banco oscilar, a home não pode cair.
     const analysisCount = await prisma.analysis.count().catch(() => 0);
-    return <MarketingHome analysisCount={analysisCount} />;
+    return (
+      <>
+        <JsonLd
+          id="jsonld-home-faq"
+          data={faqJsonLd(marketingFaqs.map(([question, answer]) => ({ question, answer })))}
+        />
+        <MarketingHome analysisCount={analysisCount} />
+      </>
+    );
   }
 
   // Depois do primeiro diagnóstico, o dashboard é a melhor porta de entrada:

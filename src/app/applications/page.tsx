@@ -93,6 +93,17 @@ export default async function ApplicationsPage() {
   ];
 
   const journey = computeJourneyMetrics(applications);
+  const respondedApplications = applications.filter((item) => item.responseAt);
+  const responseDurations = applications
+    .filter((item) => item.appliedAt && item.responseAt)
+    .map((item) => Math.max(0, item.responseAt!.getTime() - item.appliedAt!.getTime()) / (1000 * 60 * 60 * 24));
+  const averageResponseDays = responseDurations.length > 0
+    ? Math.round((responseDurations.reduce((sum, days) => sum + days, 0) / responseDurations.length) * 10) / 10
+    : null;
+  const applicationsWithResponse = applications.filter((item) => item.appliedAt).length;
+  const interviewRate = applicationsWithResponse > 0
+    ? Math.round((interviewsActive / applicationsWithResponse) * 100)
+    : null;
   const journeyStats = [
     {
       label: "Dias em busca",
@@ -113,6 +124,21 @@ export default async function ApplicationsPage() {
       label: "Candidaturas na semana",
       value: `${appliedThisWeek}`,
       tone: "text-slate-900 dark:text-white",
+    },
+    {
+      label: "Tempo médio de resposta",
+      value: averageResponseDays !== null ? `${averageResponseDays}d` : "-",
+      tone: "text-blue-600 dark:text-blue-400",
+    },
+    {
+      label: "Avanço para entrevista",
+      value: interviewRate !== null ? `${interviewRate}%` : "-",
+      tone: "text-violet-600 dark:text-violet-400",
+    },
+    {
+      label: "Respostas registradas",
+      value: `${respondedApplications.length}`,
+      tone: "text-emerald-600 dark:text-emerald-400",
     },
   ];
 
@@ -143,12 +169,10 @@ export default async function ApplicationsPage() {
             Acompanhe e organize visualmente cada etapa dos seus processos seletivos.
           </p>
         </div>
-        <Link
-          href="/feed"
-          className="inline-flex items-center justify-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-5 py-2.5 text-sm font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm shrink-0 self-start sm:self-auto"
-        >
-          Buscar Vagas no Feed
-        </Link>
+        <div className="flex flex-wrap gap-2 self-start sm:self-auto">
+          <Link href="/applications/insights" className="inline-flex items-center justify-center rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-semibold text-violet-700 hover:bg-violet-100 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-300">Ver aprendizados</Link>
+          <Link href="/feed" className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Buscar Vagas no Feed</Link>
+        </div>
       </div>
 
       {/* Warning Box for Upcoming Deadlines */}

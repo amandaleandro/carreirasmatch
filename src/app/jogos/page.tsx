@@ -8,8 +8,15 @@ import { GamesCatalog } from "@/components/games-catalog";
 import { GamesProgressPanel } from "@/components/games-progress-panel";
 import { matchAreaSlug } from "@/lib/vocation-areas";
 import { normalizeCareerSegment } from "@/lib/career-segments";
+import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Jogos de carreira e desenvolvimento | CarreirasMatch",
+  description: "Pratique comunicação, tomada de decisão e conhecimentos profissionais com jogos rápidos para sua evolução de carreira.",
+  alternates: { canonical: "/jogos" },
+};
 
 const RANKING_OPTIONS = [
   { id: "global", label: "🌟 Rank Global (XP Total)" },

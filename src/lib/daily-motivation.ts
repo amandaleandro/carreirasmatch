@@ -930,46 +930,163 @@ const MOTIVATION_CATALOG: Record<EmploymentStatusKey, DailyMotivation[]> = {
   ],
 };
 
-function personalizeMotivation(motivation: DailyMotivation, profile?: DailyMotivationProfile): DailyMotivation {
+interface AreaMemeVariant {
+  tip: string;
+  memeTitle: string;
+  memeSetup: string;
+  memePunchline: string;
+  memeTag: string;
+}
+
+function genericAreaVariants(area: string): AreaMemeVariant[] {
+  return [
+    {
+      tip: `Separe 15 minutos hoje para praticar uma habilidade de ${area} e registre o que aprendeu no seu portfólio.`,
+      memeTitle: `Quando você escolhe ${area}`,
+      memeSetup: "Pessoa: 'Vou só pesquisar um pouco sobre a área.'",
+      memePunchline: `Duas horas depois: 14 abas abertas, um curso salvo e vontade de começar um projeto de ${area}.`,
+      memeTag: "Vida na Área",
+    },
+    {
+      tip: `Peça 15 minutos de conversa com alguém que já atua em ${area} — pergunta real vale mais que pesquisa genérica.`,
+      memeTitle: `O plano de estudos de ${area}`,
+      memeSetup: "Eu no domingo: 'Essa semana vou estudar 1 hora por dia, sem falta.'",
+      memePunchline: "Eu na quinta-feira: recuperando as 4 horas perdidas num único sábado de pânico.",
+      memeTag: "Vida na Área",
+    },
+    {
+      tip: `Escreva 3 motivos concretos que te levaram a ${area} — isso vira resposta pronta pra entrevista.`,
+      memeTitle: `Explicando ${area} pra família`,
+      memeSetup: "Parente no almoço: 'Mas o que exatamente você faz?'",
+      memePunchline: "Eu, na quinta tentativa de explicação, desistindo e dizendo 'trabalho com computador'.",
+      memeTag: "Vida na Área",
+    },
+  ];
+}
+
+const AREA_MEME_CATALOG: { pattern: RegExp; variants: AreaMemeVariant[] }[] = [
+  {
+    pattern: /(tecnologia|program|dados|software|dev|ti)/,
+    variants: [
+      {
+        tip: "Escolha um pequeno problema da área e transforme-o em um projeto prático. Portfólio vence promessa.",
+        memeTitle: "Só mais um tutorial",
+        memeSetup: "Eu: 'Depois deste tutorial eu começo o projeto.'",
+        memePunchline: "O tutorial: parte 47 de 48. O projeto: ainda na pasta Downloads.",
+        memeTag: "Rotina Tech",
+      },
+      {
+        tip: "Revise um trecho de código antigo seu e reescreva com o que você aprendeu desde então.",
+        memeTitle: "Código de 6 meses atrás",
+        memeSetup: "Eu abrindo um projeto antigo: 'Quem escreveu essa aberração?'",
+        memePunchline: "O git blame: era eu, sexta-feira à noite, prazo em cima.",
+        memeTag: "Rotina Tech",
+      },
+      {
+        tip: "Mande uma mensagem hoje perguntando sobre uma vaga técnica júnior — não espere se sentir 100% pronto(a).",
+        memeTitle: "Requisito da vaga júnior",
+        memeSetup: "Anúncio: 'Vaga júnior, requer 3 anos de experiência com a ferramenta lançada há 2 anos.'",
+        memePunchline: "Eu, calculando se isso é matematicamente possível.",
+        memeTag: "Rotina Tech",
+      },
+    ],
+  },
+  {
+    pattern: /(direito|jurid|administr|negoc|financ|contab)/,
+    variants: [
+      {
+        tip: "Leia um caso real da área, resuma o problema em cinco linhas e explique qual seria sua decisão.",
+        memeTitle: "O documento era simples",
+        memeSetup: "Alguém: 'É só dar uma olhadinha rápida neste documento.'",
+        memePunchline: "O documento: 37 páginas, 12 anexos e uma reunião marcada para ontem.",
+        memeTag: "Vida Corporativa",
+      },
+      {
+        tip: "Organize 1 planilha ou processo que você já domina e transforme em exemplo prático pro currículo.",
+        memeTitle: "Reunião de alinhamento",
+        memeSetup: "Convite: 'Reunião rápida, 15 minutos, pra alinhar um ponto.'",
+        memePunchline: "1 hora e 40 depois: ainda alinhando o mesmo ponto.",
+        memeTag: "Vida Corporativa",
+      },
+      {
+        tip: "Pratique explicar um termo técnico da área em uma frase simples — isso impressiona em entrevista.",
+        memeTitle: "Prazo do relatório",
+        memeSetup: "Chefe: 'Preciso disso pra ontem, mas com calma, sem pressão.'",
+        memePunchline: "Eu, decodificando: isso é urgente ou não é?",
+        memeTag: "Vida Corporativa",
+      },
+    ],
+  },
+  {
+    pattern: /(saude|medicina|enferm|psico|fisi|odonto)/,
+    variants: [
+      {
+        tip: "Revise um conceito essencial da área e transforme-o em uma explicação simples, como se estivesse ensinando alguém.",
+        memeTitle: "Plantão do conhecimento",
+        memeSetup: "Eu: 'Hoje vou estudar só um tópico.'",
+        memePunchline: "O tópico: tem 18 capítulos, 4 protocolos e uma prova surpresa.",
+        memeTag: "Rotina da Saúde",
+      },
+      {
+        tip: "Anote 1 atendimento ou caso de estudo que te ensinou algo novo essa semana.",
+        memeTitle: "Escala de plantão",
+        memeSetup: "Escala publicada: 'Só mais um plantão de 12 horas, tranquilo.'",
+        memePunchline: "Hora 13: ainda lá, resolvendo 'só mais uma coisinha'.",
+        memeTag: "Rotina da Saúde",
+      },
+      {
+        tip: "Pratique hoje uma resposta curta pra 'por que você escolheu essa área' — quase sempre perguntam.",
+        memeTitle: "Pergunta clássica da área da saúde",
+        memeSetup: "Alguém no elevador: 'Posso te perguntar uma coisa rapidinho?'",
+        memePunchline: "Eu, sabendo que 'rapidinho' nessa área nunca é rápido.",
+        memeTag: "Rotina da Saúde",
+      },
+    ],
+  },
+  {
+    pattern: /(marketing|comunic|design|criativ|audiovisual)/,
+    variants: [
+      {
+        tip: "Analise uma campanha ou peça da área que você viu hoje e anote o que funcionou — e o que você faria diferente.",
+        memeTitle: "Briefing do cliente",
+        memeSetup: "Cliente: 'Quero algo simples, mas impactante, moderno e diferente.'",
+        memePunchline: "Eu: 'Perfeito. Só preciso de mais 12 referências e três cafés.'",
+        memeTag: "Briefing Real",
+      },
+      {
+        tip: "Monte 1 peça simples hoje pro seu portfólio, mesmo sem cliente real — projeto autoral também conta.",
+        memeTitle: "Rodada de feedback",
+        memeSetup: "Cliente: 'Só um ajuste pequeno: pode deixar mais pra direita? Ou esquerda. Vê o que fica melhor.'",
+        memePunchline: "Versão 14 do arquivo, idêntica à versão 2.",
+        memeTag: "Briefing Real",
+      },
+      {
+        tip: "Escreva o resultado (não só a tarefa) de um projeto recente — números e impacto pesam mais que descrição.",
+        memeTitle: "Prazo criativo",
+        memeSetup: "Combinado: 'Entrega sexta, sem pressa, capricha.'",
+        memePunchline: "Quinta à noite: capricho e pressa dividindo o mesmo espaço na minha cabeça.",
+        memeTag: "Briefing Real",
+      },
+    ],
+  },
+];
+
+function personalizeMotivation(
+  motivation: DailyMotivation,
+  profile: DailyMotivationProfile | undefined,
+  variantIndex: number
+): DailyMotivation {
   const area = profile?.area?.trim() || profile?.studyCourse?.trim();
   if (!area) return motivation;
 
-  const normalized = area.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const normalized = area.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
   const currentArea = profile?.currentArea?.trim();
   const isTransition = profile?.careerSegment === "career_change" && currentArea;
   const areaLabel = isTransition ? `${currentArea} → ${area}` : area;
 
-  let tip = `Separe 15 minutos hoje para praticar uma habilidade de ${area} e registre o que aprendeu no seu portfólio.`;
-  let memeTitle = `Quando você escolhe ${area}`;
-  let memeSetup = "Pessoa: 'Vou só pesquisar um pouco sobre a área.'";
-  let memePunchline = `Duas horas depois: 14 abas abertas, um curso salvo e vontade de começar um projeto de ${area}.`;
-  let memeTag = "Vida na Área";
-
-  if (/(tecnologia|program|dados|software|dev|ti)/.test(normalized)) {
-    tip = `Escolha um pequeno problema de ${area} e transforme-o em um projeto prático. Portfólio vence promessa.`;
-    memeTitle = "Só mais um tutorial";
-    memeSetup = "Eu: 'Depois deste tutorial eu começo o projeto.'";
-    memePunchline = "O tutorial: parte 47 de 48. O projeto: ainda na pasta Downloads.";
-    memeTag = "Rotina Tech";
-  } else if (/(direito|jurid|administr|negoc|financ|contab)/.test(normalized)) {
-    tip = `Leia um caso real de ${area}, resuma o problema em cinco linhas e explique qual seria sua decisão.`;
-    memeTitle = "O documento era simples";
-    memeSetup = "Alguém: 'É só dar uma olhadinha rápida neste documento.'";
-    memePunchline = "O documento: 37 páginas, 12 anexos e uma reunião marcada para ontem.";
-    memeTag = "Vida Corporativa";
-  } else if (/(saude|medicina|enferm|psico|fisi|odonto)/.test(normalized)) {
-    tip = `Revise um conceito essencial de ${area} e transforme-o em uma explicação simples, como se estivesse ensinando alguém.`;
-    memeTitle = "Plantão do conhecimento";
-    memeSetup = "Eu: 'Hoje vou estudar só um tópico.'";
-    memePunchline = "O tópico: tem 18 capítulos, 4 protocolos e uma prova surpresa.";
-    memeTag = "Rotina da Saúde";
-  } else if (/(marketing|comunic|design|criativ|audiovisual)/.test(normalized)) {
-    tip = `Analise uma campanha ou peça de ${area} que você viu hoje e anote o que funcionou — e o que você faria diferente.`;
-    memeTitle = "Briefing do cliente";
-    memeSetup = "Cliente: 'Quero algo simples, mas impactante, moderno e diferente.'";
-    memePunchline = "Eu: 'Perfeito. Só preciso de mais 12 referências e três cafés.'";
-    memeTag = "Briefing Real";
-  }
+  const matched = AREA_MEME_CATALOG.find((entry) => entry.pattern.test(normalized));
+  const variants = matched ? matched.variants : genericAreaVariants(area);
+  const { tip, memeTitle, memeSetup, memePunchline, memeTag } = variants[variantIndex % variants.length];
 
   return {
     ...motivation,
@@ -1005,7 +1122,7 @@ export function getDailyMotivation(
   );
 
   const index = dayOfYear % catalog.length;
-  const personalized = personalizeMotivation(catalog[index], profile);
+  const personalized = personalizeMotivation(catalog[index], profile, dayOfYear);
 
   if (mood === "low" || mood === "rough") {
     return { ...personalized, tip: LOW_MOOD_TIP };

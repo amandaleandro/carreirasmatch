@@ -41,7 +41,9 @@ export async function canViewFullDiagnostic(userId: string, analysisId: string):
 
   const subscription = await getActiveSubscription(userId);
   if (subscription) {
-    const limit = getCommercialPlan(subscription.planKey).limits[COMMERCIAL_FEATURE_KEYS.analysisFull];
+    // Registros legados não tinham planKey nem controle de cota por ciclo.
+    if (!subscription.planKey) return true;
+    const limit = getCommercialPlan(subscription.planKey ?? "complete").limits[COMMERCIAL_FEATURE_KEYS.analysisFull];
 
     if (limit === null) return true;
 

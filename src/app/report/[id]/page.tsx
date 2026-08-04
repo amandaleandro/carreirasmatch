@@ -106,6 +106,14 @@ export default async function ReportPage({
         experienceSuggestions: JSON.parse(record.experienceSuggestions || "[]"),
         atsChecklist: JSON.parse(record.atsChecklist || "[]"),
         currentSummary: record.currentSummary || "",
+        experienceApprovals: (() => {
+          try {
+            const override = record.resumeOverride ? JSON.parse(record.resumeOverride) : null;
+            return Array.isArray(override?.experienceApprovals) ? override.experienceApprovals : [];
+          } catch {
+            return [];
+          }
+        })(),
         grammarErrors: record.grammarErrors,
         structureRating: record.structureRating,
         structureFeedback: record.structureFeedback,

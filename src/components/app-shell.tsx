@@ -70,7 +70,14 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <div className="flex min-h-screen">
           <SidebarNav isAdmin={isAdmin} isInfluencer={isInfluencer} segment={segment} />
           <div className="flex-1 flex flex-col min-w-0">
-            <Topbar userName={userName} userEmail={userEmail} userImage={userImage} segment={segment} />
+            <Topbar
+              userName={userName}
+              userEmail={userEmail}
+              userImage={userImage}
+              segment={segment}
+              isAdmin={isAdmin}
+              isInfluencer={isInfluencer}
+            />
             <DesafioBanner />
             {/* data-authenticated: o app já tem Topbar + Sidebar, então o CSS esconde
                 o header público (.public-header) das páginas de marketing/conteúdo

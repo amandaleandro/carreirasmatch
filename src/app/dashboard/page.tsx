@@ -128,7 +128,8 @@ export default async function DashboardPage() {
 
   const allApplicationsForMetrics = await prisma.application.findMany({
     where: { userId: session.user.id },
-    select: { status: true, createdAt: true },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, jobTitle: true, status: true, createdAt: true, deadline: true, appliedAt: true, responseAt: true },
   });
   const journey = computeJourneyMetrics(allApplicationsForMetrics);
   const journeyStage = allApplicationsForMetrics.length > 0 ? "tracking" : analyses.length > 0 ? "preparation" : "analysis";
@@ -340,6 +341,24 @@ export default async function DashboardPage() {
     weakestAnalysis.careerTrack === "career_change" && weakestBridgeRoles[0]
       ? `Busque vagas de "${weakestBridgeRoles[0]}", o cargo-ponte mais acessível até seu objetivo.`
       : fixes[0];
+  const urgentApplication = allApplicationsForMetrics.find(
+    (application) => application.deadline && application.deadline >= now && application.deadline.getTime() - now.getTime() <= 3 * 24 * 60 * 60 * 1000
+  );
+  const waitingApplication = allApplicationsForMetrics.find(
+    (application) => application.status === "applied" && application.appliedAt && !application.responseAt && now.getTime() - application.appliedAt.getTime() >= 5 * 24 * 60 * 60 * 1000
+  );
+  const applicationNeedingAction = urgentApplication ?? waitingApplication ?? allApplicationsForMetrics.find((application) => ["tailor_resume", "saved"].includes(application.status));
+  const nextBestAction = applicationNeedingAction
+    ? {
+        title: urgentApplication ? "Revise uma candidatura com prazo prÃ³ximo" : waitingApplication ? "FaÃ§a follow-up de uma candidatura" : "Prepare uma candidatura salva",
+        description: urgentApplication
+          ? `${applicationNeedingAction.jobTitle} tem um prazo prÃ³ximo.`
+          : waitingApplication
+            ? `${applicationNeedingAction.jobTitle} estÃ¡ sem resposta hÃ¡ alguns dias.`
+            : `${applicationNeedingAction.jobTitle} ainda precisa de uma prÃ³xima aÃ§Ã£o.`,
+        href: `/applications/${applicationNeedingAction.id}`,
+      }
+    : null;
 
   const scoreDataPoints = analyses.map((a) => ({
     id: a.id,
@@ -543,18 +562,18 @@ export default async function DashboardPage() {
           <div>
             <p className="font-bold text-slate-900 dark:text-white text-base mb-2">Próximo Passo Recomendado</p>
             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              Ajuste para: {TRACK_LABELS[weakestAnalysis.careerTrack as CareerTrack]}
+              {nextBestAction?.title ?? `Ajuste para: ${TRACK_LABELS[weakestAnalysis.careerTrack as CareerTrack]}`}
             </p>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-              {nextStep ?? "Continue analisando suas vagas para calibrar seu roteiro personalizado."}
+              {nextBestAction?.description ?? nextStep ?? "Continue analisando suas vagas para calibrar seu roteiro personalizado."}
             </p>
           </div>
           <div className="space-y-2 pt-2">
             <Link
-              href="/"
+              href={nextBestAction?.href ?? "/analise"}
               className="block text-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold py-2.5 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm text-xs sm:text-sm"
             >
-              Ajustar Currículo
+              {nextBestAction ? "Abrir candidatura" : "Ajustar Currículo"}
             </Link>
             {topRecommendedTool && (
               <Link

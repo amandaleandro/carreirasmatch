@@ -22,6 +22,7 @@ const EMPTY_RESULT: AutoApplyRunResult = {
   skipped: 0,
 };
 const MAX_APPLICATIONS_PER_RUN = 5;
+const PROCESSING_TIMEOUT_MS = 15 * 60 * 1000;
 
 type ExternalContext = {
   enabled: boolean;
@@ -38,6 +39,7 @@ type ExternalContext = {
  * currículo sem texto extraído etc.) cai de volta pro PDF original — nunca bloqueia a candidatura.
  */
 async function buildTailoredResumePdf(
+  userId: string,
   resumeRawText: string | null,
   jobTitle: string,
   company: string,
@@ -47,7 +49,13 @@ async function buildTailoredResumePdf(
   if (!resumeRawText?.trim()) return fallbackPdf;
   try {
     const structured = await extractStructuredResume(resumeRawText);
-    const tailored = await tailorResumeForJob(structured, jobTitle, company, jobText);
+    const evidences = await prisma.professionalEvidence.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      take: 40,
+      select: { category: true, title: true, description: true, metrics: true },
+    });
+    const tailored = await tailorResumeForJob(structured, jobTitle, company, jobText, evidences);
     const pdfBytes = await renderResumePdf({
       summary: tailored.summary,
       resumeStructured: {
@@ -138,79 +146,89 @@ async function processQueueItem(
       return "unsupported";
     }
 
-    const resumePdf = external.autoTailorResume
-      ? await buildTailoredResumePdf(
-          external.resumeRawText,
-          item.jobTitle,
-          item.company,
-          item.job.jobText,
-          external.resumePdf,
-        )
-      : external.resumePdf;
+    try {
+      const resumePdf = external.autoTailorResume
+        ? await buildTailoredResumePdf(
+            userId,
+            external.resumeRawText,
+            item.jobTitle,
+            item.company,
+            item.job.jobText,
+            external.resumePdf,
+          )
+        : external.resumePdf;
 
-    const externalResult = await applyToExternalJob({
-      jobUrl: item.jobUrl,
-      profile: external.profile,
-      resumeFileName: external.resumeFileName,
-      resumePdf: resumePdf,
-    });
-
-    if (externalResult.status !== "applied") {
-      await prisma.autoApplicationQueue.update({
-        where: { id: queueId },
-        data: {
-          status: externalResult.status === "blocked" ? "blocked_external" : "failed",
-          failureReason: externalResult.detail,
-        },
+      const externalResult = await applyToExternalJob({
+        jobUrl: item.jobUrl,
+        profile: external.profile,
+        resumeFileName: external.resumeFileName,
+        resumePdf,
       });
-      return externalResult.status === "blocked" ? "unsupported" : "failed";
-    }
 
-    const appliedAt = new Date();
-    await prisma.$transaction(async (tx) => {
-      const tracked = await tx.application.findFirst({
-        where: { userId, jobId: item.jobId },
-        select: { id: true, status: true },
-      });
-      if (tracked) {
-        await tx.application.update({
-          where: { id: tracked.id },
+      if (externalResult.status !== "applied") {
+        await prisma.autoApplicationQueue.update({
+          where: { id: queueId },
           data: {
-            status: "applied",
-            appliedAt,
-            fitScore: item.fitScore,
-            notes: "Enviada automaticamente em formulário externo.",
+            status: externalResult.status === "blocked" ? "blocked_external" : "failed",
+            failureReason: externalResult.detail,
           },
         });
-        if (tracked.status !== "applied") {
+        return externalResult.status === "blocked" ? "unsupported" : "failed";
+      }
+
+      const appliedAt = new Date();
+      await prisma.$transaction(async (tx) => {
+        const tracked = await tx.application.findFirst({
+          where: { userId, jobId: item.jobId },
+          select: { id: true, status: true },
+        });
+        if (tracked) {
+          await tx.application.update({
+            where: { id: tracked.id },
+            data: {
+              status: "applied",
+              appliedAt,
+              fitScore: item.fitScore,
+              notes: "Enviada automaticamente em formulário externo.",
+            },
+          });
+          if (tracked.status !== "applied") {
+            await tx.applicationActivity.create({
+              data: { applicationId: tracked.id, fromStatus: tracked.status, toStatus: "applied" },
+            });
+          }
+        } else {
+          const application = await tx.application.create({
+            data: {
+              userId,
+              jobId: item.jobId,
+              company: item.company,
+              jobTitle: item.jobTitle,
+              jobUrl: item.jobUrl,
+              fitScore: item.fitScore,
+              status: "applied",
+              appliedAt,
+              notes: "Enviada automaticamente em formulário externo.",
+            },
+          });
           await tx.applicationActivity.create({
-            data: { applicationId: tracked.id, fromStatus: tracked.status, toStatus: "applied" },
+            data: { applicationId: application.id, toStatus: "applied" },
           });
         }
-      } else {
-        const application = await tx.application.create({
-          data: {
-            userId,
-            jobId: item.jobId,
-            company: item.company,
-            jobTitle: item.jobTitle,
-            jobUrl: item.jobUrl,
-            fitScore: item.fitScore,
-            status: "applied",
-            appliedAt,
-            notes: "Enviada automaticamente em formulário externo.",
-          },
+        await tx.autoApplicationQueue.update({
+          where: { id: queueId },
+          data: { status: "applied", appliedAt, failureReason: null },
         });
-        await tx.applicationActivity.create({
-          data: { applicationId: application.id, toStatus: "applied" },
-        });
-      }
-      await tx.autoApplicationQueue.update({
-        where: { id: queueId },
-        data: { status: "applied", appliedAt, failureReason: null },
       });
-    });
-    return "applied";
+      return "applied";
+    } catch (error) {
+      const reason = error instanceof Error ? error.message.slice(0, 500) : "Falha inesperada no formulário externo.";
+      await prisma.autoApplicationQueue.update({
+        where: { id: queueId },
+        data: { status: "failed", failureReason: reason },
+      });
+      return "failed";
+    }
   }
 
   try {
@@ -343,6 +361,18 @@ export async function runAutoApplyForUser(
     select: { id: true, fileName: true, pdfData: true, rawText: true },
   });
   if (!resume) return { ...EMPTY_RESULT, skipped: 1 };
+
+  // Uma queda do processo ou do navegador não pode deixar a fila travada em
+  // `processing` indefinidamente. O claim abaixo continua protegendo contra
+  // concorrência; só recuperamos itens sem atualização há tempo suficiente.
+  await prisma.autoApplicationQueue.updateMany({
+    where: {
+      userId,
+      status: "processing",
+      updatedAt: { lt: new Date(now.getTime() - PROCESSING_TIMEOUT_MS) },
+    },
+    data: { status: "queued", failureReason: null },
+  });
 
   const [alreadyAppliedToday, user] = await Promise.all([
     prisma.autoApplicationQueue.count({

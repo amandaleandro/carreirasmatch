@@ -2,6 +2,7 @@ import { UniversityScraper } from "./types";
 import { createSigaaCourseScraper } from "./sigaa";
 import { createSigaaBrowserCourseScraper } from "./sigaa-browser";
 import { createSigaaInstitutionScraper } from "./sigaa-institution";
+import { createUfuCatalogScraper } from "./ufu";
 
 /**
  * Cada instituição do SIGAA publica sua matriz curricular num link próprio; não dá
@@ -9,6 +10,7 @@ import { createSigaaInstitutionScraper } from "./sigaa-institution";
  * city-scrapers/multi-city-sync.ts: uma entrada nova por curso/universidade real.
  */
 export const REGISTERED_UNIVERSITY_SCRAPERS: UniversityScraper[] = [
+  createUfuCatalogScraper(),
   createSigaaCourseScraper({
     universityName: "Universidade Federal de Goiás",
     city: "Goiânia",

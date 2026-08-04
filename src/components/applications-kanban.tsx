@@ -170,9 +170,9 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">
-                            <h4 className="font-bold text-sm text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 transition-colors">
+                            <Link href={`/applications/${item.id}`} className="block font-bold text-sm text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 transition-colors">
                               {item.jobTitle}
-                            </h4>
+                            </Link>
                             {item.company && (
                               <p className="text-xs font-semibold text-slate-500 flex items-center gap-1 mt-1 truncate">
                                 <Building2 className="w-3 h-3 shrink-0 text-slate-400" />

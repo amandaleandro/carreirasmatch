@@ -103,7 +103,7 @@ export default function EvidenciasPage() {
             </h1>
           </div>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
-            Cadastre suas conquistas reais, projetos e métricas. A inteligência do CarreirasMatch utiliza este banco para otimizar seus currículos com <strong className="text-slate-900 dark:text-white">garantia de zero alucinação</strong>.
+            Cadastre suas conquistas reais, projetos e métricas para reutilizá-los nas suas candidaturas.
           </p>
         </div>
 
@@ -117,7 +117,7 @@ export default function EvidenciasPage() {
       </div>
 
       {/* Trava Antialucinação Banner */}
-      <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/50 dark:bg-emerald-950/30 p-4 sm:p-5 flex items-start gap-3">
+      <div className="hidden rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/50 dark:bg-emerald-950/30 p-4 sm:p-5 flex items-start gap-3">
         <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
           <h3 className="text-xs sm:text-sm font-bold text-emerald-900 dark:text-emerald-300">

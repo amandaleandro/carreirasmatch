@@ -94,17 +94,30 @@ export function Topbar({
   userEmail,
   userImage,
   segment = null,
+  isAdmin = false,
+  isInfluencer = false,
 }: {
   userName: string;
   userEmail: string;
   userImage?: string | null;
   segment?: CareerSegment | null;
+  isAdmin?: boolean;
+  isInfluencer?: boolean;
 }) {
   const router = useRouter();
   const { openNews, openTour } = useUiPanels();
   const [query, setQuery] = useState("");
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const segmentLinks = segment ? MOBILE_LINKS_BY_SEGMENT[segment] ?? [] : [];
+  const supplementalMobileLinks = segment
+    ? DEFAULT_EXTRA_MOBILE_LINKS.filter(
+        (link) =>
+          !segmentLinks.some((segmentLink) => segmentLink.href === link.href) &&
+          link.href !== "/suporte" &&
+          link.href !== "/settings",
+      )
+    : [];
 
   const initials = userName
     .split(" ")
@@ -245,8 +258,7 @@ export function Topbar({
                 >
                   Ferramentas
                 </Link>
-                {segment
-                  ? MOBILE_LINKS_BY_SEGMENT[segment]?.map((link) => (
+                {segmentLinks.map((link) => (
                       <Link
                         key={link.href}
                         href={link.href}
@@ -255,8 +267,35 @@ export function Topbar({
                       >
                         {link.label}
                       </Link>
-                    ))
-                  : null}
+                    ))}
+                {supplementalMobileLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileNavOpen(false)}
+                    className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+                {isInfluencer && (
+                  <Link
+                    href="/influencer"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                  >
+                    Painel de Influencer
+                  </Link>
+                )}
+                {isAdmin && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileNavOpen(false)}
+                    className="block px-3 py-2 text-sm text-slate-300 hover:bg-white/10 rounded-xl"
+                  >
+                    Administração
+                  </Link>
+                )}
                 {(!segment || segment === "career_change" || segment === "career_pro") &&
                   DEFAULT_EXTRA_MOBILE_LINKS.map((link) => (
                     <Link

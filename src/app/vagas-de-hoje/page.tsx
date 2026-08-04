@@ -21,6 +21,7 @@ import { workModelFilter } from "@/lib/job-filters";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/vagas-de-hoje" },
   title: "Vagas de hoje | CarreirasMatch",
   description: "Veja vagas novas e recentes coletadas pelo CarreirasMatch, sem precisar criar conta.",
 };

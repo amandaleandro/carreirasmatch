@@ -20,21 +20,23 @@ export function JourneyStepper({ current }: { current: (typeof STEPS)[number]["k
         </div>
         <p className="text-xs text-[var(--muted-foreground)]">Etapa atual: <strong className="text-[var(--foreground)]">{STEPS[currentIndex].label}</strong></p>
       </div>
-      <ol className="grid gap-3 sm:grid-cols-5" aria-label="Etapas da jornada de carreira">
+      <ol className="flex flex-col gap-3 sm:flex-row sm:items-start" aria-label="Etapas da jornada de carreira">
         {STEPS.map((step, index) => {
           const isDone = index < currentIndex;
           const isCurrent = index === currentIndex;
           return (
-            <li key={step.key} className="relative min-w-0">
-              {index > 0 && <span aria-hidden="true" className={`absolute -left-3 top-4 hidden h-px w-3 sm:block ${index <= currentIndex ? "bg-[var(--color-primary)]" : "bg-[var(--border-color)]"}`} />}
-              <div className="flex items-start gap-2 sm:block">
-                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold sm:mb-2 ${isDone ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" : isCurrent ? "border-[var(--color-primary)] bg-[var(--surface)] text-[var(--color-primary)] ring-4 ring-blue-500/10" : "border-[var(--border-color)] bg-[var(--surface)] text-[var(--muted-foreground)]"}`} aria-current={isCurrent ? "step" : undefined}>
+            <li key={step.key} className="flex min-w-0 flex-1 items-start gap-2 sm:flex-col sm:items-stretch">
+              <div className="flex shrink-0 items-center sm:w-full">
+                <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-xs font-bold ${isDone ? "border-[var(--color-primary)] bg-[var(--color-primary)] text-white" : isCurrent ? "border-[var(--color-primary)] bg-[var(--surface)] text-[var(--color-primary)] ring-4 ring-blue-500/10" : "border-[var(--border-color)] bg-[var(--surface)] text-[var(--muted-foreground)]"}`} aria-current={isCurrent ? "step" : undefined}>
                   {isDone ? <Check aria-hidden="true" className="h-4 w-4" /> : index + 1}
                 </span>
-                <div className="min-w-0">
-                  <p className={`text-xs font-bold ${isCurrent ? "text-[var(--foreground)]" : "text-[var(--muted-foreground)]"}`}>{step.label}</p>
-                  <p className="mt-0.5 text-[10px] leading-snug text-[var(--muted-foreground)]">{step.description}</p>
-                </div>
+                {index < STEPS.length - 1 && (
+                  <span aria-hidden="true" className={`ml-1 hidden h-px flex-1 sm:block ${index < currentIndex ? "bg-[var(--color-primary)]" : "bg-[var(--border-color)]"}`} />
+                )}
+              </div>
+              <div className="min-w-0 sm:mt-2">
+                <p className={`text-xs font-bold ${isCurrent ? "text-[var(--foreground)]" : "text-[var(--muted-foreground)]"}`}>{step.label}</p>
+                <p className="mt-0.5 text-[10px] leading-snug text-[var(--muted-foreground)]">{step.description}</p>
               </div>
             </li>
           );

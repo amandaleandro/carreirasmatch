@@ -87,6 +87,27 @@ export async function scheduleInterview(applicationId: string, formData: FormDat
   revalidatePath("/dashboard");
 }
 
+export async function updateApplicationOutcome(applicationId: string, formData: FormData) {
+  const userId = await requireUserId();
+  const outcomeNote = String(formData.get("outcomeNote") ?? "").trim().slice(0, 4000);
+  const rejectionReason = String(formData.get("rejectionReason") ?? "").trim().slice(0, 500);
+  const responseAtRaw = String(formData.get("responseAt") ?? "").trim();
+  const responseAt = responseAtRaw ? new Date(responseAtRaw) : null;
+
+  await prisma.application.updateMany({
+    where: { id: applicationId, userId },
+    data: {
+      outcomeNote,
+      rejectionReason,
+      responseAt: responseAt && !Number.isNaN(responseAt.getTime()) ? responseAt : null,
+    },
+  });
+
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+  revalidatePath("/dashboard");
+}
+
 export async function linkAnalysisToApplication(applicationId: string, formData: FormData) {
   const userId = await requireUserId();
   const analysisId = String(formData.get("analysisId") ?? "").trim();

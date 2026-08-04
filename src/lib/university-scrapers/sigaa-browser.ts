@@ -61,11 +61,21 @@ export function createSigaaBrowserCourseScraper(config: SigaaBrowserCourseConfig
         await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
         // Cursos antigos têm várias versões de matriz listadas na página; a
         // mais recente (a vigente) é sempre a última da lista.
-        const viewLinks = page.locator('a:has(img[src*="view.gif"])');
-        const viewLink = viewLinks.nth((await viewLinks.count()) - 1);
-        await viewLink.scrollIntoViewIfNeeded();
-        await viewLink.click({ timeout: NAVIGATION_TIMEOUT_MS, force: true });
-        await page.waitForLoadState("networkidle").catch(() => {});
+        const viewLinks = page.locator([
+          'a:has(img[src*="view.gif"])',
+          'a:has(img[src*="visualizar"])',
+          'a[title*="Visualizar"]',
+          'a[title*="Detalhes"]',
+          'a[href*="estrutura"]',
+          'a[href*="curriculo"]',
+        ].join(", "));
+        const count = await viewLinks.count();
+        if (count > 0) {
+          const viewLink = viewLinks.nth(count - 1);
+          await viewLink.scrollIntoViewIfNeeded();
+          await viewLink.click({ timeout: NAVIGATION_TIMEOUT_MS, force: true });
+          await page.waitForLoadState("networkidle").catch(() => {});
+        }
 
         const html = await page.content();
         const subjects = parseSigaaCurriculum(html);

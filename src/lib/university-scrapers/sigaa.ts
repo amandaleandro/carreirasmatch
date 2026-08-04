@@ -30,7 +30,25 @@ async function fetchPage(url: string) {
  * mesmo formato "CÓDIGO - NOME - 64h", sem classe `componentes` (usa
  * `linhaPar`/`linhaImpar`, ou nenhuma).
  */
-const SUBJECT_PATTERN = /^([A-Z0-9]+)\s*-\s*(.+?)\s*-\s*\d+h$/;
+const SUBJECT_PATTERN = /^([A-ZÀ-Ü0-9][A-ZÀ-Ü0-9._/-]*)\s*(?:-|–|—|:)\s*(.+?)(?:\s*(?:-|–|—)\s*(?:CH\s*[:.]?\s*)?\d+(?:[.,]\d+)?\s*(?:h|horas?|ha))?$/i;
+
+function cleanText(value: string): string {
+  return value.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function semesterFromText(value: string): number | undefined {
+  const match = value.match(/(\d+)\s*[º°o]?\s*(?:per[iíi]odo|n[iíi]vel|semestre)/i);
+  return match ? Number(match[1]) : undefined;
+}
+
+function subjectFromCell(value: string): string | null {
+  const text = cleanText(value);
+  if (!text || /^(?:c[oó]digo|disciplina|componente|total|optativa|obrigat[oó]ria)$/i.test(text)) return null;
+  const match = text.match(SUBJECT_PATTERN);
+  if (!match) return null;
+  const name = cleanText(match[2]).replace(/\s*(?:CH|carga hor[aá]ria)\s*[:.]?\s*\d+.*$/i, "");
+  return name.length >= 3 ? name : null;
+}
 
 export function parseSigaaCurriculum(html: string): ScrapedSubject[] {
   const $ = cheerio.load(html);
@@ -41,33 +59,37 @@ export function parseSigaaCurriculum(html: string): ScrapedSubject[] {
   $("tr.tituloRelatorio, tr.componentes").each((_, row) => {
     const $row = $(row);
     if ($row.hasClass("tituloRelatorio")) {
-      const periodMatch = $row.text().match(/(\d+)º?\s*Per[ií]odo/i);
-      currentSemester = periodMatch ? Number(periodMatch[1]) : undefined;
+      currentSemester = semesterFromText($row.text());
       return;
     }
-    const cellText = $row.find("td").first().text().replace(/\s+/g, " ").trim();
-    const subjectMatch = cellText.match(SUBJECT_PATTERN);
-    const name = subjectMatch ? subjectMatch[2].trim() : cellText;
-    if (name) {
-      subjects.push({ name, semester: currentSemester });
-    }
+    const name = subjectFromCell($row.find("td").first().text());
+    if (name) subjects.push({ name, semester: currentSemester });
   });
 
   // Formato B
   $("table.subFormulario").each((_, table) => {
     const $table = $(table);
-    const periodMatch = $table.find("caption").first().text().match(/(\d+)º?\s*N[ií]vel/i);
-    const semester = periodMatch ? Number(periodMatch[1]) : undefined;
+    const semester = semesterFromText($table.find("caption").first().text());
     $table.find("tbody > tr").each((_, row) => {
-      const cellText = $(row).find("td").first().text().replace(/\s+/g, " ").trim();
-      const subjectMatch = cellText.match(SUBJECT_PATTERN);
-      if (subjectMatch) {
-        subjects.push({ name: subjectMatch[2].trim(), semester });
-      }
+      const name = subjectFromCell($(row).find("td").first().text());
+      if (name) subjects.push({ name, semester });
     });
   });
 
-  return subjects;
+  if (subjects.length === 0) {
+    $("tr, li, div").each((_, element) => {
+      const name = subjectFromCell($(element).text());
+      if (name) subjects.push({ name, semester: semesterFromText($(element).parent().text()) });
+    });
+  }
+
+  const unique = new Set<string>();
+  return subjects.filter((subject) => {
+    const key = `${subject.name.toLocaleLowerCase("pt-BR")}::${subject.semester ?? ""}`;
+    if (unique.has(key)) return false;
+    unique.add(key);
+    return true;
+  });
 }
 
 export interface SigaaCourseConfig {

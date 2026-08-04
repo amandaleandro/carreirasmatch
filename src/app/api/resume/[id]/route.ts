@@ -24,10 +24,11 @@ export async function PATCH(
   const currentProgress: string[] = JSON.parse(analysis.actionPlanProgress || "[]");
   const newProgress = Array.from(new Set([...currentProgress, "today-0", "today-1"]));
 
+  const existingOverride = analysis.resumeOverride ? JSON.parse(analysis.resumeOverride) : {};
   const updated = await prisma.analysis.update({
     where: { id },
     data: { 
-      resumeOverride: JSON.stringify(body),
+      resumeOverride: JSON.stringify({ ...existingOverride, ...body }),
       actionPlanProgress: JSON.stringify(newProgress),
     },
   });

@@ -45,7 +45,7 @@ async function discoverCourses(page: Page, domain: string): Promise<DiscoveredCo
   await page.waitForTimeout(1500);
 
   return page.evaluate(() => {
-    const MODALITIES = ["Presencial", "A Distância", "Semipresencial", "EAD"];
+    const normalize = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
     // Algumas instituições (ex: UFRN) oferecem o mesmo título de curso em mais de um
     // grau (Bacharelado x Licenciatura) — anexa ao título quando encontrado, tanto
     // pra diferenciar pro usuário quanto pra evitar título/slug duplicado.
@@ -63,7 +63,10 @@ async function discoverCourses(page: Page, domain: string): Promise<DiscoveredCo
       const rawTitle = cells[0];
       if (!rawTitle) return;
       const city = cells[1] || "";
-      const modality = cells.find((c) => MODALITIES.includes(c)) || "Presencial";
+      const modality = cells.find((c) => {
+        const normalized = normalize(c);
+        return ["presencial", "a distancia", "semipresencial", "ead"].includes(normalized);
+      }) || "Presencial";
       const degreeType = cells.find((c) => DEGREE_TYPES.includes(c.toUpperCase()));
       const title = degreeType ? `${rawTitle} (${degreeType[0]}${degreeType.slice(1).toLowerCase()})` : rawTitle;
       results.push({ id: idMatch[1], title, city, modality });
@@ -76,14 +79,21 @@ async function fetchCourseSubjects(page: Page, url: string) {
   await page.goto(url, { waitUntil: "domcontentloaded", timeout: NAVIGATION_TIMEOUT_MS });
   await dismissCookieBanner(page);
 
-  const viewLinks = page.locator('a:has(img[src*="view.gif"])');
+  const viewLinks = page.locator([
+    'a:has(img[src*="view.gif"])',
+    'a:has(img[src*="visualizar"])',
+    'a[title*="Visualizar"]',
+    'a[title*="Detalhes"]',
+    'a[href*="estrutura"]',
+    'a[href*="curriculo"]',
+  ].join(", "));
   const count = await viewLinks.count();
-  if (count === 0) return [];
-
-  const viewLink = viewLinks.nth(count - 1);
-  await viewLink.scrollIntoViewIfNeeded();
-  await viewLink.click({ timeout: NAVIGATION_TIMEOUT_MS, force: true });
-  await page.waitForLoadState("networkidle").catch(() => {});
+  if (count > 0) {
+    const viewLink = viewLinks.nth(count - 1);
+    await viewLink.scrollIntoViewIfNeeded();
+    await viewLink.click({ timeout: NAVIGATION_TIMEOUT_MS, force: true });
+    await page.waitForLoadState("networkidle").catch(() => {});
+  }
 
   const html = await page.content();
   return parseSigaaCurriculum(html);
@@ -130,7 +140,7 @@ export function createSigaaInstitutionScraper(config: SigaaInstitutionConfig): U
       const now = Date.now();
 
       const pending = discovered
-        .filter((c) => c.modality === "Presencial")
+        .filter((c) => !/a\s*dist[aâ]ncia|ead|semipresencial/i.test(c.modality))
         .map((c) => ({ ...c, url: `${urlPrefix}${c.id}` }))
         .filter((c) => {
           const lastSeen = lastSeenByUrl.get(c.url);

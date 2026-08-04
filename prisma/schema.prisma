@@ -13,11 +13,11 @@ datasource db {
 }
 
 model User {
-  id                          String                  @id @default(cuid())
+  id                          String                    @id @default(cuid())
   name                        String?
-  email                       String?                 @unique
+  email                       String?                   @unique
   phone                       String?
-  whatsappMarketingOptIn      Boolean                 @default(false)
+  whatsappMarketingOptIn      Boolean                   @default(false)
   emailVerified               DateTime?
   image                       String?
   passwordHash                String?
@@ -32,11 +32,11 @@ model User {
   city                        String?
   state                       String?
   hasFormalEducation          Boolean?
-  discoverable                Boolean                 @default(false)
-  interestedRoles             String                  @default("[]")
-  themePreference             String                  @default("system")
-  internshipChecklistProgress String                  @default("[]")
-  createdAt                   DateTime                @default(now())
+  discoverable                Boolean                   @default(false)
+  interestedRoles             String                    @default("[]")
+  themePreference             String                    @default("system")
+  internshipChecklistProgress String                    @default("[]")
+  createdAt                   DateTime                  @default(now())
   accounts                    Account[]
   sessions                    Session[]
   resumes                     Resume[]
@@ -163,15 +163,16 @@ model Resume {
 }
 
 model Analysis {
-  id                      String        @id @default(cuid())
+  id                      String                     @id @default(cuid())
   resumeId                String
-  resume                  Resume        @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  resume                  Resume                     @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   payments                Payment[]
   leadId                  String?
-  lead                    Lead?         @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  lead                    Lead?                      @relation(fields: [leadId], references: [id], onDelete: SetNull)
   careerTrack             String
   jobTitle                String
   jobText                 String
+  inferredRequirements    String                     @default("[]")
   overallScore            Int
   technicalScore          Int
   experienceScore         Int
@@ -200,13 +201,13 @@ model Analysis {
   weeklyApplicationPlan   String?
   pastFeedback            String?
   feedbackAnalysis        String?
-  experienceSuggestions   String        @default("[]")
-  atsChecklist            String        @default("[]")
-  currentSummary          String        @default("")
-  resumeStructured        String        @default("{}")
+  experienceSuggestions   String                     @default("[]")
+  atsChecklist            String                     @default("[]")
+  currentSummary          String                     @default("")
+  resumeStructured        String                     @default("{}")
   resumeOverride          String?
-  actionPlanProgress      String        @default("[]")
-  interviewProgress       String        @default("{}")
+  actionPlanProgress      String                     @default("[]")
+  interviewProgress       String                     @default("{}")
   grammarErrors           String?
   structureRating         String?
   structureFeedback       String?
@@ -216,8 +217,9 @@ model Analysis {
   clarifyingQuestions     String?
   clarifyingAnswers       String?
   refinedAt               DateTime?
-  createdAt               DateTime      @default(now())
+  createdAt               DateTime                   @default(now())
   applications            Application[]
+  resumeVersions          ApplicationResumeVersion[]
 }
 
 model Job {
@@ -273,28 +275,48 @@ model JobMatch {
 }
 
 model Application {
-  id          String                @id @default(cuid())
-  userId      String
-  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jobId       String?
-  job         Job?                  @relation(fields: [jobId], references: [id], onDelete: SetNull)
-  analysisId  String?
-  analysis    Analysis?             @relation(fields: [analysisId], references: [id], onDelete: SetNull)
-  company     String                @default("")
-  jobTitle    String
-  jobUrl      String                @default("")
-  fitScore    Int?
-  status      String                @default("saved")
-  notes       String                @default("")
-  appliedAt   DateTime?
-  deadline    DateTime?
-  interviewAt DateTime?
-  createdAt   DateTime              @default(now())
-  updatedAt   DateTime              @updatedAt
-  activities  ApplicationActivity[]
+  id              String                     @id @default(cuid())
+  userId          String
+  user            User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobId           String?
+  job             Job?                       @relation(fields: [jobId], references: [id], onDelete: SetNull)
+  analysisId      String?
+  analysis        Analysis?                  @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+  company         String                     @default("")
+  jobTitle        String
+  jobUrl          String                     @default("")
+  fitScore        Int?
+  status          String                     @default("saved")
+  notes           String                     @default("")
+  outcomeNote     String                     @default("")
+  rejectionReason String                     @default("")
+  responseAt      DateTime?
+  appliedAt       DateTime?
+  deadline        DateTime?
+  interviewAt     DateTime?
+  createdAt       DateTime                   @default(now())
+  updatedAt       DateTime                   @updatedAt
+  activities      ApplicationActivity[]
+  resumeVersions  ApplicationResumeVersion[]
 
   @@index([userId, status])
   @@index([userId, jobUrl])
+}
+
+model ApplicationResumeVersion {
+  id                  String      @id @default(cuid())
+  applicationId       String
+  application         Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  analysisId          String?
+  analysis            Analysis?   @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+  label               String
+  summary             String      @default("")
+  resumeStructured    String      @default("{}")
+  approvedSuggestions String      @default("[]")
+  createdAt           DateTime    @default(now())
+
+  @@index([applicationId, createdAt])
+  @@index([analysisId])
 }
 
 model ApplicationActivity {
@@ -340,27 +362,27 @@ model UserCourse {
 }
 
 model Payment {
-  id            String    @id @default(cuid())
+  id            String         @id @default(cuid())
   userId        String
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   kind          String // "first_analysis" | "diagnostic" | "subscription"
   segment       String
   amount        Int // valor em centavos (já com desconto de cupom aplicado, se houver)
-  discountCents Int       @default(0) // desconto concedido pelo cupom; amount + discountCents = preço cheio
-  status        String    @default("pending") // pending | paid | expired | cancelled | refunded
-  mpPaymentId   String    @unique
+  discountCents Int            @default(0) // desconto concedido pelo cupom; amount + discountCents = preço cheio
+  status        String         @default("pending") // pending | paid | expired | cancelled | refunded
+  mpPaymentId   String         @unique
   analysisId    String? // set for "first_analysis" (consumed by) and "diagnostic" (unlocks) payments
-  analysis      Analysis? @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+  analysis      Analysis?      @relation(fields: [analysisId], references: [id], onDelete: SetNull)
   couponId      String?
-  coupon        Coupon?   @relation(fields: [couponId], references: [id], onDelete: SetNull)
+  coupon        Coupon?        @relation(fields: [couponId], references: [id], onDelete: SetNull)
   paidAt        DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessionId     String    @default("")
-  source        String    @default("")
-  medium        String    @default("")
-  campaign      String    @default("")
-  content       String    @default("")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  sessionId     String         @default("")
+  source        String         @default("")
+  medium        String         @default("")
+  campaign      String         @default("")
+  content       String         @default("")
   purchase      Purchase?
   paymentEvents PaymentEvent[]
 
@@ -390,19 +412,19 @@ model PaymentEvent {
 }
 
 model AiUsageLog {
-  id                 String   @id @default(cuid())
-  userId             String?
-  featureKey         String
-  provider           String
-  model              String
-  inputTokens        Int      @default(0)
-  outputTokens       Int      @default(0)
-  cachedInputTokens  Int      @default(0)
-  estimatedCostUsd   Float?
-  durationMs         Int
-  success            Boolean
-  errorType          String?
-  createdAt          DateTime @default(now())
+  id                String   @id @default(cuid())
+  userId            String?
+  featureKey        String
+  provider          String
+  model             String
+  inputTokens       Int      @default(0)
+  outputTokens      Int      @default(0)
+  cachedInputTokens Int      @default(0)
+  estimatedCostUsd  Float?
+  durationMs        Int
+  success           Boolean
+  errorType         String?
+  createdAt         DateTime @default(now())
 
   @@index([createdAt])
   @@index([featureKey, createdAt])
@@ -497,14 +519,14 @@ model Purchase {
 }
 
 model CreditWallet {
-  id           String             @id @default(cuid())
+  id           String              @id @default(cuid())
   userId       String
   creditType   String
-  balance      Int                @default(0)
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance      Int                 @default(0)
+  user         User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   transactions CreditTransaction[]
-  createdAt    DateTime           @default(now())
-  updatedAt    DateTime           @updatedAt
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
 
   @@unique([userId, creditType])
 }
@@ -529,18 +551,18 @@ model CreditTransaction {
 }
 
 model Plan {
-  id           String            @id @default(cuid())
-  key          String            @unique
-  name         String
-  priceCents   Int
-  recurring    Boolean           @default(true)
-  durationDays Int?
-  highlighted  Boolean           @default(false)
-  active       Boolean           @default(true)
-  entitlements PlanEntitlement[]
+  id            String            @id @default(cuid())
+  key           String            @unique
+  name          String
+  priceCents    Int
+  recurring     Boolean           @default(true)
+  durationDays  Int?
+  highlighted   Boolean           @default(false)
+  active        Boolean           @default(true)
+  entitlements  PlanEntitlement[]
   subscriptions Subscription[]
-  createdAt    DateTime          @default(now())
-  updatedAt    DateTime          @updatedAt
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 }
 
 model FeatureDefinition {
@@ -907,46 +929,85 @@ model ExternalCourse {
 }
 
 model University {
-  id         String   @id @default(cuid())
-  name       String
-  slug       String   @unique
-  city       String   @default("")
-  state      String   @default("")
-  website    String   @default("")
-  source     String
-  active     Boolean  @default(true)
-  lastSeenAt DateTime @default(now())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id                String    @id @default(cuid())
+  name              String
+  slug              String    @unique
+  nationalCode      String?   @unique
+  city              String    @default("")
+  state             String    @default("")
+  website           String    @default("")
+  category          String    @default("")
+  organization      String    @default("")
+  priority          Int       @default(100)
+  discoveryStatus   String    @default("pending")
+  discoveryError    String?
+  catalogLastSeenAt DateTime?
+  source            String
+  active            Boolean   @default(true)
+  lastSeenAt        DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
-  courses  UniversityCourse[]
-  partners Partner[]
+  courses    UniversityCourse[]
+  scrapeJobs UniversityScrapeJob[]
+  partners   Partner[]
 
   @@index([state, city])
 }
 
 model UniversityCourse {
-  id           String     @id @default(cuid())
-  universityId String
-  university   University @relation(fields: [universityId], references: [id], onDelete: Cascade)
-  title        String
-  slug         String     @unique
-  area         String
-  subarea      String     @default("")
-  url          String     @unique
-  modality     String     @default("presencial")
-  active       Boolean    @default(true)
-  source       String
-  lastSeenAt   DateTime   @default(now())
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  id                String     @id @default(cuid())
+  universityId      String
+  university        University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  title             String
+  slug              String     @unique
+  nationalCode      String?
+  degree            String     @default("")
+  campus            String     @default("")
+  area              String
+  subarea           String     @default("")
+  url               String     @unique
+  modality          String     @default("presencial")
+  active            Boolean    @default(true)
+  source            String
+  lastSeenAt        DateTime   @default(now())
+  catalogLastSeenAt DateTime?
+  collectionStatus  String     @default("pending")
+  collectionError   String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   subjects    CurriculumSubject[]
   enrollments UniversityEnrollment[]
+  scrapeJobs  UniversityScrapeJob[]
 
   @@index([universityId])
   @@index([active, area])
   @@index([source, lastSeenAt])
+}
+
+/// Fila persistente para processar fontes nacionais gradualmente.
+model UniversityScrapeJob {
+  id                 String            @id @default(cuid())
+  universityId       String
+  university         University        @relation(fields: [universityId], references: [id], onDelete: Cascade)
+  universityCourseId String?
+  universityCourse   UniversityCourse? @relation(fields: [universityCourseId], references: [id], onDelete: Cascade)
+  url                String
+  adapter            String            @default("auto")
+  status             String            @default("pending")
+  priority           Int               @default(100)
+  attempts           Int               @default(0)
+  nextAttemptAt      DateTime          @default(now())
+  lastAttemptAt      DateTime?
+  processedAt        DateTime?
+  lastError          String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  @@unique([universityId, url])
+  @@index([status, nextAttemptAt, priority])
+  @@index([universityId, status])
 }
 
 model CurriculumSubject {
@@ -1058,7 +1119,7 @@ model FeatureUsagePeriod {
   periodEnd   DateTime
   createdAt   DateTime @default(now())
 
-  records FeatureUsageRecord[]
+  records      FeatureUsageRecord[]
   reservations FeatureUsageReservation[]
 
   @@unique([userId, periodStart])
@@ -1080,18 +1141,18 @@ model FeatureUsageRecord {
 /// Reserva idempotente de consumo. A reserva fica pendente durante a operação
 /// cara e só vira uso confirmado quando a operação termina com sucesso.
 model FeatureUsageReservation {
-  id             String             @id @default(cuid())
-  userId         String
-  user           User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  periodId       String
-  period         FeatureUsagePeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
-  featureKey     String
-  idempotencyKey String
-  quantity       Int
+  id                  String             @id @default(cuid())
+  userId              String
+  user                User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  periodId            String
+  period              FeatureUsagePeriod @relation(fields: [periodId], references: [id], onDelete: Cascade)
+  featureKey          String
+  idempotencyKey      String
+  quantity            Int
   creditTransactionId String?
-  status         String             @default("reserved") // reserved | confirmed | cancelled
-  createdAt      DateTime           @default(now())
-  updatedAt      DateTime           @updatedAt
+  status              String             @default("reserved") // reserved | confirmed | cancelled
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
 
   @@unique([userId, idempotencyKey])
   @@index([periodId, featureKey, status])

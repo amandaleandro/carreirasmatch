@@ -121,11 +121,11 @@ export function AutoApplySettingsCard() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Não foi possível executar.");
       const result = data.run;
-      notify("success", result.applied ? `${result.applied} candidatura(s) enviada(s) agora.` : "Nenhuma nova vaga interna elegível neste momento.");
+      notify("success", result.applied ? `${result.applied} candidatura(s) enviada(s) agora.` : "Nenhuma nova vaga elegível neste momento.");
       setMessage(
         result.applied
           ? `${result.applied} candidatura(s) enviada(s) agora.`
-          : "Nenhuma nova vaga interna elegível neste momento.",
+          : "Nenhuma nova vaga elegível neste momento.",
       );
       await load();
     } catch (error) {

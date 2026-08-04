@@ -51,6 +51,8 @@ export function ComparadorVagasClient() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<JobComparisonResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [preparingIndex, setPreparingIndex] = useState<number | null>(null);
+  const [preparedId, setPreparedId] = useState<string | null>(null);
 
   const addJobInput = () => {
     if (jobs.length >= 5) return;
@@ -140,6 +142,38 @@ export function ComparadorVagasClient() {
       setError(err instanceof Error ? err.message : "Erro inesperado ao comparar vagas.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handlePrepare(index: number) {
+    const source = jobs.filter((j) => j.title.trim() && j.description.trim())[index];
+    const comparison = result?.comparisons[index];
+    if (!source || !comparison) return;
+    setPreparingIndex(index);
+    setError(null);
+    try {
+      const response = await fetch("/api/tools/prepare-application", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: comparison.jobTitle || source.title,
+          company: comparison.companyName,
+          url: source.url,
+          description: source.description,
+          matchScore: comparison.matchScore,
+          effortToAdapt: comparison.effortToAdapt,
+          keyRequirementsFound: comparison.keyRequirementsFound,
+          criticalGaps: comparison.criticalGaps,
+          recommendationVerdict: comparison.recommendationVerdict,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Não foi possível preparar a candidatura.");
+      setPreparedId(data.applicationId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Não foi possível preparar a candidatura.");
+    } finally {
+      setPreparingIndex(null);
     }
   }
 
@@ -342,6 +376,11 @@ export function ComparadorVagasClient() {
             <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed pl-1">
               {result.comparisonSummary}
             </p>
+            {preparedId && (
+              <Link href={`/applications/${preparedId}`} className="inline-flex items-center rounded-xl bg-purple-700 px-4 py-2 text-xs font-bold text-white hover:bg-purple-800">
+                Abrir candidatura preparada →
+              </Link>
+            )}
           </div>
 
           {/* Side-by-side Comparative Cards */}
@@ -384,6 +423,11 @@ export function ComparadorVagasClient() {
                       <span className="text-lg font-bold font-mono text-purple-600 dark:text-purple-400">
                         {c.matchScore}%
                       </span>
+                    </div>
+
+                    <div className="flex items-center justify-between rounded-xl border border-slate-100 bg-white/70 px-3 py-2 dark:border-slate-800 dark:bg-neutral-950/60">
+                      <span className="text-[10px] font-bold uppercase text-slate-500">Esforço de ajuste</span>
+                      <span className={`text-xs font-extrabold ${c.effortToAdapt === "Baixo" ? "text-emerald-600" : c.effortToAdapt === "Médio" ? "text-amber-600" : "text-rose-600"}`}>{c.effortToAdapt}</span>
                     </div>
 
                     {/* Classification Tag */}
@@ -430,6 +474,14 @@ export function ComparadorVagasClient() {
                     <strong className="text-slate-900 dark:text-white font-bold">Veredito:</strong>{" "}
                     {c.recommendationVerdict}
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => handlePrepare(idx)}
+                    disabled={preparingIndex !== null}
+                    className="w-full rounded-xl bg-blue-600 px-3 py-2.5 text-xs font-extrabold text-white transition hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {preparingIndex === idx ? "Preparando..." : "Preparar candidatura"}
+                  </button>
                 </div>
               );
             })}
