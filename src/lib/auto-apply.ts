@@ -390,7 +390,9 @@ export async function runAutoApplyForUser(
 
   const storedProfile = parseAutoApplyProfile(settings.applicationProfile);
   const externalContext: ExternalContext = {
-    enabled: settings.externalAutomationEnabled && Boolean(settings.externalConsentedAt),
+    // O toggle externo é a autorização explícita do usuário. O timestamp é
+    // histórico e pode estar nulo em registros criados antes desse campo.
+    enabled: settings.externalAutomationEnabled,
     autoTailorResume: settings.autoTailorResume,
     profile: {
       ...storedProfile,
@@ -404,6 +406,24 @@ export async function runAutoApplyForUser(
     resumePdf: resume.pdfData ? new Uint8Array(resume.pdfData) : null,
     resumeRawText: resume.rawText,
   };
+
+  if (settings.externalAutomationEnabled && !settings.externalConsentedAt) {
+    await prisma.autoApplicationSettings.update({
+      where: { userId },
+      data: { externalConsentedAt: now },
+    });
+  }
+
+  // Vagas marcadas como indisponíveis antes da autorização externa devem
+  // voltar para a fila quando o usuário autoriza o navegador. Isso também
+  // torna o botão "executar agora" idempotente caso a ativação e a execução
+  // tenham ocorrido em requisições diferentes.
+  if (externalContext.enabled) {
+    await prisma.autoApplicationQueue.updateMany({
+      where: { userId, status: "unsupported_external" },
+      data: { status: "queued", failureReason: null },
+    });
+  }
 
   const remaining = Math.max(0, settings.dailyLimit - alreadyAppliedToday);
   if (remaining === 0) return { ...EMPTY_RESULT, skipped: 1 };

@@ -225,13 +225,27 @@ export async function saveAnalysisAsApplication(analysisId: string) {
 
   if (!analysis) return;
 
-  const status = analysis.applicationStatus === "apply_now" ? "saved" : "tailor_resume";
+  const existing = await prisma.application.findFirst({
+    where: { userId, analysisId: analysis.id },
+    select: { id: true },
+  });
 
-  await prisma.application.create({
+  if (existing) {
+    revalidatePath(`/report/${analysisId}`);
+    revalidatePath("/applications");
+    revalidatePath("/dashboard");
+    return { id: existing.id, created: false };
+  }
+
+  const status = analysis.applicationStatus === "apply_now" ? "saved" : "tailor_resume";
+  const jobUrl = analysis.jobText.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[),.;]+$/, "") ?? "";
+
+  const application = await prisma.application.create({
     data: {
       userId,
       analysisId,
       jobTitle: analysis.jobTitle,
+      jobUrl,
       fitScore: analysis.overallScore,
       status,
       notes: analysis.applicationStatusReason,
@@ -241,4 +255,6 @@ export async function saveAnalysisAsApplication(analysisId: string) {
   revalidatePath(`/report/${analysisId}`);
   revalidatePath("/applications");
   revalidatePath("/dashboard");
+
+  return { id: application.id, created: true };
 }

@@ -1,4 +1,5 @@
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readdir, rm, writeFile } from "node:fs/promises";
+import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { chromium } from "playwright-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
@@ -9,6 +10,36 @@ chromium.use(StealthPlugin());
 
 const NAVIGATION_TIMEOUT_MS = 25_000;
 const MAX_CONTROLS = 100;
+
+async function resolveChromiumExecutable(): Promise<string | undefined> {
+  const configured = process.env.CHROMIUM_EXECUTABLE_PATH?.trim();
+  if (configured) return configured;
+
+  try {
+    const browserDirectories = await readdir("/ms-playwright", { withFileTypes: true });
+    for (const directory of browserDirectories) {
+      if (!directory.isDirectory()) continue;
+      const binaryCandidates = directory.name.startsWith("chromium_headless_shell-")
+        ? [["chrome-headless-shell-linux64", "chrome-headless-shell"], ["chrome-headless-shell-linux", "chrome-headless-shell"]]
+        : directory.name.startsWith("chromium-")
+          ? [["chrome-linux64", "chrome"], ["chrome-linux", "chrome"]]
+          : [];
+      for (const [binaryDirectory, binaryName] of binaryCandidates) {
+        const candidate = join("/ms-playwright", directory.name, binaryDirectory, binaryName);
+        try {
+          await access(candidate);
+          return candidate;
+        } catch {
+          // Tenta o layout da próxima versão da imagem Playwright.
+        }
+      }
+    }
+  } catch {
+    // Se a imagem não expuser /ms-playwright, o Playwright tenta seu caminho padrão.
+  }
+
+  return undefined;
+}
 
 type FieldKind =
   | "fullName"
@@ -180,11 +211,20 @@ function describeUnresolvedField(hint: string, inputType: string): string {
   return hint || "campo obrigatório desconhecido";
 }
 
+// O reCAPTCHA v3 (e o v2 "invisible") rodam em background e nunca exigem interação — eles só
+// injetam um iframe/badge com "recaptcha" no DOM. A prática recomendada pelo próprio Google pra
+// quem usa v3 é esconder o badge via CSS (`visibility: hidden`), então checar visibilidade já
+// filtra a maior parte desses falsos positivos. Só bloqueia quando existe um elemento visível
+// (desafio de verdade: checkbox do v2, hCaptcha, Turnstile) pro usuário resolver.
 async function hasCaptchaOrLogin(page: import("playwright").Page): Promise<string | null> {
   const captcha = page.locator(
     'iframe[src*="captcha"], iframe[title*="captcha" i], iframe[src*="turnstile" i], iframe[title*="turnstile" i], iframe[src*="hcaptcha" i], .g-recaptcha, .h-captcha, [data-sitekey], [data-hcaptcha-widget-id], input[name*="captcha" i]',
   );
-  if (await captcha.count()) return "A página exige CAPTCHA.";
+  const captchaCount = await captcha.count();
+  for (let i = 0; i < captchaCount; i++) {
+    const element = captcha.nth(i);
+    if (await element.isVisible().catch(() => false)) return "A página exige CAPTCHA.";
+  }
 
   const text = normalize((await page.locator("body").innerText().catch(() => "")).slice(0, 15_000));
   if (
@@ -434,8 +474,9 @@ export async function applyToExternalJob(input: ExternalApplyInput): Promise<Ext
 
   let browser: Awaited<ReturnType<typeof chromium.launch>> | null = null;
   try {
+    const executablePath = await resolveChromiumExecutable();
     browser = await chromium.launch({
-      executablePath: process.env.CHROMIUM_EXECUTABLE_PATH,
+      ...(executablePath ? { executablePath } : {}),
       headless: true,
       args: ["--no-sandbox", "--disable-blink-features=AutomationControlled"],
     });

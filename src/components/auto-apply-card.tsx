@@ -121,12 +121,15 @@ export function AutoApplySettingsCard() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error ?? "Não foi possível executar.");
       const result = data.run;
-      notify("success", result.applied ? `${result.applied} candidatura(s) enviada(s) agora.` : "Nenhuma nova vaga elegível neste momento.");
-      setMessage(
-        result.applied
-          ? `${result.applied} candidatura(s) enviada(s) agora.`
-          : "Nenhuma nova vaga elegível neste momento.",
-      );
+      const summary = [
+        result.applied ? `${result.applied} enviada(s)` : "",
+        result.queued ? `${result.queued} processada(s)` : "",
+        result.unsupported ? `${result.unsupported} aguardando autorização/integração` : "",
+        result.failed ? `${result.failed} com falha` : "",
+      ].filter(Boolean).join(" · ");
+      const message = summary || "Nenhuma nova vaga elegível neste momento.";
+      notify(result.failed ? "error" : "success", message);
+      setMessage(message);
       await load();
     } catch (error) {
       notify("error", error instanceof Error ? error.message : "Não foi possível executar.");
@@ -146,7 +149,7 @@ export function AutoApplySettingsCard() {
   }
 
   return (
-    <section id="piloto-automatico" className="scroll-mt-6 space-y-6 overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-50/40 dark:bg-blue-950/10 p-6">
+    <section id="piloto-automatico" className="scroll-mt-6 space-y-5 overflow-hidden rounded-2xl border border-blue-500/20 bg-blue-50/40 p-4 dark:bg-blue-950/10 sm:p-6">
       <div className="flex flex-col justify-between gap-4 border-b border-slate-200/80 pb-4 sm:flex-row sm:items-center dark:border-slate-800">
         <div>
           <span className="mb-1.5 inline-flex rounded-full bg-blue-600 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
@@ -204,7 +207,7 @@ export function AutoApplySettingsCard() {
 
       {settings && (
         <>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
           <div className="space-y-4 rounded-2xl border border-slate-200/60 bg-white/70 p-4.5 dark:border-neutral-800 dark:bg-neutral-900/70">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
               Regras da automação
@@ -277,7 +280,7 @@ export function AutoApplySettingsCard() {
               ) : (
                 <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
                   {queue.map((item) => {
-                    const needsManualAction = item.status === "blocked_external" || item.status === "unsupported_external";
+                    const needsManualAction = ["failed", "blocked_external", "unsupported_external"].includes(item.status);
                     return (
                       <div
                         key={item.id}
@@ -349,7 +352,21 @@ export function AutoApplySettingsCard() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {(() => {
+            const missing = [
+              !settings.applicationProfile.fullName.trim() && "nome completo",
+              !settings.applicationProfile.email.trim() && "e-mail",
+              !settings.applicationProfile.phone.trim() && "telefone",
+            ].filter(Boolean) as string[];
+            if (!missing.length) return null;
+            return (
+              <p className="rounded-lg bg-amber-50 px-3 py-2 text-[11px] font-semibold text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+                Preencha {missing.join(", ")} para reduzir vagas paradas em &quot;Precisa de informação&quot;.
+              </p>
+            );
+          })()}
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {[
               ["fullName", "Nome completo", "text"],
               ["email", "E-mail", "email"],

@@ -143,7 +143,7 @@ export default async function ApplicationsPage() {
   ];
 
   return (
-    <main className="px-4 sm:px-6 md:px-8 py-7 md:py-10 max-w-6xl mx-auto w-full space-y-6">
+    <main className="mx-auto w-full max-w-7xl space-y-8 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
       {/* Top Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
@@ -160,7 +160,7 @@ export default async function ApplicationsPage() {
         </span>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Gerenciador de Candidaturas
@@ -169,9 +169,9 @@ export default async function ApplicationsPage() {
             Acompanhe e organize visualmente cada etapa dos seus processos seletivos.
           </p>
         </div>
-        <div className="flex flex-wrap gap-2 self-start sm:self-auto">
-          <Link href="/applications/insights" className="inline-flex items-center justify-center rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-semibold text-violet-700 hover:bg-violet-100 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-300">Ver aprendizados</Link>
-          <Link href="/feed" className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Buscar Vagas no Feed</Link>
+        <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-2">
+          <Link href="/applications/insights" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-violet-200 bg-violet-50 px-4 py-2.5 text-sm font-semibold text-violet-700 hover:bg-violet-100 dark:border-violet-900 dark:bg-violet-950/30 dark:text-violet-300">Ver aprendizados</Link>
+          <Link href="/feed" className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Buscar Vagas no Feed</Link>
         </div>
       </div>
 
@@ -209,17 +209,20 @@ export default async function ApplicationsPage() {
 
       {/* Kanban Board Visual */}
       <section className="space-y-4">
-        <h2 className="text-base font-bold text-slate-900 dark:text-white">Quadro Kanban de Processos</h2>
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white">Quadro Kanban de Processos</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Deslize para os lados para ver todas as etapas.</p>
+        </div>
         <ApplicationsKanban items={applications} />
       </section>
 
       {/* Jornada de Busca */}
-      <section className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4">
+      <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 sm:p-5">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Jornada de Busca</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           {journeyStats.map((stat) => (
             <div key={stat.label} className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-4 py-3">
-              <p className={`text-2xl font-bold tracking-tight ${stat.tone}`}>{stat.value}</p>
+              <p className={`text-xl font-bold tracking-tight sm:text-2xl ${stat.tone}`}>{stat.value}</p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 mt-1">{stat.label}</p>
             </div>
           ))}

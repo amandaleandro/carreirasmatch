@@ -6,6 +6,7 @@ import { triggerConfetti } from "@/lib/confetti";
 import { ChecklistCard } from "@/components/checklist-card";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 import { useFeedback } from "@/components/feedback-provider";
+import { saveAnalysisAsApplication } from "@/app/applications/actions";
 
 import { InterviewSimulator } from "@/components/interview-simulator";
 import { CircularScore } from "@/components/circular-score";
@@ -1257,6 +1258,9 @@ export function AnalysisResult({
   const isEntryLevel = careerTrack === "internship" || careerTrack === "apprentice";
   const [activeTab, setActiveTab] = useState<"overview" | "gaps" | "preparation" | "study">("overview");
   const [isAtsModalOpen, setIsAtsModalOpen] = useState(false);
+  const [savingApplication, setSavingApplication] = useState(false);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
+  const { notify } = useFeedback();
   const [experienceApprovals, setExperienceApprovals] = useState<ExperienceApproval[]>(result.experienceApprovals ?? []);
   const approvedExperienceSuggestions = applyApprovals(
     result.experienceSuggestions ?? [],
@@ -1275,6 +1279,37 @@ export function AnalysisResult({
       body: JSON.stringify({ experienceApprovals }),
     });
   }, [analysisId, experienceApprovals]);
+
+  async function handleSaveApplication() {
+    if (!analysisId || savingApplication) return;
+
+    setSavingApplication(true);
+    try {
+      const saved = await saveAnalysisAsApplication(analysisId);
+      if (!saved) throw new Error("Análise não encontrada.");
+
+      setApplicationId(saved.id);
+      track(ANALYTICS_EVENTS.APPLICATION_CREATED, {
+        analysisId,
+        created: saved.created,
+      });
+      notify(
+        "success",
+        saved.created
+          ? "Vaga adicionada ao seu painel."
+          : "Esta vaga já estava no seu painel."
+      );
+    } catch (error) {
+      notify(
+        "error",
+        error instanceof Error
+          ? error.message
+          : "Não foi possível salvar a vaga. Tente novamente."
+      );
+    } finally {
+      setSavingApplication(false);
+    }
+  }
 
   const tabs = [
     { id: "overview", label: "Visão Geral", icon: BarChart3 },
@@ -1329,6 +1364,58 @@ export function AnalysisResult({
                 : result.experienceScore}
               communication={bulletAnalysis?.score ?? result.atsScore}
             />
+
+            <section
+              aria-labelledby="analysis-next-step"
+              className="rounded-2xl border border-blue-200/80 bg-blue-50/70 p-4 shadow-sm dark:border-blue-900/70 dark:bg-blue-950/25"
+            >
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p
+                    id="analysis-next-step"
+                    className="text-xs font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-300"
+                  >
+                    Próximo passo recomendado
+                  </p>
+                  <p className="mt-1 text-sm font-bold text-slate-900 dark:text-white">
+                    {result.applicationStatus === "apply_now"
+                      ? "Seu perfil está pronto para avançar com esta candidatura."
+                      : result.applicationStatus === "adjust_first"
+                        ? "Faça os ajustes indicados antes de enviar seu currículo."
+                        : "Priorize vagas mais aderentes e use este diagnóstico para fechar suas lacunas."}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-400">
+                    Registre a oportunidade no seu painel para acompanhar prazos,
+                    entrevistas e próximos passos.
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  {applicationId ? (
+                    <Link
+                      href={`/applications/${applicationId}`}
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-sm transition-colors hover:bg-blue-700"
+                    >
+                      Abrir candidatura salva
+                    </Link>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleSaveApplication}
+                      disabled={!analysisId || savingApplication}
+                      className="inline-flex min-h-11 items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-extrabold text-white shadow-sm transition-colors hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
+                    >
+                      {savingApplication ? "Salvando..." : "Acompanhar esta vaga"}
+                    </button>
+                  )}
+                  <Link
+                    href="/feed"
+                    className="inline-flex min-h-11 items-center justify-center rounded-xl border border-blue-200 bg-white px-4 py-2.5 text-xs font-bold text-blue-700 transition-colors hover:bg-blue-50 dark:border-blue-800 dark:bg-slate-900 dark:text-blue-300 dark:hover:bg-blue-950/40"
+                  >
+                    Encontrar outra vaga
+                  </Link>
+                </div>
+              </div>
+            </section>
 
             {/* Resumo visual: o que pesa a favor e contra o match */}
             <ScoreEvidenceTableCard

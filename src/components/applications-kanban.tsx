@@ -133,13 +133,13 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
 
   return (
     <div className="w-full font-sans">
-      <div className="flex gap-4 overflow-x-auto pb-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+      <div aria-label="Etapas das candidaturas" role="region" tabIndex={0} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 focus-visible:outline-2 focus-visible:outline-blue-600 sm:gap-4 dark:scrollbar-thumb-slate-800">
         {KANBAN_COLUMNS.map((col) => {
           const colItems = items.filter((item) => item.status === col.id);
           return (
             <div
               key={col.id}
-              className="w-72 shrink-0 rounded-3xl border border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/60 p-4 space-y-3.5 flex flex-col justify-between"
+              className="w-[min(84vw,20rem)] shrink-0 snap-start rounded-2xl border border-slate-200 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/60 sm:w-72 sm:rounded-3xl sm:p-4"
             >
               <div className="space-y-3.5">
                 {/* Column Header */}
@@ -166,7 +166,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                     {colItems.map((item) => (
                       <div
                         key={item.id}
-                        className="group rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-2xs hover:border-blue-500/60 transition-all space-y-3"
+                        className="group rounded-2xl border border-slate-200 bg-white p-3.5 shadow-2xs transition-all hover:border-blue-500/60 dark:border-slate-800 dark:bg-slate-900 sm:p-4"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0 flex-1">

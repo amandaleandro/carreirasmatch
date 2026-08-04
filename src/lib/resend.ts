@@ -3,6 +3,7 @@ import { formatCentsToBRL } from "@/lib/pricing";
 import { prisma } from "@/lib/prisma";
 import { formatBrazilDate } from "@/lib/brazil";
 import { createNpsToken } from "@/lib/nps-token";
+import { runJsonAcrossProviders } from "@/lib/ai-providers";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -17,39 +18,78 @@ const LOGO_URL = `${APP_URL}/logos/wordmark-dark.png`; // texto branco, p/ fundo
  * parágrafos/botões prontos. Usa tabelas (não só divs) porque clientes como o
  * Outlook desktop ignoram boa parte do CSS em divs soltas.
  */
-function layout(bodyHtml: string) {
+/**
+ * Mapa de ilustração por nicho (mesmos PNGs usados nas landing pages /para/*),
+ * reaproveitado nos e-mails cujo contexto já carrega `segment`, pra dar uma cara
+ * visual em vez de só texto. `segment` vem solto (form, query param, DB) então o
+ * lookup é tolerante e devolve null se não bater com nenhum nicho conhecido.
+ */
+const NICHE_HERO_IMAGES: Record<string, string> = {
+  internship: "/niche-hero/estagio.png",
+  first_job: "/niche-hero/primeiro-emprego.png",
+  career_change: "/niche-hero/transicao.png",
+  career_pro: "/niche-hero/recolocacao.png",
+  apprentice: "/niche-hero/aprendiz.png",
+  student: "/niche-hero/estudante.png",
+  concurseiro: "/niche-hero/concurso.png",
+  oab: "/niche-hero/oab.png",
+};
+
+function nicheHeroImageUrl(segment?: string | null): string | null {
+  const path = segment ? NICHE_HERO_IMAGES[segment.trim()] : undefined;
+  return path ? `${APP_URL}${path}` : null;
+}
+
+function layout(bodyHtml: string, opts?: { heroImageUrl?: string | null; heroImageAlt?: string }) {
+  const heroImageHtml = opts?.heroImageUrl
+    ? `
+      <tr>
+        <td style="background:#eef2f9;line-height:0;">
+          <img src="${opts.heroImageUrl}" alt="${opts.heroImageAlt ?? BRAND}" width="540" style="width:100%;max-width:540px;height:auto;display:block;border:0;" />
+        </td>
+      </tr>
+    `
+    : "";
   return `
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f9;padding:40px 16px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 8px 24px rgba(15,23,42,.10),0 1px 2px rgba(15,23,42,.06);">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 20px 48px rgba(15,23,42,.14),0 2px 6px rgba(15,23,42,.06);">
             <tr>
-              <td style="background:linear-gradient(135deg,#2563eb,#1e40af);padding:28px 32px;">
+              <td style="background:radial-gradient(120% 180% at 0% 0%,#3b82f6 0%,#1d4ed8 45%,#1e293b 100%);padding:32px 32px 30px;position:relative;">
                 <a href="${APP_URL}" style="text-decoration:none;">
-                  <img src="${LOGO_URL}" alt="${BRAND}" height="26" style="height:26px;width:auto;display:block;border:0;" />
+                  <img src="${LOGO_URL}" alt="${BRAND}" height="24" style="height:24px;width:auto;display:block;border:0;" />
                 </a>
               </td>
             </tr>
+            ${heroImageHtml}
             <tr>
-              <td style="height:4px;background:linear-gradient(90deg,#60a5fa,#2563eb,#1e40af);font-size:0;line-height:0;">&nbsp;</td>
+              <td style="height:3px;background:linear-gradient(90deg,#93c5fd,#2563eb,#1e3a8a);font-size:0;line-height:0;">&nbsp;</td>
             </tr>
             <tr>
-              <td style="padding:36px 32px 8px;color:#1e293b;font-size:15.5px;line-height:1.7;">
+              <td style="padding:38px 34px 12px;color:#1e293b;font-size:15.5px;line-height:1.7;">
                 ${bodyHtml}
               </td>
             </tr>
             <tr>
-              <td style="padding:8px 32px 30px;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+              <td style="padding:12px 34px 34px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">
                   <tr><td style="border-top:1px solid #eef2f7;font-size:0;line-height:0;">&nbsp;</td></tr>
                 </table>
-                <p style="font-size:12px;color:#94a3b8;margin:18px 0 0;line-height:1.6;">
-                  Você recebeu este e-mail porque tem uma conta no <strong style="color:#64748b;">${BRAND}</strong> 💙<br/>
-                  <a href="${APP_URL}" style="color:#94a3b8;">${APP_URL.replace(/^https?:\/\//, "")}</a>
-                </p>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;">
+                  <tr>
+                    <td>
+                      <p style="font-size:12.5px;color:#94a3b8;margin:0;line-height:1.7;">
+                        Você recebeu este e-mail porque tem uma conta no <strong style="color:#64748b;">${BRAND}</strong> 💙<br/>
+                        <a href="${APP_URL}" style="color:#2563eb;text-decoration:none;">${APP_URL.replace(/^https?:\/\//, "")}</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
+          <p style="font-size:11.5px;color:#a8b3c5;margin:20px 0 0;">${BRAND} · feito com 💙 pra quem está buscando a próxima oportunidade</p>
         </td>
       </tr>
     </table>
@@ -58,10 +98,10 @@ function layout(bodyHtml: string) {
 
 function button(href: string, label: string) {
   return `
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0;">
       <tr>
-        <td style="border-radius:12px;background:linear-gradient(135deg,#2563eb,#1e40af);box-shadow:0 4px 12px rgba(37,99,235,.28);">
-          <a href="${href}" style="display:inline-block;padding:14px 28px;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;border-radius:12px;letter-spacing:.2px;">
+        <td style="border-radius:14px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 8px 20px rgba(37,99,235,.32);">
+          <a href="${href}" style="display:inline-block;padding:15px 30px;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;border-radius:14px;letter-spacing:.2px;">
             ${label} →
           </a>
         </td>
@@ -74,7 +114,12 @@ function button(href: string, label: string) {
  * Dispara um e-mail sem nunca lançar erro para o chamador, se o Resend não
  * estiver configurado ou o envio falhar, apenas loga. Chame com fire-and-forget.
  */
-async function send(to: string, subject: string, bodyHtml: string) {
+async function send(
+  to: string,
+  subject: string,
+  bodyHtml: string,
+  heroImage?: { url: string | null; alt?: string }
+) {
   if (!resend) {
     console.error(`RESEND_API_KEY não configurada, e-mail "${subject}" não foi enviado para ${to}.`);
     return;
@@ -82,13 +127,78 @@ async function send(to: string, subject: string, bodyHtml: string) {
   try {
     // O SDK NÃO lança em erro de API (chave inválida, domínio não verificado):
     // devolve { data, error }. Sem checar `error` aqui, a falha some em silêncio.
-    const { error } = await resend.emails.send({ from: FROM, to, subject, html: layout(bodyHtml) });
+    const html = layout(bodyHtml, { heroImageUrl: heroImage?.url, heroImageAlt: heroImage?.alt });
+    const { error } = await resend.emails.send({ from: FROM, to, subject, html });
     if (error) {
       console.error(`Resend recusou o e-mail "${subject}" para ${to}:`, error);
     }
   } catch (err) {
     // Só cai aqui em falha de rede/exceção inesperada.
     console.error(`Falha ao enviar e-mail "${subject}" para ${to}:`, err);
+  }
+}
+
+const EMAIL_COPY_SYSTEM_PROMPT = `
+Você escreve e-mails de marketing/lifecycle para o ${BRAND}, uma plataforma brasileira que usa IA
+para ajudar pessoas a conseguir emprego (análise de currículo x vaga, feed de vagas, entrevista).
+
+Tom de voz: fala como uma pessoa esperta e engraçada que manja de busca de emprego, não como
+uma empresa. Pense em como marcas como Netflix, Duolingo ou Nubank escrevem e-mail: informal,
+brasileiro, com timing de meme quando cabe (referência de internet, cultura pop BR, autoironia),
+mas sem forçar a barra e sem soar bobo ou infantil. Nunca use gíria de robô tentando ser "descolado".
+Um toque de humor por e-mail é suficiente, o resto é direto e útil.
+
+Regras:
+- Português do Brasil, natural, como alguém digitando rápido pro amigo.
+- Pode usar 1-3 emojis por e-mail, nos lugares certos, sem exagerar.
+- Nunca use travessão/meia-risca; troque por vírgula, ponto, dois-pontos ou parênteses.
+- O corpo do e-mail é HTML simples: um <h2> de abertura e alguns <p>. Sem <html>/<body>/<head>.
+  Estilo já herda de um template, então não adicione cor/fonte/CSS, só as tags puras.
+- NÃO inclua botão/link de call-to-action no HTML, ele é adicionado separadamente depois do seu texto.
+- Responda em JSON: {"subject": "...", "html": "..."}.
+- O "subject" deve ter no máximo ~70 caracteres, pode ter 1 emoji.
+- Se o contexto tiver dados (nome, score, contadores etc.), use-os pra deixar o e-mail pessoal.
+`.trim();
+
+type CampaignFallback = { subject: string; bodyHtml: string };
+
+/**
+ * Gera a copy (assunto + corpo) de um e-mail de campanha via IA, reaproveitando o
+ * roteador multi-provedor já usado pelas outras features. Cada envio produz um
+ * texto levemente diferente, então o e-mail não soa como o mesmo template raspado
+ * toda vez. Se a IA falhar (sem provedor configurado, erro, JSON inválido), cai
+ * silenciosamente pro texto estático em `fallback`, então o envio nunca quebra.
+ */
+async function generateCampaignCopy(
+  operation: string,
+  contextPrompt: string,
+  fallback: CampaignFallback
+): Promise<CampaignFallback> {
+  try {
+    const raw = await runJsonAcrossProviders(
+      EMAIL_COPY_SYSTEM_PROMPT,
+      contextPrompt,
+      0.9,
+      600,
+      "llama-3.3-70b-versatile",
+      (value) => {
+        if (
+          !value ||
+          typeof value !== "object" ||
+          typeof (value as { subject?: unknown }).subject !== "string" ||
+          typeof (value as { html?: unknown }).html !== "string"
+        ) {
+          throw new Error("formato inesperado da copy gerada");
+        }
+      },
+      `email_copy_${operation}`
+    );
+    const parsed = JSON.parse(raw) as { subject: string; html: string };
+    if (!parsed.subject.trim() || !parsed.html.trim()) return fallback;
+    return { subject: parsed.subject.trim(), bodyHtml: parsed.html };
+  } catch (err) {
+    console.warn(`[email] geração de copy via IA falhou para "${operation}", usando fallback:`, err);
+    return fallback;
   }
 }
 
@@ -207,17 +317,31 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
 }
 
 export async function sendWelcomeEmail(to: string, name?: string | null) {
-  const greeting = name?.trim() ? `Olá, ${name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
+  const greeting = name?.trim() ? `E aí, ${name.trim().split(" ")[0]}! 👋` : "E aí! 👋";
+  const fallback: CampaignFallback = {
+    subject: `🔓 Bem-vindo(a)! Bora descobrir seu score de aderência`,
+    bodyHtml: `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Sua conta no ${BRAND} tá no ar. Chegou até aqui, já é sinal de que tá levando essa busca a sério 🫡</p>
+      <p>A partir de agora a IA te conta, sem enrolação, o quanto seu currículo casa com qualquer vaga, e exatamente o que mudar pra esse número subir.</p>
+      <p>Spoiler: seu currículo genérico provavelmente não passa nem pelo robô do ATS antes de chegar num humano 🤖</p>
+      <p>Leva menos de 2 minutos pra ver seu primeiro score 🚀</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "welcome",
+    `Situação: primeiro e-mail depois que a pessoa acaba de criar a conta.
+Nome: ${name?.trim() || "não informado"}.
+Objetivo: dar boas-vindas com energia, deixar claro que a IA analisa currículo x vaga e diz exatamente o que ajustar, e empurrar pra primeira análise (menos de 2 minutos).
+CTA (não incluir no html, só escrever até ele): "Analisar meu currículo".`,
+    fallback
+  );
   await send(
     to,
-    `🔓 Sua conta está pronta: descubra seu score de aderência`,
-    `
-      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Sua conta no ${BRAND} está pronta.</p>
-      <p>A partir de agora você descobre, com IA, o quanto seu currículo está aderente a qualquer vaga, e exatamente o que ajustar para subir esse número.</p>
-      <p>Leva menos de 2 minutos pra ver seu primeiro score 🚀</p>
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
-      <p>💡 Dica: quanto mais específica for a descrição da vaga, mais preciso fica o diagnóstico.</p>
+      <p>💡 Dica: quanto mais específica a descrição da vaga que você colar, mais cirúrgico fica o diagnóstico.</p>
     `
   );
 }
@@ -229,14 +353,27 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
  */
 export async function sendWhatsappOptinInviteEmail(to: string, name?: string | null) {
   const greeting = name?.trim() ? `Olá, ${name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
+  const fallback: CampaignFallback = {
+    subject: `📲 Vaga boa não espera e-mail abrir`,
+    bodyHtml: `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Sinceramente? Seu e-mail já tá lotado de promoção de loja que você comprou uma vez em 2019. A vaga certa não merece brigar por atenção lá.</p>
+      <p>Ativa o alerta por WhatsApp e seja um dos primeiros a ver (e aplicar) quando a oportunidade certa aparecer 🎯</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "whatsapp_optin_invite",
+    `Situação: convite pra pessoa ativar alertas de vaga por WhatsApp no ${BRAND} (hoje só recebe por e-mail).
+Nome: ${name?.trim() || "não informado"}.
+Objetivo: brincar com a ideia de que e-mail se perde no meio de spam/promoção e WhatsApp é lido na hora, sem soar como pressão pra dar o número.
+CTA (não incluir no html): "Ativar dicas por WhatsApp".`,
+    fallback
+  );
   await send(
     to,
-    `📲 Vaga boa não espera e-mail abrir`,
-    `
-      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Hoje a gente só te avisa por e-mail quando sai uma vaga com boa aderência ao seu perfil. Mas e-mail se acumula, WhatsApp você lê na hora.</p>
-      <p>Ativa o alerta por lá e seja um dos primeiros a ver (e aplicar) quando a vaga certa aparecer 🎯</p>
-      <p>Leva 10 segundos e dá pra desligar quando quiser, respondendo <strong>PARAR</strong>.</p>
+    copy.subject,
+    `${copy.bodyHtml}
+      <p>Leva 10 segundos e dá pra desligar quando quiser, respondendo <strong>PARAR</strong>. Sem drama, sem culpa 😌</p>
       ${button(`${APP_URL}/settings`, "Ativar dicas por WhatsApp")}
     `
   );
@@ -524,14 +661,27 @@ export async function sendLeadFollowUpEmail(
 ) {
   const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   const checkoutUrl = opts.checkoutUrl?.startsWith("/") ? opts.checkoutUrl : "/analise";
+  const fallback: CampaignFallback = {
+    subject: "📊 Seu score já foi calculado. Falta só destravar",
+    bodyHtml: `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Você chegou até o meio do caminho no ${BRAND} e parou bem na parte boa. Aquele clássico "97% completo" que ninguém aguenta ⏳</p>
+      <p>Seu score de aderência já está calculado, só falta ver: o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
+      <p>Leva menos de 2 minutos para desbloquear ⏱️</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "lead_follow_up",
+    `Situação: a pessoa começou uma análise de currículo x vaga no ${BRAND} mas não finalizou o desbloqueio do resultado completo.
+Nome: ${opts.name?.trim() || "não informado"}.
+Objetivo: brincar com a sensação de "quase lá" (tipo download travado em 99%, ou barra de progresso que nunca termina), lembrar que o score já foi calculado e falta só ver o que os recrutadores enxergam primeiro e os ajustes que mais aumentam as chances.
+CTA (não incluir no html): "Ver minha análise completa".`,
+    fallback
+  );
   await send(
     to,
-    "📊 Seu score já foi calculado. Falta só destravar",
-    `
-      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Você começou uma análise no ${BRAND} e ficou faltando pouco para ver o resultado completo.</p>
-      <p>Seu score de aderência já está calculado, o que falta é ver: o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
-      <p>Leva menos de 2 minutos para desbloquear ⏱️</p>
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}${checkoutUrl}`, "Ver minha análise completa")}
       <p>💡 Dica: quanto mais específica a descrição da vaga, mais preciso fica o diagnóstico.</p>
     `
@@ -543,16 +693,29 @@ export async function sendDiagnosticUpgradeEmail(
   opts: { segment: string; analysisId?: string | null }
 ) {
   const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
-  await send(
-    to,
-    "🌱 O diagnóstico foi só o começo. O que vem agora?",
-    `
+  const fallback: CampaignFallback = {
+    subject: "🌱 O diagnóstico foi só o começo. O que vem agora?",
+    bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Um diagnóstico é só o começo 🌱</h2>
       <p style="color:#64748b;margin:0 0 16px;">Agora que você já viu o que ajustar nesta oportunidade, o próximo passo é repetir o processo nas próximas vagas e acompanhar sua evolução.</p>
       <p>Com o plano mensal, você reúne novas análises, currículo otimizado, preparação de entrevista, plano de ação e acompanhamento das candidaturas ✨</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "diagnostic_upgrade",
+    `Situação: a pessoa comprou o diagnóstico avulso (Kit Candidatura) no ${BRAND} e agora recebe um convite pra assinar o plano mensal.
+Objetivo: mostrar que o diagnóstico avulso resolveu uma vaga, mas o plano resolve a busca inteira (novas análises, currículo otimizado, preparação de entrevista, plano de ação, acompanhamento de candidaturas). Sem pressão, tom de próximo passo natural.
+CTA (não incluir no html): "Conhecer o plano mensal".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(href, "Conhecer o plano mensal")}
       <p>Você pode cancelar quando quiser 🙂</p>
-    `
+    `,
+    { url: nicheHeroImageUrl(opts.segment) }
   );
 }
 
@@ -561,15 +724,28 @@ export async function sendCheckoutRecoveryEmail(
   opts: { segment: string }
 ) {
   const href = `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment)}`;
-  await send(
-    to,
-    "💳 Faltou um clique pra sua assinatura ativar",
-    `
+  const fallback: CampaignFallback = {
+    subject: "💳 Faltou um clique pra sua assinatura ativar",
+    bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">Seu plano ainda não foi ativado</h2>
       <p style="color:#64748b;margin:0 0 16px;">Você começou o pagamento, mas a assinatura ainda não foi confirmada. Se o Pix expirou ou o cartão não foi aprovado, pode retomar com outra forma de pagamento.</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "checkout_recovery",
+    `Situação: a pessoa começou o checkout da assinatura do ${BRAND} mas não finalizou o pagamento (Pix pode ter expirado, ou cartão não aprovado).
+Objetivo: avisar sem parecer cobrança agressiva, deixar claro que é só retomar com outra forma de pagamento.
+CTA (não incluir no html): "Retomar assinatura".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(href, "Retomar assinatura")}
       <p>Se já pagou por Pix, aguarde alguns instantes, a confirmação é automática ⏳</p>
-    `
+    `,
+    { url: nicheHeroImageUrl(opts.segment) }
   );
 }
 
@@ -578,14 +754,27 @@ export async function sendOnboardingNudgeEmail(
   opts: { name?: string | null }
 ) {
   const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
+  const fallback: CampaignFallback = {
+    subject: "🔍 Seu currículo está aderente ou não? Você ainda não sabe",
+    bodyHtml: `
+      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
+      <p style="color:#64748b;margin:0 0 16px;">Você criou conta no ${BRAND} e depois sumiu igual história de perfil no Tinder 👀 Tudo bem, a gente entende.</p>
+      <p>Só que tem um passo que você tá deixando na mesa: a análise que mostra, com IA, o quanto seu currículo está aderente a uma vaga real e exatamente o que melhorar antes de aplicar 🔍</p>
+      <p>Leva menos de 2 minutos ⏱️</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "onboarding_nudge",
+    `Situação: a pessoa criou conta no ${BRAND} mas nunca fez a primeira análise de currículo.
+Nome: ${opts.name?.trim() || "não informado"}.
+Objetivo: puxar de volta com leveza (pode brincar com "sumiu"/"ghosting" sem ser insistente), lembrar que a análise mostra o quanto o currículo é aderente a uma vaga real e o que melhorar antes de aplicar, reforçar que leva menos de 2 minutos.
+CTA (não incluir no html): "Analisar meu currículo".`,
+    fallback
+  );
   await send(
     to,
-    "🔍 Seu currículo está aderente ou não? Você ainda não sabe",
-    `
-      <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Você criou sua conta no ${BRAND} mas ainda não fez sua primeira análise.</p>
-      <p>É o passo que mostra, com IA, o quanto seu currículo está aderente a uma vaga real e exatamente o que melhorar antes de aplicar 🔍</p>
-      <p>Leva menos de 2 minutos ⏱️</p>
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
       <p>Se tiver qualquer dúvida, é só responder este e-mail 💬</p>
     `
@@ -629,16 +818,30 @@ export async function sendConvertToSubscriptionEmail(
     opts.score != null
       ? `<p>Você analisou seu currículo no ${BRAND} e o placar fechou em <strong>${opts.score} de aderência</strong>${forJob}. Não foi vexame, foi quase, e "quase" é exatamente o que o plano resolve 💪</p>`
       : `<p>Você analisou seu currículo no ${BRAND} e viu onde está sua aderência. Esse é o diagnóstico, a parte que dói. A parte que resolve é o que vem depois ✨</p>`;
-  await send(
-    to,
+  const fallback: CampaignFallback = {
     subject,
-    `
+    bodyHtml: `
       <h2 style="font-size: 20px;">${greeting} 👋</h2>
       ${scoreLine}
       <p>Com o plano você transforma aquele score em ação: currículo reescrito ponto a ponto, simulação de entrevista para aquela vaga, e uma nova análise a cada oportunidade que aparecer, porque cada vaga pede um ajuste diferente.</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "convert_to_subscription",
+    `Situação: a pessoa analisou o currículo no ${BRAND} (grátis) e viu o score, mas ainda não assinou o plano.
+Nome: ${opts.name?.trim() || "não informado"}. Score: ${opts.score ?? "não informado"}. Vaga: ${opts.jobTitle?.trim() || "não informada"}.
+Objetivo: transformar o score visto em urgência de ação sem ser genérico, o plano reescreve o currículo ponto a ponto, simula entrevista pra aquela vaga e libera novas análises pra cada oportunidade.
+CTA (não incluir no html): "Ver o que muda com o plano".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(href, "Ver o que muda com o plano")}
       <p>Sem fidelidade, cancela quando quiser. E se faltou algo para você decidir, é só responder este e-mail 💬</p>
-    `
+    `,
+    { url: nicheHeroImageUrl(opts.segment) }
   );
 }
 
@@ -658,13 +861,26 @@ export async function sendAnalysisRecoveryEmail(
     gap > 0
       ? `<p>Faltam <strong>${gap} pontos</strong> para o seu perfil entrar na faixa de "recomendado aplicar", e o caminho já está mapeado no seu relatório: currículo otimizado em PDF, palavras-chave do ATS e as perguntas prováveis da entrevista.</p>`
       : `<p>Seu perfil já está na faixa de "recomendado aplicar" 🎉 O relatório completo tem o currículo otimizado em PDF e a preparação de entrevista para você aplicar com tudo.</p>`;
-  await send(
-    to,
-    `⏳ Sua análise de hoje ficou pronta (${opts.score}% de match). A vaga ainda está aberta?`,
-    `
+  const fallback: CampaignFallback = {
+    subject: `⏳ Sua análise de hoje ficou pronta (${opts.score}% de match). A vaga ainda está aberta?`,
+    bodyHtml: `
       <h2 style="font-size: 20px;">${greeting} 👋</h2>
       <p>Sua análise${forJob} fechou em <strong>${opts.score}% de aderência</strong> hoje. O material completo já foi gerado para essa vaga e está esperando você.</p>
       ${gapLine}
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "analysis_recovery",
+    `Situação: a pessoa rodou uma análise de currículo hoje mesmo no ${BRAND}, viu o teaser bloqueado e não voltou. E-mail de recuperação no mesmo dia, enquanto a vaga ainda está quente.
+Nome: ${opts.name?.trim() || "não informado"}. Score: ${opts.score}%. Vaga: ${opts.jobTitle?.trim() || "não informada"}.
+Objetivo: criar senso de urgência real (vaga pode fechar, currículo já está pronto esperando), sem ser alarmista.
+CTA (não incluir no html): "Abrir meu relatório".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}/report/${opts.analysisId}`, "Abrir meu relatório")}
       <p>Vagas boas fecham rápido: quem ajusta o currículo antes de aplicar sai na frente de quem manda o genérico 🏃</p>
     `
@@ -679,15 +895,28 @@ export async function sendConvertSecondNudgeEmail(
   const href = opts.segment?.trim()
     ? `${APP_URL}/assinar?segment=${encodeURIComponent(opts.segment.trim())}`
     : `${APP_URL}/assinar`;
-  await send(
-    to,
-    "🔎 Elementar: seu currículo tem 7 segundos pra convencer alguém",
-    `
+  const fallback: CampaignFallback = {
+    subject: "🔎 Elementar: seu currículo tem 7 segundos pra convencer alguém",
+    bodyHtml: `
       <h2 style="font-size: 20px;">Modo detetive 🕵️</h2>
       <p>Investigamos o caso do seu currículo contra a vaga. Evidência 1: as primeiras linhas não mencionam a palavra que o recrutador vai procurar primeiro. Evidência 2: a experiência mais relevante costuma ficar no meio da página, não no topo.</p>
       <p>O plano reabre o caso 📂 reorganiza, reescreve e realça exatamente o que os 7 segundos de leitura de um recrutador precisam encontrar primeiro.</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "convert_second_nudge",
+    `Situação: segundo e-mail da régua de conversão, alguns dias depois do primeiro, pra quem analisou o currículo no ${BRAND} mas não assinou.
+Objetivo: ângulo diferente do primeiro toque (esse pode usar uma metáfora divertida, tipo investigação/detetive, ou outra analogia leve de cultura pop), reforçando que o plano reorganiza e reescreve o currículo pros 7 segundos de leitura de um recrutador.
+CTA (não incluir no html, o botão já tem esse texto fixo): "Reabrir meu caso". Escreva o texto de forma que ele encaixe naturalmente antes desse botão.`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(href, "Reabrir meu caso")}
-    `
+    `,
+    { url: nicheHeroImageUrl(opts.segment) }
   );
 }
 
@@ -697,13 +926,26 @@ export async function sendFirstAnalysisMilestoneEmail(
   opts: { name?: string | null }
 ) {
   const greeting = opts.name?.trim() ? `${opts.name.trim().split(" ")[0]}, ` : "";
-  await send(
-    to,
-    "🏁 Conquista desbloqueada: sua primeira análise",
-    `
+  const fallback: CampaignFallback = {
+    subject: "🏁 Conquista desbloqueada: sua primeira análise",
+    bodyHtml: `
       <h2 style="font-size: 20px;">Primeira análise: feita ✅🎉</h2>
       <p>${greeting}muita gente cria conta e nunca chega a rodar a primeira análise. Você já rodou, isso já te coloca na fração que realmente usa a ferramenta pra evoluir, não só pra olhar 🙌</p>
       <p>Próxima conquista: comparar seu score em duas vagas diferentes e ver o que muda 📈</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "first_analysis_milestone",
+    `Situação: a pessoa acabou de concluir a primeira análise de currículo x vaga no ${BRAND}.
+Nome: ${opts.name?.trim() || "não informado"}.
+Objetivo: comemorar de verdade, pode usar linguagem de conquista/achievement de videogame ("troféu desbloqueado" etc.), reforçar que é minoria que chega até aqui, e convidar pra próxima ação (analisar outra vaga e comparar scores).
+CTA (não incluir no html): "Analisar outra vaga".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}/analise`, "Analisar outra vaga")}
     `
   );
@@ -715,13 +957,26 @@ export async function sendScoreImprovedEmail(
   opts: { previousScore: number; newScore: number; jobTitle?: string | null }
 ) {
   const forJob = opts.jobTitle?.trim() ? ` pra <strong>${opts.jobTitle.trim()}</strong>` : "";
-  await send(
-    to,
-    `📈 De ${opts.previousScore} pra ${opts.newScore}: seu currículo evoluiu de verdade`,
-    `
+  const fallback: CampaignFallback = {
+    subject: `📈 De ${opts.previousScore} pra ${opts.newScore}: seu currículo evoluiu de verdade`,
+    bodyHtml: `
       <h2 style="font-size: 20px;">📈 Seu score subiu, e a gente reparou</h2>
       <p>Sua última análise${forJob} fechou em <strong>${opts.newScore} de aderência</strong>, ${opts.newScore - opts.previousScore} pontos a mais que a anterior. O currículo é o mesmo currículo, mas ajustado 🎯 Prova de que o processo funciona quando repetido.</p>
       <p>Guarda essa versão como referência pra próxima vaga parecida 💾</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "score_improved",
+    `Situação: a pessoa melhorou o score de aderência do currículo em relação à análise anterior no ${BRAND}.
+Score anterior: ${opts.previousScore}. Novo score: ${opts.newScore}. Diferença: +${opts.newScore - opts.previousScore} pontos. Vaga: ${opts.jobTitle?.trim() || "não informada"}.
+Objetivo: comemorar a evolução real (é prova de que os ajustes funcionam), tom animado e específico pros números, não genérico.
+CTA (não incluir no html): "Ver o que mudou".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}/dashboard`, "Ver o que mudou")}
     `
   );
@@ -735,18 +990,33 @@ export async function sendUrgencyCouponEmail(
   const segmentParam = opts.segment?.trim() ? `segment=${encodeURIComponent(opts.segment.trim())}&` : "";
   const href = `${APP_URL}/assinar?${segmentParam}coupon=${encodeURIComponent(opts.code)}`;
   const until = formatBrazilDate(opts.expiresAt);
-  await send(
-    to,
-    "⏳ Esta oferta se autodestrói em 48h (não, sério)",
-    `
+  const fallback: CampaignFallback = {
+    subject: "⏳ Esta oferta se autodestrói em 48h (não, sério)",
+    bodyHtml: `
       <h2 style="font-size: 20px;">Sua missão, caso decida aceitar 🎯</h2>
       <p>Assinar o plano com <strong>20% de desconto</strong> 🎁, válido até <strong>${until}</strong>. Depois disso o cupom expira sozinho (esta mensagem não se autodestrói, relaxa 😉).</p>
+    `,
+  };
+  // Cupom, prazo e link ficam fora da geração por IA: são dados sensíveis (código real,
+  // data real) que não podem ser parafraseados ou inventados.
+  const copy = await generateCampaignCopy(
+    "urgency_coupon",
+    `Situação: terceiro e último e-mail da régua de conversão, oferecendo um cupom pessoal de 20% de desconto no plano do ${BRAND}, válido até ${until}, uso único.
+Objetivo: criar urgência de forma bem-humorada (pode brincar com referência de filme/jogo de "missão"/prazo, estilo Missão Impossível ou algo parecido), deixando claro que é a última chance dessa régua. NÃO invente nem repita o código do cupom nem a data no texto, isso será exibido separadamente logo abaixo do seu texto.
+CTA (não incluir no html): "Usar meu cupom agora".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       <p style="background:#f1f5f9;border-radius:10px;padding:12px;font-size:16px;">
-        🎟️ Cupom: <strong>${opts.code}</strong>
+        🎟️ Cupom: <strong>${opts.code}</strong> · válido até <strong>${until}</strong>
       </p>
       ${button(href, "Usar meu cupom agora")}
       <p>O código já vem preenchido se você clicar no botão. Vale só uma vez e só até o prazo acima ⏰</p>
-    `
+    `,
+    { url: nicheHeroImageUrl(opts.segment) }
   );
 }
 
@@ -755,13 +1025,25 @@ export async function sendAnalysisCountMilestoneEmail(
   to: string,
   opts: { count: number }
 ) {
-  await send(
-    to,
-    `🏅 ${opts.count} vagas analisadas. Isso já é maratona, não corrida de 100m`,
-    `
+  const fallback: CampaignFallback = {
+    subject: `🏅 ${opts.count} vagas analisadas. Isso já é maratona, não corrida de 100m`,
+    bodyHtml: `
       <h2 style="font-size: 20px;">🏅 ${opts.count} análises concluídas</h2>
       <p>Testar o currículo contra ${opts.count} vagas diferentes é o tipo de persistência que separa quem só espera resposta de quem constrói a própria sorte 💪</p>
       <p>Bônus: dá pra ver, no seu histórico, qual tipo de vaga seu currículo casa melhor 📊</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "analysis_count_milestone",
+    `Situação: marco de volume no ${BRAND}, a pessoa completou ${opts.count} análises de currículo x vaga.
+Objetivo: comemorar a persistência/consistência (não o resultado de uma vaga só), pode usar analogia esportiva ou de jogo de RPG "grindar" com humor leve, sem exagerar.
+CTA (não incluir no html): "Ver meu histórico de scores".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${button(`${APP_URL}/dashboard`, "Ver meu histórico de scores")}
     `
   );
@@ -779,12 +1061,27 @@ export async function sendJobAlertEmail(
     </div>
   `).join("");
   const count = opts.jobs.length;
-  await send(
-    to,
-    `📬 ${count} vaga${count > 1 ? "s" : ""} nova${count > 1 ? "s" : ""}${opts.location ? ` em ${opts.location}` : ""} pra você`,
-    `
+  const fallback: CampaignFallback = {
+    subject: `📬 ${count} vaga${count > 1 ? "s" : ""} nova${count > 1 ? "s" : ""}${opts.location ? ` em ${opts.location}` : ""} pra você`,
+    bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">📬 Encontramos novas oportunidades pra você</h2>
       <p style="color:#64748b;margin:0 0 16px;">${opts.query ? `Busca: <strong>${opts.query}</strong>. ` : ""}${opts.location ? `Local: <strong>${opts.location}</strong>.` : ""}</p>
+    `,
+  };
+  // Só a abertura (h2 + parágrafo) passa pela IA; a lista de vagas em si é dado real
+  // e vem sempre fixa logo depois, pra nunca inventar ou distorcer uma vaga.
+  const copy = await generateCampaignCopy(
+    "job_alert",
+    `Situação: alerta automático de ${count} vaga${count > 1 ? "s" : ""} nova${count > 1 ? "s" : ""} compatível${count > 1 ? "eis" : ""} encontrada${count > 1 ? "s" : ""} pro perfil da pessoa no ${BRAND}.
+Busca: ${opts.query || "não informada"}. Local: ${opts.location || "não informado"}.
+Objetivo: abertura curta e animada avisando que chegaram vagas novas, a lista real vem logo abaixo do seu texto (não invente nomes de vaga nem empresa).
+CTA (não incluir no html): "Ver todas as vagas".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${rows}
       ${button(`${APP_URL}/vagas-publicas`, "Ver todas as vagas")}
       <p>Você pode alterar seus alertas nas configurações da sua conta ⚙️</p>
@@ -889,12 +1186,25 @@ export async function sendWeeklyDigestEmail(
       : opts.bestScore !== null
         ? `📊 Sua melhor nota da semana: ${opts.bestScore}/100`
         : "📊 Sua semana no CarreirasMatch";
-  await send(
-    to,
+  const fallback: CampaignFallback = {
     subject,
-    `
+    bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
       <p style="color:#64748b;margin:0 0 20px;">Resumo da sua semana de busca:</p>
+    `,
+  };
+  const copy = await generateCampaignCopy(
+    "weekly_digest",
+    `Situação: digest semanal do ${BRAND} resumindo a semana da pessoa na busca de emprego.
+Nome: ${opts.name || "não informado"}. Análises na semana: ${opts.analysesCount}. Melhor score: ${opts.bestScore ?? "n/d"}. Variação de score: ${opts.scoreDelta ?? "n/d"}. Novas vagas compatíveis: ${opts.newMatchesCount}.
+Objetivo: abertura curta tipo "aqui está seu resumo da semana", os números/cards reais vêm logo abaixo do seu texto (não repita os números aqui, só puxe o clima).
+CTA (não incluir no html): "Analisar meu currículo".`,
+    fallback
+  );
+  await send(
+    to,
+    copy.subject,
+    `${copy.bodyHtml}
       ${cards.join("")}
       <p style="margin-top:22px;">Ajustou o currículo? Re-analise e veja sua nota subir.</p>
       ${button(`${APP_URL}/analise`, "Analisar meu currículo")}

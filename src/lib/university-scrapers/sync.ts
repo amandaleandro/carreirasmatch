@@ -3,6 +3,7 @@ import { recordSync } from "@/lib/external-source-sync";
 import { slugify } from "@/lib/blog-generator";
 import { REGISTERED_UNIVERSITY_SCRAPERS } from "./registry";
 import { closeSharedBrowser } from "./sigaa-browser";
+import { completeUniversityScrapeJob, enqueueUniversityScrapeJob, failUniversityScrapeJob, startUniversityScrapeJob } from "./queue";
 
 const STALE_AFTER_MS = 45 * 24 * 60 * 60 * 1000;
 
@@ -29,6 +30,17 @@ export async function syncUniversityCurricula() {
             },
             update: { active: true, lastSeenAt: now },
           });
+
+          const sourceJob = await enqueueUniversityScrapeJob({
+            universityId: university.id,
+            url: scraper.website,
+            adapter: source,
+            priority: source.startsWith("emec:") ? 50 : 10,
+          });
+          // O registry atual continua sendo o orquestrador do cron; a fila
+          // registra o andamento e será usada pelo executor nacional. Não
+          // bloqueamos uma coleta aqui só porque a execução anterior terminou.
+          await startUniversityScrapeJob(sourceJob.id);
 
           const courses = await scraper.scrape();
           for (const course of courses) {
@@ -64,6 +76,14 @@ export async function syncUniversityCurricula() {
               },
             });
 
+            const courseJob = await enqueueUniversityScrapeJob({
+              universityId: university.id,
+              universityCourseId: universityCourse.id,
+              url: course.url,
+              adapter: source,
+              priority: 10,
+            });
+
             // Reconcilia em vez de apagar tudo e recriar: CurriculumSubjectInsight tem
             // onDelete: Cascade, então recriar a disciplina (mesmo com o mesmo nome)
             // apagaria o insight de IA já gerado e cacheado — forçando gasto de IA de
@@ -97,9 +117,18 @@ export async function syncUniversityCurricula() {
                 });
               }
             }
+            await completeUniversityScrapeJob(courseJob.id);
             courseCount += 1;
           }
+          await completeUniversityScrapeJob(sourceJob.id);
+          await prisma.university.update({ where: { id: university.id }, data: { discoveryStatus: "completed", discoveryError: null } });
         } catch (error) {
+          const existingUniversity = await prisma.university.findUnique({ where: { slug: slugify(scraper.universityName) }, select: { id: true } });
+          if (existingUniversity) {
+            const sourceJob = await prisma.universityScrapeJob.findUnique({ where: { universityId_url: { universityId: existingUniversity.id, url: scraper.website } }, select: { id: true } });
+            if (sourceJob) await failUniversityScrapeJob(sourceJob.id, error);
+            await prisma.university.update({ where: { id: existingUniversity.id }, data: { discoveryStatus: "failed", discoveryError: error instanceof Error ? error.message.slice(0, 2000) : String(error).slice(0, 2000) } });
+          }
           console.error(`[university-scrapers] Erro ao raspar ${scraper.universityName}:`, error);
         }
       }
