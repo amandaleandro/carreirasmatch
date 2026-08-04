@@ -36,6 +36,8 @@ export const ANALYTICS_EVENTS = {
   BEHAVIORAL_TEST_COMPLETED: "behavioral_test_completed",
   RESUME_SAVED: "resume_saved",
   APPLICATION_CREATED: "application_created",
+  APPLICATION_FORM_SUBMITTED: "application_form_submitted",
+  APPLICATION_SUBMITTED: "application_submitted",
   RESULT_VIEWED: "result_viewed",
   CARD_SHARED: "card_shared",
   JOB_ALERT_CREATED: "job_alert_created",

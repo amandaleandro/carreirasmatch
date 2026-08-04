@@ -15,6 +15,7 @@ import { ApplicationsKanban } from "@/components/applications-kanban";
 import { AutoApplySettingsCard } from "@/components/auto-apply-card";
 import { ArrowLeft, Layers, AlertTriangle } from "lucide-react";
 import { FormSubmitButton } from "@/components/form-submit-button";
+import { TrackedApplicationForm } from "@/components/tracked-application-form";
 
 export const dynamic = "force-dynamic";
 
@@ -256,7 +257,7 @@ export default async function ApplicationsPage() {
 
       {/* Formulários Grid */}
       <section className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-5">
-        <form
+        <TrackedApplicationForm
           action={createApplication}
           className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm space-y-4"
         >
@@ -267,10 +268,10 @@ export default async function ApplicationsPage() {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input name="jobTitle" required placeholder="Cargo" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
-            <input name="company" placeholder="Empresa" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
-            <input name="jobUrl" type="url" placeholder="Link da vaga (opcional)" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all md:col-span-2" />
-            <select name="status" defaultValue="saved" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all cursor-pointer">
+            <input name="jobTitle" required aria-label="Cargo" placeholder="Cargo" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
+            <input name="company" aria-label="Empresa" placeholder="Empresa" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all" />
+            <input name="jobUrl" type="url" aria-label="Link da vaga" placeholder="Link da vaga (opcional)" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all md:col-span-2" />
+            <select name="status" aria-label="Etapa da candidatura" defaultValue="saved" className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-3.5 py-2.5 text-xs sm:text-sm text-slate-900 dark:text-white focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-400/20 transition-all cursor-pointer">
               {APPLICATION_STATUSES.map((status) => (
                 <option key={status} value={status}>
                   {APPLICATION_STATUS_CONFIG[status].label}
@@ -286,7 +287,7 @@ export default async function ApplicationsPage() {
           <FormSubmitButton pendingLabel="Salvando..." className="ds-button-primary inline-flex items-center justify-center">
             Salvar Candidatura
           </FormSubmitButton>
-        </form>
+        </TrackedApplicationForm>
 
         <form
           action={updateWeeklyGoal}

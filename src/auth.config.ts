@@ -93,19 +93,27 @@ export const authConfig: NextAuthConfig = {
     },
     async session({ session, token }) {
       if (session.user && token.id) {
-        session.user.id = token.id as string;
-        session.user.accountType = (token.accountType as "candidate" | "company" | "partner") ?? "candidate";
-        session.user.companyId = token.companyId as string | undefined;
-        session.user.companyRole = token.companyRole as "owner" | "member" | undefined;
-        session.user.memberId = token.memberId as string | undefined;
-        session.user.partnerId = token.partnerId as string | undefined;
+        const user = session.user as typeof session.user & {
+          accountType?: "candidate" | "company" | "partner";
+          companyId?: string;
+          companyRole?: "owner" | "member";
+          memberId?: string;
+          partnerId?: string;
+        };
+        user.id = token.id as string;
+        user.accountType = (token.accountType as "candidate" | "company" | "partner") ?? "candidate";
+        user.companyId = token.companyId as string | undefined;
+        user.companyRole = token.companyRole as "owner" | "member" | undefined;
+        user.memberId = token.memberId as string | undefined;
+        user.partnerId = token.partnerId as string | undefined;
       }
       return session;
     },
     authorized({ auth, request }) {
       const isLoggedIn = Boolean(auth?.user);
-      const isCompany = auth?.user?.accountType === "company";
-      const isPartner = auth?.user?.accountType === "partner";
+      const accountType = (auth?.user as { accountType?: "candidate" | "company" | "partner" } | undefined)?.accountType;
+      const isCompany = accountType === "company";
+      const isPartner = accountType === "partner";
       const pathname = request.nextUrl.pathname;
 
       // Área de empresa: login/cadastro são públicos; o resto exige sessão de empresa.

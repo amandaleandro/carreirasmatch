@@ -4,9 +4,10 @@ import { ArrowLeft, ArrowRight, BriefcaseBusiness, CalendarDays, CheckCircle2, C
 import { prisma } from "@/lib/prisma";
 import { requireSubscriptionPage } from "@/lib/require-subscription-page";
 import { APPLICATION_STATUS_CONFIG, type ApplicationStatus } from "@/lib/applications";
-import { updateApplicationOutcome } from "@/app/applications/actions";
+import { updateApplicationDetails, updateApplicationOutcome } from "@/app/applications/actions";
 import { SaveResumeVersionButton } from "@/components/save-resume-version-button";
 import { ApplicationKitGenerator } from "@/components/application-kit-generator";
+import { FormSubmitButton } from "@/components/form-submit-button";
 
 const STATUS_NEXT_ACTION: Record<string, string> = {
   saved: "Analise a vaga e decida se vale o esforço.",
@@ -118,6 +119,30 @@ export default async function ApplicationWorkspacePage({ params }: { params: Pro
       <section className="grid gap-5 lg:grid-cols-[1.1fr_.9fr]">
         <div className="space-y-5">
           <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Dados da vaga</h2>
+            <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">Mantenha o cargo, o link e o prazo atualizados para não perder nenhum próximo passo.</p>
+            <form action={updateApplicationDetails.bind(null, application.id)} className="mt-4 space-y-3">
+              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                Cargo
+                <input name="jobTitle" required defaultValue={application.jobTitle} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white" />
+              </label>
+              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                Empresa
+                <input name="company" defaultValue={application.company} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white" />
+              </label>
+              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                Link da vaga
+                <input name="jobUrl" type="url" defaultValue={application.jobUrl} placeholder="https://..." className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white" />
+              </label>
+              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300">
+                Prazo de candidatura
+                <input name="deadline" type="date" defaultValue={application.deadline?.toISOString().slice(0, 10)} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white" />
+              </label>
+              <FormSubmitButton pendingLabel="Salvando..." className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60">Salvar dados da vaga</FormSubmitButton>
+            </form>
+          </section>
+
+          <section className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
             <h2 className="text-base font-bold text-slate-900 dark:text-white">Checklist da candidatura</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
               {checklist.map((item) => {
@@ -213,7 +238,7 @@ export default async function ApplicationWorkspacePage({ params }: { params: Pro
                 Motivo da rejeição (se aplicável)
                 <input name="rejectionReason" defaultValue={application.rejectionReason} placeholder="Ex.: senioridade, experiência, idioma ou outro motivo" className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-xs text-slate-900 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-white" />
               </label>
-              <button type="submit" className="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Salvar resultado</button>
+              <FormSubmitButton pendingLabel="Salvando..." className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 disabled:cursor-wait disabled:opacity-60 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Salvar resultado</FormSubmitButton>
             </form>
           </section>
         </div>

@@ -37,7 +37,7 @@ const KANBAN_COLUMNS = [
     dot: "bg-sky-500",
   },
   {
-    id: "resume_review",
+    id: "tailor_resume",
     label: "Ajustar Currículo",
     desc: "Adapte seu perfil antes de candidatar",
     color: "bg-amber-500/10 text-amber-600 border-amber-200 dark:bg-amber-950/40 dark:text-amber-400 dark:border-amber-900/60",
@@ -114,6 +114,9 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
     // recebida), não só usou uma ferramenta. Ver ANALYTICS_EVENTS.
     if (newStatus === "interview") {
       track(ANALYTICS_EVENTS.INTERVIEW_REPORTED, { applicationId: id });
+    }
+    if (newStatus === "applied") {
+      track(ANALYTICS_EVENTS.APPLICATION_SUBMITTED, { applicationId: id });
     }
     if (newStatus === "offer") {
       track(ANALYTICS_EVENTS.JOB_REPORTED, { applicationId: id });
@@ -195,6 +198,13 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                           </div>
                         )}
 
+                        {item.deadline && (
+                          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200 dark:border-amber-900">
+                            <CalendarDays className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                            <span>Prazo: {new Date(item.deadline).toLocaleDateString("pt-BR")}</span>
+                          </div>
+                        )}
+
                         <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-2.5 dark:border-blue-900/50 dark:bg-blue-950/30">
                           <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">PrÃ³xima aÃ§Ã£o</p>
                           <p className="mt-1 text-[11px] font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
@@ -214,6 +224,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                             value={item.status}
                             disabled={isPending}
                             aria-busy={isPending}
+                            aria-label={`Mover ${item.jobTitle} para outra etapa`}
                             onChange={(e) => handleStatusChange(item.id, e.target.value)}
                             className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2 py-1 text-[11px] font-bold text-slate-700 dark:text-slate-300 outline-none cursor-pointer hover:border-blue-500 transition-colors max-w-[130px]"
                           >
@@ -232,6 +243,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                                 rel="noreferrer"
                                 className="text-slate-400 hover:text-blue-600"
                                 title="Abrir vaga"
+                                aria-label={`Abrir vaga de ${item.jobTitle}`}
                               >
                                 <ExternalLink className="w-3.5 h-3.5" />
                               </a>
@@ -239,6 +251,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                             <Link
                               href={item.analysisId ? `/report/${item.analysisId}` : "/analise"}
                               className="text-[11px] font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-0.5"
+                              aria-label={item.analysisId ? `Abrir análise de ${item.jobTitle}` : `Analisar ${item.jobTitle}`}
                             >
                               <span>IA</span>
                               <ChevronRight className="w-3 h-3" />

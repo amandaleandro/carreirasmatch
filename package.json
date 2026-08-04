@@ -8,6 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "test:unit": "vitest --config vitest.unit.config.ts run",
+    "typecheck:focused": "tsc --project tsconfig.check.json --pretty false",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "storybook": "storybook dev -p 6006",

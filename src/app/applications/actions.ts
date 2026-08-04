@@ -71,6 +71,32 @@ export async function updateApplicationStatus(applicationId: string, formData: F
   revalidatePath("/dashboard");
 }
 
+export async function updateApplicationDetails(applicationId: string, formData: FormData) {
+  const userId = await requireUserId();
+  const jobTitle = String(formData.get("jobTitle") ?? "").trim().slice(0, 240);
+  const company = String(formData.get("company") ?? "").trim().slice(0, 240);
+  const jobUrl = String(formData.get("jobUrl") ?? "").trim().slice(0, 2000);
+  const deadlineRaw = String(formData.get("deadline") ?? "").trim();
+  const deadline = deadlineRaw ? new Date(deadlineRaw) : null;
+
+  if (!jobTitle) return;
+  if (jobUrl && !/^https?:\/\/\S+$/i.test(jobUrl)) return;
+
+  await prisma.application.updateMany({
+    where: { id: applicationId, userId },
+    data: {
+      jobTitle,
+      company,
+      jobUrl,
+      deadline: deadline && !Number.isNaN(deadline.getTime()) ? deadline : null,
+    },
+  });
+
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath("/applications");
+  revalidatePath("/dashboard");
+}
+
 export async function scheduleInterview(applicationId: string, formData: FormData) {
   const userId = await requireUserId();
   const interviewAtRaw = String(formData.get("interviewAt") ?? "").trim();
@@ -225,12 +251,29 @@ export async function saveAnalysisAsApplication(analysisId: string) {
 
   if (!analysis) return;
 
+  const jobUrl = analysis.jobText.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[),.;]+$/, "") ?? "";
   const existing = await prisma.application.findFirst({
-    where: { userId, analysisId: analysis.id },
-    select: { id: true },
+    where: {
+      userId,
+      OR: [
+        { analysisId: analysis.id },
+        ...(jobUrl ? [{ jobUrl }] : []),
+      ],
+    },
+    select: { id: true, analysisId: true },
   });
 
   if (existing) {
+    if (!existing.analysisId) {
+      await prisma.application.update({
+        where: { id: existing.id },
+        data: {
+          analysisId: analysis.id,
+          fitScore: analysis.overallScore,
+          notes: analysis.applicationStatusReason,
+        },
+      });
+    }
     revalidatePath(`/report/${analysisId}`);
     revalidatePath("/applications");
     revalidatePath("/dashboard");
@@ -238,7 +281,6 @@ export async function saveAnalysisAsApplication(analysisId: string) {
   }
 
   const status = analysis.applicationStatus === "apply_now" ? "saved" : "tailor_resume";
-  const jobUrl = analysis.jobText.match(/https?:\/\/[^\s]+/)?.[0]?.replace(/[),.;]+$/, "") ?? "";
 
   const application = await prisma.application.create({
     data: {
