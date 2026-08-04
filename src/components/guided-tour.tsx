@@ -18,23 +18,35 @@ type TourStep = {
 };
 
 // Sobe a versão sempre que a lista de passos muda de verdade: quem já viu o
-// tour precisa ver o roteiro novo (ex: passo do Desafio do Match).
-const STORAGE_KEY = "guided-tour:v2:done";
+// tour precisa ver o roteiro novo (ex: tour agora navega por todas as telas).
+const STORAGE_KEY = "guided-tour:v3:done";
 
 type StepId =
   | "welcome"
   | "desafio"
   | "analise"
+  | "evidencias"
+  | "radar"
   | "feed"
   | "todas_vagas"
   | "applications"
+  | "compare_jobs"
   | "resume"
+  | "interviews"
+  | "action_plan"
+  | "evolucao"
+  | "profile"
   | "tools"
+  | "ensino_medio"
+  | "universidade"
   | "mentorias"
   | "concursos"
   | "vestibulares"
   | "freelancer"
   | "jogos"
+  | "history"
+  | "suporte"
+  | "settings"
   | "search"
   | "overview"
   | "closing";
@@ -50,74 +62,168 @@ const BASE_STEPS: Record<StepId, TourStep> = {
     title: "Desafio do Match ⚡",
     body: "Indique amigos com o seu link e desbloqueie recompensas conforme eles se cadastram. Vale a pena dar uma olhada logo de cara.",
     placement: "right",
-    route: "/dashboard",
+    route: "/desafio",
   },
   analise: {
     target: '[data-tour="nav-analise"]',
     title: "Comece por aqui: Análise de Vaga",
     body: "Cole uma vaga + seu currículo e receba na hora sua aderência, pontos fortes e o que ajustar para se destacar.",
     placement: "right",
-    route: "/dashboard",
+    route: "/analise",
+  },
+  evidencias: {
+    target: '[data-tour="nav-evidencias"]',
+    title: "Banco de Evidências 🛡️",
+    body: "Guarde certificados, projetos e resultados que comprovam suas habilidades. Eles fortalecem suas análises e seu currículo.",
+    placement: "right",
+    route: "/evidencias",
+  },
+  radar: {
+    target: '[data-tour="nav-radar"]',
+    title: "Alertas de vagas",
+    body: "Configure alertas por área e nível e receba as vagas certas assim que forem publicadas.",
+    placement: "right",
+    route: "/radar",
   },
   feed: {
     target: '[data-tour="nav-feed"]',
     title: "Feed de Vagas",
     body: "Vagas selecionadas para o seu momento de carreira. Salve as interessantes com um clique - elas viram candidaturas.",
     placement: "right",
+    route: "/feed",
   },
   todas_vagas: {
     target: '[data-tour="nav-todas-vagas"]',
     title: "Todas as Vagas",
     body: "Quer ver o feed completo, sem curadoria? Aqui ficam todas as vagas abertas na plataforma, com filtro por área e nível.",
     placement: "right",
+    route: "/todas-as-vagas",
   },
   applications: {
     target: '[data-tour="nav-applications"]',
     title: "Candidaturas (Kanban)",
     body: "Acompanhe cada processo - de “inscrito” até “oferta” - arrastando os cards pelas etapas. Nada mais se perde.",
     placement: "right",
+    route: "/applications",
+  },
+  compare_jobs: {
+    target: '[data-tour="nav-compare-jobs"]',
+    title: "Comparador de Vagas 📊",
+    body: "Coloque duas ou mais vagas lado a lado e veja qual combina mais com seu perfil e objetivos.",
+    placement: "right",
+    route: "/tools/compare-jobs",
   },
   resume: {
     target: '[data-tour="nav-resume"]',
     title: "Meu Currículo",
     body: "Guarde e otimize seu currículo aqui. Ele é reaproveitado em toda análise, então você não precisa reenviar sempre.",
     placement: "right",
+    route: "/resume",
+  },
+  interviews: {
+    target: '[data-tour="nav-interviews"]',
+    title: "Entrevistas",
+    body: "Organize datas e etapas das suas entrevistas e receba lembretes para chegar preparado(a).",
+    placement: "right",
+    route: "/interviews",
+  },
+  action_plan: {
+    target: '[data-tour="nav-action-plan"]',
+    title: "Plano de Ação",
+    body: "Um passo a passo personalizado com as próximas ações para destravar sua busca por vaga.",
+    placement: "right",
+    route: "/action-plan",
+  },
+  evolucao: {
+    target: '[data-tour="nav-evolucao"]',
+    title: "Evolução Profissional",
+    body: "Acompanhe sua evolução ao longo do tempo: aderência, habilidades trabalhadas e conquistas.",
+    placement: "right",
+    route: "/evolucao",
+  },
+  profile: {
+    target: '[data-tour="nav-profile"]',
+    title: "Desenvolvimento",
+    body: "Trilhas e sugestões personalizadas para desenvolver as habilidades que mais pesam no seu objetivo.",
+    placement: "right",
+    route: "/profile",
   },
   tools: {
     target: '[data-tour="nav-tools"]',
     title: "Ferramentas",
     body: "Carta de apresentação, simulador de entrevista, teste vocacional e muito mais - tudo pronto para acelerar sua busca.",
     placement: "right",
+    route: "/tools",
+  },
+  ensino_medio: {
+    target: '[data-tour="nav-ensino-medio"]',
+    title: "Ensino Médio & ENEM 🎓",
+    body: "Conteúdo, simulados e organização de estudos para quem está no ensino médio ou se preparando para o ENEM.",
+    placement: "right",
+    route: "/ensino-medio",
+  },
+  universidade: {
+    target: '[data-tour="nav-universidade"]',
+    title: "Universidade",
+    body: "Compare cursos, instituições e informações que ajudam na sua escolha universitária.",
+    placement: "right",
+    route: "/universidade",
   },
   mentorias: {
     target: '[data-tour="nav-mentorias"]',
     title: "Vídeos para aprender",
     body: "Vídeos educativos, mentorias e cursos gratuitos sobre carreira, tecnologia, idiomas, finanças e outras habilidades úteis.",
     placement: "right",
+    route: "/mentorias",
   },
   concursos: {
     target: '[data-tour="nav-concursos"]',
     title: "Radar de concursos",
     body: "Novos editais, inscrições e provas de concursos públicos, reunidos e atualizados ao longo do dia.",
     placement: "right",
+    route: "/concursos",
   },
   vestibulares: {
     target: '[data-tour="nav-vestibulares"]',
     title: "Radar de vestibulares",
     body: "Vestibulares, ENEM, Sisu, ProUni e bolsas mais recentes, tudo num lugar só.",
     placement: "right",
+    route: "/vestibulares",
   },
   freelancer: {
     target: '[data-tour="nav-freelancer"]',
     title: "Freelancer",
     body: "Publique um perfil e ofereça serviços, ou publique um projeto e contrate outro profissional - tudo dentro da plataforma.",
     placement: "right",
+    route: "/freelancer",
   },
   jogos: {
     target: '[data-tour="nav-jogos"]',
     title: "Jogos",
     body: "Treine digitação, vocabulário técnico e conhecimento de mercado em 7 minijogos, com ranking diário, mensal e anual.",
     placement: "right",
+    route: "/jogos",
+  },
+  history: {
+    target: '[data-tour="nav-history"]',
+    title: "Relatórios",
+    body: "Reveja todas as suas análises de vaga já feitas, com histórico completo de aderência e recomendações.",
+    placement: "right",
+    route: "/history",
+  },
+  suporte: {
+    target: '[data-tour="nav-suporte"]',
+    title: "Suporte",
+    body: "Precisa de ajuda? Fale com a gente por aqui a qualquer momento.",
+    placement: "right",
+    route: "/suporte",
+  },
+  settings: {
+    target: '[data-tour="nav-settings"]',
+    title: "Perfil",
+    body: "Atualize seus dados, preferências de notificação e configurações da conta.",
+    placement: "right",
+    route: "/settings",
   },
   search: {
     target: '[data-tour="topbar-search"]',
@@ -142,14 +248,28 @@ const DEFAULT_ORDER: StepId[] = [
   "welcome",
   "desafio",
   "analise",
+  "evidencias",
+  "radar",
   "feed",
   "todas_vagas",
   "applications",
-  "resume",
-  "tools",
-  "mentorias",
+  "compare_jobs",
   "freelancer",
+  "resume",
+  "interviews",
+  "action_plan",
+  "evolucao",
+  "profile",
   "jogos",
+  "tools",
+  "ensino_medio",
+  "universidade",
+  "mentorias",
+  "concursos",
+  "vestibulares",
+  "history",
+  "suporte",
+  "settings",
   "search",
   "overview",
   "closing",

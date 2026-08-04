@@ -77,6 +77,14 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
         { title: "Guia de estágio", description: "Como se destacar em um processo seletivo de estágio.", href: "/tools/internship-guide" },
       ],
     },
+    {
+      value: "study_for_university",
+      label: "Estudar as disciplinas da minha faculdade",
+      cta: { label: "Ir para Minha Faculdade", href: "/universidade" },
+      shortcuts: [
+        { title: "Minhas disciplinas", description: "Veja como cada disciplina do seu curso se conecta com sua carreira e treine com exercícios.", href: "/universidade" },
+      ],
+    },
   ],
   student: [
     {

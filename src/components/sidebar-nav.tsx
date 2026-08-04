@@ -51,7 +51,7 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
-      { href: "/evidencias", label: "Banco de Evidências 🛡️", icon: ShieldCheck },
+      { href: "/evidencias", label: "Banco de Evidências 🛡️", icon: ShieldCheck, tour: "nav-evidencias" },
       { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
     ],
   },
@@ -62,7 +62,7 @@ const NAV_GROUPS: NavGroup[] = [
       { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
       { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
       { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
-      { href: "/tools/compare-jobs", label: "Comparador de Vagas 📊", icon: BarChart3 },
+      { href: "/tools/compare-jobs", label: "Comparador de Vagas 📊", icon: BarChart3, tour: "nav-compare-jobs" },
       { href: "/freelancer", label: "Freelancer", icon: Handshake, tour: "nav-freelancer" },
     ],
   },
@@ -70,12 +70,12 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Crescimento & IA",
     items: [
-      { href: "/interviews", label: "Entrevistas", icon: CalendarDays },
-      { href: "/action-plan", label: "Plano de Ação", icon: Target },
-      { href: "/evolucao", label: "Evolução Profissional", icon: TrendingUp },
+      { href: "/interviews", label: "Entrevistas", icon: CalendarDays, tour: "nav-interviews" },
+      { href: "/action-plan", label: "Plano de Ação", icon: Target, tour: "nav-action-plan" },
+      { href: "/evolucao", label: "Evolução Profissional", icon: TrendingUp, tour: "nav-evolucao" },
       { href: "/desafio", label: "Desafio do Match ⚡", icon: Flame, tour: "nav-desafio" },
       { href: "/jogos", label: "Jogos", icon: Gamepad2, tour: "nav-jogos" },
-      { href: "/profile", label: "Desenvolvimento", icon: Sparkles },
+      { href: "/profile", label: "Desenvolvimento", icon: Sparkles, tour: "nav-profile" },
     ],
   },
   {
@@ -83,13 +83,13 @@ const NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
-      { href: "/universidade", label: "Universidade", icon: GraduationCap },
+      { href: "/universidade", label: "Universidade", icon: GraduationCap, tour: "nav-universidade" },
       { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
       { href: "/concursos", label: "Radar Concursos", icon: Landmark, tour: "nav-concursos" },
       { href: "/vestibulares", label: "Radar Vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
-      { href: "/history", label: "Relatórios", icon: BarChart3 },
-      { href: "/suporte", label: "Suporte", icon: LifeBuoy },
-      { href: "/settings", label: "Perfil", icon: User },
+      { href: "/history", label: "Relatórios", icon: BarChart3, tour: "nav-history" },
+      { href: "/suporte", label: "Suporte", icon: LifeBuoy, tour: "nav-suporte" },
+      { href: "/settings", label: "Perfil", icon: User, tour: "nav-settings" },
     ],
   },
 ];
@@ -208,6 +208,7 @@ const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
   {
     title: "Organização",
     items: [
+      { href: "/universidade", label: "Minha Faculdade", icon: GraduationCap, tour: "nav-universidade" },
       { href: "/tools/internship-guide", label: "Guia de estágio", icon: BookOpen },
       { href: "/tools/internship-checklist", label: "Checklist de estágio", icon: FileText },
       { href: "/tools/internship-calculator", label: "Calculadora de bolsa", icon: BarChart3 },

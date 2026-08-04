@@ -1,6 +1,7 @@
 import { requireAuthPage } from "@/lib/require-auth-page";
 import { prisma } from "@/lib/prisma";
 import { UniversityHub } from "@/components/university/university-hub";
+import type { SubjectExercise } from "@/lib/university";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export default async function UniversityPage() {
       universityCourse: {
         include: {
           university: { select: { name: true } },
-          subjects: { orderBy: [{ semester: "asc" }, { order: "asc" }], include: { insight: true } },
+          subjects: { orderBy: [{ semester: "asc" }, { order: "asc" }], include: { insight: true, exercises: true } },
         },
       },
     },
@@ -65,6 +66,7 @@ export default async function UniversityPage() {
               suggestedProject: s.insight.suggestedProject,
             }
           : null,
+        exercises: s.exercises ? (JSON.parse(s.exercises.questions) as SubjectExercise[]) : null,
       }))}
       manualSubjects={
         enrollment?.manualSubjects.map((s) => ({
@@ -78,6 +80,7 @@ export default async function UniversityPage() {
                   suggestedProject: s.suggestedProject,
                 }
               : null,
+          exercises: s.exercises ? (JSON.parse(s.exercises) as SubjectExercise[]) : null,
         })) ?? []
       }
       subjectProgress={subjectProgress}

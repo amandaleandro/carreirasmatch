@@ -6,10 +6,13 @@ import { useUiPanels } from "@/components/ui-panels";
 import {
   ArrowRight,
   Bell,
+  BookOpen,
   Building2,
   CheckCircle2,
   Clock,
+  FileStack,
   Gamepad2,
+  GitCompare,
   GraduationCap,
   Handshake,
   Landmark,
@@ -26,12 +29,39 @@ import {
 } from "lucide-react";
 
 // Versão atualizada da chave de novidades no localStorage
-const STORAGE_KEY = "upcoming-features-modal:v6:seen";
+const STORAGE_KEY = "upcoming-features-modal:v7:seen";
 
 export type FeatureTab = "shipped" | "upcoming" | "all";
 
 /** Recursos já lançados e disponíveis para uso */
 const SHIPPED = [
+  {
+    title: "Exercícios por Matéria na Universidade",
+    description: "Pratique exercícios organizados por disciplina do seu curso, com correção guiada para fixar o conteúdo.",
+    tag: "Universidade",
+    badge: "Novo!",
+    href: "/universidade",
+    icon: BookOpen,
+    colorClass: "cyan",
+  },
+  {
+    title: "Kit de Candidatura Completo",
+    description: "Gere de uma vez currículo ajustado, carta de apresentação e checklist de preparação para a vaga.",
+    tag: "Inteligência Artificial",
+    badge: "Novo!",
+    href: "/applications",
+    icon: FileStack,
+    colorClass: "purple",
+  },
+  {
+    title: "Comparador de Vagas",
+    description: "Compare lado a lado salário, benefícios e aderência de várias vagas antes de decidir onde aplicar.",
+    tag: "Decisão de Carreira",
+    badge: "Novo!",
+    href: "/tools/comparador-vagas",
+    icon: GitCompare,
+    colorClass: "blue",
+  },
   {
     title: "Desafio do Match",
     description: "Indique amigos com seu link exclusivo e ganhe créditos de diagnóstico completo a cada 3 indicações confirmadas.",

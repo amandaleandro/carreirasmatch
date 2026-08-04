@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
+// Sem checagem de sessão de propósito: essa busca também é usada no formulário
+// de cadastro (/register), antes de existir usuário autenticado. É leitura
+// pública de catálogo de cursos, sem dado sensível.
 export async function GET(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Faça login para continuar." }, { status: 401 });
-  }
-
   const q = (req.nextUrl.searchParams.get("q") ?? "").trim();
   if (q.length < 2) return NextResponse.json({ courses: [] });
 

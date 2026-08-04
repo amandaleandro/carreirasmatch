@@ -38,3 +38,48 @@ CURSO: ${courseName || "não informado"}`;
     "cerebras"
   );
 }
+
+export type SubjectExercise = {
+  question: string;
+  options: string[];
+  correctIndex: number;
+  explanation: string;
+};
+
+export type SubjectExerciseSet = { questions: SubjectExercise[] };
+
+/** Gera uma lista de exercícios de múltipla escolha para uma disciplina universitária,
+ * no nível de uma prova/lista de fixação de conteúdo — para o aluno praticar o que
+ * aprendeu, não só entender a relevância de carreira (isso já é o insight). */
+export async function generateSubjectExercises(
+  subjectName: string,
+  courseName?: string
+): Promise<SubjectExerciseSet> {
+  const systemPrompt = `Você é um professor universitário elaborando uma lista de exercícios de fixação para uma disciplina de graduação.
+${BASE_RULES}
+Formato de resposta:
+{
+  "questions": [
+    {
+      "question": string (enunciado claro e específico do conteúdo da disciplina, nível de graduação),
+      "options": string[] (exatamente 4 alternativas plausíveis, apenas uma correta),
+      "correctIndex": number (índice 0-3 da alternativa correta),
+      "explanation": string (por que a alternativa correta está certa, 1-2 frases)
+    }
+  ] (gere exatamente 5 questões, variando o subtema dentro da disciplina)
+}`;
+
+  const userMessage = `DISCIPLINA: ${subjectName}
+CURSO: ${courseName || "não informado"}`;
+
+  return runJsonPrompt<SubjectExerciseSet>(
+    systemPrompt,
+    userMessage,
+    0.5,
+    2200,
+    undefined,
+    undefined,
+    "university_subject_exercises",
+    "cerebras"
+  );
+}

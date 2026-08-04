@@ -35,6 +35,9 @@ export default function RegisterPage() {
   const [professionalArea, setProfessionalArea] = useState("");
   const [currentArea, setCurrentArea] = useState("");
   const [studyCourse, setStudyCourse] = useState("");
+  const [courseQuery, setCourseQuery] = useState("");
+  const [courseResults, setCourseResults] = useState<{ id: string; title: string; universityName: string; city: string; state: string }[]>([]);
+  const [selectedCourse, setSelectedCourse] = useState<{ id: string; title: string; universityName: string } | null>(null);
   const [coupon, setCoupon] = useState((searchParams.get("cupom") ?? "").toUpperCase());
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -45,6 +48,26 @@ export default function RegisterPage() {
   const isTransition = careerSegment === "career_change";
   const needsCurrentArea = careerSegment === "career_change" || careerSegment === "career_pro";
   const needsCourse = careerSegment === "internship";
+
+  async function searchCourses(q: string) {
+    setCourseQuery(q);
+    setStudyCourse(q);
+    setSelectedCourse(null);
+    if (q.trim().length < 2) {
+      setCourseResults([]);
+      return;
+    }
+    const res = await fetch(`/api/universidade/courses/search?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    setCourseResults(data.courses ?? []);
+  }
+
+  function selectCourse(course: { id: string; title: string; universityName: string; city: string; state: string }) {
+    setSelectedCourse(course);
+    setStudyCourse(course.title);
+    setCourseQuery(course.title);
+    setCourseResults([]);
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -66,6 +89,8 @@ export default function RegisterPage() {
           currentProfessionalArea: needsCurrentArea && currentArea ? currentArea : null,
           targetProfessionalArea: needsTargetArea && professionalArea ? professionalArea : null,
           studyCourse: needsCourse && studyCourse ? studyCourse : null,
+          universityCourseId: needsCourse ? selectedCourse?.id ?? null : null,
+          universityName: needsCourse ? selectedCourse?.universityName ?? null : null,
           coupon: coupon.trim() || null,
         }),
       });
@@ -344,20 +369,36 @@ export default function RegisterPage() {
             {needsCourse && (
               <div className="space-y-1 relative group animate-in fade-in slide-in-from-top-2 duration-300">
                 <label className="block text-[9px] font-bold text-[#64748B] uppercase tracking-wider">
-                  Qual curso você faz?
+                  Qual curso e faculdade você faz?
                 </label>
                 <input
                   type="text"
-                  list="register-study-courses"
-                  value={studyCourse}
-                  onChange={(e) => setStudyCourse(e.target.value)}
+                  value={courseQuery || studyCourse}
+                  onChange={(e) => searchCourses(e.target.value)}
                   required
-                  placeholder="Ex: Administração, Enfermagem, Sistemas de Informação..."
+                  placeholder="Busque seu curso (ex: Sistemas de Informação)"
                   className="w-full rounded-xl border border-[#E2E8F0] bg-white px-4 py-2.5 text-xs text-[#071827] outline-none focus:border-[#2563EB] focus:ring-4 focus:ring-[#2563EB]/10 dark:border-white/10 dark:bg-white/[0.03] dark:text-white"
                 />
-                <datalist id="register-study-courses">
-                  {COMMON_STUDY_AREAS.map((option) => <option key={option} value={option} />)}
-                </datalist>
+                {courseResults.length > 0 && (
+                  <div className="absolute z-10 mt-1 w-full rounded-xl border border-[#E2E8F0] bg-white shadow-lg max-h-56 overflow-y-auto dark:border-white/10 dark:bg-neutral-900">
+                    {courseResults.map((c) => (
+                      <button
+                        type="button"
+                        key={c.id}
+                        onClick={() => selectCourse(c)}
+                        className="block w-full text-left px-3.5 py-2 text-xs hover:bg-slate-50 dark:hover:bg-white/5 border-b border-slate-100 dark:border-white/10 last:border-0"
+                      >
+                        <span className="font-semibold text-[#071827] dark:text-white">{c.title}</span>
+                        <span className="block text-[10px] text-neutral-500">{c.universityName} · {c.city}/{c.state}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {!selectedCourse && (
+                  <p className="text-[9px] text-neutral-500">
+                    Não achou sua faculdade? Pode digitar o nome do curso mesmo assim.
+                  </p>
+                )}
               </div>
             )}
             </>

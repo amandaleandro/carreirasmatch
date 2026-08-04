@@ -1019,7 +1019,8 @@ model CurriculumSubject {
   order              Int              @default(0)
   createdAt          DateTime         @default(now())
 
-  insight CurriculumSubjectInsight?
+  insight   CurriculumSubjectInsight?
+  exercises CurriculumSubjectExerciseSet?
 
   @@index([universityCourseId])
 }
@@ -1037,6 +1038,20 @@ model CurriculumSubjectInsight {
   competencies        String
   relatedProfessions  String
   suggestedProject    String
+  generatedAt         DateTime          @default(now())
+}
+
+/**
+ * Lista de exercícios (múltipla escolha) de uma disciplina do catálogo real, gerada
+ * por IA e cacheada aqui — mesmo raciocínio de CurriculumSubjectInsight: como a
+ * disciplina é compartilhada entre todos os alunos do curso, gera-se uma vez só.
+ * `questions` é um array JSON de { question, options, correctIndex, explanation }.
+ */
+model CurriculumSubjectExerciseSet {
+  id                  String            @id @default(cuid())
+  curriculumSubjectId String            @unique
+  curriculumSubject   CurriculumSubject @relation(fields: [curriculumSubjectId], references: [id], onDelete: Cascade)
+  questions           String
   generatedAt         DateTime          @default(now())
 }
 
@@ -1075,6 +1090,8 @@ model UniversitySubject {
   relatedProfessions String?
   suggestedProject   String?
   generatedAt        DateTime?
+  exercises          String?
+  exercisesGeneratedAt DateTime?
   createdAt          DateTime             @default(now())
 
   @@index([enrollmentId])

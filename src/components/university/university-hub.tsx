@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { GraduationCap, Plus, Trash2, Sparkles, Briefcase } from "lucide-react";
+import { GraduationCap, Plus, Trash2, Sparkles, Briefcase, ListChecks, CheckCircle2, XCircle } from "lucide-react";
 
 type Insight = { competencies: string[]; relatedProfessions: string[]; suggestedProject: string };
-type CatalogSubject = { id: string; name: string; semester: number | null; insight: Insight | null };
-type ManualSubject = { id: string; name: string; insight: Insight | null };
+type Exercise = { question: string; options: string[]; correctIndex: number; explanation: string };
+type CatalogSubject = { id: string; name: string; semester: number | null; insight: Insight | null; exercises: Exercise[] | null };
+type ManualSubject = { id: string; name: string; insight: Insight | null; exercises: Exercise[] | null };
 type CourseResult = { id: string; title: string; area: string; universityName: string; city: string; state: string };
 
 type Enrollment = {
@@ -22,6 +23,52 @@ type Enrollment = {
 const INPUT_CLASS =
   "w-full rounded-xl border border-neutral-200 dark:border-white/10 bg-white dark:bg-white/[0.03] px-3.5 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-colors";
 
+function ExerciseQuiz({ questions }: { questions: Exercise[] }) {
+  const [answers, setAnswers] = useState<Record<number, number>>({});
+
+  return (
+    <div className="space-y-3">
+      {questions.map((q, qi) => {
+        const chosen = answers[qi];
+        const answered = chosen !== undefined;
+        return (
+          <div key={qi} className="rounded-xl border border-slate-200 dark:border-slate-800 p-3 space-y-2">
+            <p className="text-xs font-semibold text-slate-800 dark:text-slate-100">{qi + 1}. {q.question}</p>
+            <div className="space-y-1.5">
+              {q.options.map((opt, oi) => {
+                const isCorrect = oi === q.correctIndex;
+                const isChosen = oi === chosen;
+                return (
+                  <button
+                    key={oi}
+                    type="button"
+                    disabled={answered}
+                    onClick={() => setAnswers((prev) => ({ ...prev, [qi]: oi }))}
+                    className={`flex w-full items-center gap-2 rounded-lg border px-3 py-1.5 text-left text-[11px] transition-colors disabled:cursor-default ${
+                      answered && isCorrect
+                        ? "border-green-500 bg-green-50 text-green-800 dark:bg-green-950/30 dark:text-green-300"
+                        : answered && isChosen
+                          ? "border-red-500 bg-red-50 text-red-800 dark:bg-red-950/30 dark:text-red-300"
+                          : "border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:border-blue-300"
+                    }`}
+                  >
+                    {answered && isCorrect && <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />}
+                    {answered && isChosen && !isCorrect && <XCircle className="h-3.5 w-3.5 shrink-0" />}
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+            {answered && (
+              <p className="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400">{q.explanation}</p>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function SubjectCard({
   name,
   insight,
@@ -30,6 +77,9 @@ function SubjectCard({
   generating,
   onAddToPortfolio,
   portfolioAdded,
+  exercises,
+  onGenerateExercises,
+  generatingExercises,
 }: {
   name: string;
   insight: Insight | null;
@@ -38,7 +88,11 @@ function SubjectCard({
   onAddToPortfolio?: () => void;
   portfolioAdded?: boolean;
   generating: boolean;
+  exercises: Exercise[] | null;
+  onGenerateExercises: () => void;
+  generatingExercises: boolean;
 }) {
+  const [showExercises, setShowExercises] = useState(false);
   return (
     <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3">
       <div className="flex items-start justify-between gap-3">
@@ -90,6 +144,32 @@ function SubjectCard({
           {generating ? "Gerando..." : "Ver conexão com carreira"}
         </button>
       )}
+
+      <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+        {exercises ? (
+          <div className="pt-3 space-y-2">
+            <button
+              type="button"
+              onClick={() => setShowExercises((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              <ListChecks className="h-3.5 w-3.5" />
+              {showExercises ? "Ocultar lista de exercícios" : `Praticar (${exercises.length} exercícios)`}
+            </button>
+            {showExercises && <ExerciseQuiz questions={exercises} />}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onGenerateExercises}
+            disabled={generatingExercises}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold px-4 py-2 text-slate-700 dark:text-slate-200 hover:border-blue-300 transition-all disabled:opacity-50"
+          >
+            <ListChecks className="h-3.5 w-3.5" />
+            {generatingExercises ? "Gerando..." : "Gerar lista de exercícios"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -124,6 +204,35 @@ export function UniversityHub({
   const [newSubjectName, setNewSubjectName] = useState("");
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [portfolioAdded, setPortfolioAdded] = useState<Record<string, boolean>>({});
+  const [generatingExercisesId, setGeneratingExercisesId] = useState<string | null>(null);
+
+  async function generateCatalogExercises(id: string) {
+    setGeneratingExercisesId(id);
+    try {
+      const res = await fetch(`/api/universidade/curriculum-subjects/${id}/exercises`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        const questions = JSON.parse(data.exerciseSet.questions) as Exercise[];
+        setLocalCatalogSubjects((prev) => prev.map((s) => (s.id === id ? { ...s, exercises: questions } : s)));
+      }
+    } finally {
+      setGeneratingExercisesId(null);
+    }
+  }
+
+  async function generateManualExercises(id: string) {
+    setGeneratingExercisesId(id);
+    try {
+      const res = await fetch(`/api/universidade/subjects/${id}/exercises`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        const questions = JSON.parse(data.subject.exercises) as Exercise[];
+        setLocalManualSubjects((prev) => prev.map((s) => (s.id === id ? { ...s, exercises: questions } : s)));
+      }
+    } finally {
+      setGeneratingExercisesId(null);
+    }
+  }
 
   async function searchCourses(q: string) {
     setCourseQuery(q);
@@ -184,7 +293,7 @@ export function UniversityHub({
     });
     const data = await res.json();
     if (res.ok) {
-      setLocalManualSubjects((prev) => [...prev, { id: data.subject.id, name: data.subject.name, insight: null }]);
+      setLocalManualSubjects((prev) => [...prev, { id: data.subject.id, name: data.subject.name, insight: null, exercises: null }]);
       setNewSubjectName("");
     }
   }
@@ -393,6 +502,9 @@ export function UniversityHub({
                     portfolioAdded={portfolioAdded[s.name]}
                     onGenerate={() => generateCatalogInsight(s.id)}
                     generating={generatingId === s.id}
+                    exercises={s.exercises}
+                    onGenerateExercises={() => generateCatalogExercises(s.id)}
+                    generatingExercises={generatingExercisesId === s.id}
                   />
                 ))}
               </div>
@@ -428,6 +540,9 @@ export function UniversityHub({
                     onGenerate={() => generateManualInsight(s.id)}
                       onDelete={() => deleteManualSubject(s.id)}
                       generating={generatingId === s.id}
+                      exercises={s.exercises}
+                      onGenerateExercises={() => generateManualExercises(s.id)}
+                      generatingExercises={generatingExercisesId === s.id}
                     />
                   ))}
                 </div>

@@ -59,7 +59,7 @@ const KANBAN_COLUMNS = [
   },
   {
     id: "technical_test",
-    label: "Teste tÃ©cnico",
+    label: "Teste técnico",
     desc: "Desafios, cases e provas em andamento",
     color: "bg-fuchsia-500/10 text-fuchsia-600 border-fuchsia-200 dark:bg-fuchsia-950/40 dark:text-fuchsia-400 dark:border-fuchsia-900/60",
     dot: "bg-fuchsia-500",
@@ -206,7 +206,7 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
                         )}
 
                         <div className="rounded-xl border border-blue-100 bg-blue-50/70 p-2.5 dark:border-blue-900/50 dark:bg-blue-950/30">
-                          <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">PrÃ³xima aÃ§Ã£o</p>
+                          <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Próxima ação</p>
                           <p className="mt-1 text-[11px] font-semibold leading-relaxed text-slate-700 dark:text-slate-200">
                             {nextActionFor(item.status)}
                           </p>

@@ -12,6 +12,39 @@ import { claimLeadResumesForUser } from "@/lib/leads";
 
 const REGISTER_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
+/** Cria/atualiza a matrícula universitária do usuário a partir do curso escolhido no
+ * cadastro (segmento "estágio"), pra /universidade já nascer preenchida em vez de
+ * ficar órfã até o usuário preencher de novo lá. Curso fora do catálogo (sem
+ * universityCourseId) ainda grava institution/courseName em texto livre. */
+async function upsertUniversityEnrollmentFromSignup(
+  userId: string,
+  studyCourse: unknown,
+  universityCourseId: unknown,
+  universityName: unknown
+) {
+  if (typeof studyCourse !== "string" || !studyCourse.trim()) return;
+
+  const linkedCourseId = typeof universityCourseId === "string" && universityCourseId.trim() ? universityCourseId.trim() : null;
+  if (linkedCourseId) {
+    const linkedCourse = await prisma.universityCourse.findUnique({ where: { id: linkedCourseId }, select: { id: true, active: true } });
+    if (!linkedCourse?.active) return;
+  }
+
+  await prisma.universityEnrollment.upsert({
+    where: { userId },
+    create: {
+      userId,
+      institution: typeof universityName === "string" ? universityName.trim() : "",
+      courseName: studyCourse.trim(),
+      universityCourseId: linkedCourseId,
+    },
+    update: {
+      ...(linkedCourseId ? { institution: typeof universityName === "string" ? universityName.trim() : "", universityCourseId: linkedCourseId } : {}),
+      courseName: studyCourse.trim(),
+    },
+  });
+}
+
 export async function POST(req: NextRequest) {
   try {
     const rateLimit = checkRateLimit(`register:${getClientIp(req)}`, REGISTER_LIMIT);
@@ -32,6 +65,8 @@ export async function POST(req: NextRequest) {
       currentProfessionalArea,
       targetProfessionalArea,
       studyCourse,
+      universityCourseId,
+      universityName,
       coupon,
       whatsappOptIn,
     } = await req.json();
@@ -78,6 +113,7 @@ export async function POST(req: NextRequest) {
           ...(typeof studyCourse === "string" ? { studyCourse: studyCourse.trim() || null } : {}),
         },
       });
+      await upsertUniversityEnrollmentFromSignup(existing.id, studyCourse, universityCourseId, universityName);
       void claimLeadResumesForUser(normalizedEmail, existing.id);
       return NextResponse.json({ ok: true });
     }
@@ -120,6 +156,7 @@ export async function POST(req: NextRequest) {
     };
 
     const createdUser = await prisma.user.create({ data: { ...data, email: normalizedEmail } });
+    await upsertUniversityEnrollmentFromSignup(createdUser.id, studyCourse, universityCourseId, universityName);
     void claimLeadResumesForUser(normalizedEmail, createdUser.id);
 
     // Envio de e-mails e registro de lead sem bloquear a resposta principal
