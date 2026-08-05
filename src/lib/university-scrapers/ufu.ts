@@ -72,7 +72,7 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
   const html = await getHtml(coursePage.pageUrl);
   const $ = cheerio.load(html);
   const title = $("h1").first().text().replace(/\s+/g, " ").trim() || coursePage.title;
-  const gradePattern = /grade|matriz|curr[ií]cul|fluxo|projeto.?pedag|estrutura.?curricular/i;
+  const gradePattern = /grade|matriz|curr[ií]cul|fluxo|projeto.?pedag|estrutura.?curricular|fichas?.?(?:de)?.?disciplina/i;
   const candidates = $("a[href]")
     .map((_, element) => ({
       url: absoluteUrl($(element).attr("href") ?? "", coursePage.pageUrl),
@@ -133,7 +133,18 @@ async function readHtmlSubjects(url: string) {
     const name = cells.find((cell) => cell.length >= 5 && !/^(disciplina|componente|código|carga|per[ií]odo|total)$/i.test(cell));
     if (name && /[A-Za-zÀ-ÿ]{4,}/.test(name) && !/^\d+(?:\.\d+)?$/.test(name)) subjects.push({ name: name.replace(/^[A-Z]{2,}\d{3,}\s*[-–:]\s*/i, "") });
   });
-  return subjects;
+  $("a").each((_, link) => {
+    const label = $(link).text().replace(/\s+/g, " ").trim();
+    const match = label.match(/^[A-Z]{2,}\d{2,}\s*[-–:]\s*(.+)$/i);
+    if (match?.[1] && match[1].length >= 4) subjects.push({ name: match[1].trim() });
+  });
+  const seen = new Set<string>();
+  return subjects.filter((subject) => {
+    const key = subject.name.toLocaleLowerCase("pt-BR");
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 async function readPdf(url: string) {
