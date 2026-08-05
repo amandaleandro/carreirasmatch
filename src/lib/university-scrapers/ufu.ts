@@ -7,7 +7,9 @@ import { ScrapedUniversityCourse, UniversityScraper } from "./types";
 
 const USER_AGENT = "Mozilla/5.0 (compatible; CarreirasMatchUniversityBot/1.0)";
 const REQUEST_TIMEOUT_MS = 30_000;
-const MAX_COURSES_PER_RUN = 8;
+// O catálogo oficial tem dezenas de cursos (a UFU informa 67 bacharelados e
+// 26 licenciaturas). O limite anterior de 8 deixava a carga sempre incompleta.
+const MAX_COURSES_PER_RUN = 50;
 const STALE_AFTER_MS = 45 * 24 * 60 * 60 * 1000;
 const CATALOG_URL = "https://ufu.br/graduacao?page=";
 
