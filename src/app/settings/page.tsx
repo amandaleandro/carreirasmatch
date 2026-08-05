@@ -8,6 +8,7 @@ import { ChangePasswordForm } from "@/components/change-password-form";
 import { InterestedRolesForm } from "@/components/interested-roles-form";
 import { CourseListForm } from "@/components/course-list-form";
 import { BillingSection } from "@/components/billing-section";
+import { FeatureUsageSection } from "@/components/feature-usage-section";
 import { JobAlertManager } from "@/components/job-alert-manager";
 import { DiscoverableToggle } from "@/components/discoverable-toggle";
 import { WhatsappOptInToggle } from "@/components/whatsapp-optin-toggle";
@@ -183,6 +184,19 @@ export default async function SettingsPage({
           />
         </section>
       )}
+
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+        <div>
+          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <CreditCard className="w-4 h-4 text-slate-500" />
+            Uso este mês
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Acompanhe quanto você já usou de cada recurso do seu plano neste ciclo.
+          </p>
+        </div>
+        <FeatureUsageSection userId={session.user.id} />
+      </section>
 
       <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <CourseListForm courses={courses} professionalArea={user?.professionalArea ?? null} />
