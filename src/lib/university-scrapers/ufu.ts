@@ -140,7 +140,9 @@ export function createUfuCatalogScraper(): UniversityScraper {
           const grade = await findGradePdf(course);
           if (!grade) continue;
           const subjects = await readPdf(grade.url);
-          if (subjects.length === 0) continue;
+          if (subjects.length === 0) {
+            console.warn(`[ufu-scraper] Grade sem disciplinas extraíveis; mantendo o curso ${grade.title}`);
+          }
           result.push({ title: grade.title, url: grade.url, area: matchAreaSlug(grade.title) ?? "geral", modality: "presencial", subjects });
         } catch (error) {
           console.error(`[ufu-scraper] Erro ao raspar ${course.pageUrl}:`, error);
