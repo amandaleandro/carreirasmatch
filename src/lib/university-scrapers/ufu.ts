@@ -178,6 +178,9 @@ export function createUfuCatalogScraper(): UniversityScraper {
     source: "ufu:catalog",
     async scrape(): Promise<ScrapedUniversityCourse[]> {
       const discovered = await discoverUfuCourses();
+      if (!discovered.some((course) => /sistemas?\s+de\s+informa[cç][aã]o/i.test(course.title) && /santa\s*m[oô]nica|santamonica/i.test(`${course.title} ${course.pageUrl}`))) {
+        discovered.push({ title: "Sistemas de Informação - Campus Santa Mônica", pageUrl: FACOM_SI_DISCIPLINE_PAGES[1] });
+      }
       const existing = await prisma.universityCourse.findMany({
         select: { url: true, lastSeenAt: true, _count: { select: { subjects: true } } },
       });
