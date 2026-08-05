@@ -12,6 +12,10 @@ const REQUEST_TIMEOUT_MS = 30_000;
 const MAX_COURSES_PER_RUN = 50;
 const STALE_AFTER_MS = 45 * 24 * 60 * 60 * 1000;
 const CATALOG_URL = "https://ufu.br/graduacao?page=";
+const FACOM_COMPUTACAO_DISCIPLINE_PAGES = [
+  "https://facom.ufu.br/graduacao/ciencia-da-computacao-campus-santa-monica/fichas-de-disciplina/curriculo-2012-1",
+  "https://facom.ufu.br/graduacao/ciencia-da-computacao-campus-santa-monica/fichas-de-disciplina/curriculo-2023-1",
+];
 
 async function getHtml(url: string) {
   const response = await fetch(url, {
@@ -170,19 +174,26 @@ export function createUfuCatalogScraper(): UniversityScraper {
     source: "ufu:catalog",
     async scrape(): Promise<ScrapedUniversityCourse[]> {
       const discovered = await discoverUfuCourses();
-      const existing = await prisma.universityCourse.findMany({ select: { url: true, lastSeenAt: true } });
-      const lastSeenByUrl = new Map(existing.map((course) => [course.url, course.lastSeenAt.getTime()]));
+      const existing = await prisma.universityCourse.findMany({
+        select: { url: true, lastSeenAt: true, _count: { select: { subjects: true } } },
+      });
+      const existingByUrl = new Map(existing.map((course) => [course.url, { lastSeenAt: course.lastSeenAt.getTime(), subjects: course._count.subjects }]));
       const now = Date.now();
       const pending = discovered
         .filter((course) => {
-          const lastSeen = lastSeenByUrl.get(course.pageUrl);
-          return !lastSeen || now - lastSeen > STALE_AFTER_MS;
+          const existingCourse = existingByUrl.get(course.pageUrl);
+          return !existingCourse || existingCourse.subjects === 0 || now - existingCourse.lastSeenAt > STALE_AFTER_MS;
         })
         .slice(0, MAX_COURSES_PER_RUN);
       const result: ScrapedUniversityCourse[] = [];
 
       for (const course of pending) {
         try {
+          if (/ci[eê]ncia\s+da\s+computa[cç][aã]o/i.test(course.title)) {
+            const subjects = (await Promise.all(FACOM_COMPUTACAO_DISCIPLINE_PAGES.map(readHtmlSubjects))).flat();
+            result.push({ title: course.title, url: FACOM_COMPUTACAO_DISCIPLINE_PAGES[1], area: "ti", modality: "presencial", subjects });
+            continue;
+          }
           const grade = await findGradePdf(course);
           if (!grade) {
             result.push({ title: course.title, url: course.pageUrl, area: matchAreaSlug(course.title) ?? "geral", modality: "presencial", subjects: [] });
