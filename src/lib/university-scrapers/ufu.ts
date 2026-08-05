@@ -16,6 +16,10 @@ const FACOM_COMPUTACAO_DISCIPLINE_PAGES = [
   "https://facom.ufu.br/graduacao/ciencia-da-computacao-campus-santa-monica/fichas-de-disciplina/curriculo-2012-1",
   "https://facom.ufu.br/graduacao/ciencia-da-computacao-campus-santa-monica/fichas-de-disciplina/curriculo-2023-1",
 ];
+const FACOM_SI_DISCIPLINE_PAGES = [
+  "https://facom.ufu.br/graduacao/bsi-santamonica/fichas-de-disciplinas-curriculo-2016-1",
+  "https://facom.ufu.br/graduacao/bsi-santamonica/fichas-de-disciplinas-curriculo-2022-2",
+];
 
 async function getHtml(url: string) {
   const response = await fetch(url, {
@@ -139,7 +143,7 @@ async function readHtmlSubjects(url: string) {
   });
   $("a").each((_, link) => {
     const label = $(link).text().replace(/\s+/g, " ").trim();
-    const match = label.match(/^[A-Z]{2,}\d{2,}\s*[-–:]\s*(.+)$/i);
+    const match = label.match(/^[A-Z]{2,}\d{2,}(?:\s*[-–:]\s*|\s+)(.+)$/i);
     if (match?.[1] && match[1].length >= 4) subjects.push({ name: match[1].trim() });
   });
   const seen = new Set<string>();
@@ -192,6 +196,11 @@ export function createUfuCatalogScraper(): UniversityScraper {
           if (/ci[eê]ncia\s+da\s+computa[cç][aã]o/i.test(course.title)) {
             const subjects = (await Promise.all(FACOM_COMPUTACAO_DISCIPLINE_PAGES.map(readHtmlSubjects))).flat();
             result.push({ title: course.title, url: FACOM_COMPUTACAO_DISCIPLINE_PAGES[1], area: "ti", modality: "presencial", subjects });
+            continue;
+          }
+          if (/sistemas?\s+de\s+informa[cç][aã]o/i.test(course.title) && /santa\s*m[oô]nica|santamonica/i.test(`${course.title} ${course.pageUrl}`)) {
+            const subjects = (await Promise.all(FACOM_SI_DISCIPLINE_PAGES.map(readHtmlSubjects))).flat();
+            result.push({ title: course.title, url: FACOM_SI_DISCIPLINE_PAGES[1], area: "ti", modality: "presencial", subjects });
             continue;
           }
           const grade = await findGradePdf(course);
