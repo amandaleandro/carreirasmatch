@@ -84,16 +84,34 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
       return score(b) - score(a);
     });
 
+  async function isAvailablePdf(url: string) {
+    try {
+      const response = await fetch(url, {
+        method: "HEAD",
+        headers: { "User-Agent": USER_AGENT },
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
+      return response.ok;
+    } catch {
+      return false;
+    }
+  }
+
   for (const candidate of candidates) {
-    if (/\.pdf(?:$|\?)/i.test(candidate.url)) return { url: candidate.url, title };
+    if (/\.pdf(?:$|\?)/i.test(candidate.url)) {
+      if (await isAvailablePdf(candidate.url)) return { url: candidate.url, title };
+      continue;
+    }
     try {
       const gradeHtml = await getHtml(candidate.url);
       const grade$ = cheerio.load(gradeHtml);
-      const pdf = grade$("a[href]")
+      const pdfs = grade$("a[href]")
         .map((_, element) => absoluteUrl(grade$(element).attr("href") ?? "", candidate.url))
         .get()
-        .find((url) => /\.pdf(?:$|\?)/i.test(url));
-      if (pdf) return { url: pdf, title };
+        .filter((url) => /\.pdf(?:$|\?)/i.test(url));
+      for (const pdf of pdfs) {
+        if (await isAvailablePdf(pdf)) return { url: pdf, title };
+      }
     } catch (error) {
       console.warn(`[ufu-scraper] Não foi possível abrir a página de grade ${candidate.url}:`, error);
     }
