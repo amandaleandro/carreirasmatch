@@ -109,6 +109,16 @@ export function PublicSubscriptionCheckout({
   function handleStart(e: FormEvent) {
     e.preventDefault();
     track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind: plan, segment });
+    if (plan === "card_recurring") {
+      // Fire-and-forget: registra a intenção de assinatura pra régua de
+      // recuperação de checkout conseguir alcançar quem abandona o Brick sem
+      // preencher o cartão. Não deve travar a navegação se falhar.
+      fetch("/api/billing/checkout-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payerEmail: email, segment, planKey: commercialPlanKey }),
+      }).catch(() => {});
+    }
     setShowBrick(true);
   }
 

@@ -25,6 +25,8 @@ export async function FreeTierAd({
   // Evita o custo de auth()/consulta ao banco quando o AdSense nem está ligado.
   if (!isAdsEnabled()) return null;
 
+  // Intentional exception: hides ads for anyone on any paid plan (a site-wide perk), not usage
+  // against a single feature's monthly limit — no natural catalog featureKey for it.
   const session = await auth();
   if (session?.user?.id && (await hasActiveSubscriptionAccess(session.user.id))) {
     return null;

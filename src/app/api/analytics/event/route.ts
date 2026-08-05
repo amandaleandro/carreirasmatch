@@ -5,11 +5,13 @@ import { z } from "zod";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const allowedNames = [
+  "landing_viewed", "landing_cta_clicked", "resume_uploaded", "job_description_added",
   "analysis_started", "analysis_completed", "diagnostic_teaser_viewed",
   "unlock_clicked", "checkout_started", "checkout_failed", "payment_confirmed",
   "subscription_started", "subscription_confirmed", "signup_completed",
   "lead_captured", "tool_used", "pix_generated",
-  "result_viewed", "card_shared", "resume_saved", "application_created",
+  "result_viewed", "card_shared", "referral_link_opened", "coupon_used",
+  "resume_saved", "application_created",
   "interview_reported", "job_reported", "internship_reported", "promotion_reported",
 ] as const;
 

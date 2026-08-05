@@ -55,6 +55,10 @@ export default async function ReportPage({
     notFound();
   }
 
+  // Intentional exception: `subscribed` only decides whether to show the whole-page subscription
+  // upsell banner (any paid plan), not usage against a single feature's monthly limit — no
+  // natural catalog featureKey for it. Diagnostic unlocking itself already goes through
+  // canViewFullDiagnostic, which is the correctly-scoped gate for this page.
   const [unlockedForOwner, subscribed] = await Promise.all([
     canViewFullDiagnostic(session.user.id, id),
     hasActiveSubscriptionAccess(session.user.id),

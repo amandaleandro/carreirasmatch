@@ -1,5 +1,12 @@
 import { runJsonPrompt } from "@/lib/groq";
-import type { VocationAreaConfig } from "@/lib/vocation-areas";
+
+/** Formato mínimo compartilhado por VocationAreaConfig e BlogTopicConfig — só o que o prompt de geração usa. */
+export type GeneratableTopic = {
+  label: string;
+  description: string;
+  subareas: string[];
+  careerNotes?: string;
+};
 
 export type ContentBlock =
   | { type: "heading"; text: string }
@@ -58,7 +65,7 @@ REGRAS:
 10. "coverEmoji": um único emoji temático relevante ao artigo.`;
 
 export async function generateBlogPost(
-  area: VocationAreaConfig,
+  area: GeneratableTopic,
   recentTitles: string[]
 ): Promise<GeneratedPost> {
   const recentBlock =

@@ -174,7 +174,7 @@ export async function POST(req: NextRequest) {
     // resgate do cupom para essas vendas. No cartão o Payment já nasce "paid" e a
     // rota síncrona contou; a checagem de transição evita contar duas vezes.
     if (status === "paid" && payment.status !== "paid") {
-      await registerCouponUsage(payment.couponId);
+      await registerCouponUsage(payment.couponId, { userId: payment.userId, paymentId: payment.id });
     }
 
     if (status === "paid" && payment.status !== "paid" && payment.kind !== "subscription") {
@@ -319,7 +319,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (status === "paid") {
-      if (!wasPaid) await registerCouponUsage(payment.couponId);
+      if (!wasPaid) await registerCouponUsage(payment.couponId, { userId: payment.userId, paymentId: payment.id });
 
       const currentPeriodEnd = new Date(Date.now() + SUBSCRIPTION_PERIOD_DAYS * 24 * 60 * 60 * 1000);
       await prisma.subscription.upsert({

@@ -94,6 +94,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   let postRoutes: MetadataRoute.Sitemap = [];
+  let blogAreaRoutes: MetadataRoute.Sitemap = [];
   try {
     const posts = await prisma.post.findMany({
       where: { published: true },
@@ -107,9 +108,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.6,
     }));
-  } catch {
-    // Se o banco não estiver acessível no build, o sitemap ainda sai com o resto.
+
+    // Páginas pilar por área, só para áreas que já têm post publicado
+    // (evita indexar página pilar vazia).
+    const areaRows = await prisma.post.groupBy({
+      by: ["areaSlug"],
+      where: { published: true },
+      _max: { publishedAt: true },
+    });
+    blogAreaRoutes = areaRows.map((row) => ({
+      url: `${BASE_URL}/blog/area/${row.areaSlug}`,
+      lastModified: row._max.publishedAt ?? now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    }));
+  } catch (error) {
+    // Se o banco não estiver acessível no build, o sitemap ainda sai com o resto,
+    // mas loga pra não sumir posts do Google sem ninguém perceber.
+    console.error("[sitemap] falha ao buscar posts do blog", error);
     postRoutes = [];
+    blogAreaRoutes = [];
   }
 
   let locationRoutes: MetadataRoute.Sitemap = [];
@@ -127,9 +145,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${BASE_URL}/cursos-gratuitos/${path}`, lastModified: location.updatedAt, changeFrequency: "weekly" as const, priority: 0.6 },
       ];
     });
-  } catch {
+  } catch (error) {
+    console.error("[sitemap] falha ao buscar rotas de localização", error);
     locationRoutes = [];
   }
 
-  return [...staticRoutes, ...toolRoutes, ...analysisAreaRoutes, ...publicJobRoutes, ...locationRoutes, ...postRoutes];
+  return [...staticRoutes, ...toolRoutes, ...analysisAreaRoutes, ...publicJobRoutes, ...locationRoutes, ...blogAreaRoutes, ...postRoutes];
 }

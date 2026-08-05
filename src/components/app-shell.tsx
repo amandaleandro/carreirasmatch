@@ -62,6 +62,8 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   const isAdmin = isAdminEmail(session.user.email);
   const isInfluencer = await isInfluencerUser(session.user.id);
   const segment = normalizeCareerSegment(dbUser?.careerSegment);
+  // Intentional exception: drives the global subscription-nudge provider for the whole app shell
+  // (any paid plan vs free), not a single feature's monthly limit — no natural catalog featureKey.
   const isSubscribed = await hasActiveSubscriptionAccess(session.user.id);
 
   return (

@@ -271,7 +271,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (status === "paid") {
-    await registerCouponUsage(couponId);
+    await registerCouponUsage(couponId, { userId, paymentId: payment.id });
     // Aprovação síncrona (cartão): reivindica a análise sem dono para o usuário,
     // senão ele não conseguiria vê-la em /report após o cadastro. Para PIX
     // (pending), isso acontece no webhook quando o pagamento confirma.

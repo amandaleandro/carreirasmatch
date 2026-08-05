@@ -1,12 +1,19 @@
 import { prisma } from "@/lib/prisma";
 import { getSetting, setSetting } from "@/lib/app-settings";
-import { VOCATION_AREAS } from "@/lib/vocation-areas";
+import { VOCATION_AREAS, type VocationAreaConfig } from "@/lib/vocation-areas";
+import { TRANSVERSAL_TOPICS, type BlogTopicConfig } from "@/lib/blog-topics";
 import { generateBlogPost, gradientIndexForSlug, slugify } from "@/lib/blog-generator";
 import type { Post } from "@/generated/prisma/client";
 
 const NICHE_CURSOR_SETTING_KEY = "blog:niche_cursor";
 const TICK_INTERVAL_MS = 15 * 60 * 1000;
 const INITIAL_DELAY_MS = 30 * 1000;
+
+// Rodízio único cobrindo os dois pilares do blog: áreas vocacionais e temas
+// transversais (currículo, entrevista, ensino médio...). Concatenar em vez de
+// intercalar mantém o cursor simples; com 35 áreas + 8 temas, um tema
+// transversal aparece a cada ~5 posts (posts/dia padrão = 5).
+const ALL_TOPICS: (VocationAreaConfig | BlogTopicConfig)[] = [...VOCATION_AREAS, ...TRANSVERSAL_TOPICS];
 
 function postsPerDay(): number {
   const raw = Number(process.env.BLOG_POSTS_PER_DAY);
@@ -24,7 +31,7 @@ function startOfTodaySaoPaulo(): Date {
 
 async function nextNicheCursor(): Promise<number> {
   const stored = await getSetting(NICHE_CURSOR_SETTING_KEY);
-  const cursor = stored ? parseInt(stored, 10) % VOCATION_AREAS.length : 0;
+  const cursor = stored ? parseInt(stored, 10) % ALL_TOPICS.length : 0;
   return Number.isFinite(cursor) && cursor >= 0 ? cursor : 0;
 }
 
@@ -41,7 +48,7 @@ async function uniqueSlug(title: string): Promise<string> {
 
 export async function generateNextPost(): Promise<Post> {
   const cursor = await nextNicheCursor();
-  const area = VOCATION_AREAS[cursor];
+  const area = ALL_TOPICS[cursor];
 
   // Mais títulos recentes = melhor sinal de deduplicação para o gerador não
   // repetir tema nem formato de título dentro da mesma área.
@@ -68,7 +75,7 @@ export async function generateNextPost(): Promise<Post> {
     },
   });
 
-  await setSetting(NICHE_CURSOR_SETTING_KEY, String((cursor + 1) % VOCATION_AREAS.length));
+  await setSetting(NICHE_CURSOR_SETTING_KEY, String((cursor + 1) % ALL_TOPICS.length));
   return post;
 }
 

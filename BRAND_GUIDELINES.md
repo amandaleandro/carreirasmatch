@@ -4,7 +4,7 @@ Documento de referência para manter consistência visual e de voz em todo o pro
 
 ## 1. Posicionamento
 
-CarreirasMatch é uma ferramenta que compara o currículo do candidato com a vaga, mostra a aderência real e ajuda a se preparar para a entrevista. Tom: direto, prático, orientado a resultado — não é um produto "fofo" ou institucional, é uma ferramenta de trabalho.
+CarreirasMatch é o copiloto da carreira inteira: acompanha desde a escolha profissional e os estudos até a candidatura, a entrevista, a recolocação e a evolução de carreira, não só a comparação de currículo com vaga. A análise de currículo x vaga continua sendo a porta de entrada mais forte do produto, mas é o primeiro passo de uma jornada mais longa, não o produto inteiro. Tom: direto, prático, orientado a resultado, nunca "fofo" ou institucional, é uma ferramenta de trabalho.
 
 ## 2. Logo
 

@@ -2,14 +2,27 @@
 
 ## O que o código diz que o produto é
 
-`src/lib/seo.ts` define a descrição oficial (usada no JSON-LD de organização,
-em todas as páginas): "Copiloto de carreira que compara currículo e vaga,
-mostra as lacunas que mais importam e transforma o diagnóstico em ações."
+Mensagem-âncora: **"O copiloto da sua carreira inteira."** A análise de
+currículo x vaga é a porta de entrada mais forte e o CTA primário
+(`/analise`), mas é o primeiro passo dentro de uma jornada mais longa que o
+produto já cobre de fato: descoberta de profissão, estudos, candidatura
+(inclusive automática), entrevista, recolocação e evolução de carreira.
 
-A home (`src/components/marketing-home.tsx`) resume isso na headline: **"Pare
-de se candidatar no escuro."**, com o subtítulo "Compare seu currículo com
-uma vaga real, descubra o que está ajudando ou atrapalhando e receba um plano
-claro antes de aplicar." CTA primário: "Analisar currículo e vaga" (`/analise`).
+`src/lib/seo.ts` define a descrição oficial (usada no JSON-LD de
+organização, em todas as páginas): "O copiloto da sua carreira inteira:
+escolha de profissão, estudos para concurso e vestibular, estágio, primeiro
+emprego, recolocação, transição de carreira e trabalho freelancer, tudo com
+apoio de inteligência artificial."
+
+A home (`src/components/marketing-home.tsx`) resume isso na headline: **"O
+copiloto da sua carreira inteira."**, com o subtítulo "Do primeiro currículo
+à próxima promoção: CarreirasMatch une análise de vaga, candidatura
+automática, preparo para entrevista e evolução de carreira, tudo em um só
+lugar." A seção "Em que momento da sua carreira você está?" e a seção de
+ecossistema (candidatura automática, radar de concurso/vestibular,
+marketplace freelancer, central de candidaturas) aparecem logo após o hero,
+antes do fluxo de 3 etapas de análise de currículo x vaga, justamente para
+não deixar a impressão de que o produto é só isso.
 
 ## Para quem é (fonte: `/sobre`)
 

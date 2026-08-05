@@ -92,7 +92,7 @@ export function HeroInstantScanner() {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6 font-sans">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-white">Simule sua vaga desejada</h3>
+        <h3 className="text-lg font-bold text-white">Cole aqui a vaga que você quer</h3>
         <span className="text-xs text-blue-300 font-medium">
           100% Gratuito
         </span>
@@ -100,7 +100,7 @@ export function HeroInstantScanner() {
 
       <div className="space-y-1">
         <p className="text-xs text-slate-300 leading-relaxed">
-          Digite o cargo que você procura e veja em segundos os pontos fortes que o recrutador busca.
+          Veja gratuitamente se o seu perfil combina com a oportunidade e quais pontos precisam de atenção.
         </p>
       </div>
 
@@ -113,7 +113,7 @@ export function HeroInstantScanner() {
             required
             value={roleQuery}
             onChange={(e) => setRoleQuery(e.target.value)}
-            placeholder="Ex: Desenvolvedor Front-end, Vendedor..."
+            placeholder="Cole o link ou a descrição da vaga..."
             className="w-full rounded-full border border-white/20 bg-black/30 pl-10 pr-4 py-3 text-sm text-white placeholder-white/50 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 transition-all"
           />
         </div>
@@ -127,23 +127,26 @@ export function HeroInstantScanner() {
           {scanning ? (
             <span className="inline-flex items-center gap-2">
               <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-              Analisando perfil para o cargo...
+              Analisando a vaga...
             </span>
           ) : (
             <span className="inline-flex items-center gap-2">
-              <span>Simular vaga gratuitamente</span>
+              <span>Analisar esta vaga</span>
               <ArrowRight className="w-4 h-4" />
             </span>
           )}
         </button>
       </form>
+      <p className="text-[11px] text-slate-400 leading-relaxed -mt-1">
+        Depois, você enviará seu currículo para calcular a compatibilidade.
+      </p>
 
       {/* Simulated Live Result */}
       {result && (
         <div data-testid="hero-scanner-result" className="rounded-2xl border border-white/15 bg-slate-950/90 p-5 space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300 shadow-xl">
           <div className="flex items-center justify-between pb-3 border-b border-white/10">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Cargo Simulado</p>
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Vaga analisada</p>
               <h4 className="font-bold text-sm text-white truncate max-w-[12rem] sm:max-w-xs">{result.role}</h4>
             </div>
             <div className="text-right">

@@ -88,11 +88,22 @@ export async function applyCoupon(
  * webhook, já que o PIX nasce "pending" e só confirma lá. É o contador comparado
  * contra maxRedemptions, então contar um pagamento não pago bloquearia o cupom à toa.
  */
-export async function registerCouponUsage(couponId: string | null) {
+export async function registerCouponUsage(
+  couponId: string | null,
+  context?: { userId?: string | null; paymentId?: string | null }
+) {
   if (!couponId) return;
   await prisma.coupon.update({
     where: { id: couponId },
     data: { usageCount: { increment: 1 } },
+  });
+  await prisma.funnelEvent.create({
+    data: {
+      name: "coupon_used",
+      userId: context?.userId ?? null,
+      paymentId: context?.paymentId ?? null,
+      properties: JSON.stringify({ couponId }),
+    },
   });
 }
 

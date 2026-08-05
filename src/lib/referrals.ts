@@ -20,6 +20,8 @@ export async function getUserReferralStats(userId: string) {
     prisma.user.count({
       where: { referredById: userId },
     }),
+    // Intentional exception: referral perk display gated on "has any paid plan", not usage
+    // against a single feature's monthly limit — no natural catalog featureKey for it.
     hasActiveSubscriptionAccess(userId),
   ]);
 

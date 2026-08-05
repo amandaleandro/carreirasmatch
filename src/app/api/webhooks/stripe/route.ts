@@ -72,19 +72,24 @@ export async function POST(req: NextRequest) {
       if (effectiveUserId) {
         const product = productCode ? await resolveCommercialProduct(productCode) : null;
         const existingPayment = await prisma.payment.findUnique({ where: { mpPaymentId: `stripe_${session.id}` } });
-        if (existingPayment) return NextResponse.json({ received: true });
-        const paymentRecord = await prisma.payment.create({
-          data: {
-            userId: effectiveUserId,
-            analysisId: analysisId || null,
-            amount: amountTotal,
-            kind: kind || "diagnostic",
-            segment: normalizedSegment,
-            status: "paid",
-            mpPaymentId: `stripe_${session.id}`,
-            paidAt: new Date(),
-          },
-        });
+        if (existingPayment?.status === "paid") return NextResponse.json({ received: true });
+        const paymentRecord = existingPayment
+          ? await prisma.payment.update({
+              where: { id: existingPayment.id },
+              data: { status: "paid", amount: amountTotal, paidAt: new Date() },
+            })
+          : await prisma.payment.create({
+              data: {
+                userId: effectiveUserId,
+                analysisId: analysisId || null,
+                amount: amountTotal,
+                kind: kind || "diagnostic",
+                segment: normalizedSegment,
+                status: "paid",
+                mpPaymentId: `stripe_${session.id}`,
+                paidAt: new Date(),
+              },
+            });
 
         if (product) {
           const purchase = await prisma.purchase.create({
@@ -126,7 +131,7 @@ export async function POST(req: NextRequest) {
         if (couponCode) {
           const coupon = await prisma.coupon.findUnique({ where: { code: couponCode.toUpperCase() } });
           if (coupon) {
-            await registerCouponUsage(coupon.id);
+            await registerCouponUsage(coupon.id, { userId: effectiveUserId, paymentId: paymentRecord.id });
           }
         }
 
@@ -148,6 +153,20 @@ export async function POST(req: NextRequest) {
     } catch (dbError) {
       console.error("Erro ao processar confirmação de pagamento do Stripe no banco:", dbError);
     }
+  }
+
+  // Sessão expirada sem pagamento (Stripe expira Checkout Sessions em ~24h por
+  // padrão): marca o Payment pending como cancelled, senão ele ficaria "pending"
+  // pra sempre e a régua de recuperação continuaria mandando e-mail depois que
+  // já não há mais nada a recuperar.
+  if (event.type === "checkout.session.expired") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    await prisma.payment
+      .updateMany({
+        where: { mpPaymentId: `stripe_${session.id}`, status: "pending" },
+        data: { status: "cancelled" },
+      })
+      .catch((err) => console.error("Erro ao marcar Payment expirado do Stripe:", err));
   }
 
   return NextResponse.json({ received: true });

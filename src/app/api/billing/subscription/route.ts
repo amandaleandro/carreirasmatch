@@ -122,20 +122,48 @@ export async function POST(req: NextRequest) {
 
   const status = result.status === "authorized" ? "paid" : "pending";
 
-  const payment = await prisma.payment.create({
-    data: {
+  // Reaproveita o Payment "intent_" criado quando o usuário abriu o Brick
+  // (POST /api/billing/checkout-intent), em vez de acumular uma segunda linha
+  // pra mesma tentativa de assinatura.
+  const intent = await prisma.payment.findFirst({
+    where: {
       userId,
       kind: "subscription",
       segment,
-      amount: amountCents,
-      discountCents,
-      status,
-      mpPaymentId: result.id,
-      couponId,
-      paidAt: status === "paid" ? new Date() : null,
-      ...tracking,
+      status: "pending",
+      mpPaymentId: { startsWith: "intent_" },
+      createdAt: { gte: new Date(Date.now() - 24 * 60 * 60 * 1000) },
     },
+    orderBy: { createdAt: "desc" },
   });
+
+  const payment = intent
+    ? await prisma.payment.update({
+        where: { id: intent.id },
+        data: {
+          amount: amountCents,
+          discountCents,
+          status,
+          mpPaymentId: result.id,
+          couponId,
+          paidAt: status === "paid" ? new Date() : null,
+          ...tracking,
+        },
+      })
+    : await prisma.payment.create({
+        data: {
+          userId,
+          kind: "subscription",
+          segment,
+          amount: amountCents,
+          discountCents,
+          status,
+          mpPaymentId: result.id,
+          couponId,
+          paidAt: status === "paid" ? new Date() : null,
+          ...tracking,
+        },
+      });
 
   if (status === "paid") {
     const currentPeriodEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
@@ -144,7 +172,7 @@ export async function POST(req: NextRequest) {
       create: { userId, segment, planKey, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
       update: { segment, planKey, status: "active", currentPeriodEnd, lastPaymentId: payment.id },
     });
-    await registerCouponUsage(couponId);
+    await registerCouponUsage(couponId, { userId, paymentId: payment.id });
     // E-mail no caminho síncrono (assinatura autorizada na hora). No caminho
     // assíncrono o e-mail sai no webhook, com guard para não duplicar.
     void sendSubscriptionConfirmationEmail(email, { currentPeriodEnd });

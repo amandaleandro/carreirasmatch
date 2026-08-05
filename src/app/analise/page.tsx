@@ -24,6 +24,8 @@ export default async function AnalisePage() {
     : null;
 
   const suggestedTrack = defaultTrackForSegment(user?.careerSegment) as CareerTrack | null;
+  // Intentional exception: unlocks the full track picker for any paid plan, not usage against a
+  // single feature's monthly limit — no natural catalog featureKey for it.
   const isPaidUser = userId ? await hasActiveSubscriptionAccess(userId) : false;
   const allowedTracks = isPaidUser
     ? (tracksForSegment(user?.careerSegment) as CareerTrack[] | null)

@@ -5,6 +5,7 @@ import { parseAutoApplyProfile, type AutoApplyProfile } from "@/lib/auto-apply-p
 import { applyToExternalJob } from "@/lib/external-auto-apply";
 import { extractStructuredResume, tailorResumeForJob } from "@/lib/groq";
 import { renderResumePdf } from "@/lib/resume-pdf";
+import { reserveFeature } from "@/lib/feature-access";
 
 export type AutoApplyRunResult = {
   queued: number;
@@ -436,17 +437,29 @@ export async function runAutoApplyForUser(
   });
 
   const result = { ...EMPTY_RESULT };
+  let planLimitReached = false;
   for (const item of pending) {
+    if (planLimitReached) break;
+    const reservation = await reserveFeature(userId, "job.application.create");
+    if (!reservation.allowed) {
+      planLimitReached = true;
+      break;
+    }
     const outcome = await processQueueItem(
       item.id,
       userId,
       user?.name?.trim() || "Um candidato",
       externalContext,
     );
-    if (outcome === "applied") result.applied += 1;
-    else if (outcome === "unsupported") result.unsupported += 1;
-    else if (outcome === "failed") result.failed += 1;
-    else result.skipped += 1;
+    if (outcome === "applied") {
+      result.applied += 1;
+      await reservation.reservation?.confirm();
+    } else {
+      await reservation.reservation?.cancel();
+      if (outcome === "unsupported") result.unsupported += 1;
+      else if (outcome === "failed") result.failed += 1;
+      else result.skipped += 1;
+    }
   }
 
   const slotsLeft = Math.max(0, remaining - result.applied);
@@ -507,16 +520,27 @@ export async function runAutoApplyForUser(
   }
 
   for (const queueId of queueIds) {
+    if (planLimitReached) break;
+    const reservation = await reserveFeature(userId, "job.application.create");
+    if (!reservation.allowed) {
+      planLimitReached = true;
+      break;
+    }
     const outcome = await processQueueItem(
       queueId,
       userId,
       user?.name?.trim() || "Um candidato",
       externalContext,
     );
-    if (outcome === "applied") result.applied += 1;
-    else if (outcome === "unsupported") result.unsupported += 1;
-    else if (outcome === "failed") result.failed += 1;
-    else result.skipped += 1;
+    if (outcome === "applied") {
+      result.applied += 1;
+      await reservation.reservation?.confirm();
+    } else {
+      await reservation.reservation?.cancel();
+      if (outcome === "unsupported") result.unsupported += 1;
+      else if (outcome === "failed") result.failed += 1;
+      else result.skipped += 1;
+    }
   }
 
   await notifyBlockedExternalItems(userId, now, user);

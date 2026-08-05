@@ -23,7 +23,7 @@ export function organizationJsonLd() {
     url: BASE_URL,
     logo: absoluteUrl("/logos/icon-light.png"),
     description:
-      "Plataforma de carreira completa: escolha de profissão, estudos para concurso e vestibular, estágio, primeiro emprego, recolocação, transição de carreira e trabalho freelancer, tudo com apoio de inteligência artificial.",
+      "O copiloto da sua carreira inteira: escolha de profissão, estudos para concurso e vestibular, estágio, primeiro emprego, recolocação, transição de carreira e trabalho freelancer, tudo com apoio de inteligência artificial.",
   };
 }
 
@@ -37,7 +37,7 @@ export function softwareApplicationJsonLd() {
     operatingSystem: "Web",
     url: BASE_URL,
     description:
-      "Acompanha cada etapa da carreira: teste vocacional, radar de concurso e vestibular, comparação de currículo com vaga real, candidatura automática, marketplace freelancer e preparação para entrevista.",
+      "Copiloto de carreira que acompanha cada etapa: teste vocacional, radar de concurso e vestibular, comparação de currículo com vaga real, candidatura automática, marketplace freelancer e preparação para entrevista.",
   };
 }
 
@@ -92,6 +92,7 @@ export function articleJsonLd(params: {
     headline: params.title,
     description: params.description,
     url: absoluteUrl(params.path),
+    image: absoluteUrl(`${params.path}/opengraph-image`),
     mainEntityOfPage: absoluteUrl(params.path),
     datePublished: params.publishedAt.toISOString(),
     dateModified: (params.updatedAt ?? params.publishedAt).toISOString(),

@@ -35,6 +35,9 @@ export default async function ToolsPage() {
       })
     : null;
 
+  // Intentional exception: this decides which entire tool cards render as locked/unlocked in the
+  // catalog grid ("any paid plan" access), not usage against a single feature's monthly limit —
+  // there's no natural catalog featureKey for whole-catalog access.
   const isPaidUser = session?.user?.id
     ? await hasActiveSubscriptionAccess(session.user.id)
     : false;

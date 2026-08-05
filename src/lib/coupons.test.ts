@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 const { prismaMock } = vi.hoisted(() => ({
   prismaMock: {
     coupon: { findUnique: vi.fn(), update: vi.fn() },
+    funnelEvent: { create: vi.fn() },
   },
 }));
 
@@ -35,6 +36,7 @@ function makeCoupon(overrides: Partial<CouponRules> = {}): CouponRules {
 beforeEach(() => {
   prismaMock.coupon.findUnique.mockReset();
   prismaMock.coupon.update.mockReset();
+  prismaMock.funnelEvent.create.mockReset();
 });
 
 describe("normalizeCouponCode", () => {

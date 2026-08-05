@@ -5,17 +5,25 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getWeekStart, normalizeApplicationStatus, type ApplicationStatus } from "@/lib/applications";
-import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
+import { reserveFeatureForSession } from "@/lib/feature-access";
 
 async function requireUserId() {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
-  if (!(await hasActiveSubscriptionAccess(session.user.id))) redirect("/settings?upgrade=1");
   return session.user.id;
 }
 
-export async function createApplication(formData: FormData) {
+/** For actions that create a new tracked application: reserves quota against the catalog and
+ * redirects to the upgrade prompt if the user is out of "job.application.create" for this cycle. */
+async function requireUserIdForNewApplication() {
   const userId = await requireUserId();
+  const reserved = await reserveFeatureForSession(userId, "job.application.create");
+  if (!reserved.allowed) redirect("/settings?upgrade=1");
+  return { userId, release: reserved.release! };
+}
+
+export async function createApplication(formData: FormData) {
+  const { userId, release } = await requireUserIdForNewApplication();
   const jobTitle = String(formData.get("jobTitle") ?? "").trim();
   const company = String(formData.get("company") ?? "").trim();
   const jobUrl = String(formData.get("jobUrl") ?? "").trim();
@@ -24,20 +32,29 @@ export async function createApplication(formData: FormData) {
   const deadlineRaw = String(formData.get("deadline") ?? "").trim();
   const deadline = deadlineRaw ? new Date(deadlineRaw) : null;
 
-  if (!jobTitle) return;
+  if (!jobTitle) {
+    await release.cancel();
+    return;
+  }
 
-  await prisma.application.create({
-    data: {
-      userId,
-      jobTitle,
-      company,
-      jobUrl,
-      notes,
-      status,
-      deadline: deadline && !Number.isNaN(deadline.getTime()) ? deadline : null,
-      appliedAt: status === "applied" ? new Date() : null,
-    },
-  });
+  try {
+    await prisma.application.create({
+      data: {
+        userId,
+        jobTitle,
+        company,
+        jobUrl,
+        notes,
+        status,
+        deadline: deadline && !Number.isNaN(deadline.getTime()) ? deadline : null,
+        appliedAt: status === "applied" ? new Date() : null,
+      },
+    });
+    await release.confirm();
+  } catch (e) {
+    await release.cancel();
+    throw e;
+  }
 
   revalidatePath("/applications");
   revalidatePath("/dashboard");
@@ -205,6 +222,8 @@ export async function saveFeedMatchAsApplication(
     where: { userId, jobUrl: match.job.url },
   });
 
+  // Só reserva cota de "job.application.create" quando de fato cria um registro novo;
+  // atualizar uma candidatura já existente não consome a cota.
   if (existing) {
     if (existing.status !== status) {
       await prisma.applicationActivity.create({
@@ -223,19 +242,27 @@ export async function saveFeedMatchAsApplication(
       },
     });
   } else {
-    await prisma.application.create({
-      data: {
-        userId,
-        jobId: match.jobId,
-        jobTitle: match.job.jobTitle,
-        company: match.job.company,
-        jobUrl: match.job.url,
-        fitScore: match.fitScore,
-        status,
-        appliedAt: status === "applied" ? new Date() : null,
-        notes: match.reason,
-      },
-    });
+    const reserved = await reserveFeatureForSession(userId, "job.application.create");
+    if (!reserved.allowed) redirect("/settings?upgrade=1");
+    try {
+      await prisma.application.create({
+        data: {
+          userId,
+          jobId: match.jobId,
+          jobTitle: match.job.jobTitle,
+          company: match.job.company,
+          jobUrl: match.job.url,
+          fitScore: match.fitScore,
+          status,
+          appliedAt: status === "applied" ? new Date() : null,
+          notes: match.reason,
+        },
+      });
+      await reserved.release!.confirm();
+    } catch (e) {
+      await reserved.release!.cancel();
+      throw e;
+    }
   }
 
   revalidatePath("/feed");
@@ -282,17 +309,27 @@ export async function saveAnalysisAsApplication(analysisId: string) {
 
   const status = analysis.applicationStatus === "apply_now" ? "saved" : "tailor_resume";
 
-  const application = await prisma.application.create({
-    data: {
-      userId,
-      analysisId,
-      jobTitle: analysis.jobTitle,
-      jobUrl,
-      fitScore: analysis.overallScore,
-      status,
-      notes: analysis.applicationStatusReason,
-    },
-  });
+  const reserved = await reserveFeatureForSession(userId, "job.application.create");
+  if (!reserved.allowed) redirect("/settings?upgrade=1");
+
+  let application;
+  try {
+    application = await prisma.application.create({
+      data: {
+        userId,
+        analysisId,
+        jobTitle: analysis.jobTitle,
+        jobUrl,
+        fitScore: analysis.overallScore,
+        status,
+        notes: analysis.applicationStatusReason,
+      },
+    });
+    await reserved.release!.confirm();
+  } catch (e) {
+    await reserved.release!.cancel();
+    throw e;
+  }
 
   revalidatePath(`/report/${analysisId}`);
   revalidatePath("/applications");

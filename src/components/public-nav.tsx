@@ -4,11 +4,15 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
+// Cada label leva a uma tela-hub dedicada da jornada (não mais direto pra
+// primeira ferramenta) — "Trabalhar por conta" já tinha um hub real em
+// /freelancers, as outras 4 ganharam página própria em /descobrir, /aprender,
+// /conquistar e /evoluir.
 export const journeys = [
-  { label: "Descobrir", href: "/faculdade-ou-tecnico", items: [["Teste vocacional", "/tools/vocation-test"], ["Teste comportamental", "/tools/behavioral-test"], ["Faculdade ou técnico", "/faculdade-ou-tecnico"], ["Mercado de trabalho", "/mercado-de-trabalho"]] },
-  { label: "Aprender", href: "/ensino-medio", items: [["Ensino médio", "/ensino-medio"], ["Universidade", "/universidade"], ["Concursos", "/concurso"], ["OAB", "/oab"], ["Ferramentas de estudo", "/tools"]] },
-  { label: "Conquistar", href: "/analise", items: [["Analisar currículo e vaga", "/analise"], ["Criar currículo", "/curriculo-gratis"], ["Verificar ATS", "/verificador-ats"], ["Encontrar vagas", "/todas-as-vagas"], ["Preparar entrevista", "/tools/interview-simulator"], ["Acompanhar candidaturas", "/applications"]] },
-  { label: "Evoluir", href: "/insights", items: [["Evolução profissional", "/evolucao"], ["Melhorar LinkedIn", "/tools/linkedin-optimizer"], ["Revisar GitHub", "/tools/github-review"], ["Mapa de competências", "/tools/matriz-de-skills"], ["Plano de ação", "/action-plan"], ["Transição de carreira", "/transicao"]] },
+  { label: "Descobrir", href: "/descobrir", items: [["Teste vocacional", "/tools/vocation-test"], ["Teste comportamental", "/tools/behavioral-test"], ["Faculdade ou técnico", "/faculdade-ou-tecnico"], ["Mercado de trabalho", "/mercado-de-trabalho"]] },
+  { label: "Aprender", href: "/aprender", items: [["Ensino médio", "/ensino-medio"], ["Universidade", "/universidade"], ["Concursos", "/concurso"], ["OAB", "/oab"], ["Ferramentas de estudo", "/tools"]] },
+  { label: "Conquistar", href: "/conquistar", items: [["Analisar currículo e vaga", "/analise"], ["Criar currículo", "/curriculo-gratis"], ["Verificar ATS", "/verificador-ats"], ["Encontrar vagas", "/todas-as-vagas"], ["Preparar entrevista", "/tools/interview-simulator"], ["Acompanhar candidaturas", "/applications"]] },
+  { label: "Evoluir", href: "/evoluir", items: [["Evolução profissional", "/evolucao"], ["Melhorar LinkedIn", "/tools/linkedin-optimizer"], ["Revisar GitHub", "/tools/github-review"], ["Mapa de competências", "/tools/matriz-de-skills"], ["Plano de ação", "/action-plan"], ["Transição de carreira", "/transicao"]] },
   { label: "Trabalhar por conta", href: "/freelancers", items: [["Encontrar projetos", "/projetos"], ["Criar perfil", "/freelancer"], ["Meus contratos", "/freelancer/contratos"], ["Precificação inteligente", "/freelancer/precificacao"]] },
 ] as const;
 

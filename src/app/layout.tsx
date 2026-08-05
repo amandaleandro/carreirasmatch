@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     default: "CarreirasMatch | sua carreira inteira, em um só lugar",
     template: `%s | ${SITE_NAME}`,
   },
-  description: "Escolha de profissão, concurso e vestibular, currículo, entrevista, primeiro emprego, recolocação e freelancer: acompanhe cada etapa da sua carreira com inteligência artificial.",
+  description: "O copiloto da sua carreira inteira: escolha de profissão, concurso e vestibular, currículo, candidatura, entrevista, primeiro emprego, recolocação e freelancer, com apoio de inteligência artificial.",
   applicationName: SITE_NAME,
   openGraph: {
     type: "website",

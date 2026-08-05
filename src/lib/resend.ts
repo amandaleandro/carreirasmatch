@@ -323,7 +323,8 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
     bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
       <p style="color:#64748b;margin:0 0 16px;">Sua conta no ${BRAND} tá no ar. Chegou até aqui, já é sinal de que tá levando essa busca a sério 🫡</p>
-      <p>A partir de agora a IA te conta, sem enrolação, o quanto seu currículo casa com qualquer vaga, e exatamente o que mudar pra esse número subir.</p>
+      <p>Aqui você tem um copiloto pra carreira inteira: currículo x vaga, candidatura automática, preparo pra entrevista e o que vier depois da contratação.</p>
+      <p>Primeiro passo: a IA te conta, sem enrolação, o quanto seu currículo casa com qualquer vaga, e exatamente o que mudar pra esse número subir.</p>
       <p>Spoiler: seu currículo genérico provavelmente não passa nem pelo robô do ATS antes de chegar num humano 🤖</p>
       <p>Leva menos de 2 minutos pra ver seu primeiro score 🚀</p>
     `,
@@ -332,7 +333,7 @@ export async function sendWelcomeEmail(to: string, name?: string | null) {
     "welcome",
     `Situação: primeiro e-mail depois que a pessoa acaba de criar a conta.
 Nome: ${name?.trim() || "não informado"}.
-Objetivo: dar boas-vindas com energia, deixar claro que a IA analisa currículo x vaga e diz exatamente o que ajustar, e empurrar pra primeira análise (menos de 2 minutos).
+Objetivo: dar boas-vindas com energia, deixar claro que o ${BRAND} é um copiloto pra carreira inteira (não só currículo x vaga: candidatura automática, entrevista, evolução), e empurrar pra primeira análise como primeiro passo (menos de 2 minutos).
 CTA (não incluir no html, só escrever até ele): "Analisar meu currículo".`,
     fallback
   );

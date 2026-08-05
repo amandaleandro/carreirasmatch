@@ -22,15 +22,21 @@ import { CommercialPlanCards } from "@/components/commercial-plan-cards";
 import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 
 
-const PUBLIC_PLAN_CARDS = Object.values(COMMERCIAL_PLANS).map((plan) => ({
-  key: plan.key,
-  name: plan.name,
-  priceCents: plan.priceCents,
-  recurring: plan.recurring,
-  durationDays: plan.durationDays ?? null,
-  highlighted: Boolean(plan.highlighted),
-  entitlements: Object.entries(plan.limits).map(([featureKey, limit]) => ({ limit, featureDefinition: { name: featureKey } })),
-}));
+// Home mostra só 3 opções (grátis, principal, sprint) pra reduzir indecisão;
+// o catálogo completo com 5 planos continua em /assinar.
+const HOME_PLAN_KEYS = ["free", "pro", "sprint"];
+const PUBLIC_PLAN_CARDS = Object.values(COMMERCIAL_PLANS)
+  .filter((plan) => HOME_PLAN_KEYS.includes(plan.key))
+  .sort((a, b) => HOME_PLAN_KEYS.indexOf(a.key) - HOME_PLAN_KEYS.indexOf(b.key))
+  .map((plan) => ({
+    key: plan.key,
+    name: plan.name,
+    priceCents: plan.priceCents,
+    recurring: plan.recurring,
+    durationDays: plan.durationDays ?? null,
+    highlighted: Boolean(plan.highlighted),
+    entitlements: Object.entries(plan.limits).map(([featureKey, limit]) => ({ limit, featureDefinition: { name: featureKey } })),
+  }));
 const steps = [
   ["01", "Envie seu currículo", "Cole o texto ou envie seu PDF atual. A análise respeita tudo o que você já construiu."],
   ["02", "Cole a vaga desejada", "Insira o texto ou o link da oportunidade para a qual você quer se candidatar."],
@@ -75,15 +81,13 @@ const ecosystemCards = [
   [LayoutGrid, "Central de candidaturas", "Histórico de Match, currículos e kits organizados por vaga, sem planilha.", "/applications"],
 ] as const;
 
+// Reduzida a 4 entradas na home (o diagnóstico apontou 8 cards competindo
+// cedo demais); a lista completa de momentos continua acessível no menu.
 const audienceCards = [
-  ["Descobrir", "Estou escolhendo uma profissão", "Teste vocacional, comparação de profissões e o caminho entre faculdade e curso técnico.", "/faculdade-ou-tecnico"],
-  ["Aprender", "Estou estudando", "Ensino médio, concursos, OAB e ferramentas completas de apoio aos estudos.", "/concurso"],
-  ["Conquistar", "Quero estágio", "Transforme projetos da faculdade e cursos em experiência que conta.", "/estagio"],
-  ["Conquistar", "Quero meu primeiro emprego", "Crie uma candidatura consistente e mostre seu valor mesmo sem carteira assinada.", "/primeiro-emprego"],
-  ["Conquistar", "Quero melhorar minhas candidaturas", "Analise seu currículo contra a vaga e descubra exatamente o que ajustar.", "/analise"],
-  ["Evoluir", "Quero mudar de carreira", "Identifique as habilidades que você já possui e aproximam você da nova área.", "/transicao"],
-  ["Conquistar", "Quero voltar ao mercado", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
-  ["Trabalhar por conta", "Quero trabalhar por conta", "Monte seu perfil, envie propostas e acompanhe contratos em um só lugar.", "/freelancers"],
+  ["Começando agora", "Primeiro emprego ou estágio", "Transforme cursos, projetos e atividades em experiência que conta na candidatura.", "/primeiro-emprego"],
+  ["Voltando ao mercado", "Recolocação", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
+  ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/transicao"],
+  ["Já empregado", "Quero uma vaga melhor", "Compare seu currículo com a próxima vaga e descubra exatamente o que ajustar.", "/analise"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -175,26 +179,29 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
 
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-14">
           <div className="space-y-6">
+            <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-300">
+              Análise de currículo para uma vaga real
+            </span>
+
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Da vaga encontrada à entrevista.
+              Você encontrou a vaga. Agora descubra se o seu currículo está pronto.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              O CarreirasMatch é seu copiloto da candidatura: compare currículo e vaga, descubra o que ajustar, prepare seus documentos e treine para a entrevista.
+              Compare seu currículo com a oportunidade, veja o que está alinhado, descubra o que está faltando e saiba o que ajustar antes de se candidatar.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Descobrir meu próximo passo" />
-              <a href="#momento" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
-                Conhecer a plataforma
+              <PrimaryCta label="Calcular meu Match grátis" />
+              <a href="#exemplo" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
+                Ver um resultado de exemplo
               </a>
             </div>
 
-            <div className="grid gap-2.5 text-xs font-medium text-slate-300 sm:grid-cols-2 pt-2">
-              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Análise inicial gratuita</span>
-              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Diagnóstico humano e respeitoso</span>
-              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Palavras-chave exigidas pela vaga</span>
-              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" /> Sem inventar qualificações falsas</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-300 pt-2">
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Sem cartão</span>
+              <span className="inline-flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Resultado inicial gratuito</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400 shrink-0" /> Seus dados protegidos</span>
             </div>
           </div>
 
@@ -205,6 +212,70 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
       </section>
 
       <main>
+        {/* EXEMPLO PRÁTICO */}
+        <section id="exemplo" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-20 md:px-8">
+          <div className="mx-auto max-w-3xl text-center space-y-3">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Você pode ter experiência e ainda ser descartado se o currículo não mostrar o que a vaga procura
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+              Mostramos o que a empresa procura, o que já se destaca no seu perfil e onde vale a pena dedicar atenção antes do envio.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-6 lg:grid-cols-3">
+            <Card variant="interactive">
+              <CardHeader>
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Pontos Fortes Identificados</span>
+                <CardTitle className="mt-2">Veja onde seu currículo combina</CardTitle>
+                <CardDescription>Competências, experiências e palavras-chave já alinhadas à oportunidade.</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card variant="interactive">
+              <CardHeader>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Oportunidade de Ajuste</span>
+                <CardTitle className="mt-2">Descubra o que pode eliminar você</CardTitle>
+                <CardDescription>Requisitos ausentes, trechos genéricos e problemas de leitura pelo ATS.</CardDescription>
+              </CardHeader>
+            </Card>
+
+            <Card variant="interactive" className="border-blue-200 dark:border-blue-900">
+              <CardHeader>
+                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Sugestão Prática</span>
+                <CardTitle className="mt-2">Saiba exatamente o que ajustar</CardTitle>
+                <CardDescription>Receba ações priorizadas antes de enviar a candidatura.</CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </section>
+
+        {/* COMO FUNCIONA */}
+        <section id="como-funciona" className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
+          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 space-y-12">
+            <div className="text-center space-y-2 max-w-2xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Da vaga encontrada à candidatura preparada em 4 passos
+              </h2>
+            </div>
+
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+              {journeySteps.map(([number, title, description]) => (
+                <Card key={number} variant="default" className="p-6 space-y-4">
+                  <span className="w-10 h-10 rounded-full bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center shadow-xs">
+                    {number}
+                  </span>
+                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* PROVA SOCIAL */}
+        <SocialProof analysisCount={analysisCount} />
+
         {/* MOMENTO PROFISSIONAL */}
         <section id="momento" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-16 md:px-8">
           <div className="max-w-2xl space-y-2">
@@ -212,7 +283,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               Em que momento da sua carreira você está?
             </h2>
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-              Escolha o que mais combina com você agora. O CarreirasMatch entende seu momento e mostra o próximo passo, sem que você precise conhecer todas as ferramentas.
+              Escolha o que mais combina com você agora e veja o próximo passo recomendado.
             </p>
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -227,65 +298,28 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </div>
         </section>
 
-        {/* PROVA SOCIAL */}
-        <SocialProof analysisCount={analysisCount} />
-
-        {/* EXEMPLO PRÁTICO */}
-        <section id="exemplo" className="mx-auto max-w-7xl scroll-mt-8 px-4 py-20 md:px-8">
-          <div className="mx-auto max-w-3xl text-center space-y-3">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Mais do que uma nota, entregamos clareza sobre o seu momento
-            </h2>
-            <p className="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
-              Mostramos o que a empresa procura, o que já se destaca no seu perfil e onde vale a pena dedicar atenção antes do envio.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            <Card variant="interactive">
-              <CardHeader>
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Pontos Fortes Identificados</span>
-                <CardTitle className="mt-2">Planejamento e Execução</CardTitle>
-                <CardDescription>Seu histórico apresenta comprovações de organização, cumprimento de prazos e trabalho em equipe.</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card variant="interactive">
-              <CardHeader>
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Oportunidade de Ajuste</span>
-                <CardTitle className="mt-2">Métricas de Resultado</CardTitle>
-                <CardDescription>A vaga valoriza demonstração de dados e resultados, mas seu resumo atual foca apenas em tarefas rotineiras.</CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card variant="interactive" className="border-blue-200 dark:border-blue-900">
-              <CardHeader>
-                <span className="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Sugestão Prática</span>
-                <CardTitle className="mt-2">Destaque de Impacto</CardTitle>
-                <CardDescription>Insira percentuais ou volumes atendidos. Se for um novo desafio, destaque cursos e projetos práticos recentes.</CardDescription>
-              </CardHeader>
-            </Card>
-          </div>
-        </section>
-
-        {/* COMO FUNCIONA */}
-        <section id="como-funciona" className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
-          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 space-y-12">
-            <div className="text-center space-y-2 max-w-2xl mx-auto">
+        {/* ECOSSISTEMA */}
+        <section className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
+          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+            <div className="max-w-2xl space-y-2">
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Como ajudamos você em 3 etapas simples
+                E o CarreirasMatch continua com você depois da primeira análise
               </h2>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                Prepare novas candidaturas, acompanhe seus processos, treine para entrevistas e encontre novas oportunidades.
+              </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {journeySteps.map(([number, title, description]) => (
-                <Card key={number} variant="default" className="p-6 space-y-4">
-                  <span className="w-10 h-10 rounded-full bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center shadow-xs">
-                    {number}
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {ecosystemCards.map(([Icon, title, description, href]) => (
+                <Link key={href + title} href={href} className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-blue-500/40 dark:border-slate-800 dark:bg-slate-900">
+                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+                    <Icon className="h-5 w-5" />
                   </span>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
-                </Card>
+                  <h3 className="mt-4 text-base font-bold leading-snug text-slate-900 dark:text-white">{title}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
+                  <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-transform group-hover:translate-x-1">Conhecer <ArrowRight className="h-3.5 w-3.5" /></span>
+                </Link>
               ))}
             </div>
           </div>
@@ -312,34 +346,11 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </div>
         </section>
 
-        {/* ECOSSISTEMA */}
-        <section className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
-          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-            <div className="max-w-2xl space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Ferramentas completas para toda a sua trajetória
-              </h2>
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                Além do Match de currículo, acompanhamos seu desenvolvimento em cada etapa do seu crescimento profissional.
-              </p>
-            </div>
-
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {ecosystemCards.map(([Icon, title, description, href]) => (
-                <Link key={href + title} href={href} className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-blue-500/40 dark:border-slate-800 dark:bg-slate-900">
-                  <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <h3 className="mt-4 text-base font-bold leading-snug text-slate-900 dark:text-white">{title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
-                  <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-transform group-hover:translate-x-1">Conhecer <ArrowRight className="h-3.5 w-3.5" /></span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <CommercialPlanCards plans={PUBLIC_PLAN_CARDS} />
+        <CommercialPlanCards
+          plans={PUBLIC_PLAN_CARDS}
+          title="Gratuito ou Carreira Pro: qual combina com você agora?"
+          subtitle="Carreira Pro é o mais indicado para quem está procurando emprego agora."
+        />
 
         {/* FAQ */}
         <section className="mx-auto max-w-4xl px-4 py-20 md:px-8 space-y-8">
@@ -359,12 +370,12 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
 
         <section className="mx-auto w-full max-w-5xl px-4 pb-20 md:px-8">
           <div className="rounded-3xl bg-blue-600 px-6 py-10 text-center shadow-xl shadow-blue-600/15 sm:px-10">
-            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Pronto para entender sua próxima candidatura?</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Sua próxima candidatura pode começar mais preparada</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
               Compare seu currículo com uma vaga real e descubra quais ajustes fazem sentido para o seu perfil.
             </p>
             <Link href="/analise" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-50">
-              Analisar meu currículo <ArrowRight className="h-4 w-4" />
+              Calcular meu Match grátis <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </section>

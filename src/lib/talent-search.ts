@@ -89,6 +89,8 @@ export async function searchTalent(
 
   // O selo de Top Match Gamificado é benefício pago: ranking é aberto a todos,
   // mas só quem assina exibe o selo pras empresas.
+  // Intentional exception: badge visibility gated on "has any paid plan", not usage against a
+  // single feature's monthly limit — no natural catalog featureKey for it.
   const top10Ids = topMonthlyScores.map((s) => s.userId);
   const top10SubscribedFlags = await Promise.all(
     top10Ids.map((id) => hasActiveSubscriptionAccess(id))

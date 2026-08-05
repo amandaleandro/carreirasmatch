@@ -26,15 +26,23 @@ const FEATURE_LABELS: Record<string, string> = {
   "study.tool.use": "Ferramentas de estudo",
 };
 
-export function CommercialPlanCards({ plans }: { plans: Plan[] }) {
+export function CommercialPlanCards({
+  plans,
+  title = "Escolha a profundidade da sua jornada",
+  subtitle = "Os limites abaixo são controlados pelo backend e podem evoluir com o produto.",
+}: {
+  plans: Plan[];
+  title?: string;
+  subtitle?: string;
+}) {
   return (
     <section className="mx-auto max-w-6xl px-4 pt-8">
       <div className="mx-auto max-w-2xl text-center">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Planos oficiais</p>
-        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">Escolha a profundidade da sua jornada</h2>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Os limites abaixo são controlados pelo backend e podem evoluir com o produto.</p>
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400">Planos</p>
+        <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-3xl">{title}</h2>
+        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{subtitle}</p>
       </div>
-      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+      <div className={`mt-8 grid gap-4 md:grid-cols-2 ${plans.length <= 3 ? "xl:grid-cols-3" : "xl:grid-cols-5"}`}>
         {plans.map((plan) => {
           const highlights = plan.entitlements.filter((item) => item.limit !== 0).slice(0, 4);
           return (

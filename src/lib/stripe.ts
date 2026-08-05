@@ -4,6 +4,7 @@ import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { periodPlanAmountCents, periodPlanProductName } from "@/lib/billing-plans";
 import type { CareerSegment } from "@/lib/career-segments";
 import { resolveCommercialProduct } from "@/lib/commercial-products";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Inicializa a biblioteca Stripe. Segue a instrução do blueprint:
@@ -99,6 +100,26 @@ export async function createStripeCheckoutSession({
     success_url: successUrl,
     cancel_url: cancelUrl,
   });
+
+  // Deixa um rastro "pending" assim que a sessão é criada, não só quando o
+  // pagamento é confirmado. Sem isso, quem abandona o Checkout do Stripe some
+  // sem aparecer no funil e sem entrar na régua de recuperação de checkout
+  // (sendCheckoutRecoveryEmails já varre Payment pending/cancelled). Só dá pra
+  // fazer isso com userId, porque a coluna é obrigatória — checkout de
+  // convidado sem conta ainda continua sendo registrado só no webhook.
+  if (userId) {
+    await prisma.payment.create({
+      data: {
+        userId,
+        analysisId: analysisId || null,
+        amount: unitAmountCents,
+        kind: currentKind,
+        segment,
+        status: "pending",
+        mpPaymentId: `stripe_${session.id}`,
+      },
+    });
+  }
 
   return session;
 }

@@ -128,7 +128,7 @@ export default async function BlogPage({
         {areaChips.map(([slug, label]) => (
           <Link
             key={slug}
-            href={`/blog?area=${slug}`}
+            href={`/blog/area/${slug}`}
             className={`rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all ${
               area === slug
                 ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm"

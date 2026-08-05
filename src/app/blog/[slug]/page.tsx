@@ -8,6 +8,7 @@ import { COVER_GRADIENTS, type ContentBlock } from "@/lib/blog-generator";
 import { prisma } from "@/lib/prisma";
 import { JsonLd } from "@/components/json-ld";
 import { articleJsonLd, breadcrumbJsonLd } from "@/lib/seo";
+import { getContentPillar } from "@/lib/blog-topics";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +37,13 @@ export async function generateMetadata({
       description: post.excerpt,
       url: path,
       publishedTime: post.publishedAt.toISOString(),
+      images: [`${path}/opengraph-image`],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      images: [`${path}/opengraph-image`],
     },
   };
 }
@@ -56,13 +64,32 @@ export default async function BlogPostPage({
   const blocks = JSON.parse(post.contentJson) as ContentBlock[];
   const gradient = COVER_GRADIENTS[post.gradientIdx] ?? COVER_GRADIENTS[0];
 
-  const relatedPosts = await prisma.post.findMany({
+  const sameAreaPosts = await prisma.post.findMany({
     where: { areaSlug: post.areaSlug, id: { not: post.id }, published: true },
     orderBy: { publishedAt: "desc" },
     take: 3,
   });
 
+  // Se a área ainda não tem posts suficientes (comum logo após o lançamento
+  // de uma área nova), completa com os mais recentes de outras áreas em vez
+  // de mostrar menos de 3 relacionados.
+  const relatedPosts =
+    sameAreaPosts.length >= 3
+      ? sameAreaPosts
+      : [
+          ...sameAreaPosts,
+          ...(await prisma.post.findMany({
+            where: {
+              id: { notIn: [post.id, ...sameAreaPosts.map((p) => p.id)] },
+              published: true,
+            },
+            orderBy: { publishedAt: "desc" },
+            take: 3 - sameAreaPosts.length,
+          })),
+        ];
+
   const path = `/blog/${post.slug}`;
+  const pillar = getContentPillar(post.areaSlug);
 
   return (
     <ContentPage
@@ -93,7 +120,7 @@ export default async function BlogPostPage({
 
       <div className="flex items-center gap-3 mb-8">
         <Link
-          href={`/blog?area=${post.areaSlug}`}
+          href={`/blog/area/${post.areaSlug}`}
           className="inline-flex items-center rounded-full bg-blue-50 dark:bg-blue-950/30 px-2.5 py-0.5 text-[11px] font-semibold text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-950/50 transition-colors"
         >
           {post.areaLabel}
@@ -139,8 +166,11 @@ export default async function BlogPostPage({
 
       <p className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-900 text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
         Quer ajuda prática nessa etapa da sua carreira?{" "}
-        <Link href="/tools" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
-          Explore as ferramentas do CarreirasMatch
+        <Link
+          href={pillar?.cta.path ?? "/tools"}
+          className="font-semibold text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          {pillar?.cta.label ?? "Explore as ferramentas do CarreirasMatch"}
         </Link>
         .
       </p>
