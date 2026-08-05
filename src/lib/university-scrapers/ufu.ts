@@ -39,7 +39,7 @@ async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
     const html = await getHtml(pageUrl);
     const $ = cheerio.load(html);
     let foundOnPage = 0;
-    $("a[href]").each((_, element) => {
+    $(".node--type--curso a[href]").each((_, element) => {
       const href = absoluteUrl($(element).attr("href") ?? "", pageUrl);
       const label = $(element).text().replace(/\s+/g, " ").trim();
       if (!href || !label) return;
