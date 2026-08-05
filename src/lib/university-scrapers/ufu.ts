@@ -34,9 +34,9 @@ type UfuCoursePage = { title: string; pageUrl: string };
 
 async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
   const courses = new Map<string, UfuCoursePage>();
-  // O portal atual usa a paginação iniciando em 1 e publica cada curso no
-  // subdomínio da unidade acadêmica (ex.: iarte.ufu.br).
-  for (let page = 1; page <= 20; page += 1) {
+  // A primeira página do Drupal também é publicada sem parâmetro (equivalente
+  // a page=0); as páginas seguintes usam page=1, page=2 etc.
+  for (let page = 0; page <= 20; page += 1) {
     const pageUrl = `${CATALOG_URL}${page}`;
     const html = await getHtml(pageUrl);
     const $ = cheerio.load(html);
@@ -63,7 +63,7 @@ async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
         foundOnPage += 1;
       }
     });
-    if (foundOnPage === 0 && page > 1) break;
+    if (foundOnPage === 0 && page > 0) break;
   }
   return Array.from(courses.values());
 }
