@@ -138,7 +138,10 @@ export function createUfuCatalogScraper(): UniversityScraper {
       for (const course of pending) {
         try {
           const grade = await findGradePdf(course);
-          if (!grade) continue;
+          if (!grade) {
+            result.push({ title: course.title, url: course.pageUrl, area: matchAreaSlug(course.title) ?? "geral", modality: "presencial", subjects: [] });
+            continue;
+          }
           const subjects = await readPdf(grade.url);
           if (subjects.length === 0) {
             console.warn(`[ufu-scraper] Grade sem disciplinas extraíveis; mantendo o curso ${grade.title}`);
@@ -146,6 +149,7 @@ export function createUfuCatalogScraper(): UniversityScraper {
           result.push({ title: grade.title, url: grade.url, area: matchAreaSlug(grade.title) ?? "geral", modality: "presencial", subjects });
         } catch (error) {
           console.error(`[ufu-scraper] Erro ao raspar ${course.pageUrl}:`, error);
+          result.push({ title: course.title, url: course.pageUrl, area: matchAreaSlug(course.title) ?? "geral", modality: "presencial", subjects: [] });
         }
       }
       return result;
