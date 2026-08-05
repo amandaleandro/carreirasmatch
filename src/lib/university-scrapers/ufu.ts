@@ -30,10 +30,6 @@ function absoluteUrl(value: string, base: string) {
 
 type UfuCoursePage = { title: string; pageUrl: string };
 
-function normalizedSearchText(value: string) {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-}
-
 async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
   const courses = new Map<string, UfuCoursePage>();
   // O portal atual usa a paginação iniciando em 1 e publica cada curso no
@@ -55,8 +51,11 @@ async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
       }
       if (hostname !== "ufu.br" && !hostname.endsWith(".ufu.br")) return;
       if (href.includes("/graduacao?page=") || href === "https://ufu.br/graduacao") return;
-      const searchable = normalizedSearchText(`${label} ${href}`);
-      if (!/graduacao|bacharelado|licenciatura|administracao|medicina|enfermagem|ciencia|engenharia|direito|contabeis|computacao/.test(searchable)) return;
+      // O nome do curso pode ser qualquer área (por exemplo, Artes Visuais),
+      // portanto não podemos depender de uma lista de palavras-chave. Os
+      // links institucionais principais ficam no domínio raiz ou em poucos
+      // subdomínios conhecidos e não devem entrar como cursos.
+      if (/^(www|prograd|propp|proae|proexc|reitoria|prefe|bibliotecas|portalselecao)\.ufu\.br$/i.test(hostname)) return;
       if (!courses.has(href)) {
         courses.set(href, { title: label, pageUrl: href });
         foundOnPage += 1;
