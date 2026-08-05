@@ -51,6 +51,11 @@ export default function Flashcards3DPage() {
         }),
       });
 
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
       if (!res.ok) throw new Error("Erro ao gerar flashcards");
       const data = await res.json();
       if (data.error) throw new Error(data.error);

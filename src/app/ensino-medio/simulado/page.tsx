@@ -52,6 +52,11 @@ export default function SimuladoPorAnoPage() {
         }),
       });
 
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
       if (!res.ok) {
         throw new Error("Erro ao gerar simulado");
       }

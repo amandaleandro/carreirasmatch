@@ -31,6 +31,10 @@ export default function DailyQuestionPage() {
 
     try {
       const res = await fetch("/api/ensino-medio/questao-do-dia");
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
       if (!res.ok) throw new Error("Erro ao buscar a questão do dia.");
       const json = await res.json();
       if (json.error) throw new Error(json.error);

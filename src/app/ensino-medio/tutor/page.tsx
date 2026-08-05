@@ -53,6 +53,11 @@ export default function VirtualTutorPage() {
         }),
       });
 
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
       if (!res.ok) throw new Error("Erro na API do tutor.");
 
       const json = await res.json();

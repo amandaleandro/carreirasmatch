@@ -41,6 +41,11 @@ export default function MapaMentalPage() {
         }),
       });
 
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
       if (!res.ok) throw new Error("Erro ao gerar mapa mental");
       const data = await res.json();
       if (data.error) throw new Error(data.error);

@@ -44,6 +44,11 @@ export default function CourseComparatorPage() {
         body: JSON.stringify({ query: q }),
       });
 
+      if (res.status === 401) {
+        window.location.href = `/login?callbackUrl=${encodeURIComponent(window.location.pathname)}`;
+        return;
+      }
+
       if (!res.ok) throw new Error("Erro na API");
 
       const json = await res.json();
