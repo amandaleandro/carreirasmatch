@@ -68,7 +68,7 @@ async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
   return Array.from(courses.values());
 }
 
-async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; title: string } | null> {
+async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; title: string; kind: "pdf" | "html" } | null> {
   const html = await getHtml(coursePage.pageUrl);
   const $ = cheerio.load(html);
   const title = $("h1").first().text().replace(/\s+/g, " ").trim() || coursePage.title;
@@ -99,11 +99,14 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
     }
   }
 
+  let curriculumPage: string | null = null;
+
   for (const candidate of candidates) {
     if (/\.pdf(?:$|\?)/i.test(candidate.url)) {
-      if (await isAvailablePdf(candidate.url)) return { url: candidate.url, title };
+      if (await isAvailablePdf(candidate.url)) return { url: candidate.url, title, kind: "pdf" };
       continue;
     }
+    curriculumPage ??= candidate.url;
     try {
       const gradeHtml = await getHtml(candidate.url);
       const grade$ = cheerio.load(gradeHtml);
@@ -112,13 +115,25 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
         .get()
         .filter((url) => /\.pdf(?:$|\?)/i.test(url));
       for (const pdf of pdfs) {
-        if (await isAvailablePdf(pdf)) return { url: pdf, title };
+        if (await isAvailablePdf(pdf)) return { url: pdf, title, kind: "pdf" };
       }
     } catch (error) {
       console.warn(`[ufu-scraper] Não foi possível abrir a página de grade ${candidate.url}:`, error);
     }
   }
-  return null;
+  return curriculumPage ? { url: curriculumPage, title, kind: "html" } : null;
+}
+
+async function readHtmlSubjects(url: string) {
+  const html = await getHtml(url);
+  const $ = cheerio.load(html);
+  const subjects: { name: string; semester?: number }[] = [];
+  $("table tr").each((_, row) => {
+    const cells = $(row).find("th, td").map((__, cell) => $(cell).text().replace(/\s+/g, " ").trim()).get().filter(Boolean);
+    const name = cells.find((cell) => cell.length >= 5 && !/^(disciplina|componente|código|carga|per[ií]odo|total)$/i.test(cell));
+    if (name && /[A-Za-zÀ-ÿ]{4,}/.test(name) && !/^\d+(?:\.\d+)?$/.test(name)) subjects.push({ name: name.replace(/^[A-Z]{2,}\d{3,}\s*[-–:]\s*/i, "") });
+  });
+  return subjects;
 }
 
 async function readPdf(url: string) {
@@ -162,7 +177,7 @@ export function createUfuCatalogScraper(): UniversityScraper {
             result.push({ title: course.title, url: course.pageUrl, area: matchAreaSlug(course.title) ?? "geral", modality: "presencial", subjects: [] });
             continue;
           }
-          const subjects = await readPdf(grade.url);
+          const subjects = grade.kind === "pdf" ? await readPdf(grade.url) : await readHtmlSubjects(grade.url);
           if (subjects.length === 0) {
             console.warn(`[ufu-scraper] Grade sem disciplinas extraíveis; mantendo o curso ${grade.title}`);
           }
