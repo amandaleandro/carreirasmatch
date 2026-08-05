@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { runJsonPrompt } from "@/lib/groq";
 import { z } from "zod";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 const starFeedbackSchema = z.object({
   situationScore: z.number().int().min(0).max(100),
@@ -17,11 +19,15 @@ const starFeedbackSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
+  if (!session) return response!;
+
   try {
     const body = await req.json();
     const { question, answer, jobTitle = "Profissional" } = body;
 
     if (!question || !answer) {
+      await release!.cancel();
       return NextResponse.json(
         { error: "Pergunta e resposta são obrigatórias." },
         { status: 400 }
@@ -51,8 +57,10 @@ RESPOSTA DO CANDIDATO: ${answer}`;
       "star_interview_feedback"
     );
 
+    await release!.confirm();
     return NextResponse.json({ success: true, feedback });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro no feedback STAR:", error);
     return NextResponse.json(
       { error: "Falha ao processar avaliação STAR." },

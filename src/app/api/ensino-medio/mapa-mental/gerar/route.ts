@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import { getSubjectBySlug } from "@/lib/ensino-medio";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export interface GeneratedMindMapNode {
   title: string;
@@ -16,6 +18,9 @@ export interface GeneratedMindMap {
 }
 
 export async function POST(req: Request) {
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.studyTool);
+  if (!session) return response!;
+
   try {
     const { subjectSlug, yearId, topic } = await req.json();
 
@@ -86,8 +91,10 @@ Retorne EXATAMENTE um objeto JSON válido seguindo a estrutura:
     );
 
     const parsed = JSON.parse(rawJson) as GeneratedMindMap;
+    await release!.confirm();
     return NextResponse.json(parsed);
   } catch (error) {
+    await release!.cancel();
     console.error("[API ensino-medio/mapa-mental/gerar] Erro:", error);
     return NextResponse.json(
       { error: "Falha ao gerar mapa mental. Tente novamente." },

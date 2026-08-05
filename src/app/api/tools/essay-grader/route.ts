@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
 import { reserveFeatureForSession } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { gradeEssay } from "@/lib/tools";
 import { logStudyActivity } from "@/lib/study-activity";
 
 export async function POST(req: NextRequest) {
-  const { session, response: authResponse } = await requireToolAccess("/tools/essay-grader");
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/essay-grader");
   if (!session) return authResponse!;
 
   const { allowed, response: quotaResponse, release } = await reserveFeatureForSession(

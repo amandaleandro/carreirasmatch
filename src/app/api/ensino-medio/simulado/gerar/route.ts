@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import { getSubjectBySlug } from "@/lib/ensino-medio";
 import { logStudyActivity } from "@/lib/study-activity";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export interface GeneratedSimulado {
   title: string;
@@ -21,6 +22,9 @@ export interface GeneratedSimulado {
 }
 
 export async function POST(req: Request) {
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.studyTool);
+  if (!session) return response!;
+
   try {
     const { subjectSlug, yearId, numQuestions = 5 } = await req.json();
 
@@ -80,11 +84,12 @@ Retorne EXATAMENTE um objeto JSON válido seguindo a estrutura:
 
     const parsed = JSON.parse(rawJson) as GeneratedSimulado;
 
-    const session = await auth();
-    if (session?.user?.id) void logStudyActivity(session.user.id, "simulado_enem");
+    void logStudyActivity(session.user.id, "simulado_enem");
 
+    await release!.confirm();
     return NextResponse.json(parsed);
   } catch (error) {
+    await release!.cancel();
     console.error("[API ensino-medio/simulado/gerar] Erro:", error);
     return NextResponse.json(
       { error: "Falha ao gerar simulado. Tente novamente." },

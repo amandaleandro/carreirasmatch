@@ -47,11 +47,58 @@ export async function requireAuth() {
   return { session, response: null };
 }
 
+/**
+ * Segment/allowlist check only — no binary subscription gate. Use this in routes that reserve
+ * their own quota via reserveFeatureForRoute/reserveFeatureForSession (catalog-based), where the
+ * monthly-limit enforcement already comes from the catalog and a separate binary "has active
+ * subscription" check would incorrectly block free-tier users still within their catalog quota.
+ */
+export async function requireToolSegmentAccess(toolHref: string, requiredSegment?: CareerSegment) {
+  const { session, response } = await requireAuth();
+  if (!session) return { session: null, response };
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user!.id },
+    select: { careerSegment: true, email: true },
+  });
+
+  // Full-access (admin) e influenciadores enxergam todas as ferramentas,
+  // independentemente do segmento de carreira.
+  if (hasFullAccessEmail(user?.email ?? session.user!.email) || (await isInfluencerUser(session.user!.id))) {
+    return { session, response: null };
+  }
+
+  if (requiredSegment) {
+    if (normalizeCareerSegment(user?.careerSegment) !== requiredSegment) {
+      return {
+        session: null,
+        response: NextResponse.json(
+          { error: "Esta ferramenta não está disponível para o seu perfil." },
+          { status: 403 }
+        ),
+      };
+    }
+    return { session, response: null };
+  }
+
+  if (!hasToolAccess(user?.careerSegment, toolHref)) {
+    return {
+      session: null,
+      response: NextResponse.json(
+        { error: "Esta ferramenta não está disponível para o seu perfil." },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return { session, response: null };
+}
+
 export async function requireToolAccess(toolHref: string, requiredSegment?: CareerSegment) {
   const { session, response } = await requireAuth();
   if (!session) return { session: null, response };
 
-  if (!(await hasActiveSubscriptionAccess(session.user.id))) {
+  if (!(await hasActiveSubscriptionAccess(session.user!.id!))) {
     return {
       session: null,
       response: NextResponse.json(
@@ -62,13 +109,13 @@ export async function requireToolAccess(toolHref: string, requiredSegment?: Care
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
+    where: { id: session.user!.id },
     select: { careerSegment: true, email: true },
   });
 
   // Full-access (admin) e influenciadores enxergam todas as ferramentas,
   // independentemente do segmento de carreira.
-  if (hasFullAccessEmail(user?.email ?? session.user.email) || (await isInfluencerUser(session.user.id))) {
+  if (hasFullAccessEmail(user?.email ?? session.user!.email) || (await isInfluencerUser(session.user!.id))) {
     return { session, response: null };
   }
 
@@ -102,7 +149,7 @@ export async function requireActiveSubscription() {
   const { session, response } = await requireAuth();
   if (!session) return { session: null, response };
 
-  if (!(await hasActiveSubscriptionAccess(session.user.id))) {
+  if (!(await hasActiveSubscriptionAccess(session.user!.id!))) {
     return {
       session: null,
       response: NextResponse.json(

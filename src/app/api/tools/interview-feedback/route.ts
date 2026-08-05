@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/require-auth";
 import { getInterviewFeedbackBatch } from "@/lib/tools";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export async function POST(req: NextRequest) {
-  try {
-    const { session, response } = await requireAuth();
-    if (!session) return response!;
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.interviewComplete);
+  if (!session) return response!;
 
+  try {
     const body = await req.json();
     const { jobTitle, unifiedAnswer } = body;
     let qas = body.qas;
@@ -19,6 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!Array.isArray(qas) || qas.length === 0 || qas.some((qa) => !qa?.question?.trim() || !qa?.answer?.trim())) {
+      await release!.cancel();
       return NextResponse.json(
         { error: "Preencha a(s) resposta(s) antes de finalizar a simulação." },
         { status: 400 }
@@ -26,8 +28,10 @@ export async function POST(req: NextRequest) {
     }
 
     const results = await getInterviewFeedbackBatch(qas, jobTitle ?? "");
+    await release!.confirm();
     return NextResponse.json({ results });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao gerar feedback de entrevista:", error);
     return NextResponse.json(
       { error: "Erro ao processar. Tente novamente." },

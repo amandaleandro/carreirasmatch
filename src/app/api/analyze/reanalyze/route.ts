@@ -1,18 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { analyzeResumeAgainstJob, CareerTrack, StructuredResume } from "@/lib/groq";
 import { verifyKeywords } from "@/lib/keyword-verify";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Faça login para reanalisar." }, { status: 401 });
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.analysisFull);
+  if (!session) return response!;
 
+  try {
     const { analysisId, updatedText } = await req.json();
     if (!analysisId || !updatedText || typeof updatedText !== "string") {
+      await release!.cancel();
       return NextResponse.json({ error: "Parâmetros inválidos." }, { status: 400 });
     }
 
@@ -22,6 +22,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!existing || existing.resume.userId !== session.user.id) {
+      await release!.cancel();
       return NextResponse.json({ error: "Análise não encontrada." }, { status: 404 });
     }
 
@@ -77,6 +78,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await release!.confirm();
     return NextResponse.json({
       success: true,
       overallScore: updatedRecord.overallScore,
@@ -90,6 +92,7 @@ export async function POST(req: NextRequest) {
       fixes: updatedAnalysis.fixes,
     });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro na reanálise rápida:", error);
     return NextResponse.json(
       { error: "Não foi possível reanalisar no momento." },

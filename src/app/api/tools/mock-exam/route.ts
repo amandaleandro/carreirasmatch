@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import { readFile } from "fs/promises";
 import { PDFParse } from "pdf-parse";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
 import { reserveFeatureForSession } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { generateMockExamQuestions } from "@/lib/tools";
@@ -24,7 +24,7 @@ function findExamFile(requestedPath: string) {
 }
 
 export async function POST(req: NextRequest) {
-  const { session, response: authResponse } = await requireToolAccess("/tools/vocation-test");
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/vocation-test");
   if (!session) return authResponse!;
 
   const { allowed, response: quotaResponse, release } = await reserveFeatureForSession(

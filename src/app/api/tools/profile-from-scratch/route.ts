@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
 import { reserveFeatureForSession } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { generateProfileFromScratch } from "@/lib/tools";
 
 export async function POST(req: NextRequest) {
-  const { session, response: authResponse } = await requireToolAccess("/tools/profile-from-scratch");
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/profile-from-scratch");
   if (!session) return authResponse!;
 
   const { allowed, response: quotaResponse, release } = await reserveFeatureForSession(

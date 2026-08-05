@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { runJsonPrompt } from "@/lib/groq";
 import { z } from "zod";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 const compareJobsSchema = z.object({
   comparisons: z.array(
@@ -25,11 +27,15 @@ const compareJobsSchema = z.object({
 });
 
 export async function POST(req: Request) {
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
+  if (!session) return response!;
+
   try {
     const body = await req.json();
     const { jobs = [], resumeText = "" } = body;
 
     if (!Array.isArray(jobs) || jobs.length < 2) {
+      await release!.cancel();
       return NextResponse.json(
         { error: "Envie pelo menos 2 vagas para realizar a comparação." },
         { status: 400 }
@@ -65,8 +71,10 @@ ${jobs.map((j: { title: string; description: string }, idx: number) => `--- VAGA
       "compare_jobs"
     );
 
+    await release!.confirm();
     return NextResponse.json({ success: true, result });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro na comparação de vagas:", error);
     return NextResponse.json(
       { error: "Falha ao comparar vagas." },

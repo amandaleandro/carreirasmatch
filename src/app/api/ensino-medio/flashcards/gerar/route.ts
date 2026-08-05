@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
 import { getSubjectBySlug } from "@/lib/ensino-medio";
 import { logStudyActivity } from "@/lib/study-activity";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export interface GeneratedFlashcardDeck {
   subjectName: string;
@@ -18,6 +19,9 @@ export interface GeneratedFlashcardDeck {
 }
 
 export async function POST(req: Request) {
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.studyTool);
+  if (!session) return response!;
+
   try {
     const { subjectSlug, yearId, customTopic } = await req.json();
 
@@ -74,11 +78,12 @@ Retorne EXATAMENTE um objeto JSON válido seguindo a estrutura:
 
     const parsed = JSON.parse(rawJson) as GeneratedFlashcardDeck;
 
-    const session = await auth();
-    if (session?.user?.id) void logStudyActivity(session.user.id, "flashcards_ensino_medio");
+    void logStudyActivity(session.user.id, "flashcards_ensino_medio");
 
+    await release!.confirm();
     return NextResponse.json(parsed);
   } catch (error) {
+    await release!.cancel();
     console.error("[API ensino-medio/flashcards/gerar] Erro:", error);
     return NextResponse.json(
       { error: "Falha ao gerar baralho de flashcards. Tente novamente." },

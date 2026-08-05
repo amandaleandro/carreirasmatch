@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
 import { logStudyActivity } from "@/lib/study-activity";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 type GeneratedFlashcard = {
   front: string;
@@ -10,14 +11,13 @@ type GeneratedFlashcard = {
 };
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Faça login para gerar flashcards." }, { status: 401 });
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.studyTool);
+  if (!session) return response!;
 
+  try {
     const { subject, topic, quantity } = await req.json();
     if (!subject) {
+      await release!.cancel();
       return NextResponse.json({ error: "Informe a disciplina/matéria." }, { status: 400 });
     }
 
@@ -42,8 +42,10 @@ QUANTIDADE DE FLASHCARDS: ${quantity || 5}`;
 
     void logStudyActivity(session.user.id, "flashcards_concurso");
 
+    await release!.confirm();
     return NextResponse.json({ success: true, flashcards: data.flashcards || [] });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao gerar flashcards:", error);
     return NextResponse.json({ error: "Erro ao gerar flashcards." }, { status: 500 });
   }

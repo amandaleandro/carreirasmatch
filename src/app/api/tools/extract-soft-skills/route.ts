@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Faça login para utilizar o Extrator de Soft Skills." }, { status: 401 });
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
+  if (!session) return response!;
 
+  try {
     const { projectDescription, targetRole } = await req.json();
     if (!projectDescription) {
+      await release!.cancel();
       return NextResponse.json({ error: "Descreva um projeto, trabalho escolar ou trabalho voluntário." }, { status: 400 });
     }
 
@@ -33,8 +33,10 @@ ${projectDescription}`;
 
     const data = await runJsonPrompt(systemPrompt, userPrompt, 0.3);
 
+    await release!.confirm();
     return NextResponse.json({ success: true, extracted: data });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao extrair soft skills:", error);
     return NextResponse.json({ error: "Erro ao transformar projeto em experiência." }, { status: 500 });
   }

@@ -147,7 +147,7 @@ export function getFeatureLimit(planKey: string | null | undefined, featureKey: 
   return getCommercialPlan(planKey).limits[featureKey];
 }
 
-const FEATURE_LABELS: Record<CommercialFeatureKey, string> = {
+export const FEATURE_LABELS: Record<CommercialFeatureKey, string> = {
   [COMMERCIAL_FEATURE_KEYS.analysisFull]: "análises completas de vaga por mês",
   [COMMERCIAL_FEATURE_KEYS.resumeByJob]: "currículos adaptados por vaga por mês",
   [COMMERCIAL_FEATURE_KEYS.interviewComplete]: "simulados de entrevista completos por mês",

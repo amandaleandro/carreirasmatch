@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
-import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
 
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Só alterna o "feito" de itens do plano de ação já gerado; nenhum conteúdo novo é
+  // gerado aqui, então não há gate de plano/quota a aplicar — só login.
   const { session, response } = await requireAuth();
   if (!session) return response!;
-
-  if (!(await hasActiveSubscriptionAccess(session.user.id))) {
-    return NextResponse.json({ error: "Assine o plano mensal para continuar." }, { status: 402 });
-  }
 
   const { id } = await params;
   const body = await req.json();

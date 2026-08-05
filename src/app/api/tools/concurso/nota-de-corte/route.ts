@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
 import { reserveFeatureForSession } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { estimateConcursoCutoff } from "@/lib/tools";
 
 export async function POST(req: NextRequest) {
-  const { session, response: authResponse } = await requireToolAccess("/tools/concurso/nota-de-corte");
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/concurso/nota-de-corte");
   if (!session) return authResponse!;
 
   const { allowed, response: quotaResponse, release } = await reserveFeatureForSession(

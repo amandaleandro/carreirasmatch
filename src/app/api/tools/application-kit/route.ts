@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { runJsonPrompt } from "@/lib/groq";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 const kitSchema = z.object({
   summary: z.string().min(1),
@@ -32,13 +33,16 @@ function parseStringArray(value: string | null | undefined) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user?.id) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.resumeByJob);
+  if (!session) return response!;
 
   const body = await request.json().catch(() => ({}));
   const applicationId = typeof body.applicationId === "string" ? body.applicationId : "";
   const language = body.language === "en" || body.language === "es" ? body.language : "pt-BR";
-  if (!applicationId) return NextResponse.json({ error: "Candidatura inválida." }, { status: 400 });
+  if (!applicationId) {
+    await release!.cancel();
+    return NextResponse.json({ error: "Candidatura inválida." }, { status: 400 });
+  }
 
   const application = await prisma.application.findFirst({
     where: { id: applicationId, userId: session.user.id },
@@ -47,7 +51,10 @@ export async function POST(request: Request) {
       analysis: { select: { resumeId: true, keywordsFound: true, keywordsMissing: true, interviewQuestions: true, suggestedSummary: true } },
     },
   });
-  if (!application) return NextResponse.json({ error: "Candidatura não encontrada." }, { status: 404 });
+  if (!application) {
+    await release!.cancel();
+    return NextResponse.json({ error: "Candidatura não encontrada." }, { status: 404 });
+  }
 
   const resumeId = application.analysis?.resumeId;
   const [resume, evidences] = await Promise.all([
@@ -88,8 +95,10 @@ ${requirements.join(", ") || "Nenhum requisito estruturado."}`,
       kitSchema,
       "application_kit"
     );
+    await release!.confirm();
     return NextResponse.json({ success: true, kit });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao gerar kit de candidatura:", error);
     return NextResponse.json({ error: "Não foi possível gerar o kit agora." }, { status: 500 });
   }

@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Faça login para otimizar perfil de LinkedIn." }, { status: 401 });
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
+  if (!session) return response!;
 
+  try {
     const { currentRole, targetRole, keySkills, bioSummary } = await req.json();
     if (!targetRole) {
+      await release!.cancel();
       return NextResponse.json({ error: "Informe o cargo pretendido." }, { status: 400 });
     }
 
@@ -34,8 +34,10 @@ RESUMO/RESUMO HISTÓRICO: ${bioSummary || "Sem detalhes adicionais"}`;
 
     const data = await runJsonPrompt(systemPrompt, userPrompt, 0.3);
 
+    await release!.confirm();
     return NextResponse.json({ success: true, linkedin: data });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao otimizar perfil do LinkedIn:", error);
     return NextResponse.json({ error: "Erro ao gerar otimização do LinkedIn." }, { status: 500 });
   }

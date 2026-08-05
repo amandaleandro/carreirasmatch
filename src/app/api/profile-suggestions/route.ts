@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { requireAuth, requireActiveSubscription } from "@/lib/require-auth";
+import { requireAuth } from "@/lib/require-auth";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
 import { prisma } from "@/lib/prisma";
 import { generateProfileSuggestions } from "@/lib/groq";
 import { getCoursesForArea } from "@/lib/course-catalog";
@@ -26,14 +27,17 @@ export async function GET() {
 }
 
 export async function POST() {
-  const { session, response } = await requireActiveSubscription();
+  const { session, response, release } = await reserveFeatureForRoute("career.growth.plan.generate");
   if (!session) return response!;
 
   const userId = session.user.id;
 
   try {
-    return await generateSuggestions(userId);
+    const result = await generateSuggestions(userId);
+    await release!.confirm();
+    return result;
   } catch (err) {
+    await release!.cancel();
     console.error("[profile-suggestions][POST]", err);
     return NextResponse.json(
       { error: "Não foi possível gerar as sugestões agora. Tente novamente em instantes." },

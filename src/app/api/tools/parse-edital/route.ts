@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { runJsonPrompt } from "@/lib/groq";
 import { logStudyActivity } from "@/lib/study-activity";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Faça login para utilizar o Leitor de Edital." }, { status: 401 });
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.studyTool);
+  if (!session) return response!;
 
+  try {
     const { editalText, targetRole } = await req.json();
     if (!editalText || typeof editalText !== "string") {
+      await release!.cancel();
       return NextResponse.json({ error: "Cole o texto do edital para analisar." }, { status: 400 });
     }
 
@@ -40,8 +40,10 @@ ${editalText.slice(0, 5000)}`;
 
     void logStudyActivity(session.user.id, "edital");
 
+    await release!.confirm();
     return NextResponse.json({ success: true, parsedData });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao analisar edital:", error);
     return NextResponse.json({ error: "Não foi possível analisar o edital no momento." }, { status: 500 });
   }

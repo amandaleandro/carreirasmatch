@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
 
 const schema = z.object({
   title: z.string().trim().min(1).max(240),
@@ -17,15 +16,15 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const session = await auth();
-  const userId = session?.user?.id;
-  if (!userId) return NextResponse.json({ error: "Não autorizado." }, { status: 401 });
-  if (!(await hasActiveSubscriptionAccess(userId))) {
-    return NextResponse.json({ error: "Assine um plano para preparar sua candidatura." }, { status: 402 });
-  }
+  const { session, response, release } = await reserveFeatureForRoute("job.application.create");
+  if (!session) return response!;
+  const userId = session.user.id;
 
   const parsed = schema.safeParse(await request.json());
-  if (!parsed.success) return NextResponse.json({ error: "Dados da vaga incompletos." }, { status: 400 });
+  if (!parsed.success) {
+    await release!.cancel();
+    return NextResponse.json({ error: "Dados da vaga incompletos." }, { status: 400 });
+  }
 
   const data = parsed.data;
   const jobUrl = data.url || `comparison://${userId}/${crypto.randomUUID()}`;
@@ -55,24 +54,30 @@ export async function POST(request: Request) {
     },
   });
 
-  const existing = await prisma.application.findFirst({ where: { userId, jobId: job.id } });
-  const application = existing
-    ? await prisma.application.update({
-        where: { id: existing.id },
-        data: { jobTitle: data.title, company: data.company, jobUrl, fitScore: data.matchScore, notes },
-      })
-    : await prisma.application.create({
-        data: {
-          userId,
-          jobId: job.id,
-          jobTitle: data.title,
-          company: data.company,
-          jobUrl,
-          fitScore: data.matchScore,
-          status: "tailor_resume",
-          notes,
-        },
-      });
+  try {
+    const existing = await prisma.application.findFirst({ where: { userId, jobId: job.id } });
+    const application = existing
+      ? await prisma.application.update({
+          where: { id: existing.id },
+          data: { jobTitle: data.title, company: data.company, jobUrl, fitScore: data.matchScore, notes },
+        })
+      : await prisma.application.create({
+          data: {
+            userId,
+            jobId: job.id,
+            jobTitle: data.title,
+            company: data.company,
+            jobUrl,
+            fitScore: data.matchScore,
+            status: "tailor_resume",
+            notes,
+          },
+        });
 
-  return NextResponse.json({ success: true, applicationId: application.id });
+    await release!.confirm();
+    return NextResponse.json({ success: true, applicationId: application.id });
+  } catch (e) {
+    await release!.cancel();
+    throw e;
+  }
 }

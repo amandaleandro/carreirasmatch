@@ -149,7 +149,7 @@ export async function cancelReservation(reservationId: string): Promise<void> {
 export async function reserveFeatureForRoute(featureKey: CommercialFeatureKey) {
   const { session, response } = await requireAuth();
   if (!session) return { session: null, response, release: null };
-  const result = await reserveFeature(session.user.id, featureKey);
+  const result = await reserveFeature(session.user!.id!, featureKey);
   if (!result.allowed) {
     return { session: null, response: NextResponse.json({ error: result.plan === "free" ? "Assine um plano pago para usar esta ferramenta." : `Você atingiu o limite deste mês (${result.limit}). Ele renova no próximo ciclo.` }, { status: result.plan === "free" ? 402 : 429 }), release: null };
   }

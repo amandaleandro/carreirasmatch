@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { refineAnalysisWithAnswers } from "@/lib/groq";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 type AnswerInput = { question: string; targetKeyword: string; answer: string };
 
@@ -9,7 +10,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { session, response } = await requireAuth();
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.analysisFull);
   if (!session) return response!;
 
   const { id } = await params;
@@ -20,10 +21,12 @@ export async function POST(
   });
 
   if (!analysis || analysis.resume.userId !== session.user.id) {
+    await release!.cancel();
     return NextResponse.json({ error: "Análise não encontrada." }, { status: 404 });
   }
 
   if (analysis.refinedAt) {
+    await release!.cancel();
     return NextResponse.json(
       { error: "Esta análise já foi atualizada com respostas uma vez." },
       { status: 409 }
@@ -35,6 +38,7 @@ export async function POST(
   const withContent = answers.filter((a) => a?.answer?.trim());
 
   if (withContent.length === 0) {
+    await release!.cancel();
     return NextResponse.json(
       { error: "Responda pelo menos uma pergunta." },
       { status: 400 }
@@ -63,6 +67,7 @@ export async function POST(
       },
     });
 
+    await release!.confirm();
     return NextResponse.json({
       refinementSummary: refinement.refinementSummary,
       suggestedBullets: refinement.suggestedBullets,
@@ -70,6 +75,7 @@ export async function POST(
       technicalScore: refinement.technicalScore,
     });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao refinar análise:", error);
     return NextResponse.json(
       { error: "Não foi possível atualizar a análise. Tente novamente." },

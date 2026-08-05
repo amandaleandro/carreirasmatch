@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
 import { reserveFeatureForSession } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { analyzeGithub } from "@/lib/tools";
@@ -15,7 +15,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 const PROFILE_FETCH_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
 export async function POST(req: NextRequest) {
-  const { session, response: authResponse } = await requireToolAccess("/tools/github-review");
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/github-review");
   if (!session) return authResponse!;
 
   const { allowed, response: quotaResponse, release } = await reserveFeatureForSession(

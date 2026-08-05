@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireAuth } from "@/lib/require-auth";
 import { getVocationArea } from "@/lib/vocation-areas";
 import { prisma } from "@/lib/prisma";
 import type { WeeklyScheduleBlock } from "@/lib/tools";
@@ -21,7 +21,9 @@ export async function POST(
       return NextResponse.json({ error: "Área inválida." }, { status: 400 });
     }
 
-    const { session, response } = await requireToolAccess("/tools/vocation-test");
+    // Só persiste o cronograma semanal que o usuário já escolheu (gerado em outro passo);
+    // nenhum conteúdo novo é gerado aqui, então não há gate de plano/quota a aplicar.
+    const { session, response } = await requireAuth();
     if (!session) return response!;
 
     const body = await req.json();

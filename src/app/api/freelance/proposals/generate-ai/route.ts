@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { runJsonPrompt } from "@/lib/groq";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 export async function POST(req: NextRequest) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Faça login para gerar proposta." }, { status: 401 });
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
+  if (!session) return response!;
 
+  try {
     const { projectId } = await req.json();
     if (!projectId) {
+      await release!.cancel();
       return NextResponse.json({ error: "projectId é obrigatório." }, { status: 400 });
     }
 
@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
     ]);
 
     if (!project) {
+      await release!.cancel();
       return NextResponse.json({ error: "Projeto não encontrado." }, { status: 404 });
     }
 
@@ -46,11 +47,13 @@ BIO/HABILIDADES: ${userProfile?.bio || "Experiência prática na área."} / ${us
 
     const proposalAI = await runJsonPrompt(systemPrompt, userPrompt, 0.3);
 
+    await release!.confirm();
     return NextResponse.json({
       success: true,
       proposalAI,
     });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao gerar proposta por IA:", error);
     return NextResponse.json({ error: "Erro ao gerar proposta com IA." }, { status: 500 });
   }

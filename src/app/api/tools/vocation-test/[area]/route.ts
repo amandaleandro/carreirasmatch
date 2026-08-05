@@ -4,7 +4,8 @@ import { analyzeVocationTest, VocationAnswers } from "@/lib/tools";
 import { getVocationArea } from "@/lib/vocation-areas";
 import { prisma } from "@/lib/prisma";
 import { PDFParse } from "pdf-parse";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
+import { reserveFeatureForSession } from "@/lib/feature-access";
 
 const MAX_RESUME_FILE_SIZE_BYTES = 5 * 1024 * 1024;
 
@@ -12,6 +13,7 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ area: string }> }
 ) {
+  let release: { confirm: () => Promise<void>; cancel: () => Promise<void> } | undefined;
   try {
     const { area: areaSlug } = await params;
     const area = getVocationArea(areaSlug);
@@ -38,12 +40,16 @@ export async function POST(
 
     const alreadyEnrolled = formData.get("alreadyEnrolled") === "true";
     if (alreadyEnrolled) {
-      const { session: paidSession, response } = await requireToolAccess(
+      const { session: segmentSession, response } = await requireToolSegmentAccess(
         "/tools/vocation-test",
         "internship"
       );
-      if (!paidSession) return response!;
+      if (!segmentSession) return response!;
     }
+
+    const reserved = await reserveFeatureForSession(userId, "study.tool.use");
+    if (!reserved.allowed) return reserved.response!;
+    release = reserved.release!;
 
     const answers: VocationAnswers = {
       enjoysProblemSolving: (formData.get("enjoysProblemSolving") as string) ?? "",
@@ -54,6 +60,7 @@ export async function POST(
     };
 
     if (Object.values(answers).some((v) => !v.trim())) {
+      await release!.cancel();
       return NextResponse.json(
         { error: "Responda todas as perguntas do quiz." },
         { status: 400 }
@@ -80,8 +87,10 @@ export async function POST(
       },
     });
 
+    await release.confirm();
     return NextResponse.json({ ...result, resultId: saved.id });
   } catch (error) {
+    await release?.cancel();
     console.error("Erro ao analisar teste vocacional:", error);
     return NextResponse.json(
       { error: "Erro ao processar. Tente novamente." },

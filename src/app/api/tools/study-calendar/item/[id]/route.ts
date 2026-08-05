@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(
@@ -7,7 +7,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { session, response } = await requireToolAccess("/tools/vocation-test");
+    // Só alterna o "feito" de um item já gerado; nenhum conteúdo novo é gerado aqui,
+    // então não há gate de plano/quota a aplicar — só login.
+    const { session, response } = await requireAuth();
     if (!session) return response!;
 
     const { id } = await params;

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { runJsonPrompt } from "@/lib/groq";
 import { z } from "zod";
+import { reserveFeatureForRoute } from "@/lib/feature-access";
+import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 
 const quickSaveSchema = z.object({
   extractedRole: z.string(),
@@ -14,19 +15,15 @@ const quickSaveSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "Você precisa estar autenticado para salvar vagas." },
-        { status: 401 }
-      );
-    }
+  const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
+  if (!session) return response!;
 
+  try {
     const body = await req.json();
     const { title = "", company = "", description = "", url = "" } = body;
 
     if (!description.trim()) {
+      await release!.cancel();
       return NextResponse.json(
         { error: "Envie a descrição da vaga." },
         { status: 400 }
@@ -71,8 +68,10 @@ ${description}`;
       },
     });
 
+    await release!.confirm();
     return NextResponse.json({ success: true, application, extracted });
   } catch (error) {
+    await release!.cancel();
     console.error("Erro ao salvar vaga rapidamente:", error);
     return NextResponse.json(
       { error: "Falha ao processar e salvar vaga no Kanban." },
