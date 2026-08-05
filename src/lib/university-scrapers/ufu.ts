@@ -68,7 +68,7 @@ async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
   return Array.from(courses.values());
 }
 
-async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; title: string; kind: "pdf" | "html" } | null> {
+async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; title: string; kind: "pdf" | "html"; htmlUrl?: string } | null> {
   const html = await getHtml(coursePage.pageUrl);
   const $ = cheerio.load(html);
   const title = $("h1").first().text().replace(/\s+/g, " ").trim() || coursePage.title;
@@ -103,7 +103,7 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
 
   for (const candidate of candidates) {
     if (/\.pdf(?:$|\?)/i.test(candidate.url)) {
-      if (await isAvailablePdf(candidate.url)) return { url: candidate.url, title, kind: "pdf" };
+      if (await isAvailablePdf(candidate.url)) return { url: candidate.url, title, kind: "pdf", htmlUrl: curriculumPage ?? undefined };
       continue;
     }
     curriculumPage ??= candidate.url;
@@ -115,7 +115,7 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
         .get()
         .filter((url) => /\.pdf(?:$|\?)/i.test(url));
       for (const pdf of pdfs) {
-        if (await isAvailablePdf(pdf)) return { url: pdf, title, kind: "pdf" };
+        if (await isAvailablePdf(pdf)) return { url: pdf, title, kind: "pdf", htmlUrl: candidate.url };
       }
     } catch (error) {
       console.warn(`[ufu-scraper] Não foi possível abrir a página de grade ${candidate.url}:`, error);
@@ -188,7 +188,8 @@ export function createUfuCatalogScraper(): UniversityScraper {
             result.push({ title: course.title, url: course.pageUrl, area: matchAreaSlug(course.title) ?? "geral", modality: "presencial", subjects: [] });
             continue;
           }
-          const subjects = grade.kind === "pdf" ? await readPdf(grade.url) : await readHtmlSubjects(grade.url);
+          let subjects = grade.kind === "pdf" ? await readPdf(grade.url) : await readHtmlSubjects(grade.url);
+          if (subjects.length === 0 && grade.htmlUrl) subjects = await readHtmlSubjects(grade.htmlUrl);
           if (subjects.length === 0) {
             console.warn(`[ufu-scraper] Grade sem disciplinas extraíveis; mantendo o curso ${grade.title}`);
           }
