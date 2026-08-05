@@ -12,10 +12,19 @@ function cityName(slug: string) {
 export async function generateMetadata({ params }: { params: Promise<{ state: string; city: string }> }): Promise<Metadata> {
   const { state, city } = await params;
   const name = cityName(city);
+  const courseCount = await prisma.externalCourse.count({
+    where: {
+      active: true,
+      free: true,
+      state: state.toUpperCase(),
+      city: { contains: name },
+    },
+  });
   return {
     title: `Cursos gratuitos em ${name}, ${state.toUpperCase()}`,
-    description: `Cursos gratuitos online e locais disponíveis para moradores de ${name}.`,
+    description: `Cursos gratuitos presenciais e oportunidades de qualificação disponíveis em ${name}.`,
     alternates: { canonical: `/cursos-gratuitos/${state}/${city}` },
+    ...(courseCount === 0 ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -26,13 +35,14 @@ export default async function CoursesByCityPage({ params }: { params: Promise<{ 
     where: {
       active: true,
       free: true,
-      OR: [{ modality: "online" }, { state: state.toUpperCase(), city: { contains: name } }],
+      state: state.toUpperCase(),
+      city: { contains: name },
     },
     orderBy: [{ area: "asc" }, { title: "asc" }],
     take: 200,
   });
   return (
-    <ContentPage eyebrow="Qualificação local" title={`Cursos gratuitos em ${name}, ${state.toUpperCase()}`} description="Cursos online acessíveis de qualquer cidade e oportunidades locais cadastradas." wide>
+    <ContentPage eyebrow="Qualificação local" title={`Cursos gratuitos em ${name}, ${state.toUpperCase()}`} description="Oportunidades presenciais de qualificação cadastradas para esta cidade. Para cursos online, consulte o catálogo completo." wide>
       <Link href="/cursos-gratuitos" className="text-sm font-semibold text-blue-600">Ver catálogo completo</Link>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {courses.map((course) => (

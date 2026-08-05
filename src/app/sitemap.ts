@@ -132,19 +132,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let locationRoutes: MetadataRoute.Sitemap = [];
   try {
-    const locations = await prisma.publicOpportunity.findMany({
+    const jobLocations = await prisma.publicOpportunity.findMany({
       where: { active: true, city: { not: "" }, state: { not: "" } },
       distinct: ["state", "city"],
       select: { state: true, city: true, updatedAt: true },
       take: 5000,
     });
-    locationRoutes = locations.flatMap((location) => {
-      const path = `${location.state.toLowerCase()}/${locationSlug(location.city)}`;
-      return [
-        { url: `${BASE_URL}/vagas-publicas/${path}`, lastModified: location.updatedAt, changeFrequency: "daily" as const, priority: 0.7 },
-        { url: `${BASE_URL}/cursos-gratuitos/${path}`, lastModified: location.updatedAt, changeFrequency: "weekly" as const, priority: 0.6 },
-      ];
+    const courseLocations = await prisma.externalCourse.findMany({
+      where: { active: true, free: true, city: { not: "" }, state: { not: "" } },
+      distinct: ["state", "city"],
+      select: { state: true, city: true, updatedAt: true },
+      take: 5000,
     });
+    locationRoutes = [
+      ...jobLocations.flatMap((location) => {
+        const path = `${location.state.toLowerCase()}/${locationSlug(location.city)}`;
+        return [{ url: `${BASE_URL}/vagas-publicas/${path}`, lastModified: location.updatedAt, changeFrequency: "daily" as const, priority: 0.7 }];
+      }),
+      ...courseLocations.flatMap((location) => {
+        const path = `${location.state.toLowerCase()}/${locationSlug(location.city)}`;
+        return [{ url: `${BASE_URL}/cursos-gratuitos/${path}`, lastModified: location.updatedAt, changeFrequency: "weekly" as const, priority: 0.6 }];
+      }),
+    ];
   } catch (error) {
     console.error("[sitemap] falha ao buscar rotas de localização", error);
     locationRoutes = [];

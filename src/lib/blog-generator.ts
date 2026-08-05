@@ -20,6 +20,32 @@ export type GeneratedPost = {
   contentBlocks: ContentBlock[];
 };
 
+/**
+ * A instrução do modelo não é uma garantia de qualidade. Esta validação roda
+ * antes de qualquer texto virar uma página pública e evita publicar rascunhos
+ * curtos, sem estrutura ou com conteúdo que não ajuda o leitor.
+ */
+export function validateGeneratedPost(post: GeneratedPost): void {
+  const blocks = Array.isArray(post.contentBlocks) ? post.contentBlocks : [];
+  const text = blocks
+    .map((block) => (block.type === "list" ? block.items.join(" ") : block.text))
+    .join(" ")
+    .trim();
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  const headingCount = blocks.filter((block) => block.type === "heading").length;
+  const paragraphCount = blocks.filter((block) => block.type === "paragraph").length;
+
+  if (!post.title?.trim() || !post.excerpt?.trim() || !post.coverEmoji?.trim()) {
+    throw new Error("Post gerado sem título, resumo ou capa válidos");
+  }
+  if (wordCount < 700) {
+    throw new Error(`Post gerado curto demais: ${wordCount} palavras (mínimo: 700)`);
+  }
+  if (blocks.length < 5 || headingCount < 3 || paragraphCount < 3) {
+    throw new Error("Post gerado sem estrutura editorial suficiente");
+  }
+}
+
 /** Curated gradient pairs for post covers, picked deterministically per slug so covers stay varied but stable across renders. */
 export const COVER_GRADIENTS = [
   "from-blue-600 to-cyan-500",

@@ -10,9 +10,9 @@ import { faqJsonLd } from "@/lib/seo";
 export const metadata: Metadata = {
   // A home é o mesmo segmento do layout raiz, então o title.template não a
   // alcança; usamos absolute para manter a marca no título.
-  title: { absolute: "Você encontrou a vaga. Seu currículo está pronto? | CarreirasMatch" },
+  title: { absolute: "Sua carreira em movimento começa aqui | CarreirasMatch" },
   description:
-    "Compare seu currículo com uma vaga real, descubra seu Match e ajuste o que importa antes de enviar a candidatura.",
+    "Uma plataforma para descobrir caminhos, aprender, encontrar oportunidades e evoluir na sua carreira — do primeiro passo ao próximo desafio.",
   alternates: { canonical: "/" },
 };
 

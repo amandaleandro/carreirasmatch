@@ -15,15 +15,15 @@ function formatPrice(cents: number) {
 }
 
 const FEATURE_LABELS: Record<string, string> = {
-  "ai.simple_action": "Ações simples de IA",
-  "analysis.job.full": "Análises completas",
-  "resume.by_job": "Currículo por vaga",
-  "interview.complete": "Entrevistas completas",
-  "profile.github.analysis": "Revisões de GitHub",
-  "university.subject.insight": "Insights por disciplina",
-  "career.growth.plan.generate": "Planos de desenvolvimento",
-  "job.application.create": "Candidaturas",
-  "study.tool.use": "Ferramentas de estudo",
+  "ai.simple_action": "Orientações para sua candidatura",
+  "analysis.job.full": "Análises completas da vaga",
+  "resume.by_job": "Currículos adaptados para cada vaga",
+  "interview.complete": "Preparações completas para entrevista",
+  "profile.github.analysis": "Revisões do perfil no GitHub",
+  "university.subject.insight": "Resumos e explicações de disciplinas",
+  "career.growth.plan.generate": "Planos para desenvolver sua carreira",
+  "job.application.create": "Candidaturas registradas",
+  "study.tool.use": "Ferramentas para seus estudos",
 };
 
 export function CommercialPlanCards({

@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getSetting, setSetting } from "@/lib/app-settings";
 import { VOCATION_AREAS, type VocationAreaConfig } from "@/lib/vocation-areas";
 import { TRANSVERSAL_TOPICS, type BlogTopicConfig } from "@/lib/blog-topics";
-import { generateBlogPost, gradientIndexForSlug, slugify } from "@/lib/blog-generator";
+import { generateBlogPost, gradientIndexForSlug, slugify, validateGeneratedPost } from "@/lib/blog-generator";
 import type { Post } from "@/generated/prisma/client";
 
 const NICHE_CURSOR_SETTING_KEY = "blog:niche_cursor";
@@ -17,7 +17,9 @@ const ALL_TOPICS: (VocationAreaConfig | BlogTopicConfig)[] = [...VOCATION_AREAS,
 
 function postsPerDay(): number {
   const raw = Number(process.env.BLOG_POSTS_PER_DAY);
-  return Number.isFinite(raw) && raw > 0 ? raw : 5;
+  // Uma cadência menor favorece revisão e diferenciação editorial. O limite
+  // pode ser aumentado conscientemente por ambiente após revisão humana.
+  return Number.isFinite(raw) && raw > 0 ? Math.min(Math.floor(raw), 3) : 1;
 }
 
 /** Start of "today" in America/Sao_Paulo, expressed as a UTC Date usable in a Prisma query. */
@@ -60,6 +62,7 @@ export async function generateNextPost(): Promise<Post> {
   });
 
   const generated = await generateBlogPost(area, recent.map((p) => p.title));
+  validateGeneratedPost(generated);
   const slug = await uniqueSlug(generated.title);
 
   const post = await prisma.post.create({

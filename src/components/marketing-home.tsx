@@ -85,9 +85,10 @@ const ecosystemCards = [
 // cedo demais); a lista completa de momentos continua acessível no menu.
 const audienceCards = [
   ["Começando agora", "Primeiro emprego ou estágio", "Transforme cursos, projetos e atividades em experiência que conta na candidatura.", "/primeiro-emprego"],
+  ["Aprendendo", "Descubra seu próximo caminho", "Explore cursos, profissões e possibilidades para tomar decisões com mais clareza.", "/descobrir"],
   ["Voltando ao mercado", "Recolocação", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
   ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/transicao"],
-  ["Já empregado", "Quero uma vaga melhor", "Compare seu currículo com a próxima vaga e descubra exatamente o que ajustar.", "/analise"],
+  ["Construindo seu caminho", "Projetos, freelas e renda", "Encontre formas de colocar suas habilidades em prática, criar portfólio e gerar novas oportunidades.", "/freelancers"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -180,19 +181,19 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-14">
           <div className="space-y-6">
             <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-300">
-              Análise de currículo para uma vaga real
+              Inteligência para a sua jornada profissional
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Você encontrou a vaga. Agora descubra se o seu currículo está pronto.
+              Sua carreira é maior do que uma vaga.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              Compare seu currículo com a oportunidade, veja o que está alinhado, descubra o que está faltando e saiba o que ajustar antes de se candidatar.
+              Descubra possibilidades, desenvolva suas habilidades, encontre oportunidades e avance com mais clareza — esteja você estudando, começando, mudando de área ou buscando crescer.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Calcular meu Match grátis" />
+              <PrimaryCta label="Começar minha jornada grátis" />
               <a href="#exemplo" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
                 Ver um resultado de exemplo
               </a>
@@ -255,7 +256,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 space-y-12">
             <div className="text-center space-y-2 max-w-2xl mx-auto">
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Da vaga encontrada à candidatura preparada em 4 passos
+                Do próximo passo ao próximo nível em 4 movimentos
               </h2>
             </div>
 
@@ -306,7 +307,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                 E o CarreirasMatch continua com você depois da primeira análise
               </h2>
               <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                Prepare novas candidaturas, acompanhe seus processos, treine para entrevistas e encontre novas oportunidades.
+                Aprenda, planeje sua evolução, prepare candidaturas, acompanhe seus processos e encontre novas oportunidades.
               </p>
             </div>
 
@@ -332,7 +333,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
               Tudo o que você precisa para se candidatar com segurança
             </h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Nosso objetivo é te preparar não apenas para o robô da triagem, mas para a entrevista presencial com o gestor da vaga.
+              Do autoconhecimento ao desenvolvimento, dos projetos às candidaturas: você encontra orientação prática para tomar decisões e agir.
             </p>
           </div>
 
@@ -349,7 +350,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <CommercialPlanCards
           plans={PUBLIC_PLAN_CARDS}
           title="Gratuito ou Carreira Pro: qual combina com você agora?"
-          subtitle="Carreira Pro é o mais indicado para quem está procurando emprego agora."
+          subtitle="Escolha o suporte que combina com o seu momento — para começar, se desenvolver ou acelerar sua próxima fase."
         />
 
         {/* FAQ */}
@@ -370,12 +371,12 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
 
         <section className="mx-auto w-full max-w-5xl px-4 pb-20 md:px-8">
           <div className="rounded-3xl bg-blue-600 px-6 py-10 text-center shadow-xl shadow-blue-600/15 sm:px-10">
-            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Sua próxima candidatura pode começar mais preparada</h2>
+            <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">O próximo capítulo da sua carreira começa com clareza</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
-              Compare seu currículo com uma vaga real e descubra quais ajustes fazem sentido para o seu perfil.
+              Entenda onde você está, descubra possibilidades e escolha o próximo passo que faz sentido para você.
             </p>
             <Link href="/analise" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-50">
-              Calcular meu Match grátis <ArrowRight className="h-4 w-4" />
+              Explorar minha jornada <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </section>
