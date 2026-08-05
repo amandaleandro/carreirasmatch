@@ -389,6 +389,7 @@ export function AnalyzeVagaPage({
       setResultTrack(careerTrack);
       setResultJobTitle(jobTitle);
       track(ANALYTICS_EVENTS.ANALYSIS_COMPLETED, { careerTrack, analysisId: data.id });
+      track(ANALYTICS_EVENTS.DIAGNOSTIC_COMPLETED, { careerTrack, analysisId: data.id });
       notify("success", "Análise concluída. Seu resultado de Match está pronto.");
       track(ANALYTICS_EVENTS.DIAGNOSTIC_TEASER_VIEWED, {
         careerTrack,

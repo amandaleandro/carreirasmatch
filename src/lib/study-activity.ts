@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { markFirstAction } from "@/lib/first-action";
 
 export const STUDY_ACTIVITY_TOOLS = {
   flashcards_ensino_medio: "Flashcards (Ensino Médio)",
@@ -20,6 +21,7 @@ export async function logStudyActivity(userId: string, tool: StudyActivityTool, 
     await prisma.studyActivityLog.create({
       data: { userId, tool, score: typeof score === "number" ? score : null },
     });
+    void markFirstAction(userId);
   } catch (error) {
     console.error("[logStudyActivity] Falha ao registrar atividade:", error);
   }

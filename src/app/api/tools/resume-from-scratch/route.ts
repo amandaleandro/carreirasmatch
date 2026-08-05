@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireToolAccess } from "@/lib/require-auth";
+import { requireToolSegmentAccess } from "@/lib/require-auth";
 import { reserveFeatureForSession } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
 import { generateResumeFromScratch, serializeResumeFromScratch } from "@/lib/tools";
 import { prisma } from "@/lib/prisma";
+import { markFirstAction } from "@/lib/first-action";
 
 export async function POST(req: NextRequest) {
-  const { session, response: authResponse } = await requireToolAccess("/tools/resume-from-scratch");
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/resume-from-scratch");
   if (!session) return authResponse!;
 
   const { allowed, response: quotaResponse, release } = await reserveFeatureForSession(
@@ -85,6 +86,7 @@ export async function POST(req: NextRequest) {
     });
 
     await release.confirm();
+    void markFirstAction(session.user.id);
     return NextResponse.json({ analysisId: analysis.id });
   } catch (error) {
     await release.cancel();

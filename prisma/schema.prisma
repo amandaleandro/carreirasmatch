@@ -37,6 +37,7 @@ model User {
   themePreference             String                    @default("system")
   internshipChecklistProgress String                    @default("[]")
   createdAt                   DateTime                  @default(now())
+  firstActionAt               DateTime?
   accounts                    Account[]
   sessions                    Session[]
   resumes                     Resume[]

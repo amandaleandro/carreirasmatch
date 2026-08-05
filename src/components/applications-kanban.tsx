@@ -121,6 +121,10 @@ export function ApplicationsKanban({ items }: { items: ApplicationItem[] }) {
     if (newStatus === "offer") {
       track(ANALYTICS_EVENTS.JOB_REPORTED, { applicationId: id });
     }
+    // Avanço de etapa também conta como progresso da meta semanal (Plano da semana no dashboard).
+    if (newStatus === "applied" || newStatus === "interview" || newStatus === "offer") {
+      track(ANALYTICS_EVENTS.GOAL_PROGRESSED, { applicationId: id, status: newStatus });
+    }
     startTransition(async () => {
       const fd = new FormData();
       fd.append("status", newStatus);

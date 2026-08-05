@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { markFirstAction } from "@/lib/first-action";
 import { analyzeResumeAgainstJob, extractStructuredResume, CareerTrack, StructuredResume, ResumeAnalysis } from "@/lib/groq";
 import { canViewFullDiagnostic, hasActiveSubscriptionAccess } from "@/lib/entitlements";
 import { toAnalysisTeaser } from "@/lib/analysis-teaser";
@@ -458,6 +459,8 @@ export async function POST(req: NextRequest) {
       logged_in: String(Boolean(userId)),
       outcome,
     });
+
+    if (userId) void markFirstAction(userId);
 
     const unlocked = userId ? await canViewFullDiagnostic(userId, saved.id) : false;
     const segment = normalizeCareerSegment(candidate?.careerSegment);

@@ -60,6 +60,14 @@ export const ANALYTICS_EVENTS = {
   JOB_REPORTED: "job_reported",
   INTERNSHIP_REPORTED: "internship_reported",
   PROMOTION_REPORTED: "promotion_reported",
+  // Eventos do Plano Mestre 2026 (docs/PLANOS_PERMISSOES_ANALYTICS_2026.md).
+  JOURNEY_SELECTED: "journey_selected",
+  DIAGNOSTIC_COMPLETED: "diagnostic_completed",
+  FIRST_ACTION_COMPLETED: "first_action_completed",
+  WEEKLY_PLAN_VIEWED: "weekly_plan_viewed",
+  GOAL_PROGRESSED: "goal_progressed",
+  UNIVERSITY_VIEWED: "university_viewed",
+  UNIVERSITY_ENROLLMENT_SAVED: "university_enrollment_saved",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

@@ -126,6 +126,7 @@ export function OnboardingWizard({
                 onClick={() => {
                   setSegment(option.value);
                   setObjective("");
+                  track(ANALYTICS_EVENTS.JOURNEY_SELECTED, { segment: option.value });
                 }}
               >
                 {option.label}

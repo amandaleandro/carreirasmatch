@@ -19,6 +19,7 @@ import { MoodCheckInCard } from "@/components/mood-check-in-card";
 import { getMoodDayKey } from "@/lib/mood";
 import { updateEmploymentStatusAction, saveMoodAction } from "./actions";
 import { JourneyStepper } from "@/components/journey-stepper";
+import { WeeklyPlanViewTracker } from "@/components/weekly-plan-view-tracker";
 
 export const dynamic = "force-dynamic";
 
@@ -71,6 +72,8 @@ export default async function DashboardPage() {
     where: { userId_dayKey: { userId: session.user.id, dayKey: getMoodDayKey() } },
   });
 
+  // Intentional exception: gates a whole perk section (exclusive jobs for top players) on
+  // "has any paid plan", not a per-feature monthly limit — no natural catalog featureKey for it.
   const isTopPlayer =
     topMonthlyScores.some((s) => s.userId === session.user.id) &&
     (await hasActiveSubscriptionAccess(session.user.id));
@@ -149,6 +152,7 @@ export default async function DashboardPage() {
 
   const weeklyPlanSection = isStudySegment ? (
     <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <WeeklyPlanViewTracker variant="study" />
       <div className="flex items-center justify-between">
         <p className="font-bold text-slate-900 dark:text-white text-base">Plano de estudos da semana</p>
         <Link href="/ensino-medio/cronograma" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
@@ -198,6 +202,7 @@ export default async function DashboardPage() {
     </div>
   ) : (
     <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm space-y-4">
+      <WeeklyPlanViewTracker variant="applications" />
       <div className="flex items-center justify-between">
         <p className="font-bold text-slate-900 dark:text-white text-base">Plano da semana</p>
         <Link href="/applications" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">

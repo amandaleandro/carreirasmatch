@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
-import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
+import { markFirstAction } from "@/lib/first-action";
 
 export async function PATCH(
   req: NextRequest,
@@ -9,10 +9,6 @@ export async function PATCH(
 ) {
   const { session, response } = await requireAuth();
   if (!session) return response!;
-
-  if (!(await hasActiveSubscriptionAccess(session.user.id))) {
-    return NextResponse.json({ error: "Assine o plano mensal para continuar." }, { status: 402 });
-  }
 
   const { id } = await params;
   const body = await req.json();
@@ -45,6 +41,12 @@ export async function PATCH(
     where: { id },
     data: { interviewProgress: JSON.stringify(progress) },
   });
+
+  // Só marca a primeira ação quando o usuário de fato respondeu uma pergunta
+  // (não em reset nem em uma sincronização de progresso vazia).
+  if (typeof body.index === "number") {
+    void markFirstAction(session.user.id);
+  }
 
   return NextResponse.json({ interviewProgress: updated.interviewProgress });
 }

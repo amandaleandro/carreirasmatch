@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { GraduationCap, Plus, Trash2, Sparkles, Briefcase, ListChecks, CheckCircle2, XCircle } from "lucide-react";
+import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 type Insight = { competencies: string[]; relatedProfessions: string[]; suggestedProject: string };
 type Exercise = { question: string; options: string[]; correctIndex: number; explanation: string };
@@ -206,6 +207,11 @@ export function UniversityHub({
   const [portfolioAdded, setPortfolioAdded] = useState<Record<string, boolean>>({});
   const [generatingExercisesId, setGeneratingExercisesId] = useState<string | null>(null);
 
+  useEffect(() => {
+    track(ANALYTICS_EVENTS.UNIVERSITY_VIEWED, { hasEnrollment: !!enrollment });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function generateCatalogExercises(id: string) {
     setGeneratingExercisesId(id);
     try {
@@ -276,6 +282,7 @@ export function UniversityHub({
         }),
       });
       if (!res.ok) throw new Error("Não foi possível salvar. Tente novamente.");
+      track(ANALYTICS_EVENTS.UNIVERSITY_ENROLLMENT_SAVED, { courseName, hasCatalogCourse: !!selectedCourse });
       window.location.reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
