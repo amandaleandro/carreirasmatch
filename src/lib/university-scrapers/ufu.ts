@@ -30,11 +30,15 @@ function absoluteUrl(value: string, base: string) {
 
 type UfuCoursePage = { title: string; pageUrl: string };
 
+function normalizedSearchText(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
 async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
   const courses = new Map<string, UfuCoursePage>();
-  // O catálogo tem paginação e pode crescer; paramos quando uma página não
-  // trouxer novos links de graduação.
-  for (let page = 0; page < 20; page += 1) {
+  // O portal atual usa a paginação iniciando em 1 e publica cada curso no
+  // subdomínio da unidade acadêmica (ex.: iarte.ufu.br).
+  for (let page = 1; page <= 20; page += 1) {
     const pageUrl = `${CATALOG_URL}${page}`;
     const html = await getHtml(pageUrl);
     const $ = cheerio.load(html);
@@ -42,19 +46,23 @@ async function discoverUfuCourses(): Promise<UfuCoursePage[]> {
     $("a[href]").each((_, element) => {
       const href = absoluteUrl($(element).attr("href") ?? "", pageUrl);
       const label = $(element).text().replace(/\s+/g, " ").trim();
-      if (!href || !/\.ufu\.br\/|^https:\/\/ufu\.br\//i.test(href)) return;
-      if (!label || /^(p[aá]gina|pr[oó]xima|[úu]ltima|avan[cç]ar|voltar)$/i.test(label)) return;
+      if (!href || !label) return;
+      let hostname = "";
+      try {
+        hostname = new URL(href).hostname.toLowerCase();
+      } catch {
+        return;
+      }
+      if (hostname !== "ufu.br" && !hostname.endsWith(".ufu.br")) return;
       if (href.includes("/graduacao?page=") || href === "https://ufu.br/graduacao") return;
-      // O catálogo oficial mistura links de cursos e links institucionais;
-      // cursos sempre apontam para uma unidade acadêmica ou para o portal do curso.
-      if (!/ufu\.br\/(?:graduacao|www\.)/i.test(href) && !/\.(?:fagen|facom|famed|facic|famat|famev|faued|fadir|faced|iciag|incis|ifilo|ileel|ime|ief|feelt|fagmu|faps|facip)\.ufu\.br/i.test(href)) return;
-      if (!/gradua[cç][aã]o|bacharelado|licenciatura|administra[cç][aã]o|medicina|enfermagem|ci[eê]ncia|engenharia|direito|cont[aá]beis|comput[aá]ção/i.test(`${label} ${href}`)) return;
+      const searchable = normalizedSearchText(`${label} ${href}`);
+      if (!/graduacao|bacharelado|licenciatura|administracao|medicina|enfermagem|ciencia|engenharia|direito|contabeis|computacao/.test(searchable)) return;
       if (!courses.has(href)) {
         courses.set(href, { title: label, pageUrl: href });
         foundOnPage += 1;
       }
     });
-    if (foundOnPage === 0 && page > 0) break;
+    if (foundOnPage === 0 && page > 1) break;
   }
   return Array.from(courses.values());
 }
@@ -63,16 +71,17 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
   const html = await getHtml(coursePage.pageUrl);
   const $ = cheerio.load(html);
   const title = $("h1").first().text().replace(/\s+/g, " ").trim() || coursePage.title;
+  const gradePattern = /grade|matriz|curr[ií]cul|fluxo|projeto.?pedag|estrutura.?curricular/i;
   const candidates = $("a[href]")
     .map((_, element) => ({
       url: absoluteUrl($(element).attr("href") ?? "", coursePage.pageUrl),
       label: $(element).text().replace(/\s+/g, " ").trim(),
     }))
     .get()
-    .filter((link) => link.url && (/\.pdf(?:$|\?)/i.test(link.url) || /grade|curr[ií]cul|fluxo/i.test(link.url)))
+    .filter((link) => link.url && (/\.pdf(?:$|\?)/i.test(link.url) || gradePattern.test(`${link.url} ${link.label}`)))
     .sort((a, b) => {
       const score = (value: { url: string; label: string }) =>
-        (/\.pdf(?:$|\?)/i.test(value.url) ? 4 : 0) + (/grade|curr[ií]cul|fluxo/i.test(`${value.url} ${value.label}`) ? 8 : 0);
+        (/\.pdf(?:$|\?)/i.test(value.url) ? 4 : 0) + (gradePattern.test(`${value.url} ${value.label}`) ? 8 : 0);
       return score(b) - score(a);
     });
 
@@ -116,9 +125,7 @@ export function createUfuCatalogScraper(): UniversityScraper {
     source: "ufu:catalog",
     async scrape(): Promise<ScrapedUniversityCourse[]> {
       const discovered = await discoverUfuCourses();
-      const existing = await prisma.universityCourse.findMany({
-        select: { url: true, lastSeenAt: true },
-      });
+      const existing = await prisma.universityCourse.findMany({ select: { url: true, lastSeenAt: true } });
       const lastSeenByUrl = new Map(existing.map((course) => [course.url, course.lastSeenAt.getTime()]));
       const now = Date.now();
       const pending = discovered
@@ -135,13 +142,7 @@ export function createUfuCatalogScraper(): UniversityScraper {
           if (!grade) continue;
           const subjects = await readPdf(grade.url);
           if (subjects.length === 0) continue;
-          result.push({
-            title: grade.title,
-            url: grade.url,
-            area: matchAreaSlug(grade.title) ?? "geral",
-            modality: "presencial",
-            subjects,
-          });
+          result.push({ title: grade.title, url: grade.url, area: matchAreaSlug(grade.title) ?? "geral", modality: "presencial", subjects });
         } catch (error) {
           console.error(`[ufu-scraper] Erro ao raspar ${course.pageUrl}:`, error);
         }
