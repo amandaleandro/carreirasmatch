@@ -13,7 +13,7 @@ export function PublicSiteHeader() {
           <BrandLogo heightClassName="h-9 sm:h-10" />
         </Link>
         <nav className="hidden items-center gap-7 text-xs font-semibold text-slate-600 dark:text-slate-300 md:flex">
-          <Link href="/assinar" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+          <Link href="/rota-profissional" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
             Planos
           </Link>
           <Link href="/freelancers" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">

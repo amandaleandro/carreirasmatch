@@ -14,7 +14,7 @@ type SubscriptionNudge = {
 const SubscriptionNudgeContext = createContext<SubscriptionNudge | null>(null);
 
 const SESSION_KEY = "subscription-nudge:shown";
-const SUPPRESSED_PREFIXES = ["/assinar", "/login", "/register", "/empresa", "/parceiro"];
+const SUPPRESSED_PREFIXES = ["/assinar", "/rota-profissional", "/plano-de-candidatura", "/login", "/register", "/empresa", "/parceiro"];
 
 const COPY: Record<NudgeReason, { eyebrow: string; title: string; body: string }> = {
   engagement: {
@@ -167,7 +167,7 @@ function NudgeModal({
         </div>
 
         <Link
-          href={`/assinar?segment=${encodeURIComponent(segment)}`}
+          href={`/rota-profissional?segment=${encodeURIComponent(segment)}`}
           onClick={onClose}
           className="flex w-full items-center justify-center gap-2 rounded-full bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-95"
         >

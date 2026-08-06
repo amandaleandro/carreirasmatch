@@ -111,7 +111,7 @@ export default async function ToolsPage() {
               </p>
             </div>
             <Link
-              href="/assinar"
+              href="/rota-profissional"
               className="shrink-0 inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold text-xs sm:text-sm px-5 py-3 transition-colors shadow-sm"
             >
               <span>Conhecer o Plano Pro</span>
@@ -223,7 +223,7 @@ function ToolGrid({
               <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-200/60 pt-3 text-xs dark:border-slate-800/60">
                 <span className="text-slate-400">{lockLabel}.</span>
                 <Link
-                  href={belongsToSegment ? "/assinar" : "/settings"}
+                  href={belongsToSegment ? "/rota-profissional" : "/settings"}
                   className="shrink-0 font-bold text-blue-600 hover:underline dark:text-blue-400"
                 >
                   {belongsToSegment ? "Desbloquear" : "Ajustar perfil"}
