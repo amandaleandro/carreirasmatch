@@ -154,8 +154,29 @@ ler onde a rota é chamada, não só a rota em si.
 
 - Revisar estados vazios, tempo de resposta de IA, recuperação de erro e uso
   em celular nas telas centrais da jornada (análise, kit, Kanban, entrevista).
+  Não testado ainda — exige navegar o produto de verdade, não só ler código.
 - Testar consistência dos scores e da geração de currículo/DOCX entre
   execuções e entre modelos de IA configurados.
+
+**Testado em 06/08/2026 (consistência de scores).** A chamada principal de
+análise (`analyzeResumeAgainstJob`, `src/lib/groq.ts:585-590`) já é
+restrita por design a `["groq", "openai"]` com `temperature: 0` — não usa
+os outros 5 provedores do registro. Rodei o mesmo currículo/vaga via Groq
+(preferido) e via fallback forçado para OpenAI (`gpt-4.1-nano`, cenário de
+Groq indisponível): `overall` 72→66, `technical` 85→70, `experience`
+70→60, `seniority` 60→50, `ats` 80→65 — diferenças de até 15 pontos em
+sub-scores, embora `applicationStatus` tenha coincidido
+(`adjust_first`) nesse caso. Geração de DOCX/PDF não chama IA (é template
+puro sobre o JSON já gerado), então não tem esse risco.
+
+**Risco real, não corrigido**: se o Groq cair/estourar cota no meio de uma
+reanálise, a pessoa pode ver o score cair de verdade sem ter mudado nada no
+currículo — parece bug de instabilidade, mas é o fallback pago entregando
+uma calibração diferente. Não corrigido porque a solução não é óbvia sem
+decisão de produto: normalizar/recalibrar o prompt para o OpenAI aproximar
+os scores do Groq, avisar o usuário quando a análise rodou no fallback, ou
+aceitar a variação como raridade (só ocorre quando Groq falha). Fica em
+aberto para decisão.
 
 ## Prioridade 7 — Funil de analytics
 
