@@ -10,8 +10,8 @@ import { Menu } from "lucide-react";
 // /conquistar e /evoluir.
 export const journeys = [
   { label: "Descobrir", href: "/descobrir", items: [["Teste vocacional", "/tools/vocation-test"], ["Teste comportamental", "/tools/behavioral-test"], ["Mercado de trabalho", "/mercado-de-trabalho"]] },
-  { label: "Aprender", href: "/aprender", items: [["Ensino médio", "/ensino-medio"], ["Universidade", "/universidade"], ["Concursos", "/tools/concurso"], ["OAB", "/tools/oab"], ["Ferramentas de estudo", "/tools"]] },
-  { label: "Conquistar", href: "/conquistar", items: [["Analisar currículo e vaga", "/analise"], ["Criar currículo", "/curriculo-gratis"], ["Verificar ATS", "/verificador-ats"], ["Encontrar vagas", "/todas-as-vagas"], ["Preparar entrevista", "/tools/interview-simulator"], ["Acompanhar candidaturas", "/applications"]] },
+  { label: "Aprender", href: "/aprender", items: [["Rota de Aprovação", "/estudos"], ["Ensino médio", "/ensino-medio"], ["Universidade", "/universidade"], ["Concursos", "/tools/concurso"], ["OAB", "/tools/oab"], ["Ferramentas de estudo", "/tools"]] },
+  { label: "Conquistar", href: "/conquistar", items: [["Analisar currículo e vaga", "/analise"], ["Plano de Candidatura", "/plano-de-candidatura"], ["Rota Profissional", "/rota-profissional"], ["Criar currículo", "/curriculo-gratis"], ["Verificar ATS", "/verificador-ats"], ["Encontrar vagas", "/todas-as-vagas"], ["Preparar entrevista", "/tools/interview-simulator"], ["Acompanhar candidaturas", "/applications"]] },
   { label: "Evoluir", href: "/evoluir", items: [["Evolução profissional", "/evolucao"], ["Melhorar LinkedIn", "/tools/linkedin-optimizer"], ["Revisar GitHub", "/tools/github-review"], ["Mapa de competências", "/tools/matriz-de-skills"], ["Plano de ação", "/action-plan"], ["Transição de carreira", "/analise"]] },
   { label: "Trabalhar por conta", href: "/freelancers", items: [["Encontrar projetos", "/projetos"], ["Criar perfil", "/freelancer"], ["Meus contratos", "/freelancer/contratos"], ["Precificação inteligente", "/freelancer/precificacao"]] },
 ] as const;

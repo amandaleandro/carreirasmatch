@@ -177,6 +177,12 @@ export default async function EmpresasLandingPage() {
             </Link>
           </div>
           <p className="mt-4 text-[11px] text-white/40">Comece grátis, sem cartão de crédito.</p>
+          <p className="mt-2 text-xs text-white/60">
+            Só quer avaliar uma vaga antes de publicar?{" "}
+            <Link href="/empresas/diagnostico" className="font-semibold text-blue-300 hover:text-blue-200 underline underline-offset-2">
+              Gerar diagnóstico grátis
+            </Link>
+          </p>
           {analysisCount >= 50 && (
             <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-200">
               {analysisCount.toLocaleString("pt-BR")} candidatos já usam o CarreirasMatch para buscar vaga, do outro lado do seu processo seletivo.

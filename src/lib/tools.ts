@@ -92,6 +92,84 @@ OBSERVAÇÕES DA EMPRESA (opcional, use se houver): ${notes || "nenhuma"}`;
   return { description: asText(result?.description) };
 }
 
+// --- Diagnóstico da Vaga (para empresas, entrada gratuita da jornada Empresas) ---
+
+export type JobDiagnosticResult = {
+  clarityScore: number;
+  clarityLabel: string;
+  mainRequirements: string[];
+  ambiguities: string[];
+  suggestions: string[];
+};
+
+export async function generateJobDiagnostic(jobDescription: string): Promise<JobDiagnosticResult> {
+  const systemPrompt = `Você é um especialista em recrutamento que avalia a clareza de descrições de vaga escritas por empresas brasileiras, antes da publicação.
+${BASE_RULES}
+Avalie apenas o texto fornecido. Não invente requisitos, benefícios ou informações que não estão no texto.
+Formato de resposta:
+{
+  "clarityScore": number (0 a 100, quão clara e completa está a vaga para atrair o perfil certo),
+  "clarityLabel": string (rótulo curto, ex: "Vaga clara e completa", "Precisa de ajustes", "Vaga confusa"),
+  "mainRequirements": string[] (requisitos principais que já estão claros no texto, até 6 itens),
+  "ambiguities": string[] (pontos vagos, genéricos ou ambíguos que podem afastar ou confundir candidatos, até 5 itens),
+  "suggestions": string[] (sugestões objetivas de melhoria no texto da vaga, até 5 itens)
+}`;
+
+  const userMessage = `DESCRIÇÃO DA VAGA:\n${jobDescription}`;
+
+  const result = await runToolJsonPrompt<JobDiagnosticResult>("job_diagnostic", systemPrompt, userMessage);
+  return {
+    clarityScore: asScore(result?.clarityScore, 0, 100, 50),
+    clarityLabel: asText(result?.clarityLabel),
+    mainRequirements: asStringArray(result?.mainRequirements),
+    ambiguities: asStringArray(result?.ambiguities),
+    suggestions: asStringArray(result?.suggestions),
+  };
+}
+
+// --- Diagnóstico de Preparação (entrada gratuita da jornada Estudos) ---
+
+export type StudyDiagnosticResult = {
+  currentSituation: string;
+  mainDifficulties: string[];
+  firstNextStep: string;
+};
+
+const STUDY_OBJECTIVE_LABELS: Record<string, string> = {
+  enem: "ENEM",
+  vestibular: "Vestibular",
+  concurso: "Concurso público",
+  oab: "Exame da OAB",
+  ensino_medio: "Ensino médio",
+};
+
+export async function generateStudyDiagnostic(
+  objective: string,
+  context: string
+): Promise<StudyDiagnosticResult> {
+  const objectiveLabel = STUDY_OBJECTIVE_LABELS[objective] ?? objective;
+  const systemPrompt = `Você é um orientador de estudos que ajuda estudantes brasileiros a entenderem seu ponto de partida antes de montar um plano de preparação.
+${BASE_RULES}
+Baseie-se apenas no que a pessoa descreveu. Se ela não descreveu quase nada, dê uma orientação geral e honesta para o objetivo informado, sem inventar detalhes específicos sobre ela.
+Formato de resposta:
+{
+  "currentSituation": string (leitura curta e direta da situação atual da pessoa, 1-2 frases),
+  "mainDifficulties": string[] (até 4 dificuldades prováveis para esse objetivo, com base no que foi descrito),
+  "firstNextStep": string (uma única ação concreta e específica para começar agora, 1 frase)
+}`;
+
+  const userMessage = `OBJETIVO: ${objectiveLabel}
+
+O QUE A PESSOA DESCREVEU SOBRE SUA SITUAÇÃO (pode estar vazio): ${context || "não informado"}`;
+
+  const result = await runToolJsonPrompt<StudyDiagnosticResult>("study_diagnostic", systemPrompt, userMessage);
+  return {
+    currentSituation: asText(result?.currentSituation),
+    mainDifficulties: asStringArray(result?.mainDifficulties),
+    firstNextStep: asText(result?.firstNextStep),
+  };
+}
+
 // --- Vocação de carreira ---
 
 export type VocationAnswers = {

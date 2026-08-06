@@ -47,7 +47,7 @@ type NavGroup = {
 
 const NAV_GROUPS: NavGroup[] = [
   {
-    title: "Principal",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
@@ -56,7 +56,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Oportunidades",
+    title: "Minha Carreira",
     items: [
       { href: "/radar", label: "Alertas de vagas", icon: Rss, tour: "nav-radar" },
       { href: "/feed", label: "Feed de Vagas", icon: Rss, tour: "nav-feed" },
@@ -68,7 +68,7 @@ const NAV_GROUPS: NavGroup[] = [
   },
 
   {
-    title: "Crescimento & IA",
+    title: "Evoluir",
     items: [
       { href: "/interviews", label: "Entrevistas", icon: CalendarDays, tour: "nav-interviews" },
       { href: "/action-plan", label: "Plano de Ação", icon: Target, tour: "nav-action-plan" },
@@ -79,7 +79,7 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Recursos & Suporte",
+    title: "Explorar",
     items: [
       { href: "/tools", label: "Ferramentas", icon: Wrench, tour: "nav-tools" },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
@@ -96,9 +96,10 @@ const NAV_GROUPS: NavGroup[] = [
 
 const STUDENT_NAV_GROUPS: NavGroup[] = [
   {
-    title: "Minha jornada",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/estudos", label: "Rota de Aprovação", icon: GraduationCap },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
       { href: "/descobrir", label: "Faculdade ou Técnico", icon: GraduationCap },
       { href: "/universidade", label: "Universidade", icon: GraduationCap },
@@ -106,7 +107,7 @@ const STUDENT_NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    title: "Explorar oportunidades",
+    title: "Explorar",
     items: [
       { href: "/vestibulares", label: "Radar Vestibulares", icon: ScrollText, tour: "nav-vestibulares" },
       { href: "/mentorias", label: "Mentorias", icon: GraduationCap, tour: "nav-mentorias" },
@@ -124,7 +125,7 @@ const STUDENT_NAV_GROUPS: NavGroup[] = [
 
 const APPRENTICE_NAV_GROUPS: NavGroup[] = [
   {
-    title: "Minha jornada",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen },
@@ -146,6 +147,7 @@ const APPRENTICE_NAV_GROUPS: NavGroup[] = [
       { href: "/radar", label: "Alertas de vagas", icon: Target },
       { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
       { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+      { href: "/plano-de-candidatura", label: "Plano de Candidatura", icon: FileText },
     ],
   },
   {
@@ -160,7 +162,7 @@ const APPRENTICE_NAV_GROUPS: NavGroup[] = [
 
 const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
   {
-    title: "Minha jornada",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/analise", label: "Primeiro emprego", icon: Briefcase },
@@ -182,6 +184,7 @@ const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
       { href: "/radar", label: "Alertas de vagas", icon: Target },
       { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase, tour: "nav-todas-vagas" },
       { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+      { href: "/plano-de-candidatura", label: "Plano de Candidatura", icon: FileText },
     ],
   },
   {
@@ -196,7 +199,7 @@ const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
 
 const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
   {
-    title: "Minha jornada",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/estagio/trilhas", label: "Estágios", icon: Briefcase },
@@ -221,6 +224,7 @@ const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
       { href: "/radar", label: "Alertas de vagas", icon: Target },
       { href: "/todas-as-vagas", label: "Todas as Vagas", icon: Briefcase },
       { href: "/applications", label: "Candidaturas", icon: KanbanSquare, tour: "nav-applications" },
+      { href: "/plano-de-candidatura", label: "Plano de Candidatura", icon: FileText },
     ],
   },
   {
@@ -235,14 +239,15 @@ const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
 
 const CONCURSEIRO_NAV_GROUPS: NavGroup[] = [
   {
-    title: "Minha preparação",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/estudos/diagnostico", label: "Diagnóstico de Preparação", icon: Search },
       { href: "/concursos", label: "Radar de Concursos", icon: Landmark, tour: "nav-concursos" },
     ],
   },
   {
-    title: "Ferramentas de estudo",
+    title: "Explorar",
     items: [
       { href: "/tools/concurso", label: "Plano e simulados", icon: BookOpen, tour: "nav-tools" },
       { href: "/tools/leitor-edital", label: "Leitor de edital", icon: FileText },
@@ -261,13 +266,14 @@ const CONCURSEIRO_NAV_GROUPS: NavGroup[] = [
 
 const OAB_NAV_GROUPS: NavGroup[] = [
   {
-    title: "Minha preparação",
+    title: "Minha Rota",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/estudos/diagnostico", label: "Diagnóstico de Preparação", icon: Search },
     ],
   },
   {
-    title: "Ferramentas de estudo",
+    title: "Explorar",
     items: [
       { href: "/tools/oab", label: "Simulados OAB", icon: BookOpen, tour: "nav-tools" },
       { href: "/tools/oab/segunda-fase", label: "Segunda fase", icon: FileText },

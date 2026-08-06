@@ -23,6 +23,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { CommercialPlanCards } from "@/components/commercial-plan-cards";
 import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
+import { JOURNEYS } from "@/lib/journeys";
 
 
 // Home mostra só 3 opções (grátis, principal, sprint) pra reduzir indecisão;
@@ -390,6 +391,33 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           title="Gratuito ou Carreira Pro: qual combina com você agora?"
           subtitle="Escolha o suporte que combina com o seu momento: para começar, se desenvolver ou acelerar sua próxima fase."
         />
+
+        {/* OUTRAS JORNADAS - aparece só depois da jornada principal (candidato) */}
+        <section className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
+          <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
+              O CarreirasMatch também acompanha outros objetivos
+            </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <Link
+                href={JOURNEYS.study.free.href}
+                className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-blue-500/40 dark:border-slate-800 dark:bg-slate-900"
+              >
+                <h3 className="text-base font-bold leading-snug text-slate-900 dark:text-white">Quero estudar para uma aprovação</h3>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{JOURNEYS.study.promise}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-transform group-hover:translate-x-1">Começar <ArrowRight className="h-3.5 w-3.5" /></span>
+              </Link>
+              <Link
+                href={JOURNEYS.company.free.href}
+                className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-blue-500/40 dark:border-slate-800 dark:bg-slate-900"
+              >
+                <h3 className="text-base font-bold leading-snug text-slate-900 dark:text-white">Quero contratar melhor</h3>
+                <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{JOURNEYS.company.promise}</p>
+                <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-transform group-hover:translate-x-1">Conhecer <ArrowRight className="h-3.5 w-3.5" /></span>
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* FAQ */}
         <section className="mx-auto max-w-4xl px-4 py-20 md:px-8 space-y-8">
