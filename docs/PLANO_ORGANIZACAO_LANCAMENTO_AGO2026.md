@@ -22,14 +22,13 @@ expor o que já existe.
 
 ## Prioridade 1 — Landing e posicionamento
 
-- Mensagem única na home: "Compare seu currículo com a vaga, prepare toda a
-  candidatura e acompanhe cada oportunidade até a entrevista."
-- Um CTA principal: "Analisar currículo e vaga grátis".
-- Remover ou reduzir destaque de módulos secundários (jogos, ensino médio,
-  concursos) na primeira dobra; eles continuam existindo, mas não competem
-  com a mensagem principal.
-- Arquivos prováveis: `src/components/marketing-home.tsx`,
-  `src/components/hero-instant-scanner.tsx`, `src/app/descobrir/page.tsx`.
+**Concluído, verificado em 06/08/2026.** `src/components/marketing-home.tsx`
+já tem headline única ("Escolha melhor a vaga. Prepare melhor a
+candidatura.") com 1 CTA principal ("Analisar uma vaga grátis"). Jogos não
+aparece em nenhum lugar da home nem do menu (`src/components/public-nav.tsx`);
+ensino médio e concursos ficam dentro do dropdown "Aprender", fora da
+primeira dobra e sem competir com a mensagem principal. Nenhuma ação
+pendente.
 
 ## Prioridade 2 — Jornada única visível no produto
 
