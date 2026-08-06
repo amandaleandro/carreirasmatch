@@ -125,20 +125,27 @@ ler onde a rota é chamada, não só a rota em si.
   client é gerado em `@/generated/prisma/client` (output customizado no
   schema). Não era item do plano, mas travava qualquer verificação.
 
+### Corrigido em sessão posterior (06/08/2026)
+
+- Lacunas da análise → `/api/career-growth/plan`: agora busca a análise mais
+  recente do usuário (`strengths`/`weaknesses`/`fixes`) e passa como contexto
+  pro prompt de `generateCareerGrowthPlan`
+  (`src/app/api/career-growth/plan/route.ts`, `src/lib/career-growth.ts`). O
+  prompt instrui a IA a usar isso como base real, sem repetir os itens
+  literalmente — mitigação deliberada ao risco registrado abaixo de misturar
+  lacunas de vaga externa com lacunas de promoção interna sem critério.
+  Decisão de manter foi confirmada com o produto em 06/08/2026.
+
+- Empresa: candidatura recebida pelo feed (`.../vagas/[id]/candidatar`) agora
+  recalcula Match via IA na primeira candidatura, gravando `fitScore` e
+  `fitReason` em `CompanyJobApplication` (campos novos, migration
+  `20260806090000_add_company_job_application_fit_score`; ver
+  `src/app/api/empresa/vagas/[id]/candidatar/route.ts:47-72`). Continua sendo
+  outro fluxo do que `.../vagas/[id]/rematch` (banco de talentos) — não foi
+  unificado, só passou a calcular também no fluxo do feed.
+
 ### Ainda não integrado (real, não corrigido)
 
-- Lacunas da análise → `/api/career-growth/plan`: o formulário de evolução de
-  cargo (`currentRole` → `targetRole`) não lê `weaknesses`/`fixes` da análise
-  mais recente (`src/app/api/career-growth/plan/route.ts:11-22`). Ficou fora
-  desta rodada porque é conceitualmente outra coisa — gaps de promoção
-  interna, não lacunas de uma vaga externa — misturar os dois sem repensar o
-  produto arriscava forçar uma integração que não faz sentido de verdade.
-- Empresa: candidatura recebida pelo feed (`.../vagas/[id]/candidatar`) não
-  recalcula Match via IA — `CompanyJobApplication` nem tem campo de score
-  (`prisma/schema.prisma:1476-1490`); o recálculo real (`runVagaMatch`) só
-  existe na rota de banco de talentos, `.../vagas/[id]/rematch`, que é outro
-  fluxo (`src/lib/company-vaga.ts:45`). Não verificado neste ciclo se faz
-  sentido de produto unificar os dois fluxos.
 - Lacunas da análise → `action-plan`: só faz toggle de itens já existentes
   (`src/app/api/action-plan/[id]/route.ts:16-31`), não gera nada novo. Baixo
   risco, não priorizado.
@@ -160,6 +167,16 @@ visita → análise iniciada → currículo enviado → vaga inserida → análi
 concluída → cadastro → diagnóstico visualizado → oferta vista → checkout
 iniciado → pagamento aprovado → primeira candidatura preparada → retorno D7 →
 cancelamento.
+
+**Confirmado em 06/08/2026**: os eventos de `src/lib/analytics.ts`
+(`LANDING_VIEWED`, `ANALYSIS_STARTED`, `RESUME_UPLOADED`,
+`JOB_DESCRIPTION_ADDED`, `ANALYSIS_COMPLETED`, `SIGNUP_COMPLETED`,
+`DIAGNOSTIC_TEASER_VIEWED`, `CHECKOUT_STARTED`, `PAYMENT_CONFIRMED`,
+`APPLICATION_CREATED`) cobrem cada etapa e têm chamada real em componente
+(não só declarados), verificado por grep em `src/components` e `src/app`.
+"Retorno D7" e "cancelamento" não têm evento de front-end dedicado — são
+derivados do banco (status de assinatura, timestamps de sessão), o que é
+arquitetura esperada para esses dois pontos, não lacuna.
 
 ## Fora de escopo deste ciclo
 
