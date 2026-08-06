@@ -32,17 +32,16 @@ pendente.
 
 ## Prioridade 2 — Jornada única visível no produto
 
-- Unificar os endpoints hoje separados (`/api/tools/prepare-application`,
-  `/api/tools/application-kit`, `/api/tools/cover-letter`,
-  `/api/tools/application-answer`, `/api/tools/interview-simulator`, etc.) em
-  um fluxo de UI só: "Preparar esta candidatura", com passos sequenciais em
-  vez de ferramentas soltas.
-- Cada etapa deve indicar a próxima ação (currículo adaptado → carta →
-  respostas → mensagem ao recrutador → perguntas de entrevista → salvar no
-  Kanban).
-- Validar que o resultado de uma etapa (ex.: Match e lacunas) realmente
-  alimenta a etapa seguinte (ex.: currículo adaptado, plano de estudo) — ver
-  Prioridade 5 (integração).
+**Concluído, verificado em 06/08/2026.** `src/app/applications/[id]/page.tsx`
+já é o workspace único por candidatura: checklist de progresso (vaga
+analisada → currículo revisado → candidatura registrada → entrevista
+preparada), banner de "próxima ação" por status, e links contextuais para
+carta/resposta/entrevista já pré-preenchidos via `applicationId`. O
+`ApplicationKitGenerator` (`src/components/application-kit-generator.tsx`)
+gera currículo adaptado, carta, mensagem ao recrutador, pedido de indicação,
+respostas de formulário e plano de entrevista num fluxo só, dentro da mesma
+tela — não são mais ferramentas soltas. Integração de Match→kit já
+confirmada na Prioridade 5.
 
 ## Prioridade 3 — Demonstração e prova social
 
