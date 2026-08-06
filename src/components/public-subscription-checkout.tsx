@@ -332,7 +332,7 @@ export function PublicSubscriptionCheckout({
                 <legend className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
                   Como você quer pagar
                 </legend>
-                {plans.filter((p) => p.id === "card_recurring" || (p.id === "monthly_oneoff" ? commercialPlanKey === "sprint" || commercialPlanKey === "pro" : commercialPlanKey === "pro")).map((p) => (
+                {plans.filter((p) => p.id === "card_recurring" || (p.id === "monthly_oneoff" ? commercialPlanKey === "sprint" || commercialPlanKey === "pro" || commercialPlanKey === "essential" || commercialPlanKey === "complete" : commercialPlanKey === "pro" || commercialPlanKey === "essential" || commercialPlanKey === "complete")).map((p) => (
                   <label
                     key={p.id}
                     className={`flex items-start gap-3 rounded-2xl border p-4 cursor-pointer transition-all ${
