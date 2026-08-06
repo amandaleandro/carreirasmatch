@@ -53,11 +53,13 @@ confirmada na Prioridade 5.
 
 ## Prioridade 4 — Onboarding por objetivo
 
-- Ao entrar, perguntar objetivo único: preparar candidatura, encontrar vagas,
-  melhorar currículo, treinar entrevista, melhorar LinkedIn.
-- Conduzir para uma única ação inicial em vez de expor o menu completo.
-- Verificar reaproveitamento do onboarding existente em `src/app/onboarding`
-  e `src/lib/onboarding-objectives.ts` antes de criar fluxo novo.
+**Concluído, verificado em 06/08/2026.**
+`src/components/onboarding/onboarding-wizard.tsx` já pergunta objetivo único
+na etapa 2 (`objectivesForSegment`, `src/lib/onboarding-objectives.ts`) e
+conduz pra 1 CTA de ação inicial na etapa 6 — inclusive com regra de
+prioridade: se a pessoa ainda não tem currículo, o CTA vira "Criar meu
+currículo" em vez do objetivo escolhido, porque é pré-requisito pra tudo o
+resto. Nenhuma ação pendente.
 
 ## Prioridade 5 — Integração real entre módulos (auditoria técnica)
 
