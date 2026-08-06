@@ -13,14 +13,13 @@ import type { CareerSegment } from "@/lib/career-segments";
 const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; label: string }[]>> = {
   student: [
     { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" },
-    { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico" },
+    { href: "/descobrir", label: "Faculdade ou Técnico" },
     { href: "/cursos-gratuitos", label: "Cursos gratuitos" },
     { href: "/vestibulares", label: "Radar de vestibulares" },
     { href: "/mentorias", label: "Mentorias" },
     { href: "/jogos", label: "Jogos" },
   ],
   apprentice: [
-    { href: "/jovem-aprendiz", label: "Jovem Aprendiz" },
     { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓" },
     { href: "/tools/apprentice-areas", label: "Áreas de atuação" },
     { href: "/tools/apprentice-companies", label: "Empresas" },
@@ -32,7 +31,7 @@ const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; lab
     { href: "/applications", label: "Candidaturas" },
   ],
   first_job: [
-    { href: "/primeiro-emprego", label: "Primeiro emprego" },
+    { href: "/analise", label: "Primeiro emprego" },
     { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência" },
     { href: "/tools/first-job-guide", label: "Guia do primeiro emprego" },
     { href: "/vagas-de-hoje", label: "Vagas de hoje" },
@@ -43,7 +42,7 @@ const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; lab
     { href: "/applications", label: "Candidaturas" },
   ],
   internship: [
-    { href: "/estagio", label: "Estágios" },
+    { href: "/estagio/trilhas", label: "Estágios" },
     { href: "/feed", label: "Feed de estágios" },
     { href: "/analise", label: "Análise de Vaga" },
     { href: "/tools/internship-guide", label: "Guia de estágio" },
@@ -56,13 +55,11 @@ const MOBILE_LINKS_BY_SEGMENT: Partial<Record<CareerSegment, { href: string; lab
   ],
   concurseiro: [
     { href: "/concursos", label: "Radar de Concursos" },
-    { href: "/concurso", label: "Preparação para concurso" },
     { href: "/tools/concurso", label: "Plano e simulados" },
     { href: "/tools/leitor-edital", label: "Leitor de edital" },
     { href: "/tools/essay-grader", label: "Corretor de redação" },
   ],
   oab: [
-    { href: "/oab", label: "Preparação para OAB" },
     { href: "/tools/oab", label: "Simulados OAB" },
     { href: "/tools/oab/segunda-fase", label: "Segunda fase" },
   ],

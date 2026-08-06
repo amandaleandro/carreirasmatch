@@ -107,6 +107,8 @@ export default async function VagaDetailPage({ params }: { params: Promise<{ id:
                   status: a.status,
                   note: a.note,
                   createdAt: a.createdAt.toISOString(),
+                  fitScore: a.fitScore,
+                  fitReason: a.fitReason,
                 }))}
               />
             )}

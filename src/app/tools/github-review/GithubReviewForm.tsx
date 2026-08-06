@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
 
 type Result = {
@@ -16,6 +16,19 @@ export function GithubReviewForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
+  const [loadedFromSaved, setLoadedFromSaved] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/tools/github-review")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.result) {
+          setResult(data.result);
+          setLoadedFromSaved(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -40,6 +53,7 @@ export function GithubReviewForm() {
       if (!res.ok) throw new Error(data.error ?? "Erro ao processar.");
 
       setResult(data as Result);
+      setLoadedFromSaved(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro inesperado.");
     } finally {
@@ -116,6 +130,11 @@ export function GithubReviewForm() {
 
       {result && (
         <div className="mt-10 space-y-6">
+          {loadedFromSaved && (
+            <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+              Mostrando a última análise gerada para você. Analise de novo se algo mudou.
+            </p>
+          )}
           <div className="rounded-2xl border border-neutral-200/80 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-6 shadow-sm shadow-slate-900/5">
             <h3 className="font-semibold mb-3">Impressão geral</h3>
             <p className="text-sm text-neutral-700 dark:text-neutral-300">

@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 const items = [
   { icon: School, title: "Ensino médio", description: "Simulados, flashcards, redação e cronograma pensados para o ENEM e o vestibular.", href: "/ensino-medio" },
   { icon: Landmark, title: "Universidade", description: "Conecte suas disciplinas do semestre a competências, profissões e projetos práticos.", href: "/universidade" },
-  { icon: BookOpenText, title: "Concursos", description: "Estude pelo edital de verdade: plano de estudo, simulado e nota de corte estimada.", href: "/concurso" },
-  { icon: Scale3d, title: "OAB", description: "Preparação para 1ª e 2ª fase no estilo da banca, com correção de peça prática.", href: "/oab" },
+  { icon: BookOpenText, title: "Concursos", description: "Estude pelo edital de verdade: plano de estudo, simulado e nota de corte estimada.", href: "/tools/concurso" },
+  { icon: Scale3d, title: "OAB", description: "Preparação para 1ª e 2ª fase no estilo da banca, com correção de peça prática.", href: "/tools/oab" },
   { icon: Wrench, title: "Ferramentas de estudo", description: "Todas as ferramentas de aprendizado em um só lugar, por tema e objetivo.", href: "/tools" },
 ];
 

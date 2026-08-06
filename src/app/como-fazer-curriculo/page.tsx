@@ -141,7 +141,7 @@ export default function ComoFazerCurriculoPage() {
             Veja como fazer um currículo sem experiência
           </Link>{" "}
           ou o guia de{" "}
-          <Link href="/primeiro-emprego" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/analise" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
             currículo para o primeiro emprego
           </Link>
           .

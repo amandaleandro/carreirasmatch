@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
+import { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireAuth } from "@/lib/require-auth";
 import { hasActiveSubscriptionAccess } from "@/lib/entitlements";
@@ -20,11 +21,21 @@ function currentCalendarPeriod(now = new Date()) {
 
 async function getOrCreateCurrentPeriod(userId: string) {
   const { periodStart, periodEnd } = currentCalendarPeriod();
-  return prisma.featureUsagePeriod.upsert({
-    where: { userId_periodStart: { userId, periodStart } },
-    create: { userId, periodStart, periodEnd },
-    update: {},
-  });
+  try {
+    return await prisma.featureUsagePeriod.upsert({
+      where: { userId_periodStart: { userId, periodStart } },
+      create: { userId, periodStart, periodEnd },
+      update: {},
+    });
+  } catch (error) {
+    // Concurrent requests can both miss the upsert's read and race on create;
+    // the loser here just needs the row the winner already inserted.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      const period = await prisma.featureUsagePeriod.findUnique({ where: { userId_periodStart: { userId, periodStart } } });
+      if (period) return period;
+    }
+    throw error;
+  }
 }
 
 export type FeatureAccessResult = { allowed: boolean; plan: CommercialPlanKey; used: number; limit: number | null };

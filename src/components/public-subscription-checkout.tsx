@@ -189,6 +189,78 @@ export function PublicSubscriptionCheckout({
         </div>
       </section>
 
+      {/* Step 1+2: segmento e plano — uma única grade, sem repetir preço em outro lugar */}
+      {!showBrick && (
+        <section className="space-y-8">
+          <div className="max-w-md mx-auto space-y-2">
+            <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 text-center">
+              Seu momento profissional
+            </label>
+            <select
+              value={segment}
+              onChange={(e) => setSegment(e.target.value as CareerSegment)}
+              className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500"
+            >
+              {CAREER_SEGMENT_OPTIONS.filter((option) => option.value !== "student").map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <fieldset>
+            <legend className="text-center text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-4">
+              Escolha o plano
+            </legend>
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {Object.values(COMMERCIAL_PLANS)
+                .filter((candidate) => candidate.key !== "free")
+                .map((candidate) => {
+                  const selected = commercialPlanKey === candidate.key;
+                  return (
+                    <button
+                      type="button"
+                      key={candidate.key}
+                      onClick={() => {
+                        setCommercialPlanKey(candidate.key);
+                        setPlan(candidate.recurring ? "card_recurring" : "monthly_oneoff");
+                      }}
+                      className={`relative text-left rounded-2xl border p-5 transition-all ${
+                        selected
+                          ? "border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 ring-2 ring-blue-500/20"
+                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                      }`}
+                    >
+                      {candidate.highlighted && (
+                        <span className="absolute -top-3 left-4 inline-flex items-center rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                          Mais escolhido
+                        </span>
+                      )}
+                      <p className="font-bold text-sm text-slate-900 dark:text-white">{candidate.name}</p>
+                      <p className="mt-1 text-xl font-extrabold text-blue-600 dark:text-blue-400">
+                        {formatCentsToBRL(candidate.priceCents)}
+                        {candidate.recurring && <span className="text-xs font-semibold text-slate-500">/mês</span>}
+                        {!candidate.recurring && candidate.durationDays && (
+                          <span className="text-xs font-semibold text-slate-500">/{candidate.durationDays} dias</span>
+                        )}
+                      </p>
+                      <ul className="mt-3 space-y-1.5">
+                        {getPlanFeatureList(candidate.key).slice(0, 3).map((feature) => (
+                          <li key={feature} className="flex items-start gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                            <Check className="mt-0.5 h-3 w-3 shrink-0 text-emerald-500" />
+                            <span>{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </button>
+                  );
+                })}
+            </div>
+          </fieldset>
+        </section>
+      )}
+
       {/* Main Grid: Offer summary + Payment form */}
       <div className="grid gap-8 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
         {/* Left Column: What's included */}
@@ -256,37 +328,9 @@ export function PublicSubscriptionCheckout({
         <section className="rounded-3xl border border-slate-200 dark:border-slate-800 p-6 md:p-8 bg-white dark:bg-slate-900 shadow-sm space-y-6">
           {!showBrick ? (
             <form onSubmit={handleStart} className="space-y-6">
-              <div className="space-y-2">
-                <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  1. Selecione o seu momento profissional
-                </label>
-                <select
-                  value={segment}
-                  onChange={(e) => setSegment(e.target.value as CareerSegment)}
-                  className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white outline-none focus:border-blue-500"
-                >
-                  {CAREER_SEGMENT_OPTIONS.filter((option) => option.value !== "student").map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <fieldset className="space-y-3">
-                <legend className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">2. Escolha o plano</legend>
-                {Object.values(COMMERCIAL_PLANS).filter((candidate) => candidate.key !== "free").map((candidate) => (
-                  <label key={candidate.key} className={`flex items-center gap-3 rounded-2xl border p-4 cursor-pointer ${commercialPlanKey === candidate.key ? "border-blue-500 bg-blue-50/60 dark:bg-blue-950/30" : "border-slate-200 dark:border-slate-800"}`}>
-                    <input type="radio" name="commercialPlan" checked={commercialPlanKey === candidate.key} onChange={() => { setCommercialPlanKey(candidate.key); setPlan(candidate.recurring ? "card_recurring" : "monthly_oneoff"); }} className="accent-blue-600" />
-                    <span className="flex-1"><span className="font-bold text-sm text-slate-900 dark:text-white">{candidate.name}</span><span className="ml-2 text-sm font-extrabold text-blue-600 dark:text-blue-400">{formatCentsToBRL(candidate.priceCents)}{candidate.recurring ? "/mês" : ""}</span></span>
-                    {candidate.highlighted && <span className="text-[10px] font-bold uppercase text-blue-600">Mais escolhido</span>}
-                  </label>
-                ))}
-              </fieldset>
-
               <fieldset className="space-y-3">
                 <legend className="text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-2">
-                  3. Escolha como pagar
+                  Como você quer pagar
                 </legend>
                 {plans.filter((p) => p.id === "card_recurring" || (p.id === "monthly_oneoff" ? commercialPlanKey === "sprint" || commercialPlanKey === "pro" : commercialPlanKey === "pro")).map((p) => (
                   <label
@@ -320,7 +364,7 @@ export function PublicSubscriptionCheckout({
 
               <div className="space-y-2">
                 <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300">
-                  4. E-mail de cadastro
+                  E-mail de cadastro
                 </label>
                 <input
                   type="email"
@@ -374,7 +418,7 @@ export function PublicSubscriptionCheckout({
                 ← Voltar e alterar dados
               </button>
               <MercadoPagoPaymentBrick
-                amount={amountCents}
+                amount={amountCents / 100}
                 payerEmail={email}
                 kind={plan === "annual" ? "subscription_annual" : "subscription_monthly"}
                 productCode={avulsoProductCode(commercialPlanKey, plan === "annual" ? "annual" : "monthly")}

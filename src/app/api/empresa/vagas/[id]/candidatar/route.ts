@@ -3,6 +3,7 @@ import { requireAuth } from "@/lib/require-auth";
 import { prisma } from "@/lib/prisma";
 import { sendCompanyNewApplicationEmail } from "@/lib/resend";
 import { sendCompanyNewApplicationWhatsapp } from "@/lib/evolution";
+import { rankCandidates } from "@/lib/tools";
 
 // Candidato se candidata a uma vaga de empresa publicada no feed.
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -17,7 +18,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const vaga = await prisma.companyVaga.findFirst({
     where: { id, publishedToFeed: true, status: "open" },
-    select: { id: true, title: true, companyId: true },
+    select: { id: true, title: true, companyId: true, description: true },
   });
   if (!vaga) {
     return NextResponse.json({ error: "Vaga indisponível." }, { status: 404 });
@@ -42,6 +43,33 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     create: { vagaId: vaga.id, userId: session.user.id, message },
     update: message ? { message } : {},
   });
+
+  // Calcula a aderência via IA só na primeira candidatura (mesmo motor de
+  // ranking do banco de talentos), pra recrutador não ver a candidatura do
+  // feed "sem match" enquanto a do banco de talentos mostra fitScore.
+  if (!already) {
+    const resume = await prisma.resume.findFirst({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      select: { rawText: true },
+    });
+    if (resume?.rawText) {
+      try {
+        const { ranking } = await rankCandidates(vaga.title, vaga.description, [
+          { id: session.user.id, label: session.user.name ?? "Candidato", resumeText: resume.rawText },
+        ]);
+        const match = ranking[0];
+        if (match) {
+          await prisma.companyJobApplication.update({
+            where: { vagaId_userId: { vagaId: vaga.id, userId: session.user.id } },
+            data: { fitScore: match.fitScore, fitReason: match.reason },
+          });
+        }
+      } catch (error) {
+        console.error("Erro ao calcular aderência da candidatura pelo feed:", error);
+      }
+    }
+  }
 
   if (!already) {
     const owners = await prisma.companyMember.findMany({

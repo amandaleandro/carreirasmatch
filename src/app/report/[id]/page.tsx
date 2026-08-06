@@ -200,7 +200,7 @@ export default async function ReportPage({
               Otimizar currículo para esta vaga →
             </Link>
             <Link
-              href="/tools/cover-letter"
+              href={`/tools/cover-letter?analysisId=${id}`}
               className="inline-block text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
             >
               Gerar carta de apresentação para esta vaga →

@@ -10,7 +10,7 @@ const TOOL_HREF = "/tools/resume-from-scratch";
 export default async function ResumeFromScratchPage() {
   const session = await requireSubscriptionPage();
 
-  const [user, courses] = await Promise.all([
+  const [user, courses, evidences] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: { careerSegment: true, professionalArea: true },
@@ -19,15 +19,22 @@ export default async function ResumeFromScratchPage() {
       where: { userId: session.user.id },
       select: { title: true, provider: true },
     }),
+    prisma.professionalEvidence.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      take: 20,
+      select: { title: true, description: true, metrics: true },
+    }),
   ]);
 
   if (!hasFullAccessEmail(session.user.email) && !hasToolAccess(user?.careerSegment, TOOL_HREF)) {
     return <ToolAccessGate hasSegment={Boolean(user?.careerSegment)} />;
   }
 
-  const initialProjects = courses
-    .map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title))
-    .join("\n");
+  const initialProjects = [
+    ...evidences.map((e) => `${e.title}: ${e.description}${e.metrics ? ` (${e.metrics})` : ""}`),
+    ...courses.map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title)),
+  ].join("\n");
 
   return (
     <ResumeFromScratchForm

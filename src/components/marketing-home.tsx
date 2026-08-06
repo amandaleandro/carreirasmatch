@@ -13,6 +13,9 @@ import {
   Radar,
   Briefcase,
   LayoutGrid,
+  Target,
+  ClipboardCheck,
+  LineChart,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { PublicNav, PublicNavMobile } from "@/components/public-nav";
@@ -50,12 +53,20 @@ const journeySteps = [
 
 const deliverables = [
   "Diagnóstico claro de aderência técnica por requisito",
+  "Prioridade para as oportunidades que mais combinam com você",
   "Requisitos preenchidos e lacunas para você comprovar",
   "Palavras-chave essenciais para passar nos filtros (ATS)",
   "Currículo formatado e pronto para download em PDF",
   "Guia de preparação para as perguntas da entrevista",
+  "Histórico para entender o que está gerando respostas",
   "Plano de ação simples com os próximos passos",
 ];
+
+const decisionCards = [
+  [Target, "Escolha onde investir", "Compare suas oportunidades e comece pelas vagas em que seu perfil tem mais força."],
+  [ClipboardCheck, "Candidate-se com evidências", "Ajuste seu currículo e organize cada próximo passo sem inventar nada sobre sua trajetória."],
+  [LineChart, "Aprenda com o caminho", "Registre resultados, identifique padrões e transforme cada candidatura em uma decisão melhor."],
+] as const;
 
 export const marketingFaqs = [
   ["A análise gratuita já mostra o resultado?", "Sim. Você recebe o resultado inicial de aderência. O Kit Candidatura reúne a versão otimizada em PDF, a análise de palavras-chave e a preparação para entrevista."],
@@ -84,10 +95,10 @@ const ecosystemCards = [
 // Reduzida a 4 entradas na home (o diagnóstico apontou 8 cards competindo
 // cedo demais); a lista completa de momentos continua acessível no menu.
 const audienceCards = [
-  ["Começando agora", "Primeiro emprego ou estágio", "Transforme cursos, projetos e atividades em experiência que conta na candidatura.", "/primeiro-emprego"],
+  ["Começando agora", "Primeiro emprego ou estágio", "Transforme cursos, projetos e atividades em experiência que conta na candidatura.", "/analise"],
   ["Aprendendo", "Descubra seu próximo caminho", "Explore cursos, profissões e possibilidades para tomar decisões com mais clareza.", "/descobrir"],
-  ["Voltando ao mercado", "Recolocação", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/recolocacao"],
-  ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/transicao"],
+  ["Voltando ao mercado", "Recolocação", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/analise"],
+  ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/tools/matriz-de-skills"],
   ["Construindo seu caminho", "Projetos, freelas e renda", "Encontre formas de colocar suas habilidades em prática, criar portfólio e gerar novas oportunidades.", "/freelancers"],
 ] as const;
 
@@ -181,21 +192,21 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-14">
           <div className="space-y-6">
             <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-300">
-              Inteligência para a sua jornada profissional
+              Seu copiloto para decisões de carreira
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Sua carreira é maior do que uma vaga.
+              Escolha melhor a vaga. Prepare melhor a candidatura.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              Descubra possibilidades, desenvolva suas habilidades, encontre oportunidades e avance com mais clareza — esteja você estudando, começando, mudando de área ou buscando crescer.
+              Compare seu perfil com oportunidades reais, descubra onde vale investir seu tempo e avance com um plano claro: do primeiro Match à próxima entrevista.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Começar minha jornada grátis" />
+              <PrimaryCta label="Analisar uma vaga grátis" />
               <a href="#exemplo" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
-                Ver um resultado de exemplo
+                Ver como funciona
               </a>
             </div>
 
@@ -248,6 +259,33 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                 <CardDescription>Receba ações priorizadas antes de enviar a candidatura.</CardDescription>
               </CardHeader>
             </Card>
+          </div>
+        </section>
+
+        {/* DECISÃO E CONTINUIDADE */}
+        <section className="border-y border-blue-100 bg-blue-50/50 dark:border-blue-950/60 dark:bg-blue-950/15">
+          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
+            <div className="mx-auto max-w-3xl text-center space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Mais clareza em cada candidatura</span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Não é só sobre melhorar o currículo. É sobre melhorar suas decisões.
+              </h2>
+              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                O CarreirasMatch transforma cada oportunidade em um próximo passo concreto, e cada resultado em aprendizado para a sua estratégia.
+              </p>
+            </div>
+
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {decisionCards.map(([Icon, title, description]) => (
+                <Card key={title} variant="default" className="p-6">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-xs dark:bg-slate-900 dark:text-blue-400">
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-5 text-base font-bold text-slate-900 dark:text-white">{title}</h3>
+                  <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{description}</p>
+                </Card>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -350,7 +388,7 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <CommercialPlanCards
           plans={PUBLIC_PLAN_CARDS}
           title="Gratuito ou Carreira Pro: qual combina com você agora?"
-          subtitle="Escolha o suporte que combina com o seu momento — para começar, se desenvolver ou acelerar sua próxima fase."
+          subtitle="Escolha o suporte que combina com o seu momento: para começar, se desenvolver ou acelerar sua próxima fase."
         />
 
         {/* FAQ */}

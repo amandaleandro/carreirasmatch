@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useFeedback } from "@/components/feedback-provider";
 
 type Tone = "formal" | "direto" | "entusiasmado";
@@ -26,7 +27,26 @@ export function CoverLetterForm() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [copied, setCopied] = useState(false);
+  const [prefilledFromApplication, setPrefilledFromApplication] = useState(false);
   const { notify } = useFeedback();
+  const searchParams = useSearchParams();
+  const applicationId = searchParams.get("applicationId");
+  const analysisId = searchParams.get("analysisId");
+
+  useEffect(() => {
+    if (!applicationId && !analysisId) return;
+    const query = applicationId ? `applicationId=${applicationId}` : `analysisId=${analysisId}`;
+    fetch(`/api/tools/prepare-context?${query}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!data) return;
+        if (data.jobTitle) setJobTitle(data.jobTitle);
+        if (data.jobText) setJobText(data.jobText);
+        if (data.resumeText) setResumeText(data.resumeText);
+        setPrefilledFromApplication(true);
+      })
+      .catch(() => {});
+  }, [applicationId, analysisId]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -85,6 +105,12 @@ export function CoverLetterForm() {
           enviar.
         </p>
       </header>
+
+      {prefilledFromApplication && (
+        <p className="mb-4 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+          Cargo, vaga e currículo preenchidos automaticamente a partir da sua candidatura.
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>

@@ -9,6 +9,19 @@ import {
   parseGithubUsername,
 } from "@/lib/github-profile";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { prisma } from "@/lib/prisma";
+
+export async function GET() {
+  const { session, response: authResponse } = await requireToolSegmentAccess("/tools/github-review");
+  if (!session) return authResponse!;
+
+  const saved = await prisma.toolReviewResult.findUnique({
+    where: { userId_type: { userId: session.user.id, type: "github" } },
+  });
+  if (!saved) return NextResponse.json({ result: null });
+
+  return NextResponse.json({ result: JSON.parse(saved.result), updatedAt: saved.updatedAt });
+}
 
 // Buscar o perfil consome a cota da API do GitHub, que é do servidor inteiro
 // (60/h sem GITHUB_TOKEN). Limita por usuário para um não derrubar os outros.
@@ -67,6 +80,13 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await analyzeGithub(profileText, targetRole ?? "");
+
+    await prisma.toolReviewResult.upsert({
+      where: { userId_type: { userId: session.user.id, type: "github" } },
+      create: { userId: session.user.id, type: "github", input: JSON.stringify({ githubUrl, targetRole }), result: JSON.stringify(result) },
+      update: { input: JSON.stringify({ githubUrl, targetRole }), result: JSON.stringify(result) },
+    });
+
     await release.confirm();
     return NextResponse.json(result);
   } catch (error) {

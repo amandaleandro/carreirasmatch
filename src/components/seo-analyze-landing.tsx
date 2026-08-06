@@ -3,12 +3,10 @@ import { AnalyzeVagaPage } from "@/components/analyze-vaga";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 
 const RELATED_LINKS = [
-  { label: "Estágio", href: "/estagio" },
-  { label: "Primeiro emprego", href: "/primeiro-emprego" },
-  { label: "Recolocação", href: "/recolocacao" },
-  { label: "Transição de carreira", href: "/transicao" },
-  { label: "Concurso público", href: "/concurso" },
   { label: "Currículo grátis", href: "/curriculo-gratis" },
+  { label: "Conquistar sua próxima vaga", href: "/conquistar" },
+  { label: "Preparação para concurso", href: "/tools/concurso" },
+  { label: "Evoluir na carreira", href: "/evoluir" },
 ] as const;
 
 export type LandingFaq = { question: string; answer: string };

@@ -12,9 +12,9 @@ type Result = {
   nextSteps: string[];
 };
 
-export function ProfileFromScratchForm() {
+export function ProfileFromScratchForm({ initialProjects = "" }: { initialProjects?: string }) {
   const [education, setEducation] = useState("");
-  const [projects, setProjects] = useState("");
+  const [projects, setProjects] = useState(initialProjects);
   const [skills, setSkills] = useState("");
   const [targetRole, setTargetRole] = useState("");
   const [loading, setLoading] = useState(false);

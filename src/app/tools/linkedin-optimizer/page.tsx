@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useFeedback } from "@/components/feedback-provider";
 
@@ -19,7 +19,20 @@ export default function LinkedinOptimizerPage() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<LinkedInOptimization | null>(null);
   const [error, setError] = useState("");
+  const [loadedFromSaved, setLoadedFromSaved] = useState(false);
   const { notify } = useFeedback();
+
+  useEffect(() => {
+    fetch("/api/tools/linkedin-optimizer")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.result) {
+          setResult(data.result);
+          setLoadedFromSaved(true);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const handleOptimize = async () => {
     if (!targetRole.trim()) {
@@ -44,6 +57,7 @@ export default function LinkedinOptimizerPage() {
       } else {
         notify("success", "Perfil otimizado. Revise as sugestões antes de publicar.");
         setResult(data.linkedin);
+        setLoadedFromSaved(false);
       }
     } catch {
       notify("error", "Erro de conexão. Tente novamente.");
@@ -125,6 +139,11 @@ export default function LinkedinOptimizerPage() {
 
       {result && (
         <div className="space-y-6">
+          {loadedFromSaved && (
+            <p className="text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+              Mostrando a última otimização gerada para você. Gere de novo se algo mudou.
+            </p>
+          )}
           {result.headlineOptions?.length > 0 && (
             <section className="space-y-3">
               <h3 className="text-sm font-bold text-neutral-900 dark:text-white uppercase tracking-wider text-blue-600 dark:text-blue-400">

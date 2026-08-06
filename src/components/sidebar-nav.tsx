@@ -100,7 +100,7 @@ const STUDENT_NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
-      { href: "/faculdade-ou-tecnico", label: "Faculdade ou Técnico", icon: GraduationCap },
+      { href: "/descobrir", label: "Faculdade ou Técnico", icon: GraduationCap },
       { href: "/universidade", label: "Universidade", icon: GraduationCap },
       { href: "/cursos-gratuitos", label: "Cursos gratuitos", icon: BookOpen, tour: "nav-tools" },
     ],
@@ -127,7 +127,6 @@ const APPRENTICE_NAV_GROUPS: NavGroup[] = [
     title: "Minha jornada",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/jovem-aprendiz", label: "Jovem Aprendiz", icon: GraduationCap },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen },
     ],
   },
@@ -164,7 +163,7 @@ const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
     title: "Minha jornada",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/primeiro-emprego", label: "Primeiro emprego", icon: Briefcase },
+      { href: "/analise", label: "Primeiro emprego", icon: Briefcase },
       { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência", icon: FileText },
     ],
   },
@@ -200,7 +199,7 @@ const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
     title: "Minha jornada",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/estagio", label: "Estágios", icon: Briefcase },
+      { href: "/estagio/trilhas", label: "Estágios", icon: Briefcase },
       { href: "/feed", label: "Feed de estágios", icon: Rss, tour: "nav-feed" },
       { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
     ],
@@ -240,7 +239,6 @@ const CONCURSEIRO_NAV_GROUPS: NavGroup[] = [
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
       { href: "/concursos", label: "Radar de Concursos", icon: Landmark, tour: "nav-concursos" },
-      { href: "/concurso", label: "Preparação para concurso", icon: ScrollText },
     ],
   },
   {
@@ -266,7 +264,6 @@ const OAB_NAV_GROUPS: NavGroup[] = [
     title: "Minha preparação",
     items: [
       { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-      { href: "/oab", label: "Preparação para OAB", icon: Landmark },
     ],
   },
   {

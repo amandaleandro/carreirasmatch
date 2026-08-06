@@ -16,6 +16,10 @@ function ensureInitialized() {
 
 type PixResult = { qrCode: string; qrCodeBase64: string } | null;
 
+type PaymentBrickSubmitParam = {
+  formData?: unknown;
+};
+
 export function MercadoPagoPaymentBrick({
   amount,
   kind,
@@ -44,11 +48,11 @@ export function MercadoPagoPaymentBrick({
   // Valores que mudam com frequência (ex: cada tecla do cupom) não podem entrar
   // nas deps do onSubmit: o SDK do MP reinicializa o Brick inteiro quando essas
   // referências mudam, apagando os dados do cartão em digitação.
-  const latest = useRef({ analysisId, couponCode, segment });
+  const latest = useRef({ analysisId, couponCode, segment, onSuccess });
 
   useEffect(() => {
-    latest.current = { analysisId, couponCode, segment };
-  }, [analysisId, couponCode, segment]);
+    latest.current = { analysisId, couponCode, segment, onSuccess };
+  }, [analysisId, couponCode, segment, onSuccess]);
 
   useEffect(() => {
     ensureInitialized();
@@ -73,11 +77,18 @@ export function MercadoPagoPaymentBrick({
   );
 
   const handleSubmit = useCallback(
-    async (formData: unknown) => {
-      const { analysisId, couponCode, segment } = latest.current;
+    async (param: PaymentBrickSubmitParam) => {
+      const { analysisId, couponCode, segment, onSuccess } = latest.current;
       setError(null);
       track(ANALYTICS_EVENTS.CHECKOUT_STARTED, { kind });
       try {
+        // O Payment Brick envolve os dados reais em `param.formData`.
+        // Enviar `param` diretamente faz o backend receber um token vazio.
+        const formData = param?.formData;
+        if (!formData || typeof formData !== "object") {
+          throw new Error("Não foi possível obter os dados do pagamento. Tente novamente.");
+        }
+
         const res = await fetch(freelanceContractId ? `/api/freelance/contracts/${freelanceContractId}/checkout` : "/api/billing/payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -109,10 +120,9 @@ export function MercadoPagoPaymentBrick({
       } catch (err) {
         track(ANALYTICS_EVENTS.CHECKOUT_FAILED, { kind });
         setError(err instanceof Error ? err.message : "Erro inesperado.");
-        throw err;
       }
     },
-    [kind, onSuccess, freelanceContractId, productCode],
+    [kind, freelanceContractId, productCode],
   );
 
   const handleError = useCallback(

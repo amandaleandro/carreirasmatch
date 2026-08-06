@@ -14,12 +14,14 @@ fonte de verdade.
 | Necessidade | Documento |
 | --- | --- |
 | Inventário completo de funcionalidades | [FEATURES.md](FEATURES.md) |
+| Documentação detalhada de funções, páginas e APIs | [FUNCOES_DO_SISTEMA.md](FUNCOES_DO_SISTEMA.md) |
 | Visão executiva, público e proposta de valor | [PRODUCT_AND_MARKETING_BRIEF.md](PRODUCT_AND_MARKETING_BRIEF.md) |
 | Arquitetura, integrações e domínios | [COMPLETE_ARCHITECTURE_AND_ECOSYSTEM.md](COMPLETE_ARCHITECTURE_AND_ECOSYSTEM.md) |
 | Jornadas principais | [USER_FLOWS.md](USER_FLOWS.md) |
 | Mapa resumido de rotas e acesso | [ROUTES_MAPPING.md](ROUTES_MAPPING.md) |
 | Design e UX | [DESIGN_SYSTEM_AND_UX.md](DESIGN_SYSTEM_AND_UX.md) |
 | Melhorias planejadas | [IMPROVEMENTS_ROADMAP.md](IMPROVEMENTS_ROADMAP.md) |
+| Plano de organização e lançamento (ago/2026) | [PLANO_ORGANIZACAO_LANCAMENTO_AGO2026.md](PLANO_ORGANIZACAO_LANCAMENTO_AGO2026.md) |
 | Posicionamento e mensagens | [marketing/POSITIONING.md](marketing/POSITIONING.md) |
 | Biblioteca de copy real | [marketing/COPY_LIBRARY.md](marketing/COPY_LIBRARY.md) |
 | Operação de marketing | [marketing/README.md](marketing/README.md) |

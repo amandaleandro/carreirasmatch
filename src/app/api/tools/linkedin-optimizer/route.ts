@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { runJsonPrompt } from "@/lib/groq";
 import { reserveFeatureForRoute } from "@/lib/feature-access";
 import { COMMERCIAL_FEATURE_KEYS } from "@/lib/commercial-plan-catalog";
+import { prisma } from "@/lib/prisma";
+import { requireAuth } from "@/lib/require-auth";
+
+export async function GET() {
+  const { session, response } = await requireAuth();
+  if (!session) return response!;
+
+  const saved = await prisma.toolReviewResult.findUnique({
+    where: { userId_type: { userId: session.user.id, type: "linkedin" } },
+  });
+  if (!saved) return NextResponse.json({ result: null });
+
+  return NextResponse.json({ result: JSON.parse(saved.result), updatedAt: saved.updatedAt });
+}
 
 export async function POST(req: NextRequest) {
   const { session, response, release } = await reserveFeatureForRoute(COMMERCIAL_FEATURE_KEYS.aiSimpleAction);
@@ -33,6 +47,12 @@ PRINCIPAIS SKILLS: ${keySkills || "Geral da área"}
 RESUMO/RESUMO HISTÓRICO: ${bioSummary || "Sem detalhes adicionais"}`;
 
     const data = await runJsonPrompt(systemPrompt, userPrompt, 0.3);
+
+    await prisma.toolReviewResult.upsert({
+      where: { userId_type: { userId: session.user.id, type: "linkedin" } },
+      create: { userId: session.user.id, type: "linkedin", input: JSON.stringify({ currentRole, targetRole, keySkills, bioSummary }), result: JSON.stringify(data) },
+      update: { input: JSON.stringify({ currentRole, targetRole, keySkills, bioSummary }), result: JSON.stringify(data) },
+    });
 
     await release!.confirm();
     return NextResponse.json({ success: true, linkedin: data });

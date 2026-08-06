@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Compass, Users, GraduationCap, LineChart } from "lucide-react";
+import { Compass, Users, LineChart } from "lucide-react";
 import { JourneyHubPage } from "@/components/journey-hub";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbJsonLd } from "@/lib/seo";
@@ -14,7 +14,6 @@ export const metadata: Metadata = {
 const items = [
   { icon: Compass, title: "Teste vocacional", description: "Descubra áreas e profissões com maior aderência ao seu perfil em poucos minutos.", href: "/tools/vocation-test" },
   { icon: Users, title: "Teste comportamental", description: "Entenda seus pontos fortes de comportamento e como usá-los a seu favor na escolha de carreira.", href: "/tools/behavioral-test" },
-  { icon: GraduationCap, title: "Faculdade ou técnico", description: "Compare os dois caminhos de formação e veja qual combina com seu momento e objetivo.", href: "/faculdade-ou-tecnico" },
   { icon: LineChart, title: "Mercado de trabalho", description: "Veja demanda, salários e tendências reais antes de escolher uma área para investir.", href: "/mercado-de-trabalho" },
 ];
 

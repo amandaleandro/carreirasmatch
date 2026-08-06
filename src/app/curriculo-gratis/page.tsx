@@ -126,11 +126,11 @@ export default function CurriculoGratisPage() {
               , o que colocar quando você ainda não teve um emprego formal.
             </li>
             <li>
-              <Link href="/primeiro-emprego" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              <Link href="/analise" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                 Currículo para o primeiro emprego
               </Link>{" "}
               e{" "}
-              <Link href="/jovem-aprendiz" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+              <Link href="/tools/apprentice-guide" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
                 Jovem Aprendiz
               </Link>
               .

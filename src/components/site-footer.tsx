@@ -32,7 +32,7 @@ export function SiteFooter({ maxWidth = "max-w-7xl" }: { maxWidth?: string }) {
             <li><Link href="/cursos-gratuitos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Cursos gratuitos</Link></li>
             <li><Link href="/concursos" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Concursos</Link></li>
             <li><Link href="/vestibulares" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Vestibulares</Link></li>
-            <li><Link href="/oab" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Preparação para OAB</Link></li>
+            <li><Link href="/tools/oab" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Preparação para OAB</Link></li>
             <li><Link href="/mercado-de-trabalho" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Mercado</Link></li>
             <li><Link href="/mentorias" className="hover:text-neutral-800 dark:hover:text-white transition-colors">Mentorias</Link></li>
           </ul>

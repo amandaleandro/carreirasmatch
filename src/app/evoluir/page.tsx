@@ -17,7 +17,7 @@ const items = [
   { icon: Code2, title: "Revisar GitHub", description: "Receba uma análise técnica do seu perfil e projetos para times de tecnologia.", href: "/tools/github-review" },
   { icon: LayoutGrid, title: "Mapa de competências", description: "Veja onde você está forte e onde vale investir para o próximo passo de carreira.", href: "/tools/matriz-de-skills" },
   { icon: ClipboardCheck, title: "Plano de ação", description: "Transforme o diagnóstico da sua análise em próximos passos concretos e priorizados.", href: "/action-plan" },
-  { icon: Shuffle, title: "Transição de carreira", description: "Identifique as habilidades que você já tem e que aproximam você da nova área.", href: "/transicao" },
+  { icon: Shuffle, title: "Transição de carreira", description: "Identifique as habilidades que você já tem e que aproximam você da nova área.", href: "/tools/matriz-de-skills" },
 ];
 
 export default function EvoluirHubPage() {

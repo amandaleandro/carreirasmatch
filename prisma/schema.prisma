@@ -72,6 +72,7 @@ model User {
   npsResponses                NpsResponse[]
   moodLogs                    MoodLog[]
   professionalEvidences       ProfessionalEvidence[]
+  toolReviewResults           ToolReviewResult[]
 
   autoApplicationSettings AutoApplicationSettings?
   autoApplicationQueue    AutoApplicationQueue[]
@@ -609,6 +610,23 @@ model ProfileSuggestion {
   createdAt    DateTime @default(now())
 
   @@unique([userId, title, provider])
+  @@index([userId])
+}
+
+/// Guarda o resultado gerado por ferramentas de revisão de perfil externo
+/// (LinkedIn, GitHub) para o usuário poder voltar depois sem gerar de novo,
+/// em vez do resultado só aparecer na tela e sumir.
+model ToolReviewResult {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String // "linkedin" | "github"
+  input     String // resumo do que foi enviado (cargo, url, etc.), pra dar contexto ao reabrir
+  result    String // JSON serializado do resultado gerado
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, type])
   @@index([userId])
 }
 
@@ -1483,6 +1501,11 @@ model CompanyJobApplication {
   status    String      @default("new") // new | reviewing | interview | approved | rejected
   /// Anotação interna da empresa sobre a candidatura.
   note      String      @default("")
+  /// Aderência calculada por IA entre o currículo do candidato e a vaga no
+  /// momento da candidatura (mesmo motor de ranking do banco de talentos).
+  /// Null quando ainda não foi possível calcular (ex.: candidato sem currículo).
+  fitScore  Int?
+  fitReason String      @default("")
   createdAt DateTime    @default(now())
 
   @@unique([vagaId, userId])

@@ -23,13 +23,13 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
       shortcuts: [
         { title: "Criar meu currículo", description: "Currículo do zero para quem ainda não tem experiência.", href: "/curriculo-sem-experiencia" },
         { title: "Empresas que contratam aprendizes", description: "Lista de empresas com programas ativos de Jovem Aprendiz.", href: "/tools/apprentice-companies" },
-        { title: "Ver vagas de estágio e aprendiz", description: "Oportunidades compatíveis com o seu perfil.", href: "/estagio" },
+        { title: "Ver vagas de estágio e aprendiz", description: "Oportunidades compatíveis com o seu perfil.", href: "/todas-as-vagas" },
       ],
     },
     {
       value: "understand_apprentice_journey",
       label: "Entender como funciona a jornada de aprendiz",
-      cta: { label: "Ver guia do Jovem Aprendiz", href: "/jovem-aprendiz" },
+      cta: { label: "Ver guia do Jovem Aprendiz", href: "/tools/apprentice-guide" },
       shortcuts: [
         { title: "Guia do Jovem Aprendiz", description: "Direitos, deveres e como funciona o contrato de aprendizagem.", href: "/tools/apprentice-guide" },
         { title: "Áreas para começar", description: "Áreas mais comuns para o primeiro contato com o mercado.", href: "/tools/apprentice-areas" },
@@ -61,9 +61,9 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     {
       value: "find_internships",
       label: "Encontrar vagas de estágio",
-      cta: { label: "Ver vagas de estágio", href: "/estagio" },
+      cta: { label: "Ver vagas de estágio", href: "/todas-as-vagas" },
       shortcuts: [
-        { title: "Ver vagas de estágio", description: "Oportunidades de estágio compatíveis com seu curso.", href: "/estagio" },
+        { title: "Ver vagas de estágio", description: "Oportunidades de estágio compatíveis com seu curso.", href: "/todas-as-vagas" },
         { title: "Checklist de estágio", description: "O que preparar antes de se candidatar.", href: "/tools/internship-checklist" },
         { title: "Calculadora de bolsa-auxílio", description: "Estime valores e carga horária do estágio.", href: "/tools/internship-calculator" },
       ],
@@ -94,7 +94,7 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
       shortcuts: [
         { title: "Teste vocacional", description: "Descubra áreas com mais aderência ao seu perfil.", href: "/tools/vocation-test" },
         { title: "Descobrir profissões", description: "Explore profissões por área de interesse.", href: "/tools/vocation-test/discover" },
-        { title: "Faculdade ou técnico", description: "Compare os dois caminhos para decidir o seu.", href: "/faculdade-ou-tecnico" },
+        { title: "Faculdade ou técnico", description: "Compare os dois caminhos para decidir o seu.", href: "/descobrir" },
       ],
     },
     {
@@ -118,9 +118,9 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     {
       value: "faculdade_ou_tecnico",
       label: "Decidir entre faculdade e curso técnico",
-      cta: { label: "Comparar faculdade e técnico", href: "/faculdade-ou-tecnico" },
+      cta: { label: "Comparar faculdade e técnico", href: "/descobrir" },
       shortcuts: [
-        { title: "Comparar faculdade e técnico", description: "Prós, contras e tempo de formação de cada caminho.", href: "/faculdade-ou-tecnico" },
+        { title: "Comparar faculdade e técnico", description: "Prós, contras e tempo de formação de cada caminho.", href: "/descobrir" },
         { title: "Comparar cursos", description: "Veja o mercado de trabalho por curso.", href: "/tools/vocation-test/college" },
       ],
     },
@@ -129,9 +129,9 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     {
       value: "leverage_experience",
       label: "Descobrir o que já posso aproveitar da minha experiência",
-      cta: { label: "Ver minha transição de carreira", href: "/transicao" },
+      cta: { label: "Ver minha transição de carreira", href: "/tools/matriz-de-skills" },
       shortcuts: [
-        { title: "Minha transição de carreira", description: "Habilidades transferíveis para a nova área.", href: "/transicao" },
+        { title: "Minha transição de carreira", description: "Habilidades transferíveis para a nova área.", href: "/tools/matriz-de-skills" },
         { title: "Guia de transição de carreira", description: "Passo a passo para migrar de área com segurança.", href: "/tools/career-change-guide" },
       ],
     },
@@ -199,7 +199,7 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     {
       value: "practice_mock_exams",
       label: "Treinar com simulados",
-      cta: { label: "Ir para Concursos", href: "/concurso" },
+      cta: { label: "Ir para Concursos", href: "/tools/concurso" },
       shortcuts: [
         { title: "Simulado de concurso", description: "Questões no estilo da banca escolhida.", href: "/tools/concurso/simulado" },
         { title: "Nota de corte", description: "Estimativa de nota de corte para o cargo.", href: "/tools/concurso/nota-de-corte" },
@@ -210,9 +210,9 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     {
       value: "prepare_first_phase",
       label: "Me preparar para a 1ª fase",
-      cta: { label: "Ir para a preparação OAB", href: "/oab" },
+      cta: { label: "Ir para a preparação OAB", href: "/tools/oab" },
       shortcuts: [
-        { title: "Preparação OAB", description: "Trilha de estudo para a 1ª fase do exame.", href: "/oab" },
+        { title: "Preparação OAB", description: "Trilha de estudo para a 1ª fase do exame.", href: "/tools/oab" },
       ],
     },
     {

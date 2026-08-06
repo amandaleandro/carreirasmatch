@@ -92,7 +92,7 @@ export function HeroInstantScanner() {
   return (
     <div className="relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 md:p-8 backdrop-blur-xl shadow-xl space-y-6 font-sans">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-bold text-white">Cole aqui a vaga que você quer</h3>
+        <h3 className="text-lg font-bold text-white">Comece por uma oportunidade real</h3>
         <span className="text-xs text-blue-300 font-medium">
           100% Gratuito
         </span>
@@ -100,7 +100,7 @@ export function HeroInstantScanner() {
 
       <div className="space-y-1">
         <p className="text-xs text-slate-300 leading-relaxed">
-          Veja gratuitamente se o seu perfil combina com a oportunidade e quais pontos precisam de atenção.
+          Cole uma vaga e veja em poucos segundos onde seu perfil já se destaca e o que merece atenção.
         </p>
       </div>
 

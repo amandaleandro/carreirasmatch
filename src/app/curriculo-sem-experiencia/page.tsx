@@ -130,11 +130,11 @@ export default function CurriculoSemExperienciaPage() {
             como fazer um currículo do zero
           </Link>
           , o guia de{" "}
-          <Link href="/primeiro-emprego" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/analise" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
             currículo para o primeiro emprego
           </Link>{" "}
           e as vagas de{" "}
-          <Link href="/jovem-aprendiz" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+          <Link href="/tools/apprentice-guide" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
             Jovem Aprendiz
           </Link>
           .

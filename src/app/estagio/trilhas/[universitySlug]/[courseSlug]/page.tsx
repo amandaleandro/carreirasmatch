@@ -109,7 +109,7 @@ export default async function TrilhaDetalhePage({
 
       <div className="mt-10 pt-6 border-t border-slate-200 dark:border-slate-800 text-sm text-slate-600 dark:text-slate-400">
         Quer mais conteúdo de preparação para estágio?{" "}
-        <Link href="/estagio" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+        <Link href="/tools/internship-guide" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
           Veja o guia completo de estágio
         </Link>
         .

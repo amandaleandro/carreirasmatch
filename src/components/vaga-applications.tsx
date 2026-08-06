@@ -15,6 +15,8 @@ export type VagaApplication = {
   status: string;
   note: string;
   createdAt: string;
+  fitScore: number | null;
+  fitReason: string;
 };
 
 const STATUS_TONE: Record<string, string> = {
@@ -26,7 +28,7 @@ const STATUS_TONE: Record<string, string> = {
 };
 
 function toCsv(apps: VagaApplication[]): string {
-  const header = ["Nome", "E-mail", "Telefone", "Área", "Cidade", "UF", "Status", "Mensagem", "Anotação"];
+  const header = ["Nome", "E-mail", "Telefone", "Área", "Cidade", "UF", "Match", "Status", "Mensagem", "Anotação"];
   const escape = (v: string) => `"${(v ?? "").replace(/"/g, '""')}"`;
   const rows = apps.map((a) =>
     [
@@ -35,6 +37,7 @@ function toCsv(apps: VagaApplication[]): string {
       a.phone,
       a.area,
       [a.city, a.state].filter(Boolean).join("/"),
+      a.fitScore != null ? `${a.fitScore}%` : "",
       applicationStatusLabel(a.status),
       a.message.replace(/\r?\n/g, " "),
       a.note.replace(/\r?\n/g, " "),
@@ -43,6 +46,12 @@ function toCsv(apps: VagaApplication[]): string {
       .join(",")
   );
   return [header.map(escape).join(","), ...rows].join("\n");
+}
+
+function fitScoreTone(score: number) {
+  if (score >= 75) return "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300";
+  if (score >= 50) return "bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300";
+  return "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300";
 }
 
 export function VagaApplications({ applications: initial }: { applications: VagaApplication[] }) {
@@ -121,7 +130,14 @@ export function VagaApplications({ applications: initial }: { applications: Vaga
                 <div className="space-y-2">
                   {colApps.map((a) => (
                     <div key={a.id} className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950 p-3">
-                      <p className="font-semibold text-sm truncate">{a.name || "Candidato"}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="font-semibold text-sm truncate">{a.name || "Candidato"}</p>
+                        {a.fitScore != null && (
+                          <span className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold ${fitScoreTone(a.fitScore)}`}>
+                            {a.fitScore}%
+                          </span>
+                        )}
+                      </div>
                       {a.area && <p className="text-xs text-neutral-500 truncate">{a.area}</p>}
                       {a.email && <p className="text-xs text-neutral-500 truncate">{a.email}</p>}
                       <select
@@ -148,6 +164,11 @@ export function VagaApplications({ applications: initial }: { applications: Vaga
               <div className="min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="font-semibold">{a.name || "Candidato"}</h3>
+                  {a.fitScore != null && (
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${fitScoreTone(a.fitScore)}`}>
+                      Match {a.fitScore}%
+                    </span>
+                  )}
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_TONE[a.status] ?? STATUS_TONE.new}`}>
                     {applicationStatusLabel(a.status)}
                   </span>
@@ -159,6 +180,9 @@ export function VagaApplications({ applications: initial }: { applications: Vaga
                   {a.email && <p>{a.email}</p>}
                   {a.phone && <p>{a.phone}</p>}
                 </div>
+                {a.fitReason && (
+                  <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400 italic">{a.fitReason}</p>
+                )}
                 {a.message && (
                   <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400 whitespace-pre-line">{a.message}</p>
                 )}

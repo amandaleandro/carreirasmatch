@@ -336,7 +336,7 @@ export function EnsinoMedioStudyView({ subject }: Props) {
                   </p>
                 </div>
                 <Link
-                  href="/faculdade-ou-tecnico"
+                  href="/descobrir"
                   className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold text-xs hover:bg-purple-200 transition-all shrink-0"
                 >
                   Fazer Teste Vocacional Completo
