@@ -15,10 +15,24 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const lastAnalysis = await prisma.analysis.findFirst({
+      where: { resume: { userId: session.user.id } },
+      orderBy: { createdAt: "desc" },
+      select: { strengths: true, weaknesses: true, fixes: true },
+    });
+    const pastAnalysis = lastAnalysis
+      ? {
+          strengths: JSON.parse(lastAnalysis.strengths) as string[],
+          weaknesses: JSON.parse(lastAnalysis.weaknesses) as string[],
+          fixes: JSON.parse(lastAnalysis.fixes) as string[],
+        }
+      : null;
+
     const generated = await generateCareerGrowthPlan(
       currentRole.trim(),
       typeof currentSeniority === "string" ? currentSeniority.trim() : "",
-      targetRole.trim()
+      targetRole.trim(),
+      pastAnalysis
     );
 
     const plan = await prisma.careerGrowthPlan.upsert({

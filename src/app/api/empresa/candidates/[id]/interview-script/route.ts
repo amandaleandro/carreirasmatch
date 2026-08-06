@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireCompanyApi } from "@/lib/company-auth";
 import { runJsonPrompt } from "@/lib/groq";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+const INTERVIEW_SCRIPT_LIMIT = { limit: 20, windowMs: 10 * 60 * 1000 };
 
 export async function POST(
   req: NextRequest,
@@ -20,6 +23,14 @@ export async function POST(
 
     if (!company || !candidate || candidate.job.companyId !== company.id) {
       return NextResponse.json({ error: "Candidato não encontrado." }, { status: 404 });
+    }
+
+    const rateLimit = checkRateLimit(`company-interview-script:${company.id}`, INTERVIEW_SCRIPT_LIMIT);
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: "Muitos roteiros gerados em sequência. Aguarde um momento." },
+        { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+      );
     }
 
     const systemPrompt = `Você é um gestor especialista em R&S (Recrutamento e Seleção).

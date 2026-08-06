@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import { requireCompanyApi } from "@/lib/company-auth";
 import { generateJobDescription } from "@/lib/tools";
+import { checkRateLimit } from "@/lib/rate-limit";
+
+const DESCRIPTION_LIMIT = { limit: 20, windowMs: 10 * 60 * 1000 };
 
 // Gera uma descrição de vaga com IA a partir do cargo (e observações opcionais).
 export async function POST(req: Request) {
   const { company, response } = await requireCompanyApi();
   if (!company) return response;
+
+  const rateLimit = checkRateLimit(`company-job-description:${company.id}`, DESCRIPTION_LIMIT);
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: "Muitas gerações em sequência. Aguarde um momento." },
+      { status: 429, headers: { "Retry-After": String(rateLimit.retryAfterSeconds) } }
+    );
+  }
 
   let body: { title?: string; notes?: string };
   try {

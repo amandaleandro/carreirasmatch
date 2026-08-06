@@ -132,14 +132,19 @@ async function findGradePdf(coursePage: UfuCoursePage): Promise<{ url: string; t
   return curriculumPage ? { url: curriculumPage, title, kind: "html" } : null;
 }
 
-async function readHtmlSubjects(url: string) {
-  const html = await getHtml(url);
+export function extractSubjectsFromHtml(html: string) {
   const $ = cheerio.load(html);
   const subjects: { name: string; semester?: number }[] = [];
   $("table tr").each((_, row) => {
     const cells = $(row).find("th, td").map((__, cell) => $(cell).text().replace(/\s+/g, " ").trim()).get().filter(Boolean);
-    const name = cells.find((cell) => cell.length >= 5 && !/^(disciplina|componente|código|carga|per[ií]odo|total)$/i.test(cell));
-    if (name && /[A-Za-zÀ-ÿ]{4,}/.test(name) && !/^\d+(?:\.\d+)?$/.test(name)) subjects.push({ name: name.replace(/^[A-Z]{2,}\d{3,}\s*[-–:]\s*/i, "") });
+    const name = cells.find(
+      (cell) =>
+        cell.length >= 5 &&
+        !/^(disciplina|componente|código|carga|per[ií]odo|total)/i.test(cell) &&
+        /[A-Za-zÀ-ÿ]{4,}/.test(cell) &&
+        !/^\d+(?:\.\d+)?$/.test(cell)
+    );
+    if (name) subjects.push({ name: name.replace(/^[A-Z]{2,}\d{3,}\s*[-–:]\s*/i, "") });
   });
   $("a").each((_, link) => {
     const label = $(link).text().replace(/\s+/g, " ").trim();
@@ -153,6 +158,11 @@ async function readHtmlSubjects(url: string) {
     seen.add(key);
     return true;
   });
+}
+
+async function readHtmlSubjects(url: string) {
+  const html = await getHtml(url);
+  return extractSubjectsFromHtml(html);
 }
 
 async function readPdf(url: string) {
