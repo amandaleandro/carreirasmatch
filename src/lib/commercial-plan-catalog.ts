@@ -66,7 +66,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
   },
   essential: {
     key: "essential",
-    name: "Essencial",
+    name: "Rota Essencial",
     priceCents: 1490,
     recurring: true,
     limits: {
@@ -83,7 +83,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
   },
   pro: {
     key: "pro",
-    name: "Pro",
+    name: "Rota Pro",
     priceCents: 2990,
     recurring: true,
     highlighted: true,
@@ -102,7 +102,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
   },
   complete: {
     key: "complete",
-    name: "Completo",
+    name: "Rota Completa",
     priceCents: 4990,
     recurring: true,
     limits: {
@@ -120,7 +120,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
   },
   sprint: {
     key: "sprint",
-    name: "Sprint 7 dias",
+    name: "Rota Sprint 7 dias",
     priceCents: 1490,
     recurring: false,
     durationDays: 7,
