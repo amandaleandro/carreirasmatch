@@ -75,7 +75,7 @@ export default function PlanoDeCandidaturaPage() {
 
         <div className="relative mx-auto max-w-4xl px-4 pb-20 pt-8 text-center md:px-8 lg:pb-28 lg:pt-14">
           <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-300">
-            {journey.oneOff.label}
+            {journey.oneOff!.label}
           </span>
 
           <h1 className="mt-6 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.15] tracking-tight text-white">
@@ -89,7 +89,7 @@ export default function PlanoDeCandidaturaPage() {
 
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <JourneyCtaLink
-              href={journey.oneOff.href}
+              href={journey.oneOff!.href}
               journey={journey.key}
               tier="oneOff"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-7 py-3.5 text-sm font-bold text-white shadow-sm shadow-blue-600/20 transition-all hover:bg-blue-700 hover:scale-[1.02] active:scale-95"
