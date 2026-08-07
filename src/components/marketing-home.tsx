@@ -382,14 +382,31 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         </section>
 
         {/* OFERTA */}
-        <section className="mx-auto max-w-5xl px-4 py-20 md:px-8">
+        <section className="mx-auto max-w-6xl px-4 py-20 md:px-8">
           <div className="mx-auto max-w-2xl text-center space-y-2">
             <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               O que você precisa resolver agora?
             </h2>
           </div>
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+            <div className="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900 sm:p-8">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Para começar</span>
+              <h3 className="mt-2 text-xl font-extrabold text-slate-900 dark:text-white">Descobrir meu Match</h3>
+              <p className="mt-3 text-3xl font-extrabold text-slate-900 dark:text-white">Grátis</p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                Para quando você quer ver seu resultado antes de decidir qualquer coisa.
+              </p>
+              <ul className="mt-5 space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                {["Cole a vaga e seu currículo", "Veja seu % de aderência", "Sem cartão de crédito"].map((item) => (
+                  <li key={item} className="flex gap-2"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-500" /><span>{item}</span></li>
+                ))}
+              </ul>
+              <Link href="/register" className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 px-4 py-3 text-xs font-bold text-slate-700 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200 dark:hover:border-blue-400 dark:hover:text-blue-400">
+                Descobrir meu Match
+              </Link>
+            </div>
+
             <div className="rounded-3xl border border-slate-200/90 bg-white p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900 sm:p-8">
               <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Uma vaga</span>
               <h3 className="mt-2 text-xl font-extrabold text-slate-900 dark:text-white">Plano de Candidatura</h3>
@@ -432,9 +449,6 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
             </div>
           </div>
 
-          <p className="mt-8 text-center text-xs text-slate-500 dark:text-slate-400">
-            Quer só começar de graça? <Link href="/register" className="font-semibold text-blue-600 hover:underline dark:text-blue-400">Descubra seu Match sem custo</Link>.
-          </p>
         </section>
 
         {/* PROVA: O QUE UMA ANÁLISE ENCONTRA */}
