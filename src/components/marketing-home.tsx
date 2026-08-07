@@ -7,7 +7,6 @@ import {
   ArrowRight,
   Check,
   ShieldCheck,
-  CheckCircle2,
   TrendingUp,
   Bot,
   Radar,
@@ -15,12 +14,9 @@ import {
   LayoutGrid,
   Target,
   ClipboardCheck,
-  LineChart,
   Search,
-  GitCompare,
   PenLine,
   MessageCircle,
-  ListChecks,
 } from "lucide-react";
 import { BrandLogo } from "@/components/brand-logo";
 import { PublicNav, PublicNavMobile } from "@/components/public-nav";
@@ -30,40 +26,12 @@ import { COMMERCIAL_PLANS } from "@/lib/commercial-plan-catalog";
 import { COMMERCIAL_PRODUCTS } from "@/lib/commercial-products";
 import { JOURNEYS } from "@/lib/journeys";
 
-const steps = [
-  ["01", "Envie seu currículo", "Cole o texto ou envie seu PDF atual. A análise respeita tudo o que você já construiu."],
-  ["02", "Cole a vaga desejada", "Insira o texto ou o link da oportunidade para a qual você quer se candidatar."],
-  ["03", "Descubra seu Match", "Entenda a aderência real, ajuste pontos-chave e aumente suas chances de entrevista."],
-];
-
-const journeySteps = [
-  ...steps,
-  ["04", "Prepare sua candidatura", "Use o diagnostico para revisar seu curriculo, organizar os proximos passos e treinar para a entrevista."],
-] as const;
-
-const deliverables = [
-  "Diagnóstico claro de aderência técnica por requisito",
-  "Prioridade para as oportunidades que mais combinam com você",
-  "Requisitos preenchidos e lacunas para você comprovar",
-  "Palavras-chave essenciais para passar nos filtros (ATS)",
-  "Currículo formatado e pronto para download em PDF",
-  "Guia de preparação para as perguntas da entrevista",
-  "Histórico para entender o que está gerando respostas",
-  "Plano de ação simples com os próximos passos",
-];
-
-const decisionCards = [
-  [Target, "Escolha onde investir", "Compare suas oportunidades e comece pelas vagas em que seu perfil tem mais força."],
-  [ClipboardCheck, "Candidate-se com evidências", "Ajuste seu currículo e organize cada próximo passo sem inventar nada sobre sua trajetória."],
-  [LineChart, "Aprenda com o caminho", "Registre resultados, identifique padrões e transforme cada candidatura em uma decisão melhor."],
-] as const;
-
 const routeSteps = [
-  [Search, "01", "Entender", "O que esta vaga realmente procura."],
-  [GitCompare, "02", "Comparar", "Onde o seu perfil já atende."],
-  [PenLine, "03", "Preparar", "O que precisa aparecer melhor no currículo."],
-  [MessageCircle, "04", "Treinar", "Como se preparar para a conversa."],
-  [ListChecks, "05", "Acompanhar", "O que acontece depois da candidatura."],
+  [Search, "01", "Encontre ou cole a vaga", "Comece pela oportunidade real que você quer conquistar."],
+  [Target, "02", "Descubra seu Match", "Veja a aderência real entre seu perfil e o que a vaga pede."],
+  [ClipboardCheck, "03", "Veja o que falta", "Entenda as lacunas antes de se candidatar, não depois."],
+  [PenLine, "04", "Ajuste sua candidatura", "Currículo e palavras-chave alinhados a esta vaga específica."],
+  [MessageCircle, "05", "Prepare-se para a entrevista", "Perguntas prováveis, respostas e roteiro de preparo."],
 ] as const;
 
 const darkColumns = [
@@ -98,11 +66,11 @@ const ecosystemCards = [
 // Reduzida a 4 entradas na home (o diagnóstico apontou 8 cards competindo
 // cedo demais); a lista completa de momentos continua acessível no menu.
 const audienceCards = [
-  ["Começando agora", "Primeiro emprego ou estágio", "Transforme cursos, projetos e atividades em experiência que conta na candidatura.", "/analise"],
-  ["Aprendendo", "Descubra seu próximo caminho", "Explore cursos, profissões e possibilidades para tomar decisões com mais clareza.", "/descobrir"],
-  ["Voltando ao mercado", "Recolocação", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/analise"],
-  ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/tools/career-change-guide"],
-  ["Construindo seu caminho", "Projetos, freelas e renda", "Encontre formas de colocar suas habilidades em prática, criar portfólio e gerar novas oportunidades.", "/freelancers"],
+  ["Começando agora", "Primeiro emprego ou estágio", "Descubra onde seu perfil já tem valor mesmo sem experiência. Veja vagas compatíveis e o que destacar além da experiência profissional.", "/analise", "Encontrar minhas oportunidades"],
+  ["Aprendendo", "Descubra seu próximo caminho", "Descubra que cursos e profissões já fazem sentido com o que você sabe fazer hoje.", "/descobrir", "Explorar meus caminhos"],
+  ["Voltando ao mercado", "Recolocação", "Descubra o que pode estar impedindo seu próximo “sim”. Compare currículo, mercado e vagas antes da próxima candidatura.", "/analise", "Analisar minha recolocação"],
+  ["Mudando de área", "Transição de carreira", "Descubra o que da sua carreira atual já vale na próxima. Habilidades transferíveis, gaps e vagas em que seu perfil já pode competir.", "/tools/career-change-guide", "Ver meu caminho"],
+  ["Construindo seu caminho", "Projetos, freelas e renda", "Descubra onde suas habilidades já geram valor fora do emprego fixo. Portfólio, projetos e oportunidades para começar agora.", "/freelancers", "Ver minhas oportunidades"],
 ] as const;
 
 function SocialProof({ analysisCount }: { analysisCount: number }) {
@@ -116,8 +84,11 @@ function SocialProof({ analysisCount }: { analysisCount: number }) {
             Uma história real de quem viveu essa busca
           </p>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-snug">
-            5 entrevistas em uma única semana. A agenda foi a nossa resposta.
+            Sua busca por emprego também precisa de organização.
           </h2>
+          <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            Entrevistas, candidaturas, retornos e prazos reunidos em um só lugar. Você procura a vaga, o CarreirasMatch ajuda você a não perder o processo.
+          </p>
           <blockquote className="border-l-3 border-blue-600 pl-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
             &ldquo;Criei o CarreirasMatch porque conheço de perto a frustração de ter um bom histórico e não receber respostas. Quando ajustei meu currículo especificamente para cada vaga, conquistei 5 entrevistas em sete dias.&rdquo;
           </blockquote>
@@ -199,15 +170,23 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Encontrou uma vaga? Descubra se ela realmente combina com você.
+              Encontrou uma vaga?
+              <span className="block text-blue-300">Descubra suas chances antes de se candidatar.</span>
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              Envie seu currículo e a vaga. O CarreirasMatch mostra seu Match, o que está faltando e o que você deveria fazer antes de se candidatar.
+              Cole a vaga e veja em poucos minutos:
             </p>
 
+            <ul className="space-y-2 text-sm sm:text-base font-medium text-slate-200 max-w-2xl">
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Quanto seu perfil combina</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> O que está faltando</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> O que destacar no currículo</li>
+              <li className="flex items-center gap-2"><Check className="h-4 w-4 text-emerald-400 shrink-0" /> Como se preparar para a entrevista</li>
+            </ul>
+
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Analisar uma vaga" />
+              <PrimaryCta label="Analisar esta vaga" />
               <Link href="/todas-as-vagas" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
                 Encontrar vagas
               </Link>
@@ -276,82 +255,36 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </div>
         </section>
 
-        {/* DECISÃO E CONTINUIDADE */}
-        <section className="border-y border-blue-100 bg-blue-50/50 dark:border-blue-950/60 dark:bg-blue-950/15">
+        {/* DA VAGA À ENTREVISTA */}
+        <section id="como-funciona" className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
           <div className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-            <div className="mx-auto max-w-3xl text-center space-y-3">
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Mais clareza em cada candidatura</span>
+            <div className="mx-auto max-w-2xl text-center space-y-2">
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Não apenas dizer quanto você combina. Mostrar o que fazer com essa informação.
+                Da vaga até a entrevista.
               </h2>
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
-                O CarreirasMatch transforma cada oportunidade em um próximo passo concreto, e cada resultado em aprendizado para a sua estratégia.
-              </p>
             </div>
 
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {decisionCards.map(([Icon, title, description]) => (
-                <Card key={title} variant="default" className="p-6">
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-xs dark:bg-slate-900 dark:text-blue-400">
+            <div className="mt-12 grid gap-6 md:grid-cols-5">
+              {routeSteps.map(([Icon, number, title, description], index) => (
+                <div key={number} className="relative flex flex-col items-center text-center">
+                  {index < routeSteps.length - 1 && (
+                    <span className="absolute left-1/2 top-6 hidden h-px w-full -translate-y-1/2 bg-slate-200 dark:bg-slate-800 md:block" />
+                  )}
+                  <span className="relative z-10 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-xs">
                     <Icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-5 text-base font-bold text-slate-900 dark:text-white">{title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">{description}</p>
-                </Card>
+                  <span className="mt-3 text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">{number}</span>
+                  <h3 className="mt-1 text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
+                </div>
               ))}
             </div>
-          </div>
-        </section>
 
-        {/* A ROTA DA VAGA */}
-        <section className="mx-auto max-w-7xl px-4 py-20 md:px-8">
-          <div className="mx-auto max-w-2xl text-center space-y-2">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Uma vaga. Uma rota.
-            </h2>
-          </div>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-5">
-            {routeSteps.map(([Icon, number, title, description], index) => (
-              <div key={number} className="relative flex flex-col items-center text-center">
-                {index < routeSteps.length - 1 && (
-                  <span className="absolute left-1/2 top-6 hidden h-px w-full -translate-y-1/2 bg-slate-200 dark:bg-slate-800 md:block" />
-                )}
-                <span className="relative z-10 inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white shadow-xs">
-                  <Icon className="h-5 w-5" />
-                </span>
-                <span className="mt-3 text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">{number}</span>
-                <h3 className="mt-1 text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
-              </div>
-            ))}
-          </div>
-
-          <p className="mt-12 text-center text-lg font-bold text-slate-900 dark:text-white">
-            Candidatura preparada <Check className="inline h-5 w-5 text-emerald-500" />
-          </p>
-        </section>
-
-        {/* COMO FUNCIONA */}
-        <section id="como-funciona" className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
-          <div className="mx-auto max-w-7xl px-4 py-20 md:px-8 space-y-12">
-            <div className="text-center space-y-2 max-w-2xl mx-auto">
-              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Uma vaga. Uma rota de candidatura.</span>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-                Da vaga encontrada à candidatura preparada
-              </h2>
-            </div>
-
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              {journeySteps.map(([number, title, description]) => (
-                <Card key={number} variant="default" className="p-6 space-y-4">
-                  <span className="w-10 h-10 rounded-full bg-blue-600 text-white font-extrabold text-sm flex items-center justify-center shadow-xs">
-                    {number}
-                  </span>
-                  <h3 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{description}</p>
-                </Card>
-              ))}
+            <div className="mt-12 flex flex-col items-center gap-4">
+              <p className="text-center text-lg font-bold text-slate-900 dark:text-white">
+                Candidatura preparada <Check className="inline h-5 w-5 text-emerald-500" />
+              </p>
+              <PrimaryCta label="Começar com uma vaga" />
             </div>
           </div>
         </section>
@@ -410,12 +343,12 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
             </p>
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {audienceCards.map(([label, title, description, href]) => (
+            {audienceCards.map(([label, title, description, href, cta]) => (
               <Link key={href} href={href} className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-xs transition-all hover:-translate-y-1 hover:border-blue-500/40 hover:shadow-md dark:border-slate-800 dark:bg-slate-900">
                 <span className="inline-block text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">{label}</span>
                 <h3 className="mt-3 text-base font-bold leading-snug text-slate-900 dark:text-white">{title}</h3>
                 <p className="mt-2 text-xs leading-relaxed text-slate-500 dark:text-slate-400">{description}</p>
-                <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-transform group-hover:translate-x-1">Saiba mais <ArrowRight className="h-3.5 w-3.5" /></span>
+                <span className="mt-5 inline-flex items-center gap-1 text-xs font-semibold text-blue-600 transition-transform group-hover:translate-x-1">{cta} <ArrowRight className="h-3.5 w-3.5" /></span>
               </Link>
             ))}
           </div>
@@ -445,27 +378,6 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
                 </Link>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* O QUE VEM NO KIT */}
-        <section id="kit" className="mx-auto max-w-7xl px-4 py-20 md:px-8 grid gap-12 lg:grid-cols-[.85fr_1.15fr] lg:items-center">
-          <div className="space-y-4">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-              Tudo o que você precisa para se candidatar com segurança
-            </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Do autoconhecimento ao desenvolvimento, dos projetos às candidaturas: você encontra orientação prática para tomar decisões e agir.
-            </p>
-          </div>
-
-          <div className="grid gap-3.5 sm:grid-cols-2">
-            {deliverables.map((item) => (
-              <div key={item} className="flex items-start gap-3 rounded-2xl border border-slate-200/90 bg-white p-4 text-xs font-semibold text-slate-800 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 shadow-xs">
-                <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
-                <span>{item}</span>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -525,6 +437,39 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </p>
         </section>
 
+        {/* PROVA: O QUE UMA ANÁLISE ENCONTRA */}
+        <section className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
+          <div className="mx-auto max-w-4xl px-4 py-20 md:px-8">
+            <div className="text-center space-y-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Vaga: Analista de Marketing</span>
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+                Veja o que uma análise encontra
+              </h2>
+            </div>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200/90 bg-white p-6 dark:border-slate-800 dark:bg-slate-900">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Antes</span>
+                <ul className="mt-4 space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
+                  <li className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />Currículo genérico</li>
+                  <li className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />Poucas palavras-chave</li>
+                  <li className="flex gap-2"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-400" />Experiência relevante escondida</li>
+                </ul>
+              </div>
+
+              <div className="rounded-2xl border border-blue-200 bg-blue-50/60 p-6 dark:border-blue-900 dark:bg-blue-950/20">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Depois da análise</span>
+                <ul className="mt-4 space-y-2.5 text-sm text-slate-700 dark:text-slate-200">
+                  <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />87% de aderência</li>
+                  <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />6 experiências para destacar</li>
+                  <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />4 palavras-chave ausentes</li>
+                  <li className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />8 perguntas prováveis de entrevista</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* OUTRAS JORNADAS - aparece só depois da jornada principal (candidato) */}
         <section className="border-y border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
           <div className="mx-auto max-w-7xl px-4 py-16 md:px-8">
@@ -568,26 +513,11 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
           </div>
         </section>
 
-        {/* IDENTIDADE */}
-        <section className="bg-[#071827] text-white">
-          <div className="mx-auto max-w-3xl px-4 py-24 text-center md:px-8">
-            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">
-              Eu não me candidato no escuro.
-            </h2>
-            <p className="mt-6 text-sm font-semibold uppercase tracking-wider text-slate-300 sm:text-base">
-              Eu encontro. Eu analiso. Eu entendo. Eu preparo. Eu decido.
-            </p>
-            <div className="mt-8">
-              <PrimaryCta label="Descobrir meu Match" />
-            </div>
-          </div>
-        </section>
-
         <section className="mx-auto w-full max-w-5xl px-4 pb-20 md:px-8">
           <div className="rounded-3xl bg-blue-600 px-6 py-10 text-center shadow-xl shadow-blue-600/15 sm:px-10">
             <h2 className="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Aquela vaga pode ser importante demais para uma candidatura no escuro</h2>
             <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-blue-100">
-              Envie seu currículo, cole a vaga e descubra seu Match — e saiba o que fazer depois.
+              Envie seu currículo, cole a vaga e descubra seu Match, e saiba o que fazer depois.
             </p>
             <Link href="/analise" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-blue-700 transition-colors hover:bg-blue-50">
               Analisar minha vaga <ArrowRight className="h-4 w-4" />
