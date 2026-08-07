@@ -259,7 +259,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const [candidate, userCourses, userEvidences] = userId
+    const [candidate, userCourses, userCertificados, userEvidences] = userId
       ? await Promise.all([
           prisma.user.findUnique({
             where: { id: userId },
@@ -269,6 +269,10 @@ export async function POST(req: NextRequest) {
             where: { userId },
             select: { title: true, provider: true },
           }),
+          prisma.certificado.findMany({
+            where: { userId },
+            select: { title: true, issuer: true },
+          }),
           prisma.professionalEvidence.findMany({
             where: { userId },
             orderBy: { createdAt: "desc" },
@@ -276,7 +280,7 @@ export async function POST(req: NextRequest) {
             select: { category: true, title: true, description: true, metrics: true },
           }),
         ])
-      : [null, [], []];
+      : [null, [], [], []];
 
     // Paid users must be analyzed under the "momento profissional" set on their profile,
     // regardless of what the client submitted (the form UI already enforces this, but a
@@ -322,7 +326,10 @@ export async function POST(req: NextRequest) {
           {
             professionalArea: candidate?.professionalArea ?? null,
             hasFormalEducation: candidate?.hasFormalEducation ?? null,
-            courses: userCourses.map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title)),
+            courses: [
+              ...userCourses.map((c) => (c.provider ? `${c.title} (${c.provider})` : c.title)),
+              ...userCertificados.map((c) => (c.issuer ? `${c.title} (${c.issuer})` : c.title)),
+            ],
             evidences: userEvidences,
           },
           carriedResumeStructured

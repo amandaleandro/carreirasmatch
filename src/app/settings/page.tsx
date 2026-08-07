@@ -7,6 +7,7 @@ import { ProfileForm } from "@/components/profile-form";
 import { ChangePasswordForm } from "@/components/change-password-form";
 import { InterestedRolesForm } from "@/components/interested-roles-form";
 import { CourseListForm } from "@/components/course-list-form";
+import { CertificateListForm } from "@/components/certificate-list-form";
 import { BillingSection } from "@/components/billing-section";
 import { FeatureUsageSection } from "@/components/feature-usage-section";
 import { JobAlertManager } from "@/components/job-alert-manager";
@@ -31,7 +32,7 @@ export default async function SettingsPage({
 
   const { upgrade } = await searchParams;
 
-  const [user, courses, subscription, jobAlerts, contactRequests] = await Promise.all([
+  const [user, courses, certificados, subscription, jobAlerts, contactRequests] = await Promise.all([
     prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -56,6 +57,11 @@ export default async function SettingsPage({
       where: { userId: session.user.id },
       orderBy: { createdAt: "desc" },
       select: { id: true, title: true, provider: true, url: true, status: true },
+    }),
+    prisma.certificado.findMany({
+      where: { userId: session.user.id },
+      orderBy: { createdAt: "desc" },
+      select: { id: true, title: true, issuer: true, credentialUrl: true, issuedAt: true },
     }),
     prisma.subscription.findUnique({
       where: { userId: session.user.id },
@@ -200,6 +206,10 @@ export default async function SettingsPage({
 
       <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
         <CourseListForm courses={courses} professionalArea={user?.professionalArea ?? null} />
+      </section>
+
+      <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+        <CertificateListForm certificados={certificados} />
       </section>
 
       <section className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">

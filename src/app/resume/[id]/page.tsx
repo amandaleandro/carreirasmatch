@@ -73,6 +73,17 @@ export default async function ResumeOptimizerPage({
     resumeStructured = EMPTY_STRUCTURED;
   }
 
+  const certificados = await prisma.certificado.findMany({
+    where: { userId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    select: { title: true, issuer: true },
+  });
+  const certificadoLabels = certificados.map((c) => (c.issuer ? `${c.title} (${c.issuer})` : c.title));
+  resumeStructured = {
+    ...resumeStructured,
+    certifications: Array.from(new Set([...certificadoLabels, ...resumeStructured.certifications])),
+  };
+
   const previous = await prisma.analysis.findFirst({
     where: {
       resume: { userId: session.user.id },

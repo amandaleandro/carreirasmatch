@@ -47,6 +47,7 @@ model User {
   applications                Application[]
   weeklyGoals                 WeeklyGoal[]
   courses                     UserCourse[]
+  certificados                Certificado[]
   payments                    Payment[]
   subscription                Subscription?
   profileSuggestions          ProfileSuggestion[]
@@ -360,6 +361,19 @@ model UserCourse {
   certificateUrl String    @default("")
   status         String    @default("completed")
   completedAt    DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Certificado {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  issuer         String    @default("")
+  credentialUrl  String    @default("")
+  issuedAt       DateTime?
   createdAt      DateTime  @default(now())
 
   @@index([userId])

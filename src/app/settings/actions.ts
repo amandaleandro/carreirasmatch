@@ -88,3 +88,37 @@ export async function deleteUserCourse(courseId: string) {
 
   revalidatePath("/settings");
 }
+
+export async function addCertificado(formData: FormData) {
+  const userId = await requireUserId();
+  const title = String(formData.get("title") ?? "").trim();
+  const issuer = String(formData.get("issuer") ?? "").trim();
+  const credentialUrl = String(formData.get("credentialUrl") ?? "").trim();
+  const issuedAtRaw = String(formData.get("issuedAt") ?? "").trim();
+
+  if (!title) return;
+
+  const issuedAt = issuedAtRaw ? new Date(issuedAtRaw) : null;
+
+  await prisma.certificado.create({
+    data: {
+      userId,
+      title,
+      issuer,
+      credentialUrl,
+      issuedAt: issuedAt && !Number.isNaN(issuedAt.getTime()) ? issuedAt : null,
+    },
+  });
+
+  revalidatePath("/settings");
+}
+
+export async function deleteCertificado(certificadoId: string) {
+  const userId = await requireUserId();
+
+  await prisma.certificado.deleteMany({
+    where: { id: certificadoId, userId },
+  });
+
+  revalidatePath("/settings");
+}
