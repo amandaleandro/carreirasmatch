@@ -40,7 +40,10 @@ function nicheHeroImageUrl(segment?: string | null): string | null {
   return path ? `${APP_URL}${path}` : null;
 }
 
-function layout(bodyHtml: string, opts?: { heroImageUrl?: string | null; heroImageAlt?: string }) {
+function layout(
+  bodyHtml: string,
+  opts?: { heroImageUrl?: string | null; heroImageAlt?: string; preheader?: string }
+) {
   const heroImageHtml = opts?.heroImageUrl
     ? `
       <tr>
@@ -51,12 +54,13 @@ function layout(bodyHtml: string, opts?: { heroImageUrl?: string | null; heroIma
     `
     : "";
   return `
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef2f9;padding:40px 16px;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${opts?.preheader ?? "Novidades da sua jornada profissional no CarreirasMatch."}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5fb;padding:32px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:540px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 20px 48px rgba(15,23,42,.14),0 2px 6px rgba(15,23,42,.06);">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 18px 48px rgba(15,23,42,.12),0 2px 8px rgba(15,23,42,.05);">
             <tr>
-              <td style="background:radial-gradient(120% 180% at 0% 0%,#3b82f6 0%,#1d4ed8 45%,#1e293b 100%);padding:32px 32px 30px;position:relative;">
+              <td style="background:#172554;padding:28px 32px 26px;">
                 <a href="${APP_URL}" style="text-decoration:none;">
                   <img src="${LOGO_URL}" alt="${BRAND}" height="24" style="height:24px;width:auto;display:block;border:0;" />
                 </a>
@@ -64,15 +68,15 @@ function layout(bodyHtml: string, opts?: { heroImageUrl?: string | null; heroIma
             </tr>
             ${heroImageHtml}
             <tr>
-              <td style="height:3px;background:linear-gradient(90deg,#93c5fd,#2563eb,#1e3a8a);font-size:0;line-height:0;">&nbsp;</td>
+              <td style="height:4px;background:#60a5fa;font-size:0;line-height:0;">&nbsp;</td>
             </tr>
             <tr>
-              <td style="padding:38px 34px 12px;color:#1e293b;font-size:15.5px;line-height:1.7;">
+              <td style="padding:36px 36px 12px;color:#1e293b;font-size:15px;line-height:1.7;">
                 ${bodyHtml}
               </td>
             </tr>
             <tr>
-              <td style="padding:12px 34px 34px;">
+              <td style="padding:12px 36px 32px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">
                   <tr><td style="border-top:1px solid #eef2f7;font-size:0;line-height:0;">&nbsp;</td></tr>
                 </table>
@@ -98,10 +102,10 @@ function layout(bodyHtml: string, opts?: { heroImageUrl?: string | null; heroIma
 
 function button(href: string, label: string) {
   return `
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:26px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0;">
       <tr>
-        <td style="border-radius:14px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);box-shadow:0 8px 20px rgba(37,99,235,.32);">
-          <a href="${href}" style="display:inline-block;padding:15px 30px;color:#ffffff;font-weight:700;font-size:15px;text-decoration:none;border-radius:14px;letter-spacing:.2px;">
+        <td style="border-radius:12px;background:#2563eb;">
+          <a href="${href}" style="display:inline-block;padding:14px 24px;color:#ffffff;font-weight:700;font-size:14px;text-decoration:none;border-radius:12px;letter-spacing:.1px;">
             ${label} →
           </a>
         </td>
@@ -127,7 +131,11 @@ async function send(
   try {
     // O SDK NÃO lança em erro de API (chave inválida, domínio não verificado):
     // devolve { data, error }. Sem checar `error` aqui, a falha some em silêncio.
-    const html = layout(bodyHtml, { heroImageUrl: heroImage?.url, heroImageAlt: heroImage?.alt });
+    const html = layout(bodyHtml, {
+      heroImageUrl: heroImage?.url,
+      heroImageAlt: heroImage?.alt,
+      preheader: subject,
+    });
     const { error } = await resend.emails.send({ from: FROM, to, subject, html });
     if (error) {
       console.error(`Resend recusou o e-mail "${subject}" para ${to}:`, error);
@@ -250,18 +258,24 @@ async function sendAdmin(subject: string, rows: Array<[string, string]>) {
     return;
   }
   const body = `
-    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 480px; margin: 0 auto; color: #0f172a; background:#ffffff; border-radius:16px; padding:20px 24px; border:1px solid #e2e8f0;">
-      <h2 style="font-size: 18px; margin: 0 0 12px;">${subject}</h2>
-      <table style="border-collapse: collapse; font-size: 14px;">
+    <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:560px;margin:0 auto;color:#0f172a;background:#f1f5fb;padding:32px 16px;">
+      <div style="background:#172554;border-radius:18px 18px 0 0;padding:24px 28px;">
+        <img src="${LOGO_URL}" alt="${BRAND}" height="22" style="height:22px;width:auto;display:block;border:0;" />
+      </div>
+      <div style="background:#ffffff;border-radius:0 0 18px 18px;padding:28px;border:1px solid #e2e8f0;border-top:0;">
+      <p style="margin:0 0 8px;color:#2563eb;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Notificação interna</p>
+      <h2 style="font-size:22px;line-height:1.25;margin:0 0 20px;color:#0f172a;">${subject}</h2>
+      <table width="100%" style="border-collapse:collapse;font-size:14px;">
         ${rows
           .map(
             ([k, v]) => `<tr>
-              <td style="padding: 4px 12px 4px 0; color: #64748b; vertical-align: top;">${k}</td>
-              <td style="padding: 4px 0;"><strong>${v}</strong></td>
+              <td style="padding:12px 12px 12px 0;color:#64748b;vertical-align:top;border-top:1px solid #eef2f7;">${k}</td>
+              <td style="padding:12px 0;border-top:1px solid #eef2f7;"><strong>${v}</strong></td>
             </tr>`
           )
           .join("")}
       </table>
+      </div>
     </div>
   `;
   try {

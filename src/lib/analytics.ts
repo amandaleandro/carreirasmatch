@@ -68,6 +68,7 @@ export const ANALYTICS_EVENTS = {
   GOAL_PROGRESSED: "goal_progressed",
   UNIVERSITY_VIEWED: "university_viewed",
   UNIVERSITY_ENROLLMENT_SAVED: "university_enrollment_saved",
+  UNIVERSITY_SUBJECTS_IMPORTED: "university_subjects_imported",
 } as const;
 
 export type AnalyticsEvent = (typeof ANALYTICS_EVENTS)[keyof typeof ANALYTICS_EVENTS];

@@ -19,7 +19,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   }
 
   try {
-    const generated = await generateSubjectExercises(subject.name, subject.enrollment.courseName);
+    const generated = await generateSubjectExercises(subject.name, subject.enrollment.courseName, subject.syllabus ?? undefined);
     const updated = await prisma.universitySubject.update({
       where: { id: subject.id },
       data: {

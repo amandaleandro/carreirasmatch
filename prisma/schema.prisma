@@ -1040,8 +1040,9 @@ model CurriculumSubject {
   order              Int              @default(0)
   createdAt          DateTime         @default(now())
 
-  insight   CurriculumSubjectInsight?
-  exercises CurriculumSubjectExerciseSet?
+  insight       CurriculumSubjectInsight?
+  exercises     CurriculumSubjectExerciseSet?
+  studyMaterial CurriculumSubjectStudyMaterial?
 
   @@index([universityCourseId])
 }
@@ -1077,6 +1078,21 @@ model CurriculumSubjectExerciseSet {
 }
 
 /**
+ * Material de estudo (resumo, tópicos e pontos-chave) de uma disciplina do catálogo
+ * real, gerado por IA e cacheado aqui — mesmo raciocínio de CurriculumSubjectExerciseSet:
+ * compartilhado entre todos os alunos do curso, gera-se uma vez só.
+ */
+model CurriculumSubjectStudyMaterial {
+  id                  String            @id @default(cuid())
+  curriculumSubjectId String            @unique
+  curriculumSubject   CurriculumSubject @relation(fields: [curriculumSubjectId], references: [id], onDelete: Cascade)
+  summary             String
+  topics              String
+  keyPoints           String
+  generatedAt         DateTime          @default(now())
+}
+
+/**
  * Matrícula do usuário: curso e período atual. Quando `universityCourseId` está
  * preenchido, o curso foi encontrado no catálogo real (SIGAA) e "minhas disciplinas"
  * vem de `CurriculumSubject` filtrado pelo período; sem match no catálogo, o usuário
@@ -1103,17 +1119,24 @@ model UniversityEnrollment {
  * (por usuário) — diferente de CurriculumSubjectInsight, que é compartilhado.
  */
 model UniversitySubject {
-  id                 String               @id @default(cuid())
-  enrollmentId       String
-  enrollment         UniversityEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
-  name               String
-  competencies       String?
-  relatedProfessions String?
-  suggestedProject   String?
-  generatedAt        DateTime?
-  exercises          String?
-  exercisesGeneratedAt DateTime?
-  createdAt          DateTime             @default(now())
+  id                       String               @id @default(cuid())
+  enrollmentId             String
+  enrollment               UniversityEnrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+  name                     String
+  /// Trecho da ementa/grade extraído de um PDF enviado pelo aluno, usado como contexto
+  /// extra ao gerar insight, exercícios e material de estudo (quando presente).
+  syllabus                 String?
+  competencies             String?
+  relatedProfessions       String?
+  suggestedProject         String?
+  generatedAt              DateTime?
+  exercises                String?
+  exercisesGeneratedAt     DateTime?
+  studyMaterialSummary     String?
+  studyMaterialTopics      String?
+  studyMaterialKeyPoints   String?
+  studyMaterialGeneratedAt DateTime?
+  createdAt                DateTime             @default(now())
 
   @@index([enrollmentId])
 }

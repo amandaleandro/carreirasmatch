@@ -13,7 +13,8 @@ const BASE_RULES = `Responda SEMPRE em português do Brasil. Responda SOMENTE co
  * pode fazer para transformar o conteúdo em algo demonstrável no currículo. */
 export async function generateSubjectCareerInsight(
   subjectName: string,
-  courseName?: string
+  courseName?: string,
+  syllabus?: string
 ): Promise<SubjectCareerInsight> {
   const systemPrompt = `Você é um orientador de carreira que ajuda universitários a entender como cada disciplina do curso se conecta ao mercado de trabalho.
 ${BASE_RULES}
@@ -25,7 +26,7 @@ Formato de resposta:
 }`;
 
   const userMessage = `DISCIPLINA: ${subjectName}
-CURSO: ${courseName || "não informado"}`;
+CURSO: ${courseName || "não informado"}${syllabus ? `\nEMENTA (use como base do conteúdo real da disciplina):\n${syllabus}` : ""}`;
 
   return runJsonPrompt<SubjectCareerInsight>(
     systemPrompt,
@@ -53,7 +54,8 @@ export type SubjectExerciseSet = { questions: SubjectExercise[] };
  * aprendeu, não só entender a relevância de carreira (isso já é o insight). */
 export async function generateSubjectExercises(
   subjectName: string,
-  courseName?: string
+  courseName?: string,
+  syllabus?: string
 ): Promise<SubjectExerciseSet> {
   const systemPrompt = `Você é um professor universitário elaborando uma lista de exercícios de fixação para uma disciplina de graduação.
 ${BASE_RULES}
@@ -70,7 +72,7 @@ Formato de resposta:
 }`;
 
   const userMessage = `DISCIPLINA: ${subjectName}
-CURSO: ${courseName || "não informado"}`;
+CURSO: ${courseName || "não informado"}${syllabus ? `\nEMENTA (baseie as questões nos tópicos reais listados aqui):\n${syllabus}` : ""}`;
 
   return runJsonPrompt<SubjectExerciseSet>(
     systemPrompt,
@@ -82,4 +84,84 @@ CURSO: ${courseName || "não informado"}`;
     "university_subject_exercises",
     "cerebras"
   );
+}
+
+export type SubjectStudyMaterial = {
+  summary: string;
+  topics: string[];
+  keyPoints: string[];
+};
+
+/** Gera material de estudo (resumo + tópicos + pontos-chave) de uma disciplina
+ * universitária — o "o que estudar e por onde começar", complementar à lista de
+ * exercícios (que é prática) e ao insight de carreira (que é motivacional). */
+export async function generateSubjectStudyMaterial(
+  subjectName: string,
+  courseName?: string,
+  syllabus?: string
+): Promise<SubjectStudyMaterial> {
+  const systemPrompt = `Você é um professor universitário preparando material de estudo para uma disciplina de graduação.
+${BASE_RULES}
+Formato de resposta:
+{
+  "summary": string (resumo do conteúdo da disciplina em 3-5 frases, nível de graduação),
+  "topics": string[] (4-8 tópicos/módulos de estudo, na ordem em que fazem sentido aprender),
+  "keyPoints": string[] (4-6 pontos-chave ou conceitos que costumam cair em prova e o aluno não pode deixar de dominar)
+}`;
+
+  const userMessage = `DISCIPLINA: ${subjectName}
+CURSO: ${courseName || "não informado"}${syllabus ? `\nEMENTA (use como base do conteúdo real da disciplina):\n${syllabus}` : ""}`;
+
+  return runJsonPrompt<SubjectStudyMaterial>(
+    systemPrompt,
+    userMessage,
+    0.4,
+    2000,
+    undefined,
+    undefined,
+    "university_subject_study_material",
+    "cerebras"
+  );
+}
+
+export type ExtractedCurriculumSubject = {
+  name: string;
+  syllabus: string;
+};
+
+/** Extrai a lista de disciplinas (com trecho de ementa, quando disponível) a partir do
+ * texto de um PDF de grade curricular e/ou ementa enviado pelo aluno. */
+export async function extractSubjectsFromCurriculumText(
+  text: string,
+  courseName?: string
+): Promise<ExtractedCurriculumSubject[]> {
+  const systemPrompt = `Você extrai a lista de disciplinas de um documento de grade curricular e/ou ementa de um curso de graduação brasileiro.
+${BASE_RULES}
+Formato de resposta:
+{
+  "subjects": [
+    {
+      "name": string (nome da disciplina, como aparece no documento, sem código/sigla),
+      "syllabus": string (trecho da ementa dessa disciplina no documento — tópicos, conteúdo programático; "" se o documento não trouxer ementa, só o nome)
+    }
+  ]
+}
+Ignore linhas que não sejam disciplinas (carga horária isolada, cabeçalhos, rodapés, numeração de página). Não invente disciplinas que não estejam no texto.`;
+
+  const userMessage = `CURSO: ${courseName || "não informado"}
+TEXTO DO DOCUMENTO:
+${text}`;
+
+  const result = await runJsonPrompt<{ subjects: ExtractedCurriculumSubject[] }>(
+    systemPrompt,
+    userMessage,
+    0.2,
+    4000,
+    undefined,
+    undefined,
+    "university_curriculum_pdf_extract",
+    "cerebras"
+  );
+
+  return result.subjects.filter((s) => typeof s.name === "string" && s.name.trim().length > 0);
 }

@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { GraduationCap, Plus, Trash2, Sparkles, Briefcase, ListChecks, CheckCircle2, XCircle } from "lucide-react";
+import { GraduationCap, Plus, Trash2, Sparkles, Briefcase, ListChecks, CheckCircle2, XCircle, FileUp, BookOpen } from "lucide-react";
 import { track, ANALYTICS_EVENTS } from "@/lib/analytics";
 
 type Insight = { competencies: string[]; relatedProfessions: string[]; suggestedProject: string };
 type Exercise = { question: string; options: string[]; correctIndex: number; explanation: string };
-type CatalogSubject = { id: string; name: string; semester: number | null; insight: Insight | null; exercises: Exercise[] | null };
-type ManualSubject = { id: string; name: string; insight: Insight | null; exercises: Exercise[] | null };
+type StudyMaterial = { summary: string; topics: string[]; keyPoints: string[] };
+type CatalogSubject = { id: string; name: string; semester: number | null; insight: Insight | null; exercises: Exercise[] | null; studyMaterial: StudyMaterial | null };
+type ManualSubject = { id: string; name: string; hasSyllabus?: boolean; insight: Insight | null; exercises: Exercise[] | null; studyMaterial: StudyMaterial | null };
 type CourseResult = { id: string; title: string; area: string; universityName: string; city: string; state: string };
 
 type Enrollment = {
@@ -72,6 +73,7 @@ function ExerciseQuiz({ questions }: { questions: Exercise[] }) {
 
 function SubjectCard({
   name,
+  hasSyllabus,
   insight,
   onGenerate,
   onDelete,
@@ -81,8 +83,12 @@ function SubjectCard({
   exercises,
   onGenerateExercises,
   generatingExercises,
+  studyMaterial,
+  onGenerateStudyMaterial,
+  generatingStudyMaterial,
 }: {
   name: string;
+  hasSyllabus?: boolean;
   insight: Insight | null;
   onGenerate: () => void;
   onDelete?: () => void;
@@ -92,12 +98,23 @@ function SubjectCard({
   exercises: Exercise[] | null;
   onGenerateExercises: () => void;
   generatingExercises: boolean;
+  studyMaterial: StudyMaterial | null;
+  onGenerateStudyMaterial: () => void;
+  generatingStudyMaterial: boolean;
 }) {
   const [showExercises, setShowExercises] = useState(false);
+  const [showStudyMaterial, setShowStudyMaterial] = useState(false);
   return (
     <div className="rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 space-y-3">
       <div className="flex items-start justify-between gap-3">
-        <h3 className="text-sm font-bold text-slate-900 dark:text-white">{name}</h3>
+        <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">{name}</h3>
+          {hasSyllabus && (
+            <span className="mt-1 inline-flex items-center gap-1 text-[10px] font-semibold text-blue-600 dark:text-blue-400">
+              <FileUp className="h-3 w-3" /> Ementa importada
+            </span>
+          )}
+        </div>
         {onDelete && (
           <button type="button" onClick={onDelete} className="text-slate-400 hover:text-red-600 transition-colors shrink-0">
             <Trash2 className="h-4 w-4" />
@@ -145,6 +162,52 @@ function SubjectCard({
           {generating ? "Gerando..." : "Ver conexão com carreira"}
         </button>
       )}
+
+      <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
+        {studyMaterial ? (
+          <div className="pt-3 space-y-2">
+            <button
+              type="button"
+              onClick={() => setShowStudyMaterial((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+            >
+              <BookOpen className="h-3.5 w-3.5" />
+              {showStudyMaterial ? "Ocultar material de estudo" : "Ver material de estudo"}
+            </button>
+            {showStudyMaterial && (
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-950 p-3 space-y-2.5 text-xs">
+                <p className="leading-relaxed text-slate-700 dark:text-slate-300">{studyMaterial.summary}</p>
+                <div>
+                  <p className="font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Tópicos para estudar</p>
+                  <ol className="list-decimal list-inside space-y-0.5 text-slate-700 dark:text-slate-300">
+                    {studyMaterial.topics.map((t) => (
+                      <li key={t}>{t}</li>
+                    ))}
+                  </ol>
+                </div>
+                <div>
+                  <p className="font-bold text-slate-500 uppercase tracking-wider text-[10px] mb-1">Pontos-chave</p>
+                  <ul className="list-disc list-inside space-y-0.5 text-slate-700 dark:text-slate-300">
+                    {studyMaterial.keyPoints.map((k) => (
+                      <li key={k}>{k}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={onGenerateStudyMaterial}
+            disabled={generatingStudyMaterial}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold px-4 py-2 text-slate-700 dark:text-slate-200 hover:border-blue-300 transition-all disabled:opacity-50"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            {generatingStudyMaterial ? "Gerando..." : "Gerar material de estudo"}
+          </button>
+        )}
+      </div>
 
       <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
         {exercises ? (
@@ -206,6 +269,10 @@ export function UniversityHub({
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [portfolioAdded, setPortfolioAdded] = useState<Record<string, boolean>>({});
   const [generatingExercisesId, setGeneratingExercisesId] = useState<string | null>(null);
+  const [generatingStudyMaterialId, setGeneratingStudyMaterialId] = useState<string | null>(null);
+  const [importingPdf, setImportingPdf] = useState(false);
+  const [importPdfError, setImportPdfError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     track(ANALYTICS_EVENTS.UNIVERSITY_VIEWED, { hasEnrollment: !!enrollment });
@@ -237,6 +304,73 @@ export function UniversityHub({
       }
     } finally {
       setGeneratingExercisesId(null);
+    }
+  }
+
+  async function generateCatalogStudyMaterial(id: string) {
+    setGeneratingStudyMaterialId(id);
+    try {
+      const res = await fetch(`/api/universidade/curriculum-subjects/${id}/study-material`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        const material = {
+          summary: data.studyMaterial.summary,
+          topics: JSON.parse(data.studyMaterial.topics) as string[],
+          keyPoints: JSON.parse(data.studyMaterial.keyPoints) as string[],
+        };
+        setLocalCatalogSubjects((prev) => prev.map((s) => (s.id === id ? { ...s, studyMaterial: material } : s)));
+      }
+    } finally {
+      setGeneratingStudyMaterialId(null);
+    }
+  }
+
+  async function generateManualStudyMaterial(id: string) {
+    setGeneratingStudyMaterialId(id);
+    try {
+      const res = await fetch(`/api/universidade/subjects/${id}/study-material`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        const material = {
+          summary: data.subject.studyMaterialSummary as string,
+          topics: JSON.parse(data.subject.studyMaterialTopics) as string[],
+          keyPoints: JSON.parse(data.subject.studyMaterialKeyPoints) as string[],
+        };
+        setLocalManualSubjects((prev) => prev.map((s) => (s.id === id ? { ...s, studyMaterial: material } : s)));
+      }
+    } finally {
+      setGeneratingStudyMaterialId(null);
+    }
+  }
+
+  async function importCurriculumPdf(file: File) {
+    setImportPdfError(null);
+    setImportingPdf(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/universidade/subjects/import-pdf", { method: "POST", body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Não foi possível processar o PDF.");
+      const imported = (data.subjects as { id: string; name: string; syllabus: string | null }[]).map((s) => ({
+        id: s.id,
+        name: s.name,
+        hasSyllabus: !!s.syllabus,
+        insight: null,
+        exercises: null,
+        studyMaterial: null,
+      }));
+      setLocalManualSubjects((prev) => {
+        const byId = new Map(prev.map((s) => [s.id, s]));
+        for (const s of imported) byId.set(s.id, { ...byId.get(s.id), ...s });
+        return Array.from(byId.values());
+      });
+      track(ANALYTICS_EVENTS.UNIVERSITY_SUBJECTS_IMPORTED, { count: imported.length });
+    } catch (err) {
+      setImportPdfError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
+      setImportingPdf(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   }
 
@@ -300,7 +434,7 @@ export function UniversityHub({
     });
     const data = await res.json();
     if (res.ok) {
-      setLocalManualSubjects((prev) => [...prev, { id: data.subject.id, name: data.subject.name, insight: null, exercises: null }]);
+      setLocalManualSubjects((prev) => [...prev, { id: data.subject.id, name: data.subject.name, insight: null, exercises: null, studyMaterial: null }]);
       setNewSubjectName("");
     }
   }
@@ -512,6 +646,9 @@ export function UniversityHub({
                     exercises={s.exercises}
                     onGenerateExercises={() => generateCatalogExercises(s.id)}
                     generatingExercises={generatingExercisesId === s.id}
+                    studyMaterial={s.studyMaterial}
+                    onGenerateStudyMaterial={() => generateCatalogStudyMaterial(s.id)}
+                    generatingStudyMaterial={generatingStudyMaterialId === s.id}
                   />
                 ))}
               </div>
@@ -535,12 +672,36 @@ export function UniversityHub({
                 </button>
               </form>
 
+              <div className="rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <FileUp className="h-5 w-5 text-blue-600 shrink-0" />
+                <div className="flex-1">
+                  <p className="text-xs font-bold text-slate-900 dark:text-white">Importar grade ou ementa em PDF</p>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                    Envie o PDF da sua grade curricular ou ementa e a gente cadastra as disciplinas automaticamente.
+                  </p>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) importCurriculumPdf(file);
+                  }}
+                  disabled={importingPdf}
+                  className="shrink-0 text-[11px] file:mr-2 file:rounded-lg file:border-0 file:bg-slate-900 dark:file:bg-white file:text-white dark:file:text-slate-900 file:px-3 file:py-1.5 file:text-xs file:font-bold"
+                />
+              </div>
+              {importingPdf && <p className="text-[11px] text-blue-600 dark:text-blue-400">Processando PDF...</p>}
+              {importPdfError && <p className="text-[11px] font-bold text-red-600">{importPdfError}</p>}
+
               {localManualSubjects.length > 0 ? (
                 <div className="grid gap-4 sm:grid-cols-2">
                   {localManualSubjects.map((s) => (
                     <SubjectCard
                       key={s.id}
                       name={s.name}
+                      hasSyllabus={s.hasSyllabus}
                       insight={s.insight}
                       onAddToPortfolio={s.insight ? () => addInsightToPortfolio(s.name, s.insight!) : undefined}
                     portfolioAdded={portfolioAdded[s.name]}
@@ -550,6 +711,9 @@ export function UniversityHub({
                       exercises={s.exercises}
                       onGenerateExercises={() => generateManualExercises(s.id)}
                       generatingExercises={generatingExercisesId === s.id}
+                      studyMaterial={s.studyMaterial}
+                      onGenerateStudyMaterial={() => generateManualStudyMaterial(s.id)}
+                      generatingStudyMaterial={generatingStudyMaterialId === s.id}
                     />
                   ))}
                 </div>

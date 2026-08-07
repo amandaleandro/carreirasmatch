@@ -21,7 +21,7 @@ export default async function UniversityPage() {
       universityCourse: {
         include: {
           university: { select: { name: true } },
-          subjects: { orderBy: [{ semester: "asc" }, { order: "asc" }], include: { insight: true, exercises: true } },
+          subjects: { orderBy: [{ semester: "asc" }, { order: "asc" }], include: { insight: true, exercises: true, studyMaterial: true } },
         },
       },
     },
@@ -67,11 +67,19 @@ export default async function UniversityPage() {
             }
           : null,
         exercises: s.exercises ? (JSON.parse(s.exercises.questions) as SubjectExercise[]) : null,
+        studyMaterial: s.studyMaterial
+          ? {
+              summary: s.studyMaterial.summary,
+              topics: JSON.parse(s.studyMaterial.topics) as string[],
+              keyPoints: JSON.parse(s.studyMaterial.keyPoints) as string[],
+            }
+          : null,
       }))}
       manualSubjects={
         enrollment?.manualSubjects.map((s) => ({
           id: s.id,
           name: s.name,
+          hasSyllabus: !!s.syllabus,
           insight:
             s.competencies && s.relatedProfessions && s.suggestedProject
               ? {
@@ -81,6 +89,14 @@ export default async function UniversityPage() {
                 }
               : null,
           exercises: s.exercises ? (JSON.parse(s.exercises) as SubjectExercise[]) : null,
+          studyMaterial:
+            s.studyMaterialSummary && s.studyMaterialTopics && s.studyMaterialKeyPoints
+              ? {
+                  summary: s.studyMaterialSummary,
+                  topics: JSON.parse(s.studyMaterialTopics) as string[],
+                  keyPoints: JSON.parse(s.studyMaterialKeyPoints) as string[],
+                }
+              : null,
         })) ?? []
       }
       subjectProgress={subjectProgress}
