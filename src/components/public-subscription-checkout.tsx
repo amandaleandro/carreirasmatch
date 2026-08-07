@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { CouponCodeInput } from "@/components/coupon-code-input";
+import { RecentSignupToast } from "@/components/recent-signup-toast";
 import { MercadoPagoSubscriptionBrick } from "@/components/mercadopago-subscription-brick";
 import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
@@ -126,6 +127,7 @@ export function PublicSubscriptionCheckout({
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-10 w-full font-sans space-y-10">
+      <RecentSignupToast />
       {/* Top Banner Header */}
       <header className="text-center max-w-3xl mx-auto space-y-3">
 
