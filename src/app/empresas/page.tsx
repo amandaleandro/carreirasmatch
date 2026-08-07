@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/json-ld";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
 import { prisma } from "@/lib/prisma";
 import { COMPANY_PLANS } from "@/lib/company-billing";
+import { RotaMatchSteps } from "@/components/rota-match-steps";
 import {
   Search,
   KanbanSquare,
@@ -183,6 +184,8 @@ export default async function EmpresasLandingPage() {
               Gerar diagnóstico grátis
             </Link>
           </p>
+
+          <RotaMatchSteps className="mt-10" />
           {analysisCount >= 50 && (
             <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-2 text-xs font-semibold text-blue-200">
               {analysisCount.toLocaleString("pt-BR")} candidatos já usam o CarreirasMatch para buscar vaga, do outro lado do seu processo seletivo.

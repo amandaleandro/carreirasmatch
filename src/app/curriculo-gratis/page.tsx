@@ -5,6 +5,7 @@ import { FreeTierAd } from "@/components/free-tier-ad";
 import { SiteFooter } from "@/components/site-footer";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbJsonLd, faqJsonLd } from "@/lib/seo";
+import { JourneyUpsellBanner } from "@/components/journey-upsell-banner";
 
 export const metadata: Metadata = {
   title: "Currículo grátis: crie um modelo pronto online",
@@ -152,6 +153,12 @@ export default function CurriculoGratisPage() {
 
         <FreeTierAd name="toolGuide" className="pt-4" />
       </section>
+
+      <JourneyUpsellBanner
+        journey="career"
+        title="Melhore seu currículo para aumentar sua aderência à vaga que você deseja"
+        description="O Plano de Candidatura mostra exatamente o que ajustar para a vaga específica que você quer, não só regras gerais."
+      />
 
       <SiteFooter />
     </div>
