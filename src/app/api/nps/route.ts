@@ -17,12 +17,12 @@ export async function GET(req: Request) {
 
   const score = Number(scoreRaw);
   if (!token || !Number.isFinite(score) || score < 0 || score > 10) {
-    return NextResponse.redirect(`${APP_URL}/`);
+    return NextResponse.redirect(`${APP_URL}/nps/obrigado?invalid=1`);
   }
 
   const userId = verifyNpsToken(token);
   if (!userId) {
-    return NextResponse.redirect(`${APP_URL}/`);
+    return NextResponse.redirect(`${APP_URL}/nps/obrigado?invalid=1`);
   }
 
   const existing = await prisma.npsResponse.findFirst({ where: { userId, source } });

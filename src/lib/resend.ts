@@ -9,6 +9,8 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 const APP_URL = (process.env.APP_URL ?? "https://carreirasmatch.com.br").replace(/\/$/, "");
 const BRAND = "CarreirasMatch";
+const BRAND_POSITIONING =
+  "Você mostra onde quer chegar. O CarreirasMatch organiza a rota, transformando dúvida em direção e ajudando a entender, decidir, preparar, executar e acompanhar.";
 // Com nome de exibição: sem isso, o Gmail mostra o e-mail cru como remetente em vez de "CarreirasMatch".
 const FROM = `${BRAND} <${process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev"}>`;
 const LOGO_URL = `${APP_URL}/logos/wordmark-dark.png`; // texto branco, p/ fundo azul do cabeçalho
@@ -47,36 +49,37 @@ function layout(
   const heroImageHtml = opts?.heroImageUrl
     ? `
       <tr>
-        <td style="background:#eef2f9;line-height:0;">
-          <img src="${opts.heroImageUrl}" alt="${opts.heroImageAlt ?? BRAND}" width="540" style="width:100%;max-width:540px;height:auto;display:block;border:0;" />
+        <td style="background:#f8fafc;line-height:0;">
+          <img src="${opts.heroImageUrl}" alt="${opts.heroImageAlt ?? BRAND}" width="640" style="width:100%;max-width:640px;height:auto;display:block;border:0;" />
         </td>
       </tr>
     `
     : "";
   return `
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${opts?.preheader ?? "Novidades da sua jornada profissional no CarreirasMatch."}</div>
-    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5fb;padding:32px 12px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${opts?.preheader ?? "Do objetivo ao próximo passo."}</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
       <tr>
         <td align="center">
-          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 18px 48px rgba(15,23,42,.12),0 2px 8px rgba(15,23,42,.05);">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:640px;background:#ffffff;overflow:hidden;">
             <tr>
-              <td style="background:#172554;padding:28px 32px 26px;">
+              <td style="background:#0b1730;padding:34px 40px 30px;border-bottom:4px solid #60a5fa;">
                 <a href="${APP_URL}" style="text-decoration:none;">
-                  <img src="${LOGO_URL}" alt="${BRAND}" height="24" style="height:24px;width:auto;display:block;border:0;" />
+                  <img src="${LOGO_URL}" alt="${BRAND}" width="190" style="width:190px;height:auto;display:block;border:0;" />
                 </a>
+                <p style="margin:22px 0 0;color:#bfdbfe;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;">Do objetivo ao próximo passo.</p>
               </td>
             </tr>
             ${heroImageHtml}
             <tr>
-              <td style="height:4px;background:#60a5fa;font-size:0;line-height:0;">&nbsp;</td>
+              <td style="height:0;font-size:0;line-height:0;">&nbsp;</td>
             </tr>
             <tr>
-              <td style="padding:36px 36px 12px;color:#1e293b;font-size:15px;line-height:1.7;">
+              <td style="padding:46px 40px 18px;color:#1e293b;font-size:15px;line-height:1.75;">
                 ${bodyHtml}
               </td>
             </tr>
             <tr>
-              <td style="padding:12px 36px 32px;">
+              <td style="padding:12px 40px 40px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">
                   <tr><td style="border-top:1px solid #eef2f7;font-size:0;line-height:0;">&nbsp;</td></tr>
                 </table>
@@ -93,7 +96,7 @@ function layout(
               </td>
             </tr>
           </table>
-          <p style="font-size:11.5px;color:#a8b3c5;margin:20px 0 0;">${BRAND} · feito com 💙 pra quem está buscando a próxima oportunidade</p>
+          <p style="font-size:11.5px;color:#94a3b8;margin:22px 0 0;">${BRAND} · menos dúvida, mais direção.</p>
         </td>
       </tr>
     </table>
@@ -147,19 +150,32 @@ async function send(
 }
 
 const EMAIL_COPY_SYSTEM_PROMPT = `
-Você escreve e-mails de marketing/lifecycle para o ${BRAND}, uma plataforma brasileira que usa IA
-para ajudar pessoas a conseguir emprego (análise de currículo x vaga, feed de vagas, entrevista).
+Você escreve e-mails de lifecycle para o ${BRAND}, uma marca brasileira que transforma dúvida
+em direção para quem está escolhendo, preparando e acompanhando uma oportunidade.
 
-Tom de voz: fala como uma pessoa esperta e engraçada que manja de busca de emprego, não como
-uma empresa. Pense em como marcas como Netflix, Duolingo ou Nubank escrevem e-mail: informal,
-brasileiro, com timing de meme quando cabe (referência de internet, cultura pop BR, autoironia),
-mas sem forçar a barra e sem soar bobo ou infantil. Nunca use gíria de robô tentando ser "descolado".
-Um toque de humor por e-mail é suficiente, o resto é direto e útil.
+Posicionamento da marca: ${BRAND_POSITIONING}
+
+Tom de voz: claro, direto, seguro e próximo. Fale como aquela pessoa organizada que leu tudo,
+encontrou o que importa e recomenda uma ação. O CarreirasMatch não fala como consultoria,
+recrutador corporativo, coach ou robô futurista. Recomenda, não decreta.
 
 Regras:
-- Português do Brasil, natural, como alguém digitando rápido pro amigo.
-- Pode usar 1-3 emojis por e-mail, nos lugares certos, sem exagerar.
+- Português do Brasil, natural e direto, sem formalidade corporativa.
+- Pode usar no máximo 1 emoji e só quando ele ajudar a leitura.
 - Nunca use travessão/meia-risca; troque por vírgula, ponto, dois-pontos ou parênteses.
+- Use o vocabulário da marca: Match, Rota, Sinais, Lacunas, vaga-alvo, candidatura preparada
+  e próximo passo. Quando fizer sentido, use os nomes oficiais: Meu Match, Match da Vaga,
+  Sinais da Vaga, Plano de Candidatura, Minha Rota, Minhas Candidaturas e Minha Evolução.
+- Estruture a mensagem, quando possível, em: situação, diagnóstico, consequência, direção
+  e próximo passo.
+- Prefira frases proprietárias como "Antes de se candidatar, dê Match", "Uma vaga. Uma rota",
+  "Entenda antes de enviar" e "Seu próximo passo começa aqui". Não force mais de uma na mesma mensagem.
+- Para CTAs, prefira ações concretas: "Ver meu Match", "Ver meu Plano", "Preparar esta vaga",
+  "Melhorar meu currículo", "Treinar entrevista", "Continuar minha rota" ou "Começar minha rota".
+- Evite "garantir emprego", "hackear o ATS", "enganar o algoritmo", "vaga perfeita", "score"
+  como protagonista e qualquer promessa de resultado.
+- Não diga que a IA decide pela pessoa. Ela mostra sinais, contexto e prioridades para a
+  pessoa decidir com mais segurança.
 - O corpo do e-mail é HTML simples: um <h2> de abertura e alguns <p>. Sem <html>/<body>/<head>.
   Estilo já herda de um template, então não adicione cor/fonte/CSS, só as tags puras.
 - NÃO inclua botão/link de call-to-action no HTML, ele é adicionado separadamente depois do seu texto.
@@ -333,29 +349,28 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
 export async function sendWelcomeEmail(to: string, name?: string | null) {
   const greeting = name?.trim() ? `E aí, ${name.trim().split(" ")[0]}! 👋` : "E aí! 👋";
   const fallback: CampaignFallback = {
-    subject: `🔓 Bem-vindo(a)! Bora descobrir seu score de aderência`,
+    subject: `🔓 Bem-vindo(a)! Prepare sua próxima candidatura`,
     bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Sua conta no ${BRAND} tá no ar. Chegou até aqui, já é sinal de que tá levando essa busca a sério 🫡</p>
-      <p>Aqui você tem um copiloto pra carreira inteira: currículo x vaga, candidatura automática, preparo pra entrevista e o que vier depois da contratação.</p>
-      <p>Primeiro passo: a IA te conta, sem enrolação, o quanto seu currículo casa com qualquer vaga, e exatamente o que mudar pra esse número subir.</p>
-      <p>Spoiler: seu currículo genérico provavelmente não passa nem pelo robô do ATS antes de chegar num humano 🤖</p>
-      <p>Leva menos de 2 minutos pra ver seu primeiro score 🚀</p>
+      <p style="color:#64748b;margin:0 0 16px;">Sua conta no ${BRAND} está pronta. Agora você pode preparar cada candidatura com mais clareza.</p>
+      <p>Comece com uma vaga real: compare seu currículo com os requisitos, entenda seu Match e veja quais lacunas merecem atenção.</p>
+      <p>Depois, ajuste seus materiais, treine para a conversa e acompanhe o próximo passo. A ideia é transformar a busca em um processo mais específico e mensurável.</p>
+      <p>Leva menos de 2 minutos para fazer sua primeira análise.</p>
     `,
   };
   const copy = await generateCampaignCopy(
     "welcome",
     `Situação: primeiro e-mail depois que a pessoa acaba de criar a conta.
 Nome: ${name?.trim() || "não informado"}.
-Objetivo: dar boas-vindas com energia, deixar claro que o ${BRAND} é um copiloto pra carreira inteira (não só currículo x vaga: candidatura automática, entrevista, evolução), e empurrar pra primeira análise como primeiro passo (menos de 2 minutos).
-CTA (não incluir no html, só escrever até ele): "Analisar meu currículo".`,
+Objetivo: dar boas-vindas e apresentar o ${BRAND} como um espaço para preparar cada candidatura com uma vaga real, entender o Match, identificar lacunas e escolher o próximo passo. Incentive a primeira análise, que leva menos de 2 minutos.
+CTA (não incluir no html, só escrever até ele): "Analisar uma vaga".`,
     fallback
   );
   await send(
     to,
     copy.subject,
     `${copy.bodyHtml}
-      ${button(`${APP_URL}/analise`, "Analisar meu currículo")}
+      ${button(`${APP_URL}/analise`, "Analisar uma vaga")}
       <p>💡 Dica: quanto mais específica a descrição da vaga que você colar, mais cirúrgico fica o diagnóstico.</p>
     `
   );
@@ -372,8 +387,8 @@ export async function sendWhatsappOptinInviteEmail(to: string, name?: string | n
     subject: `📲 Vaga boa não espera e-mail abrir`,
     bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Sinceramente? Seu e-mail já tá lotado de promoção de loja que você comprou uma vez em 2019. A vaga certa não merece brigar por atenção lá.</p>
-      <p>Ativa o alerta por WhatsApp e seja um dos primeiros a ver (e aplicar) quando a oportunidade certa aparecer 🎯</p>
+      <p style="color:#64748b;margin:0 0 16px;">Algumas oportunidades pedem atenção no momento certo. Com as dicas por WhatsApp, você acompanha novas vagas sem depender de lembrar de abrir o e-mail.</p>
+      <p>Ative o alerta para receber oportunidades e decidir com calma quais fazem sentido para o seu próximo passo.</p>
     `,
   };
   const copy = await generateCampaignCopy(
@@ -677,11 +692,11 @@ export async function sendLeadFollowUpEmail(
   const greeting = opts.name?.trim() ? `Olá, ${opts.name.trim().split(" ")[0]}! 👋` : "Olá! 👋";
   const checkoutUrl = opts.checkoutUrl?.startsWith("/") ? opts.checkoutUrl : "/analise";
   const fallback: CampaignFallback = {
-    subject: "📊 Seu score já foi calculado. Falta só destravar",
+    subject: "📊 Seu Match está pronto. Falta ver a rota",
     bodyHtml: `
       <h2 style="font-size:21px;font-weight:700;letter-spacing:-.2px;margin:0 0 4px;color:#0f172a;">${greeting}</h2>
-      <p style="color:#64748b;margin:0 0 16px;">Você chegou até o meio do caminho no ${BRAND} e parou bem na parte boa. Aquele clássico "97% completo" que ninguém aguenta ⏳</p>
-      <p>Seu score de aderência já está calculado, só falta ver: o que os recrutadores enxergam primeiro e os ajustes que mais aumentam suas chances.</p>
+      <p style="color:#64748b;margin:0 0 16px;">Você já começou a sua Rota no ${BRAND}. Agora falta abrir o diagnóstico e entender qual é o próximo passo para essa vaga.</p>
+      <p>Seu Match já está pronto. Agora você pode ver os sinais da vaga, entender as lacunas e escolher o próximo passo antes de enviar.</p>
       <p>Leva menos de 2 minutos para desbloquear ⏱️</p>
     `,
   };

@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
 import { CouponCodeInput } from "@/components/coupon-code-input";
 import { MercadoPagoSubscriptionBrick } from "@/components/mercadopago-subscription-brick";
 import { MercadoPagoPaymentBrick } from "@/components/mercadopago-payment-brick";
 import { CAREER_OFFER_BY_SEGMENT } from "@/lib/career-offers";
 import { COMMERCIAL_PLANS, getPlanFeatureList, type CommercialPlanKey } from "@/lib/commercial-plan-catalog";
+import { COMMERCIAL_PRODUCTS } from "@/lib/commercial-products";
 import { avulsoProductCode } from "@/lib/commercial-product-codes";
 import { CAREER_SEGMENT_OPTIONS, type CareerSegment } from "@/lib/career-segments";
 import { formatCentsToBRL } from "@/lib/pricing";
@@ -213,49 +215,65 @@ export function PublicSubscriptionCheckout({
             <legend className="text-center text-xs font-extrabold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-4">
               Escolha o plano
             </legend>
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {Object.values(COMMERCIAL_PLANS)
-                .filter((candidate) => candidate.key !== "free")
-                .map((candidate) => {
-                  const selected = commercialPlanKey === candidate.key;
-                  return (
-                    <button
-                      type="button"
-                      key={candidate.key}
-                      onClick={() => {
-                        setCommercialPlanKey(candidate.key);
-                        setPlan(candidate.recurring ? "card_recurring" : "monthly_oneoff");
-                      }}
-                      className={`relative text-left rounded-2xl border p-5 transition-all ${
-                        selected
-                          ? "border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 ring-2 ring-blue-500/20"
-                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
-                      }`}
-                    >
-                      {candidate.highlighted && (
-                        <span className="absolute -top-3 left-4 inline-flex items-center rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-                          Mais escolhido
-                        </span>
-                      )}
-                      <p className="font-bold text-sm text-slate-900 dark:text-white">{candidate.name}</p>
-                      <p className="mt-1 text-xl font-extrabold text-blue-600 dark:text-blue-400">
-                        {formatCentsToBRL(candidate.priceCents)}
-                        {candidate.recurring && <span className="text-xs font-semibold text-slate-500">/mês</span>}
-                        {!candidate.recurring && candidate.durationDays && (
-                          <span className="text-xs font-semibold text-slate-500">/{candidate.durationDays} dias</span>
-                        )}
-                      </p>
-                      <ul className="mt-3 space-y-1.5">
-                        {getPlanFeatureList(candidate.key).slice(0, 3).map((feature) => (
-                          <li key={feature} className="flex items-start gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300">
-                            <Check className="mt-0.5 h-3 w-3 shrink-0 text-emerald-500" />
-                            <span>{feature}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </button>
-                  );
-                })}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Para começar</span>
+                <p className="mt-1 font-bold text-sm text-slate-900 dark:text-white">Descobrir meu Match</p>
+                <p className="mt-1 text-xl font-extrabold text-slate-900 dark:text-white">Grátis</p>
+                <p className="mt-3 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                  Veja seu % de aderência antes de decidir qualquer coisa.
+                </p>
+                <Link
+                  href="/register"
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200"
+                >
+                  Descobrir meu Match
+                </Link>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Uma vaga</span>
+                <p className="mt-1 font-bold text-sm text-slate-900 dark:text-white">Plano de Candidatura</p>
+                <p className="mt-1 text-xl font-extrabold text-slate-900 dark:text-white">
+                  {formatCentsToBRL(COMMERCIAL_PRODUCTS.fullAnalysis.priceCents)}
+                  <span className="text-xs font-semibold text-slate-500"> avulso</span>
+                </p>
+                <p className="mt-3 text-[11px] leading-relaxed text-slate-500 dark:text-slate-400">
+                  Para quando você encontrou uma oportunidade que realmente importa.
+                </p>
+                <Link
+                  href="/plano-de-candidatura"
+                  className="mt-4 inline-flex w-full items-center justify-center rounded-xl border border-slate-300 px-4 py-2.5 text-xs font-bold text-slate-700 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-slate-700 dark:text-slate-200"
+                >
+                  Preparar esta vaga
+                </Link>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setCommercialPlanKey("pro");
+                  setPlan("card_recurring");
+                }}
+                className="relative text-left rounded-2xl border border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 ring-2 ring-blue-500/20 p-5"
+              >
+                <span className="absolute -top-3 left-4 inline-flex items-center rounded-full bg-blue-600 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
+                  Busca contínua
+                </span>
+                <p className="mt-1 font-bold text-sm text-slate-900 dark:text-white">Rota Profissional</p>
+                <p className="mt-1 text-xl font-extrabold text-blue-600 dark:text-blue-400">
+                  {formatCentsToBRL(COMMERCIAL_PLANS.pro.priceCents)}
+                  <span className="text-xs font-semibold text-slate-500">/mês</span>
+                </p>
+                <ul className="mt-3 space-y-1.5">
+                  {getPlanFeatureList("pro").slice(0, 3).map((feature) => (
+                    <li key={feature} className="flex items-start gap-1.5 text-[11px] font-medium text-slate-600 dark:text-slate-300">
+                      <Check className="mt-0.5 h-3 w-3 shrink-0 text-emerald-500" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </button>
             </div>
           </fieldset>
         </section>
