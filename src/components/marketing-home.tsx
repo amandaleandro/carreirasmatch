@@ -101,7 +101,7 @@ const audienceCards = [
   ["Começando agora", "Primeiro emprego ou estágio", "Transforme cursos, projetos e atividades em experiência que conta na candidatura.", "/analise"],
   ["Aprendendo", "Descubra seu próximo caminho", "Explore cursos, profissões e possibilidades para tomar decisões com mais clareza.", "/descobrir"],
   ["Voltando ao mercado", "Recolocação", "Ajuste seu currículo para as exigências atuais das empresas e conquiste respostas.", "/analise"],
-  ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/tools/matriz-de-skills"],
+  ["Mudando de área", "Transição de carreira", "Identifique as habilidades que você já tem e que aproximam você da nova área.", "/tools/career-change-guide"],
   ["Construindo seu caminho", "Projetos, freelas e renda", "Encontre formas de colocar suas habilidades em prática, criar portfólio e gerar novas oportunidades.", "/freelancers"],
 ] as const;
 
