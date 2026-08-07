@@ -26,6 +26,14 @@ import type { StructuredResume } from "@/lib/groq";
 import { getRecommendedPartnerCourses } from "@/lib/analysis-recommendations";
 import { PartnerCoursesRecommendation } from "@/components/partner-courses-recommendation";
 import { ReanalysisTrigger } from "@/components/analysis/reanalysis-trigger";
+import { JOURNEYS } from "@/lib/journeys";
+import { JourneyCtaLink } from "@/components/journey-cta-link";
+import { ArrowRight } from "lucide-react";
+
+// Etapa 5 da arquitetura de ofertas: recomendar avulso vs assinatura com base
+// em comportamento real (nao adivinhacao) — quem ja analisou varias vagas
+// diferentes esta buscando ativamente, nao resolvendo uma oportunidade unica.
+const MULTIPLE_JOBS_THRESHOLD = 3;
 
 export const dynamic = "force-dynamic";
 
@@ -162,6 +170,16 @@ export default async function ReportPage({
   const missingKeywords: string[] = JSON.parse(record.keywordsMissing || "[]");
   const recommendedCourses = await getRecommendedPartnerCourses(missingKeywords, record.jobTitle);
 
+  // Conta vagas distintas ja analisadas por esta pessoa (nao so reanalises da
+  // mesma vaga) para decidir se recomenda o avulso (uma vaga) ou a assinatura
+  // (busca ativa em varias vagas).
+  const distinctJobsAnalyzed = await prisma.analysis.findMany({
+    where: { resume: { userId: session.user.id } },
+    distinct: ["jobTitle"],
+    select: { jobTitle: true },
+  });
+  const isActivelySearching = distinctJobsAnalyzed.length >= MULTIPLE_JOBS_THRESHOLD;
+
   return (
     <main className="max-w-3xl mx-auto px-4 py-12 w-full space-y-10">
       <header>
@@ -279,25 +297,54 @@ export default async function ReportPage({
               analysisId={id}
               segment={segment ?? undefined}
             />
-            <div id="proximo-passo" className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
-                Próximo passo recomendado
-              </p>
-              <h3 className="font-semibold text-lg">Libere o Kit Candidatura para esta vaga</h3>
-              <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                Currículo pronto em PDF, palavras-chave da vaga, mensagem para o recrutador,
-                perguntas de entrevista e um plano de evolução, tudo em um só lugar.
-              </p>
-              <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
-                {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (
-                  <li key={item} className="flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
-            </div>
+            {isActivelySearching && !subscribed ? (
+              <div id="proximo-passo" className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
+                  Próximo passo recomendado
+                </p>
+                <h3 className="font-semibold text-lg">Você já analisou {distinctJobsAnalyzed.length} vagas diferentes</h3>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Comprar avulso a cada vaga pode sair mais caro do que acompanhar sua busca inteira.
+                  A {JOURNEYS.career.subscription!.label} inclui análises recorrentes, currículo por vaga
+                  e acompanhamento de candidaturas.
+                </p>
+                <JourneyCtaLink
+                  href={`${JOURNEYS.career.subscription!.href}?segment=career_pro`}
+                  journey="career"
+                  tier="subscription"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700 transition-all"
+                >
+                  Conhecer a {JOURNEYS.career.subscription!.label}
+                  <ArrowRight className="h-4 w-4" />
+                </JourneyCtaLink>
+                <div className="text-xs text-neutral-500 dark:text-neutral-400">
+                  Prefere resolver só esta vaga agora?{" "}
+                  <span className="inline-block align-middle">
+                    <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <div id="proximo-passo" className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/40 dark:bg-blue-950/20 p-5 shadow-sm space-y-3">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
+                  Próximo passo recomendado
+                </p>
+                <h3 className="font-semibold text-lg">Libere o Kit Candidatura para esta vaga</h3>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Currículo pronto em PDF, palavras-chave da vaga, mensagem para o recrutador,
+                  perguntas de entrevista e um plano de evolução, tudo em um só lugar.
+                </p>
+                <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
+                  {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (
+                    <li key={item} className="flex items-center gap-2">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <UnlockDiagnosticButton analysisId={id} price={diagnosticPrice} />
+              </div>
+            )}
           </AnalysisTeaserView>
         </div>
       )}
