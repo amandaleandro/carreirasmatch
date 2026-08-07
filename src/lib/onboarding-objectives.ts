@@ -2,6 +2,33 @@ import type { CareerSegment } from "@/lib/career-segments";
 
 export type ObjectiveShortcut = { title: string; description: string; href: string };
 
+/** Os 5 objetivos de entrada do onboarding curto (tela 1). Cada um mapeia para um
+ * CareerSegment (que continua orientando recomendações/ferramentas/nav por trás),
+ * mas a pergunta ao usuário nessa tela é sobre o que ele quer conquistar agora, não
+ * sobre "momento profissional". */
+export type OnboardingGoal =
+  | "find_job"
+  | "prepare_specific_job"
+  | "first_job"
+  | "internship"
+  | "career_change";
+
+export const GOAL_OPTIONS: { value: OnboardingGoal; label: string; description: string }[] = [
+  { value: "find_job", label: "Encontrar uma nova vaga", description: "Quero buscar oportunidades e me candidatar melhor." },
+  { value: "prepare_specific_job", label: "Preparar uma vaga que já encontrei", description: "Já tenho uma oportunidade em mente." },
+  { value: "first_job", label: "Conseguir meu primeiro emprego", description: "Quero começar minha carreira." },
+  { value: "internship", label: "Conseguir um estágio", description: "Quero transformar meus estudos e projetos em experiência." },
+  { value: "career_change", label: "Mudar de carreira", description: "Quero descobrir como aproveitar o que já sei em uma nova área." },
+];
+
+export const GOAL_TO_SEGMENT: Record<OnboardingGoal, CareerSegment> = {
+  find_job: "career_pro",
+  prepare_specific_job: "career_pro",
+  first_job: "first_job",
+  internship: "internship",
+  career_change: "career_change",
+};
+
 export type OnboardingObjective = {
   value: string;
   label: string;
@@ -38,6 +65,16 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
   ],
   first_job: [
     {
+      value: "first_job",
+      label: "Conseguir meu primeiro emprego",
+      cta: { label: "Montar meu currículo", href: "/curriculo-sem-experiencia" },
+      shortcuts: [
+        { title: "Montar meu currículo", description: "Currículo do zero, sem precisar de experiência formal.", href: "/curriculo-sem-experiencia" },
+        { title: "Guia do primeiro emprego", description: "Como se apresentar mesmo sem carteira assinada.", href: "/tools/first-job-guide" },
+        { title: "Ver vagas de hoje", description: "Oportunidades de entrada publicadas recentemente.", href: "/vagas-de-hoje" },
+      ],
+    },
+    {
       value: "build_first_resume",
       label: "Criar meu primeiro currículo",
       cta: { label: "Montar meu currículo", href: "/curriculo-sem-experiencia" },
@@ -58,6 +95,16 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     },
   ],
   internship: [
+    {
+      value: "internship",
+      label: "Conseguir um estágio",
+      cta: { label: "Ver vagas de estágio", href: "/todas-as-vagas" },
+      shortcuts: [
+        { title: "Ver vagas de estágio", description: "Oportunidades de estágio compatíveis com seu curso.", href: "/todas-as-vagas" },
+        { title: "Checklist de estágio", description: "O que preparar antes de se candidatar.", href: "/tools/internship-checklist" },
+        { title: "Transformar projetos em experiência", description: "Projetos pessoais e da faculdade contam como experiência.", href: "/tools/project-to-experience" },
+      ],
+    },
     {
       value: "find_internships",
       label: "Encontrar vagas de estágio",
@@ -127,6 +174,16 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
   ],
   career_change: [
     {
+      value: "career_change",
+      label: "Mudar de carreira",
+      cta: { label: "Ver minha transição de carreira", href: "/tools/matriz-de-skills" },
+      shortcuts: [
+        { title: "Minha transição de carreira", description: "Habilidades transferíveis para a nova área.", href: "/tools/matriz-de-skills" },
+        { title: "Guia de transição de carreira", description: "Passo a passo para migrar de área com segurança.", href: "/tools/career-change-guide" },
+        { title: "Montar meu currículo", description: "Currículo reposicionado para a área de destino.", href: "/resume" },
+      ],
+    },
+    {
       value: "leverage_experience",
       label: "Descobrir o que já posso aproveitar da minha experiência",
       cta: { label: "Ver minha transição de carreira", href: "/tools/matriz-de-skills" },
@@ -146,6 +203,25 @@ export const OBJECTIVE_OPTIONS_BY_SEGMENT: Record<CareerSegment, OnboardingObjec
     },
   ],
   career_pro: [
+    {
+      value: "find_job",
+      label: "Encontrar uma nova vaga",
+      cta: { label: "Ver vagas para mim", href: "/feed" },
+      shortcuts: [
+        { title: "Ver meu feed de vagas", description: "Vagas ordenadas pela sua aderência.", href: "/feed" },
+        { title: "Todas as vagas", description: "Busca completa sem curadoria de Match.", href: "/todas-as-vagas" },
+        { title: "Montar meu currículo", description: "Deixe seu currículo pronto para candidatar.", href: "/resume" },
+      ],
+    },
+    {
+      value: "prepare_specific_job",
+      label: "Preparar uma vaga que já encontrei",
+      cta: { label: "Analisar esta vaga", href: "/analise" },
+      shortcuts: [
+        { title: "Analisar esta vaga", description: "Veja sua aderência real e o que falta ajustar.", href: "/analise" },
+        { title: "Verificar ATS", description: "Confira se seu currículo passa pelos filtros automáticos.", href: "/verificador-ats" },
+      ],
+    },
     {
       value: "improve_applications",
       label: "Melhorar minhas candidaturas",

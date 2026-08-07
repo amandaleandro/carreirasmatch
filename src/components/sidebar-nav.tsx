@@ -49,7 +49,7 @@ const NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/resume", label: "Meu Currículo", icon: FileText, tour: "nav-resume" },
       { href: "/evidencias", label: "Banco de Evidências 🛡️", icon: ShieldCheck, tour: "nav-evidencias" },
       { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
@@ -98,7 +98,7 @@ const STUDENT_NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/estudos", label: "Rota de Aprovação", icon: GraduationCap },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen, tour: "nav-ensino-medio" },
       { href: "/descobrir", label: "Faculdade ou Técnico", icon: GraduationCap },
@@ -127,7 +127,7 @@ const APPRENTICE_NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/ensino-medio", label: "Ensino Médio & ENEM 🎓", icon: BookOpen },
     ],
   },
@@ -164,7 +164,7 @@ const FIRST_JOB_NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/analise", label: "Primeiro emprego", icon: Briefcase },
       { href: "/curriculo-sem-experiencia", label: "Currículo sem experiência", icon: FileText },
     ],
@@ -201,7 +201,7 @@ const INTERNSHIP_NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/estagio/trilhas", label: "Estágios", icon: Briefcase },
       { href: "/feed", label: "Feed de estágios", icon: Rss, tour: "nav-feed" },
       { href: "/analise", label: "Análise de Vaga", icon: Search, tour: "nav-analise" },
@@ -241,7 +241,7 @@ const CONCURSEIRO_NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/estudos/diagnostico", label: "Diagnóstico de Preparação", icon: Search },
       { href: "/concursos", label: "Radar de Concursos", icon: Landmark, tour: "nav-concursos" },
     ],
@@ -268,7 +268,7 @@ const OAB_NAV_GROUPS: NavGroup[] = [
   {
     title: "Minha Rota",
     items: [
-      { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard", label: "Início", icon: LayoutDashboard },
       { href: "/estudos/diagnostico", label: "Diagnóstico de Preparação", icon: Search },
     ],
   },

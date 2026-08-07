@@ -31,6 +31,8 @@ model User {
   objectiveDeadline           String?
   city                        String?
   state                       String?
+  preferredWorkModel          String?
+  onboardingResumeChoice      String?
   hasFormalEducation          Boolean?
   discoverable                Boolean                   @default(false)
   interestedRoles             String                    @default("[]")

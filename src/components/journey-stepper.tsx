@@ -1,11 +1,13 @@
 import { Check } from "lucide-react";
 
 const STEPS = [
-  { key: "analysis", label: "Análise", description: "Enviar currículo e vaga" },
-  { key: "diagnostic", label: "Diagnóstico", description: "Entender seu Match" },
+  { key: "objective", label: "Objetivo", description: "Definir seu cargo desejado" },
+  { key: "resume", label: "Currículo", description: "Ter um currículo pronto" },
+  { key: "job", label: "Vaga", description: "Encontrar uma oportunidade" },
+  { key: "match", label: "Match", description: "Entender sua aderência" },
   { key: "preparation", label: "Preparação", description: "Corrigir as lacunas" },
   { key: "application", label: "Candidatura", description: "Aplicar com contexto" },
-  { key: "tracking", label: "Acompanhamento", description: "Acompanhar respostas" },
+  { key: "interview", label: "Entrevista", description: "Treinar e comparecer" },
 ] as const;
 
 export function JourneyStepper({ current }: { current: (typeof STEPS)[number]["key"] }) {

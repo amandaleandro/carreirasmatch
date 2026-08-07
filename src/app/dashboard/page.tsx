@@ -20,6 +20,7 @@ import { getMoodDayKey } from "@/lib/mood";
 import { updateEmploymentStatusAction, saveMoodAction } from "./actions";
 import { JourneyStepper } from "@/components/journey-stepper";
 import { WeeklyPlanViewTracker } from "@/components/weekly-plan-view-tracker";
+import { computeNextSteps } from "@/lib/next-step";
 
 export const dynamic = "force-dynamic";
 
@@ -129,13 +130,63 @@ export default async function DashboardPage() {
         ];
       })();
 
-  const allApplicationsForMetrics = await prisma.application.findMany({
-    where: { userId: session.user.id },
-    orderBy: { updatedAt: "desc" },
-    select: { id: true, jobTitle: true, status: true, createdAt: true, deadline: true, appliedAt: true, responseAt: true },
-  });
+  const [allApplicationsForMetrics, resumesCount, linkedinReviewCount, jobMatches] = await Promise.all([
+    prisma.application.findMany({
+      where: { userId: session.user.id },
+      orderBy: { updatedAt: "desc" },
+      select: {
+        id: true,
+        jobTitle: true,
+        status: true,
+        createdAt: true,
+        deadline: true,
+        interviewAt: true,
+        appliedAt: true,
+        responseAt: true,
+        analysisId: true,
+      },
+    }),
+    prisma.resume.count({ where: { userId: session.user.id } }),
+    prisma.toolReviewResult.count({ where: { userId: session.user.id, type: "linkedin" } }),
+    prisma.jobMatch.findMany({
+      where: { resume: { userId: session.user.id }, fitScore: { gte: 55 } },
+      orderBy: { fitScore: "desc" },
+      take: 4,
+      include: { job: true },
+    }),
+  ]);
   const journey = computeJourneyMetrics(allApplicationsForMetrics);
-  const journeyStage = allApplicationsForMetrics.length > 0 ? "tracking" : analyses.length > 0 ? "preparation" : "analysis";
+  const hasFutureInterview = allApplicationsForMetrics.some((a) => a.interviewAt && a.interviewAt.getTime() >= now.getTime());
+  const journeyStage = !user?.objective
+    ? "objective"
+    : hasFutureInterview
+      ? "interview"
+      : allApplicationsForMetrics.some((a) => ["applied", "interview", "technical_test", "offer", "rejected"].includes(a.status))
+        ? "application"
+        : analyses.length > 0
+          ? "preparation"
+          : jobMatches.length > 0 || allApplicationsForMetrics.length > 0
+            ? "match"
+            : resumesCount > 0
+              ? "job"
+              : "resume";
+  const nextSteps = computeNextSteps({
+    applications: allApplicationsForMetrics,
+    hasResume: resumesCount > 0,
+    hasLinkedinReview: linkedinReviewCount > 0,
+    hasBehavioralTest: behavioralResult !== null,
+    now,
+  });
+  const todayItems = nextSteps.slice(0, 3);
+  const applicationFunnel = {
+    preparando: allApplicationsForMetrics.filter((a) => ["saved", "tailor_resume"].includes(a.status)).length,
+    enviadas: allApplicationsForMetrics.filter((a) => a.status === "applied").length,
+    entrevistas: allApplicationsForMetrics.filter((a) => ["interview", "technical_test"].includes(a.status)).length,
+    finalizadas: allApplicationsForMetrics.filter((a) => ["offer", "rejected"].includes(a.status)).length,
+  };
+  const nextInterview = allApplicationsForMetrics
+    .filter((a) => a.interviewAt && a.interviewAt.getTime() >= now.getTime())
+    .sort((a, b) => a.interviewAt!.getTime() - b.interviewAt!.getTime())[0] ?? null;
   const currentObjective = findObjective(segment, user?.objective ?? "");
   const deadlineLabel = OBJECTIVE_DEADLINE_OPTIONS.find((o) => o.value === user?.objectiveDeadline)?.label ?? null;
   const userAreaSlug = matchAreaSlug(user?.targetProfessionalArea || user?.professionalArea || user?.studyCourse);
@@ -146,7 +197,6 @@ export default async function DashboardPage() {
     studyCourse: user?.studyCourse,
   };
   const { recommended: recommendedTools } = toolsForSegment(segment, userAreaSlug);
-  const topRecommendedTool = recommendedTools[0];
 
   const greeting = getBrazilGreeting(session.user.name ?? user?.name ?? undefined);
 
@@ -335,35 +385,13 @@ export default async function DashboardPage() {
 
   const latest = analyses[0];
   const latestResume = latest.resume;
-  const weakestAnalysis = [...analyses].sort(
-    (a, b) => a.overallScore - b.overallScore
-  )[0];
-  const fixes: string[] = JSON.parse(weakestAnalysis.fixes || "[]");
-  const weakestBridgeRoles: string[] = weakestAnalysis.bridgeRoles
-    ? JSON.parse(weakestAnalysis.bridgeRoles)
-    : [];
-  const nextStep =
-    weakestAnalysis.careerTrack === "career_change" && weakestBridgeRoles[0]
-      ? `Busque vagas de "${weakestBridgeRoles[0]}", o cargo-ponte mais acessível até seu objetivo.`
-      : fixes[0];
-  const urgentApplication = allApplicationsForMetrics.find(
-    (application) => application.deadline && application.deadline >= now && application.deadline.getTime() - now.getTime() <= 3 * 24 * 60 * 60 * 1000
-  );
-  const waitingApplication = allApplicationsForMetrics.find(
-    (application) => application.status === "applied" && application.appliedAt && !application.responseAt && now.getTime() - application.appliedAt.getTime() >= 5 * 24 * 60 * 60 * 1000
-  );
-  const applicationNeedingAction = urgentApplication ?? waitingApplication ?? allApplicationsForMetrics.find((application) => ["tailor_resume", "saved"].includes(application.status));
-  const nextBestAction = applicationNeedingAction
-    ? {
-        title: urgentApplication ? "Revise uma candidatura com prazo prÃ³ximo" : waitingApplication ? "FaÃ§a follow-up de uma candidatura" : "Prepare uma candidatura salva",
-        description: urgentApplication
-          ? `${applicationNeedingAction.jobTitle} tem um prazo prÃ³ximo.`
-          : waitingApplication
-            ? `${applicationNeedingAction.jobTitle} estÃ¡ sem resposta hÃ¡ alguns dias.`
-            : `${applicationNeedingAction.jobTitle} ainda precisa de uma prÃ³xima aÃ§Ã£o.`,
-        href: `/applications/${applicationNeedingAction.id}`,
-      }
-    : null;
+
+  const missingKeywordCounts = new Map<string, number>();
+  for (const a of analyses.slice(0, 5)) {
+    const missing: string[] = JSON.parse(a.keywordsMissing || "[]");
+    for (const kw of missing) missingKeywordCounts.set(kw, (missingKeywordCounts.get(kw) ?? 0) + 1);
+  }
+  const recurringGap = [...missingKeywordCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null;
 
   const scoreDataPoints = analyses.map((a) => ({
     id: a.id,
@@ -381,7 +409,7 @@ export default async function DashboardPage() {
       </div>
 
       <div data-tour="dash-overview" className="space-y-1">
-        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Minha Jornada</span>
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Minha Rota</span>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           {greeting}
         </h1>
@@ -405,16 +433,19 @@ export default async function DashboardPage() {
           <div>
             <p className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Seu próximo passo</p>
             <h2 id="prioridade-heading" className="mt-1 text-base font-bold text-slate-900 dark:text-white">
-              {currentObjective ? currentObjective.cta.label : "Escolha uma próxima ação"}
+              {nextSteps[0]?.title ?? (currentObjective ? currentObjective.cta.label : "Escolha uma próxima ação")}
             </h2>
             <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
-              {currentObjective
-                ? `Recomendado para seu objetivo: "${currentObjective.label}".`
-                : "Seu histórico está salvo. Você pode revisar o último match ou encontrar novas oportunidades."}
+              {nextSteps[0]?.description ??
+                (currentObjective
+                  ? `Recomendado para seu objetivo: "${currentObjective.label}".`
+                  : "Seu histórico está salvo. Você pode revisar o último match ou encontrar novas oportunidades.")}
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row">
-            {currentObjective ? (
+            {nextSteps[0] ? (
+              <Link href={nextSteps[0].href} className="rounded-xl bg-blue-600 px-4 py-2.5 text-center text-xs font-semibold text-white transition-colors hover:bg-blue-700">{nextSteps[0].ctaLabel}</Link>
+            ) : currentObjective ? (
               <Link href={currentObjective.cta.href} className="rounded-xl bg-blue-600 px-4 py-2.5 text-center text-xs font-semibold text-white transition-colors hover:bg-blue-700">{currentObjective.cta.label}</Link>
             ) : (
               <Link href={`/report/${latest.id}`} className="rounded-xl bg-slate-900 px-4 py-2.5 text-center text-xs font-semibold text-white transition-colors hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">Revisar último match</Link>
@@ -423,6 +454,28 @@ export default async function DashboardPage() {
           </div>
         </div>
       </section>
+
+      {todayItems.length > 0 && (
+        <section aria-labelledby="para-hoje-heading" className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-sm">
+          <h2 id="para-hoje-heading" className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">Para hoje</h2>
+          <ol className="space-y-2">
+            {todayItems.map((item, i) => (
+              <li key={item.key}>
+                <Link
+                  href={item.href}
+                  className="flex items-center justify-between gap-3 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 px-4 py-3 hover:border-blue-300 dark:hover:border-blue-800 transition-all"
+                >
+                  <span className="flex items-center gap-3 min-w-0">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold">{i + 1}</span>
+                    <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{item.title}</span>
+                  </span>
+                  <span className="text-xs font-semibold text-slate-400 shrink-0">{item.minutes} min</span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       <JourneyStepper current={journeyStage} />
 
@@ -503,6 +556,11 @@ export default async function DashboardPage() {
                 ? "Aderência moderada, alguns ajustes recomendados."
                 : "Aderência baixa, mapeie novos diferenciais."}
             </p>
+            {recurringGap && (
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                Ponto recorrente: <strong className="text-slate-700 dark:text-slate-300">{recurringGap}</strong> continua aparecendo como lacuna nas suas últimas vagas.
+              </p>
+            )}
           </div>
           <div className="sm:ml-auto">
             <CircularScore value={averageAdherence} size={110} strokeWidth={9} />
@@ -530,6 +588,52 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Próxima entrevista */}
+      {nextInterview && (
+        <div className="rounded-2xl border border-blue-200/80 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 p-6 shadow-sm space-y-3">
+          <p className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">Próxima entrevista</p>
+          <p className="font-bold text-slate-900 dark:text-white text-base">{nextInterview.jobTitle}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            {formatBrazilDate(nextInterview.interviewAt!)}
+          </p>
+          <Link
+            href={`/interviews/${nextInterview.id}`}
+            className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white transition-colors hover:bg-blue-700"
+          >
+            Continuar preparação <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+      )}
+
+      {/* Oportunidades para você */}
+      {jobMatches.length > 0 && (
+        <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <p className="font-bold text-slate-900 dark:text-white text-base">Oportunidades para você</p>
+            <Link href="/feed" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+              Ver todas as vagas →
+            </Link>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+            {jobMatches.map((match) => (
+              <Link
+                key={match.id}
+                href={match.job.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950 p-4 hover:border-blue-300 dark:hover:border-blue-800 transition-all"
+              >
+                <p className="font-semibold text-sm text-slate-900 dark:text-white line-clamp-2 leading-tight">{match.job.jobTitle}</p>
+                <p className="text-xs text-slate-500 mt-1">{match.job.company ?? match.job.location ?? ""}</p>
+                <p className="mt-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  {match.fitScore >= 75 ? "Alta aderência estimada" : "Pode combinar com você"}
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Grid de Recomendações e Análises */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -562,32 +666,33 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Próximo Passo */}
+        {/* Minhas oportunidades */}
         <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm flex flex-col justify-between space-y-4">
           <div>
-            <p className="font-bold text-slate-900 dark:text-white text-base mb-2">Próximo Passo Recomendado</p>
-            <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">
-              {nextBestAction?.title ?? `Ajuste para: ${TRACK_LABELS[weakestAnalysis.careerTrack as CareerTrack]}`}
-            </p>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-2 leading-relaxed">
-              {nextBestAction?.description ?? nextStep ?? "Continue analisando suas vagas para calibrar seu roteiro personalizado."}
-            </p>
-          </div>
-          <div className="space-y-2 pt-2">
-            <Link
-              href={nextBestAction?.href ?? "/analise"}
-              className="block text-center rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-semibold py-2.5 hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors shadow-sm text-xs sm:text-sm"
-            >
-              {nextBestAction ? "Abrir candidatura" : "Ajustar Currículo"}
-            </Link>
-            {topRecommendedTool && (
-              <Link
-                href={topRecommendedTool.href}
-                className="block text-center rounded-xl border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold py-2.5 transition-colors text-xs sm:text-sm"
-              >
-                {topRecommendedTool.title}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <p className="font-bold text-slate-900 dark:text-white text-base">Minhas oportunidades</p>
+              <Link href="/applications" className="text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">
+                Ver todas →
               </Link>
-            )}
+            </div>
+            <div className="grid grid-cols-2 gap-3 mt-4 text-center">
+              <div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{applicationFunnel.preparando}</p>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Preparando</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{applicationFunnel.enviadas}</p>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Enviadas</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{applicationFunnel.entrevistas}</p>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Entrevistas</p>
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">{applicationFunnel.finalizadas}</p>
+                <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mt-0.5">Finalizadas</p>
+              </div>
+            </div>
           </div>
         </div>
 
