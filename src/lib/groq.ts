@@ -1,7 +1,8 @@
 import { getSetting } from "@/lib/app-settings";
 import { GROQ_MODEL_SETTING_KEY } from "@/lib/groq-model-options";
 import { runJsonAcrossProviders } from "@/lib/ai-providers";
-import { profileSuggestionsSchema, refinementSchema, resumeAnalysisSchema, structuredResumeSchema, tailoredResumeSchema } from "@/lib/ai-schemas";
+import { evidenceSuggestionsSchema, profileSuggestionsSchema, refinementSchema, resumeAnalysisSchema, structuredResumeSchema, tailoredResumeSchema } from "@/lib/ai-schemas";
+import type { z } from "zod";
 import {
   CAREER_SEGMENT_LABELS,
   normalizeCareerSegment,
@@ -667,6 +668,36 @@ export async function extractStructuredResume(resumeText: string): Promise<Struc
     structuredResumeSchema,
     "resume_extraction",
     "groq"
+  );
+}
+
+export type EvidenceSuggestion = z.infer<typeof evidenceSuggestionsSchema>["suggestions"][number];
+
+const EVIDENCE_SUGGESTIONS_SYSTEM_PROMPT = `Você lê um currículo e identifica evidências profissionais concretas (projetos, resultados com métricas, certificações, domínio de ferramentas) que o candidato já comprovou ter.
+
+REGRAS:
+1. NUNCA invente nada que não esteja explícito ou claramente implícito no currículo. Cada evidência precisa ser rastreável a um trecho real do currículo.
+2. "category": "projeto" (projeto de impacto que executou), "resultado" (métrica/resultado alcançado), "certificacao" (certificação ou curso concluído), ou "ferramenta" (domínio técnico específico com uso comprovado, não apenas listado como skill genérica).
+3. "title": curto e específico (máx. ~10 palavras).
+4. "description": 1-3 frases descrevendo o que foi feito, com contexto (empresa/projeto/período quando disponível).
+5. "metrics": SOMENTE se o currículo tiver um número real (%, R$, tempo, quantidade). Não estime nem arredonde inventando precisão que não existe. Omita se não houver métrica no texto.
+6. Não crie uma evidência para cada linha do currículo — extraia apenas o que é forte o bastante para ser reutilizado em candidaturas (até 12 itens, priorize os mais fortes).
+7. Responda apenas em português do Brasil.`;
+
+/** Lê o currículo já extraído/bruto do usuário e sugere itens para o Banco de Evidências Profissionais — a pessoa ainda revisa e escolhe o que salvar, a IA só faz a leitura e a proposta inicial. */
+export async function suggestEvidencesFromResume(resumeText: string): Promise<{ suggestions: EvidenceSuggestion[] }> {
+  resumeText = normalizeForPrompt(resumeText, MAX_RESUME_CHARS);
+  const userMessage = `CURRÍCULO DO CANDIDATO:\n${resumeText}\n\n${JSON_ONLY_INSTRUCTION}\n{
+  "suggestions": [{ "category": "projeto|resultado|certificacao|ferramenta", "title": "...", "description": "...", "metrics": "..." }]
+}`;
+  return runJsonPrompt(
+    EVIDENCE_SUGGESTIONS_SYSTEM_PROMPT,
+    userMessage,
+    0.2,
+    3500,
+    undefined,
+    evidenceSuggestionsSchema,
+    "evidence_suggestions"
   );
 }
 

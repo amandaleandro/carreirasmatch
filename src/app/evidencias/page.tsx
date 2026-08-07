@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ShieldCheck, Plus, Sparkles, CheckCircle2, Award, Briefcase, Trash2, ArrowLeft } from "lucide-react";
+import { ShieldCheck, Plus, Sparkles, CheckCircle2, Award, Briefcase, Trash2, ArrowLeft, Loader2 } from "lucide-react";
 
 export type EvidenceItem = {
   id: string;
@@ -13,6 +13,13 @@ export type EvidenceItem = {
   verifiedAt: string;
 };
 
+type EvidenceSuggestion = {
+  category: EvidenceItem["category"];
+  title: string;
+  description: string;
+  metrics?: string;
+};
+
 export default function EvidenciasPage() {
   const [items, setItems] = useState<EvidenceItem[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -20,6 +27,11 @@ export default function EvidenciasPage() {
   const [category, setCategory] = useState<EvidenceItem["category"]>("resultado");
   const [description, setDescription] = useState("");
   const [metrics, setMetrics] = useState("");
+
+  const [generating, setGenerating] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [suggestions, setSuggestions] = useState<EvidenceSuggestion[] | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     void fetch("/api/evidencias")
@@ -81,6 +93,61 @@ export default function EvidenciasPage() {
     }
   }
 
+  async function handleGenerateFromResume() {
+    setGenerating(true);
+    try {
+      const response = await fetch("/api/evidencias/gerar", { method: "POST" });
+      const data = (await response.json().catch(() => ({}))) as { suggestions?: EvidenceSuggestion[]; error?: string };
+      if (!response.ok || !data.suggestions) {
+        alert(data.error || "Não foi possível gerar sugestões agora. Tente novamente.");
+        return;
+      }
+      setSuggestions(data.suggestions);
+      setSelected(new Set(data.suggestions.map((_, i) => i)));
+    } catch {
+      alert("Não foi possível gerar sugestões. Verifique sua conexão e tente novamente.");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function toggleSuggestion(index: number) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+  }
+
+  async function handleSaveSuggestions() {
+    if (!suggestions) return;
+    const toSave = suggestions.filter((_, i) => selected.has(i));
+    if (toSave.length === 0) {
+      setSuggestions(null);
+      return;
+    }
+    setSaving(true);
+    try {
+      const saved: EvidenceItem[] = [];
+      for (const suggestion of toSave) {
+        const response = await fetch("/api/evidencias", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(suggestion),
+        });
+        if (response.ok) {
+          const data = (await response.json()) as { item: EvidenceItem };
+          saved.push(data.item);
+        }
+      }
+      setItems((prev) => [...saved, ...prev]);
+      setSuggestions(null);
+    } finally {
+      setSaving(false);
+    }
+  }
+
   return (
     <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-10 py-8 space-y-8 font-sans">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
@@ -99,13 +166,23 @@ export default function EvidenciasPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowModal(true)}
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-extrabold px-5 py-3 shadow-md transition-all shrink-0"
-        >
-          <Plus className="w-4 h-4" />
-          Adicionar Nova Evidência
-        </button>
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={handleGenerateFromResume}
+            disabled={generating}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 text-xs sm:text-sm font-extrabold px-5 py-3 transition-all disabled:opacity-60"
+          >
+            {generating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+            {generating ? "Lendo seu currículo…" : "Gerar da IA (via currículo)"}
+          </button>
+          <button
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs sm:text-sm font-extrabold px-5 py-3 shadow-md transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            Adicionar Nova Evidência
+          </button>
+        </div>
       </div>
 
       {/* Trava Antialucinação Banner */}
@@ -272,6 +349,77 @@ export default function EvidenciasPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de revisão das sugestões geradas pela IA a partir do currículo */}
+      {suggestions && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 max-w-2xl w-full space-y-5 shadow-2xl max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between shrink-0">
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-emerald-500" />
+                  Sugestões geradas do seu currículo
+                </h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  Revise e desmarque o que não fizer sentido antes de salvar. Só o que estiver marcado vai pro seu banco de evidências.
+                </p>
+              </div>
+              <button
+                onClick={() => setSuggestions(null)}
+                className="text-slate-400 hover:text-slate-600 dark:hover:text-white text-xs font-bold shrink-0"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-3 overflow-y-auto pr-1">
+              {suggestions.map((s, i) => (
+                <label
+                  key={i}
+                  className="flex items-start gap-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-950/40 p-4 cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.has(i)}
+                    onChange={() => toggleSuggestion(i)}
+                    className="mt-1 accent-blue-600"
+                  />
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        {s.category}
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">{s.title}</h4>
+                    </div>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{s.description}</p>
+                    {s.metrics && (
+                      <p className="text-[11px] font-medium text-emerald-600 dark:text-emerald-400">📊 {s.metrics}</p>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="pt-2 flex gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setSuggestions(null)}
+                className="w-1/2 rounded-xl border border-slate-200 dark:border-slate-800 p-3 text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveSuggestions}
+                disabled={saving}
+                className="w-1/2 rounded-xl bg-blue-600 hover:bg-blue-500 p-3 text-xs font-extrabold text-white shadow-md disabled:opacity-60"
+              >
+                {saving ? "Salvando…" : `Salvar selecionadas (${selected.size})`}
+              </button>
+            </div>
           </div>
         </div>
       )}

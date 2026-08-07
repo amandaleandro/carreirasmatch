@@ -91,6 +91,15 @@ export const profileSuggestionsSchema = z.object({
   })).min(1),
 });
 
+export const evidenceSuggestionsSchema = z.object({
+  suggestions: z.array(z.object({
+    category: z.enum(["projeto", "resultado", "certificacao", "ferramenta"]),
+    title: z.string().trim().min(1).max(160),
+    description: z.string().trim().min(1).max(4000),
+    metrics: z.string().trim().max(500).optional(),
+  })).min(1),
+});
+
 export const atsStandaloneSchema = z.object({
   atsReadabilityScore: score,
   resumeQualityScore: score,
