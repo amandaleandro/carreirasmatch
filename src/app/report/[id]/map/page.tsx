@@ -145,7 +145,7 @@ export default async function OpportunityMapPage({
               href={`/report/${id}`}
               className="text-blue-600 dark:text-blue-400 hover:underline"
             >
-              Kit Candidatura
+              Plano de Candidatura
             </Link>{" "}
             e use o simulado de entrevista com as perguntas prováveis para esta vaga.
           </p>

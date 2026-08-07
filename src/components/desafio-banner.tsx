@@ -55,7 +55,7 @@ export function DesafioBanner() {
           <span className="font-bold underline decoration-blue-200 decoration-1 underline-offset-2">
             Desafio do Match:
           </span>{" "}
-          descubra seu % de aderência com a vaga dos sonhos e ganhe um Kit Candidatura grátis!
+          descubra seu % de aderência com a vaga dos sonhos e ganhe um Plano de Candidatura grátis!
         </p>
       </div>
 

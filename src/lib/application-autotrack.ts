@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 
 /**
- * Coloca a vaga do Kit Candidatura recém-liberado no painel de candidaturas do
+ * Coloca a vaga do Plano de Candidatura recém-liberado no painel de candidaturas do
  * usuário (uma vez por análise). Nunca lança: falha aqui não pode derrubar a
  * confirmação de pagamento.
  */
@@ -26,7 +26,7 @@ export async function ensureApplicationForDiagnostic(userId: string, analysisId:
         jobTitle: details.jobTitle,
         fitScore: details.overallScore,
         status: "saved",
-        notes: "Adicionada automaticamente ao liberar o Kit Candidatura.",
+        notes: "Adicionada automaticamente ao liberar o Plano de Candidatura.",
       },
     });
   } catch (error) {

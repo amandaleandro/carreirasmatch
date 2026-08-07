@@ -550,9 +550,9 @@ export async function sendPaymentConfirmationEmail(
   opts: { kind: string; amountCents: number }
 ) {
   const isDiagnostic = opts.kind === "diagnostic";
-  const what = isDiagnostic ? "o Kit Candidatura da sua análise" : "sua análise completa";
+  const what = isDiagnostic ? "o Plano de Candidatura da sua análise" : "sua análise completa";
   const cta = isDiagnostic
-    ? { href: `${APP_URL}/report`, label: "Ver meu Kit Candidatura" }
+    ? { href: `${APP_URL}/report`, label: "Ver meu Plano de Candidatura" }
     : { href: `${APP_URL}/analise`, label: "Ir para minha análise" };
 
   await send(
@@ -704,7 +704,7 @@ export async function sendDiagnosticUpgradeEmail(
   };
   const copy = await generateCampaignCopy(
     "diagnostic_upgrade",
-    `Situação: a pessoa comprou o diagnóstico avulso (Kit Candidatura) no ${BRAND} e agora recebe um convite pra assinar o plano mensal.
+    `Situação: a pessoa comprou o diagnóstico avulso (Plano de Candidatura) no ${BRAND} e agora recebe um convite pra assinar o plano mensal.
 Objetivo: mostrar que o diagnóstico avulso resolveu uma vaga, mas o plano resolve a busca inteira (novas análises, currículo otimizado, preparação de entrevista, plano de ação, acompanhamento de candidaturas). Sem pressão, tom de próximo passo natural.
 CTA (não incluir no html): "Conhecer o plano mensal".`,
     fallback

@@ -83,7 +83,7 @@ export const COMMERCIAL_PLANS: Record<CommercialPlanKey, CommercialPlan> = {
   },
   pro: {
     key: "pro",
-    name: "Rota Pro",
+    name: "Rota Profissional",
     priceCents: 2990,
     recurring: true,
     highlighted: true,

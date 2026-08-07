@@ -209,12 +209,12 @@ export async function POST(req: NextRequest) {
       } else {
         if (email) void sendPaymentConfirmationEmail(email, { kind: payment.kind, amountCents: payment.amount });
         void notifyAdminPurchase({
-          product: payment.kind === "diagnostic" ? "Kit Candidatura" : "Primeira análise",
+          product: payment.kind === "diagnostic" ? "Plano de Candidatura" : "Primeira análise",
           amountCents: payment.amount,
           email,
         });
         void notifyAdminPurchaseWhatsapp({
-          product: payment.kind === "diagnostic" ? "Kit Candidatura" : "Primeira análise",
+          product: payment.kind === "diagnostic" ? "Plano de Candidatura" : "Primeira análise",
           amountCents: payment.amount,
           email,
         });

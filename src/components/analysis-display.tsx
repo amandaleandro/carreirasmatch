@@ -714,6 +714,10 @@ export function AnalysisTeaserView({
   const topStrengths = result.strengths.slice(0, 2);
   const mainWeakness = result.weaknesses[0] || "Ajuste de formatação e ordenação de termos técnicos.";
   const mainMissingKeyword = result.keywordsMissing[0] || "Termos específicos da área";
+  // Sinais reais já identificados na análise que ainda não foram mostrados na
+  // prévia gratuita (1 lacuna + 1 palavra-chave já exibidas) — nunca um número
+  // inventado, só a contagem do que a análise completa já calculou.
+  const extraSignalsCount = Math.max(result.weaknesses.length - 1, 0) + Math.max(result.keywordsMissing.length - 1, 0);
 
   return (
     <section className="space-y-6 font-sans">
@@ -800,6 +804,25 @@ export function AnalysisTeaserView({
             </p>
           </div>
         </div>
+
+        {extraSignalsCount > 0 && (
+          <div className="rounded-2xl bg-white dark:bg-neutral-900 p-4 border border-amber-200/60 dark:border-amber-900/40 space-y-2">
+            <p className="text-[11px] font-bold text-[#071827] dark:text-white">
+              Encontramos mais {extraSignalsCount} ponto{extraSignalsCount > 1 ? "s" : ""} de atenção nesta vaga.
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from({ length: Math.min(extraSignalsCount, 6) }).map((_, i) => (
+                <span
+                  key={i}
+                  aria-hidden="true"
+                  className="select-none rounded-full bg-amber-100/80 dark:bg-amber-900/30 px-3 py-1 text-[11px] font-medium text-transparent blur-[3px]"
+                >
+                  ██████████
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 4. SUA RECOMENDAÇÃO EXECUTIVA */}
@@ -812,6 +835,35 @@ export function AnalysisTeaserView({
           {result.applicationStatus === "apply_now" && "Seu perfil possui forte alinhamento inicial. Aplique agora e use o diagnóstico para se preparar para as perguntas da entrevista."}
           {result.applicationStatus === "adjust_first" && "Ajustar seu currículo primeiro para incluir os termos faltantes aumentará drasticamente suas chances de passar no filtro do RH."}
           {result.applicationStatus === "deprioritize" && "Esta vaga exige pré-requisitos ainda não indicados no seu perfil. Considere fechar essas lacunas ou focar em vagas mais aderentes."}
+        </p>
+      </div>
+
+      {/* 4b. PREVIEW DA ROTA */}
+      <div className="rounded-3xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] dark:bg-neutral-900 p-6 shadow-sm space-y-3">
+        <div className="flex items-center gap-2">
+          <span className="inline-flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+            <Route className="w-4 h-4" />
+          </span>
+          <h3 className="font-title font-bold text-sm text-[#071827] dark:text-white">Sua Rota da Vaga</h3>
+        </div>
+        <ol className="flex flex-wrap items-center gap-x-2 gap-y-2 text-xs font-semibold">
+          {["Entender", "Ajustar", "Preparar", "Candidatar", "Acompanhar"].map((step, i) => (
+            <li key={step} className="flex items-center gap-2">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 ${
+                  i === 0
+                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
+                    : "bg-[#F8FAFC] text-[#64748B] dark:bg-neutral-950 dark:text-neutral-400"
+                }`}
+              >
+                {i === 0 ? "✓" : "○"} {step}
+              </span>
+              {i < 4 && <span className="text-[#CBD5E1] dark:text-neutral-700">→</span>}
+            </li>
+          ))}
+        </ol>
+        <p className="text-[11px] text-[#64748B] dark:text-neutral-400 font-medium">
+          Você já entendeu. O Plano de Candidatura libera as próximas 4 etapas para esta vaga.
         </p>
       </div>
 
@@ -862,12 +914,12 @@ const FIT_CONFIG: Record<
 > = {
   fit: {
     label: "Boa aderência identificada",
-    message: "Seu perfil é compatível com os requisitos. Libere o Kit Candidatura para obter o plano de ação passo a passo.",
+    message: "Seu perfil é compatível com os requisitos. Libere o Plano de Candidatura para obter o plano de ação passo a passo.",
     className: "border-[#22C55E]/30 bg-[#22C55E]/5 text-[#22C55E]",
   },
   partial: {
     label: "Aderência parcial",
-    message: "Seu perfil possui gaps que podem ser corrigidos. Libere o Kit para saber como otimizar seu currículo.",
+    message: "Seu perfil possui gaps que podem ser corrigidos. Libere o Plano de Candidatura para saber como otimizar seu currículo.",
     className: "border-[#F59E0B]/30 bg-[#F59E0B]/5 text-[#F59E0B]",
   },
   no_fit: {
@@ -945,7 +997,7 @@ export function SimpleFitTeaser({
       )}
 
       <div className="rounded-2xl border border-[#E2E8F0] dark:border-neutral-800 bg-[#FFFFFF] p-4 shadow-sm">
-        <h3 className="font-title font-bold text-xs mb-2 text-[#071827]">Benefícios do Kit Candidatura:</h3>
+        <h3 className="font-title font-bold text-xs mb-2 text-[#071827]">Benefícios do Plano de Candidatura:</h3>
         <ul className="space-y-1.5 text-xs text-[#64748B] leading-relaxed">
           {[
             "Roteiro passo a passo para reescrever seu currículo",

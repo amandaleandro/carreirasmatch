@@ -70,7 +70,9 @@ export function UnlockDiagnosticButton({
             segment={segment}
             onSuccess={() => {
               track(ANALYTICS_EVENTS.PAYMENT_CONFIRMED, { kind: "diagnostic" });
-              window.location.reload();
+              const url = new URL(window.location.href);
+              url.searchParams.set("unlocked", "1");
+              window.location.href = url.toString();
             }}
           />
         </div>
@@ -87,7 +89,7 @@ export function UnlockDiagnosticButton({
       }}
       className="w-full sm:w-auto rounded-md bg-blue-600 text-white font-medium px-5 py-2.5 text-sm hover:bg-blue-700 transition-colors"
     >
-      {`Gerar meu Kit Candidatura (${price})`}
+      {`Gerar meu Plano de Candidatura (${price})`}
     </button>
   );
 }

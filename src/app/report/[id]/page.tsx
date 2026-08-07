@@ -39,13 +39,17 @@ export const dynamic = "force-dynamic";
 
 export default async function ReportPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ stripe_status?: string; unlocked?: string }>;
 }) {
   const session = await auth();
   if (!session?.user?.id) redirect("/login");
 
   const { id } = await params;
+  const { stripe_status, unlocked: unlockedParam } = await searchParams;
+  const justUnlocked = stripe_status === "success" || unlockedParam === "1";
 
   const [record, user, behavioralResult, referralStats] = await Promise.all([
     prisma.analysis.findUnique({ where: { id }, include: { resume: true } }),
@@ -268,6 +272,20 @@ export default async function ReportPage({
 
       {analysis ? (
         <div className="space-y-6">
+          {justUnlocked && (
+            <div className="rounded-2xl border border-blue-200 dark:border-blue-900 bg-blue-50/60 dark:bg-blue-950/30 p-5 shadow-sm space-y-1">
+              <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
+                Sua Rota da Vaga está liberada
+              </p>
+              <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+                Vamos começar pelo ponto mais importante:{" "}
+                <strong className="text-neutral-900 dark:text-white">
+                  {analysis.weaknesses[0] ?? "ajustar seu currículo para esta vaga"}
+                </strong>
+                .
+              </p>
+            </div>
+          )}
           <div id="resultado-match">
             <AnalysisResult
             result={analysis}
@@ -329,13 +347,13 @@ export default async function ReportPage({
                 <p className="text-[11px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-300">
                   Próximo passo recomendado
                 </p>
-                <h3 className="font-semibold text-lg">Libere o Kit Candidatura para esta vaga</h3>
+                <h3 className="font-semibold text-lg">Libere o Plano de Candidatura para esta vaga</h3>
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   Currículo pronto em PDF, palavras-chave da vaga, mensagem para o recrutador,
                   perguntas de entrevista e um plano de evolução, tudo em um só lugar.
                 </p>
                 <ul className="grid gap-2 text-sm text-neutral-700 dark:text-neutral-300 sm:grid-cols-2">
-                  {["Pagamento único", "Acesso vinculado a esta análise", "Cartão ou Pix", "Sem promessa de contratação"].map((item) => (
+                  {["Pagamento único", "Acesso vinculado a esta análise", "Reanálise após os ajustes", "Cartão ou Pix"].map((item) => (
                     <li key={item} className="flex items-center gap-2">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                       {item}
