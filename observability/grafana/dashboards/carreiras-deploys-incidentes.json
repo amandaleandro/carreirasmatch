@@ -92,32 +92,32 @@
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
-      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[1d])) / 2", "legendFormat": "incidentes" }],
-      "description": "Incidentes de indisponibilidade nas ultimas 24 horas, estimados por queda e recuperacao do health check do app."
+      "targets": [{ "refId": "A", "expr": "clamp_min(sum(changes(up{job=\"carreiras-app\"}[1d])) / 2 - sum(changes(carreiras_deploy_timestamp_seconds[1d])), 0)", "legendFormat": "incidentes" }],
+      "description": "Quedas do health check nas ultimas 24h, menos a quantidade de deploys registrados no mesmo periodo (marcador gravado pelo hook post-receive: todo deploy tambem derruba o processo por um instante, via --force-recreate). Ainda pode contar crashloops como incidente, ja que um crash tambem reinicia o processo sem deploy."
     },
     {
       "type": "stat", "title": "Incidentes na semana", "gridPos": { "h": 5, "w": 6, "x": 6, "y": 21 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
-      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[7d])) / 2", "legendFormat": "incidentes" }],
-      "description": "Incidentes de indisponibilidade nos ultimos 7 dias, estimados por queda e recuperacao do health check do app."
+      "targets": [{ "refId": "A", "expr": "clamp_min(sum(changes(up{job=\"carreiras-app\"}[7d])) / 2 - sum(changes(carreiras_deploy_timestamp_seconds[7d])), 0)", "legendFormat": "incidentes" }],
+      "description": "Quedas do health check nos ultimos 7 dias, menos a quantidade de deploys registrados no mesmo periodo (marcador gravado pelo hook post-receive)."
     },
     {
       "type": "stat", "title": "Incidentes no mes", "gridPos": { "h": 5, "w": 6, "x": 12, "y": 21 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
-      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[30d])) / 2", "legendFormat": "incidentes" }],
-      "description": "Incidentes de indisponibilidade nos ultimos 30 dias, estimados por queda e recuperacao do health check do app."
+      "targets": [{ "refId": "A", "expr": "clamp_min(sum(changes(up{job=\"carreiras-app\"}[30d])) / 2 - sum(changes(carreiras_deploy_timestamp_seconds[30d])), 0)", "legendFormat": "incidentes" }],
+      "description": "Quedas do health check nos ultimos 30 dias, menos a quantidade de deploys registrados no mesmo periodo (marcador gravado pelo hook post-receive)."
     },
     {
       "type": "stat", "title": "Incidentes no ano", "gridPos": { "h": 5, "w": 6, "x": 18, "y": 21 },
       "datasource": { "type": "prometheus", "uid": "prometheus" },
       "fieldConfig": { "defaults": { "unit": "short", "decimals": 0 } },
       "options": { "reduceOptions": { "calcs": ["lastNotNull"], "values": false }, "colorMode": "value", "graphMode": "none" },
-      "targets": [{ "refId": "A", "expr": "sum(changes(up{job=\"carreiras-app\"}[365d])) / 2", "legendFormat": "incidentes" }],
-      "description": "Incidentes de indisponibilidade nos ultimos 365 dias, estimados por queda e recuperacao do health check do app."
+      "targets": [{ "refId": "A", "expr": "clamp_min(sum(changes(up{job=\"carreiras-app\"}[365d])) / 2 - sum(changes(carreiras_deploy_timestamp_seconds[365d])), 0)", "legendFormat": "incidentes" }],
+      "description": "Quedas do health check nos ultimos 365 dias, menos a quantidade de deploys registrados no mesmo periodo (marcador gravado pelo hook post-receive)."
     },
 
     { "type": "row", "title": "Indisponibilidade", "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 }, "collapsed": false, "panels": [] },

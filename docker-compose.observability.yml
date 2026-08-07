@@ -96,8 +96,10 @@ services:
     command:
       - --path.rootfs=/host
       - --collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)
+      - --collector.textfile.directory=/textfile_collector
     volumes:
       - /:/host:ro,rslave
+      - /opt/carreiras-match/metrics:/textfile_collector:ro
     networks:
       - app_net
 
