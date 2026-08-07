@@ -9,6 +9,7 @@ const PUBLIC_PATHS = [
   "/plano-de-candidatura",
   "/rota-profissional",
   "/estudos",
+  "/ensino-medio/calculadora-enem",
   "/agosto",
   "/report",
   "/estagio/trilhas",
