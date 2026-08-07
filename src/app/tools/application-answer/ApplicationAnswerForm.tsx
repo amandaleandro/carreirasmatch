@@ -132,7 +132,7 @@ export function ApplicationAnswerForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-sm font-medium mb-1">
-            Seu perfil <span className="text-neutral-500 font-normal">— cole seu currículo ou resuma sua experiência</span>
+            Seu perfil <span className="text-neutral-500 font-normal">(cole seu currículo ou resuma sua experiência)</span>
           </label>
           <textarea
             value={profileText}
@@ -145,7 +145,7 @@ export function ApplicationAnswerForm() {
 
         <div>
           <label className="block text-sm font-medium mb-1">
-            A vaga <span className="text-neutral-500 font-normal">— cole a descrição ou os principais requisitos</span>
+            A vaga <span className="text-neutral-500 font-normal">(cole a descrição ou os principais requisitos)</span>
           </label>
           <textarea
             value={jobText}

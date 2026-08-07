@@ -641,7 +641,7 @@ export function EnsinoMedioStudyView({ subject }: Props) {
                           }`}
                         >
                           <strong>{isCorrect ? "Correto!" : "Incorreto!"}</strong>{" "}
-                          (Resposta correta: {item.isTrue ? "Verdadeiro" : "Falso"}) — {item.explanation}
+                          (Resposta correta: {item.isTrue ? "Verdadeiro" : "Falso"}) {item.explanation}
                         </div>
                       )}
                     </div>

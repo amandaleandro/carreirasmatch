@@ -25,7 +25,7 @@ export default function TesteCurriculoAtsPage() {
         {
           question: "O que é um sistema ATS?",
           answer:
-            "ATS (Applicant Tracking System) é o software que grandes empresas usam para receber e filtrar currículos. Ele converte seu PDF em campos estruturados e busca as palavras-chave da vaga — currículos que o robô não consegue ler ou que não têm os termos certos são descartados antes de chegar ao recrutador.",
+            "ATS (Applicant Tracking System) é o software que grandes empresas usam para receber e filtrar currículos. Ele converte seu PDF em campos estruturados e busca as palavras-chave da vaga: currículos que o robô não consegue ler ou que não têm os termos certos são descartados antes de chegar ao recrutador.",
         },
         {
           question: "O teste de currículo ATS é grátis mesmo?",
@@ -40,7 +40,7 @@ export default function TesteCurriculoAtsPage() {
         {
           question: "Funciona para qualquer profissão?",
           answer:
-            "Sim. A análise funciona para qualquer área — vendas, saúde, logística, TI, administrativo, engenharia — e se adapta ao seu momento profissional, do primeiro emprego à recolocação.",
+            "Sim. A análise funciona para qualquer área (vendas, saúde, logística, TI, administrativo, engenharia) e se adapta ao seu momento profissional, do primeiro emprego à recolocação.",
         },
       ]}
       path="/teste-curriculo-ats"

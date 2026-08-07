@@ -14,7 +14,7 @@ export default function NotaDoCurriculoPage() {
       badge="Análise Gratuita de Aderência"
       title="Qual é a nota do seu currículo?"
       highlight="nota do seu currículo"
-      subtitle="Envie seu currículo e a vaga desejada: nosso sistema gera uma nota de 0 a 100 e mostra o que está pesando contra você — palavras-chave ausentes, falta de resultados quantificados, estrutura e senioridade."
+      subtitle="Envie seu currículo e a vaga desejada: nosso sistema gera uma nota de 0 a 100 e mostra o que está pesando contra você, como palavras-chave ausentes, falta de resultados quantificados, estrutura e senioridade."
       bullets={[
         { label: "Nota 0-100", desc: "Técnica, experiência e ATS" },
         { label: "Comparativo", desc: "Sua posição entre candidatos" },
@@ -30,12 +30,12 @@ export default function NotaDoCurriculoPage() {
         {
           question: "O que é uma boa nota de currículo?",
           answer:
-            "Acima de 70, vale se candidatar já. Entre 45 e 69, compensa ajustar o currículo primeiro — geralmente incluindo palavras-chave da vaga e quantificando resultados. Abaixo de 45, a vaga provavelmente exige requisitos que ainda faltam, e mostramos um plano de estudo para fechá-los.",
+            "Acima de 70, vale se candidatar já. Entre 45 e 69, compensa ajustar o currículo primeiro, geralmente incluindo palavras-chave da vaga e quantificando resultados. Abaixo de 45, a vaga provavelmente exige requisitos que ainda faltam, e mostramos um plano de estudo para fechá-los.",
         },
         {
           question: "Preciso pagar para ver minha nota?",
           answer:
-            "Não. A nota geral, a nota ATS e os principais pontos fortes e fracos são gratuitos. O relatório completo — com plano de ação, perguntas de entrevista e mensagem pronta para o recrutador — é opcional.",
+            "Não. A nota geral, a nota ATS e os principais pontos fortes e fracos são gratuitos. O relatório completo, com plano de ação, perguntas de entrevista e mensagem pronta para o recrutador, é opcional.",
         },
         {
           question: "Posso analisar o mesmo currículo para várias vagas?",

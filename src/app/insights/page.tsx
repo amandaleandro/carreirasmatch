@@ -33,7 +33,7 @@ export default async function InsightsPage() {
           </h1>
           <p className="text-sm text-[#64748B] dark:text-slate-400 leading-relaxed">
             O que {insights.totalAnalyses.toLocaleString("pt-BR")} análises de currículo × vaga
-            revelam sobre o que falta nos currículos brasileiros — atualizado continuamente a partir
+            revelam sobre o que falta nos currículos brasileiros, atualizado continuamente a partir
             de dados agregados, sem nenhuma informação pessoal.
           </p>
         </header>
@@ -62,7 +62,7 @@ export default async function InsightsPage() {
             Termos exigidos pelas vagas e ausentes nos currículos, nas análises mais recentes.
           </p>
           {insights.topMissingKeywords.length === 0 && (
-            <p className="text-xs text-[#64748B]">Ainda coletando dados suficientes — volte em breve.</p>
+            <p className="text-xs text-[#64748B]">Ainda coletando dados suficientes, volte em breve.</p>
           )}
           <ol className="space-y-2">
             {insights.topMissingKeywords.map((k, i) => (
@@ -116,7 +116,7 @@ export default async function InsightsPage() {
             Onde o seu currículo entra nessa estatística?
           </h2>
           <p className="text-xs text-[#64748B]">
-            Descubra sua nota e compare-se com os dados acima — grátis, em segundos.
+            Descubra sua nota e compare-se com os dados acima, grátis, em segundos.
           </p>
           <Link
             href="/nota-do-curriculo"

@@ -218,7 +218,7 @@ export function ResumeFromScratchForm({
                 Projetos, cursos, voluntariado, trabalhos informais
               </label>
               <p className="text-xs text-neutral-500 mb-2">
-                Descreva cada atividade relevante, mesmo que informal — uma por linha.
+                Descreva cada atividade relevante, mesmo que informal, uma por linha.
               </p>
               <textarea
                 value={projects}

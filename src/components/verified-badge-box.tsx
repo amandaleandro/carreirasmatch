@@ -35,7 +35,7 @@ export function VerifiedBadgeBox({ analysisId, overallScore }: { analysisId: str
       </div>
       <p className="text-xs text-[#64748B] leading-relaxed">
         Página pública com sua nota, pronta para colocar no LinkedIn ou enviar a recrutadores.
-        Mostra só seu primeiro nome e a nota — a vaga e o currículo continuam privados.
+        Mostra só seu primeiro nome e a nota, a vaga e o currículo continuam privados.
       </p>
       <div className="flex flex-wrap gap-2">
         <button

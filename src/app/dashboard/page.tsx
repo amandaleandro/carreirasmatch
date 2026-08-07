@@ -217,7 +217,7 @@ export default async function DashboardPage() {
                 {item.done && <CheckCircle2 className="h-3 w-3 text-white" />}
               </span>
               <span className={item.done ? "text-slate-400 line-through" : "text-slate-700 dark:text-slate-200"}>
-                {item.task}{item.focus ? ` — ${item.focus}` : ""}
+                {item.task}{item.focus ? `: ${item.focus}` : ""}
               </span>
             </li>
           ))}

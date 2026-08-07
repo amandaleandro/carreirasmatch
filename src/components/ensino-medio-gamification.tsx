@@ -19,7 +19,10 @@ export function EnsinoMedioGamification() {
   ];
 
   return (
-    <div className="bg-gradient-to-r from-blue-900 via-indigo-900 to-purple-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
+    <div
+      className="text-white rounded-3xl p-6 sm:p-8 shadow-xl space-y-6"
+      style={{ background: "linear-gradient(to right, #1e3a8a, #312e81, #581c87)" }}
+    >
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-white/10 pb-4">
         <div className="flex items-center gap-3">
           <div className="h-12 w-12 rounded-2xl bg-amber-400 text-blue-950 flex items-center justify-center font-bold text-xl shadow-md shrink-0">

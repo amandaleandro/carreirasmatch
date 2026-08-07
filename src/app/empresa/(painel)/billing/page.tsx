@@ -50,7 +50,7 @@ export default async function CompanyBillingPage() {
           </div>
           <p className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
             <CheckCircle2 className="w-4 h-4" />
-            Plano ativo — renova em {company.planCurrentPeriodEnd?.toLocaleDateString("pt-BR")}
+            Plano ativo, renova em {company.planCurrentPeriodEnd?.toLocaleDateString("pt-BR")}
           </p>
         </div>
       ) : (

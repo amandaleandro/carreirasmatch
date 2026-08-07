@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   // alcança; usamos absolute para manter a marca no título.
   title: { absolute: "Sua carreira em movimento começa aqui | CarreirasMatch" },
   description:
-    "Uma plataforma para descobrir caminhos, aprender, encontrar oportunidades e evoluir na sua carreira — do primeiro passo ao próximo desafio.",
+    "Uma plataforma para descobrir caminhos, aprender, encontrar oportunidades e evoluir na sua carreira, do primeiro passo ao próximo desafio.",
   alternates: { canonical: "/" },
 };
 

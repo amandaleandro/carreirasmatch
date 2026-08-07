@@ -567,7 +567,7 @@ export function UniversityHub({
             )}
             {!selectedCourse && (
               <p className="text-[11px] text-slate-400 mt-1">
-                Não achou seu curso? Digite o nome mesmo assim — as disciplinas você cadastra manualmente.
+                Não achou seu curso? Digite o nome mesmo assim: as disciplinas você cadastra manualmente.
               </p>
             )}
           </div>

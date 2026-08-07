@@ -15,7 +15,7 @@ const MOMENT_TIPS: Record<string, string> = {
   apprentice: "✨ Encontre vagas de aprendizagem, prepare seu primeiro currículo e descubra áreas para começar.",
   first_job: "✨ Destaque projetos, cursos e habilidades para conquistar sua primeira oportunidade.",
   internship: "✨ Encontre estágios alinhados ao seu curso e organize sua preparação para as seleções.",
-  student: "✨ Prepare-se para o próximo passo — mesmo que você já tenha uma profissão em mente ou ainda esteja explorando opções.",
+  student: "✨ Prepare-se para o próximo passo, mesmo que você já tenha uma profissão em mente ou ainda esteja explorando opções.",
   career_change: "✨ Aproveite sua experiência anterior e construa uma ponte para a nova área.",
   career_pro: "✨ Melhore seu posicionamento, currículo e estratégia para conquistar uma vaga melhor.",
   concurseiro: "✨ Organize seus estudos, acompanhe concursos e prepare-se para as provas.",

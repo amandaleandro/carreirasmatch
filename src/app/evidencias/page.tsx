@@ -13,27 +13,8 @@ export type EvidenceItem = {
   verifiedAt: string;
 };
 
-const INITIAL_EVIDENCES: EvidenceItem[] = [
-  {
-    id: "1",
-    category: "resultado",
-    title: "Otimização de Performance Web",
-    description: "Redução do tempo de carregamento da página principal em 45% utilizando Lazy Loading e Next.js.",
-    metrics: "45% mais rápido / +15k usuários atingidos",
-    verifiedAt: "2026-06-15",
-  },
-  {
-    id: "2",
-    category: "certificacao",
-    title: "Certificação AWS Cloud Practitioner",
-    description: "Conhecimentos validados em arquitetura de nuvem, segurança e infraestrutura.",
-    metrics: "Emitido em Mai/2026",
-    verifiedAt: "2026-05-10",
-  },
-];
-
 export default function EvidenciasPage() {
-  const [items, setItems] = useState<EvidenceItem[]>(INITIAL_EVIDENCES);
+  const [items, setItems] = useState<EvidenceItem[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState<EvidenceItem["category"]>("resultado");
@@ -43,50 +24,61 @@ export default function EvidenciasPage() {
   useEffect(() => {
     void fetch("/api/evidencias")
       .then(async (response) => {
-        if (!response.ok) throw new Error("NÃ£o foi possÃ­vel carregar suas evidÃªncias.");
+        if (!response.ok) throw new Error("Não foi possível carregar suas evidências.");
         const data = (await response.json()) as { items: EvidenceItem[] };
         setItems(data.items);
       })
       .catch(() => undefined);
   }, []);
 
-  function handleAddEvidence(e: React.FormEvent) {
+  async function handleAddEvidence(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !description.trim()) return;
 
-    const newItem: EvidenceItem = {
-      id: Date.now().toString(),
-      category,
-      title: title.trim(),
-      description: description.trim(),
-      metrics: metrics.trim() || undefined,
-      verifiedAt: new Date().toISOString().split("T")[0],
-    };
-
-    setItems([newItem, ...items]);
-    void fetch("/api/evidencias", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        category: newItem.category,
-        title: newItem.title,
-        description: newItem.description,
-        metrics: newItem.metrics,
-      }),
-    });
-    setTitle("");
-    setDescription("");
-    setMetrics("");
-    setShowModal(false);
+    try {
+      const response = await fetch("/api/evidencias", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          category,
+          title: title.trim(),
+          description: description.trim(),
+          metrics: metrics.trim() || undefined,
+        }),
+      });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        alert(data.error || "Não foi possível salvar a evidência. Tente novamente.");
+        return;
+      }
+      const data = (await response.json()) as { item: EvidenceItem };
+      setItems([data.item, ...items]);
+      setTitle("");
+      setDescription("");
+      setMetrics("");
+      setShowModal(false);
+    } catch {
+      alert("Não foi possível salvar a evidência. Verifique sua conexão e tente novamente.");
+    }
   }
 
-  function handleDelete(id: string) {
+  async function handleDelete(id: string) {
+    const previous = items;
     setItems(items.filter((item) => item.id !== id));
-    void fetch("/api/evidencias", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-    });
+    try {
+      const response = await fetch("/api/evidencias", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!response.ok) {
+        setItems(previous);
+        alert("Não foi possível excluir a evidência. Tente novamente.");
+      }
+    } catch {
+      setItems(previous);
+      alert("Não foi possível excluir a evidência. Verifique sua conexão e tente novamente.");
+    }
   }
 
   return (

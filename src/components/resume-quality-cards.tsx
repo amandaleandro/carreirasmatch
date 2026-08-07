@@ -32,7 +32,7 @@ export function BulletDiagnosticsCard({ analysis }: { analysis: BulletAnalysisSu
       </div>
       <p className="text-[10px] text-[#64748B] mb-3">
         Checagem automática, experiência por experiência: verbos de ação, resultados com números,
-        tamanho e clichês — os mesmos critérios que recrutadores e robôs de triagem usam.
+        tamanho e clichês: os mesmos critérios que recrutadores e robôs de triagem usam.
       </p>
       <div className="space-y-2">
         {analysis.diagnostics.map((d, i) => {

@@ -41,7 +41,7 @@ export function AdminWhatsappMarketingCampaign() {
           </p>
           {result.failed > 0 && (
             <p className="text-red-500">
-              {result.failed} falharam ao enviar (recusado pela Evolution API ou instância desconectada) — ficaram
+              {result.failed} falharam ao enviar (recusado pela Evolution API ou instância desconectada) e ficaram
               disponíveis pra tentar de novo no próximo disparo.
             </p>
           )}

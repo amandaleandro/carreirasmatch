@@ -75,7 +75,7 @@ export default function SobrePage() {
         </div>
         <div className="space-y-3 text-sm sm:text-base leading-relaxed text-slate-600 dark:text-slate-300">
           <p>Os artigos do blog são redigidos com apoio de IA a partir de diretrizes editoriais definidas pela equipe do CarreirasMatch: cada texto precisa trazer um ângulo específico sobre a carreira tratada, evitar generalidades e citar situações concretas da rotina profissional em vez de repetir um roteiro genérico.</p>
-          <p>Não atribuímos os textos a autores individuais fictícios nem inventamos credenciais — a responsabilidade editorial é da equipe do CarreirasMatch como um todo, identificada em cada artigo. Erros, imprecisões ou desatualizações podem ser reportados por qualquer leitor através da <Link href="/contato" className="font-medium underline">página de contato</Link>, e o conteúdo é corrigido a partir desse retorno.</p>
+          <p>Não atribuímos os textos a autores individuais fictícios nem inventamos credenciais: a responsabilidade editorial é da equipe do CarreirasMatch como um todo, identificada em cada artigo. Erros, imprecisões ou desatualizações podem ser reportados por qualquer leitor através da <Link href="/contato" className="font-medium underline">página de contato</Link>, e o conteúdo é corrigido a partir desse retorno.</p>
         </div>
       </section>
 

@@ -255,7 +255,7 @@ export default async function ReportPage({
             este match ficou {Math.abs(scoreDelta)} ponto{Math.abs(scoreDelta) > 1 ? "s" : ""}{" "}
             {scoreDelta > 0 ? "acima" : "abaixo"} da análise anterior deste currículo (
             {previousAnalysis.jobTitle}, {previousAnalysis.createdAt.toLocaleDateString("pt-BR")}).
-            {scoreDelta < 0 && " Vagas diferentes exigem requisitos diferentes — veja as palavras-chave ausentes."}
+            {scoreDelta < 0 && " Vagas diferentes exigem requisitos diferentes: veja as palavras-chave ausentes."}
           </p>
         </div>
       )}

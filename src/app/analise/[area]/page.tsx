@@ -49,7 +49,7 @@ export default async function AnaliseAreaPage({
         badge={`Análise para ${area.label}`}
         title={`Análise de currículo para ${area.label}`}
         highlight={area.label}
-        subtitle={`Envie seu currículo e uma vaga de ${area.label} — de ${subareaSample} e outras frentes da área. A IA compara os dois, dá sua nota de aderência e mostra as palavras-chave e requisitos que faltam para passar na triagem.`}
+        subtitle={`Envie seu currículo e uma vaga de ${area.label}, de ${subareaSample} e outras frentes da área. A IA compara os dois, dá sua nota de aderência e mostra as palavras-chave e requisitos que faltam para passar na triagem.`}
         bullets={[
           { label: "Nota da vaga", desc: "Aderência de 0 a 100" },
           { label: "Teste ATS", desc: "Passa nos robôs de triagem?" },
@@ -63,7 +63,7 @@ export default async function AnaliseAreaPage({
           },
           {
             question: `Serve para qualquer especialidade de ${area.label}?`,
-            answer: `Sim. A análise considera a subárea da vaga enviada — por exemplo ${subareaSample} — e avalia seu currículo contra os requisitos reais daquela especialidade, não contra um modelo genérico.`,
+            answer: `Sim. A análise considera a subárea da vaga enviada, por exemplo ${subareaSample}, e avalia seu currículo contra os requisitos reais daquela especialidade, não contra um modelo genérico.`,
           },
           {
             question: "Preciso de conta para testar?",

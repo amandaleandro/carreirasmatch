@@ -475,7 +475,7 @@ export function AutoApplySettingsCard() {
           </label>
 
           <label className="block space-y-1 text-[11px] font-bold text-slate-700 dark:text-slate-300">
-            Respostas adicionais — uma por linha no formato “pergunta = resposta”
+            Respostas adicionais: uma por linha no formato “pergunta = resposta”
             <textarea
               rows={4}
               value={Object.entries(settings.applicationProfile.customAnswers)

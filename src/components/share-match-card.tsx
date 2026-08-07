@@ -326,7 +326,7 @@ export function ShareMatchCard({ jobTitle, overallScore, userId, betterThanPerce
     const origin = typeof window !== "undefined" ? window.location.origin : "https://carreirasmatch.com.br";
     const shareUrl = userId ? `${origin}/desafio?ref=${userId}` : `${origin}/desafio`;
     const text = hasPercentile
-      ? `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch — fiquei à frente de ${betterThanPercent}% dos candidatos! Faça o seu teste também:`
+      ? `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch, fiquei à frente de ${betterThanPercent}% dos candidatos! Faça o seu teste também:`
       : `Meu Match com a vaga de ${jobTitle} foi de ${overallScore}% no CarreirasMatch! Faça o seu teste também:`;
 
     if (navigator.share && dataUrl) {

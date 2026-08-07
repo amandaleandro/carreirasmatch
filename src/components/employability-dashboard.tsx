@@ -67,7 +67,7 @@ function LinkUniversityForm() {
       </h2>
       <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
         Busque sua instituição no catálogo real de universidades pra ver métricas agregadas e anônimas dos seus
-        alunos que já usam o CarreirasMatch — nunca dado individual, sempre números consolidados.
+        alunos que já usam o CarreirasMatch, nunca dado individual, sempre números consolidados.
       </p>
 
       <div className="relative">
@@ -174,7 +174,7 @@ export function EmployabilityDashboard({
 
           <p className="text-[11px] text-slate-400 flex items-center gap-1.5">
             <ShieldCheck className="h-3.5 w-3.5 shrink-0" />
-            Nenhum dado individual de aluno é exibido — todas as métricas são agregadas e só aparecem com no mínimo {minThreshold ?? 5} alunos por grupo.
+            Nenhum dado individual de aluno é exibido: todas as métricas são agregadas e só aparecem com no mínimo {minThreshold ?? 5} alunos por grupo.
           </p>
         </div>
       )}

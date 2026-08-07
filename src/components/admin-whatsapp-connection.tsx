@@ -223,7 +223,7 @@ export function AdminWhatsappConnection() {
               <div className="rounded-lg border border-neutral-200 dark:border-neutral-800 p-4 space-y-3">
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">
                   No celular dessa linha: WhatsApp → Aparelhos conectados → Conectar um aparelho, e aponte a câmera
-                  pra este código. Ele expira em segundos — se der erro, gere outro.
+                  pra este código. Ele expira em segundos, se der erro, gere outro.
                 </p>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
