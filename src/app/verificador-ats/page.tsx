@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AtsVerifierResult } from "@/components/ats-verifier-result";
 import { AtsStandaloneAnalysis } from "@/lib/ats-checker";
+import { JourneyUpsellBanner } from "@/components/journey-upsell-banner";
 
 export default function VerificadorAtsPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -180,6 +181,12 @@ export default function VerificadorAtsPage() {
           </div>
         )}
       </div>
+
+      <JourneyUpsellBanner
+        journey="career"
+        title="Quer um diagnóstico completo para uma vaga específica?"
+        description="O Plano de Candidatura junta Match, ajustes de currículo, mensagem para o recrutador e preparação de entrevista em um só lugar."
+      />
     </div>
   );
 }

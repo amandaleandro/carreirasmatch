@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getAreaOfTheDayExplanation } from "@/lib/area-of-the-day";
 import { ContentPage } from "@/components/content-page";
 import { VocationHubClient, RecommendedAreaInfo } from "./VocationHubClient";
+import { JourneyUpsellBanner } from "@/components/journey-upsell-banner";
 
 export default async function VocationTestHubPage() {
   const session = await auth();
@@ -53,6 +54,12 @@ export default async function VocationTestHubPage() {
         recommendedAreas={recommendedAreas}
         areaOfTheDay={areaOfTheDay}
         loggedIn={Boolean(session?.user?.id)}
+      />
+      <JourneyUpsellBanner
+        journey="career"
+        tier="subscription"
+        title="Quer acompanhar sua busca inteira, não só descobrir uma área?"
+        description="A Rota Profissional junta feed personalizado, candidaturas, entrevistas e evolução em um só lugar."
       />
     </ContentPage>
   );

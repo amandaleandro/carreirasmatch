@@ -18,6 +18,10 @@ export const journeys = [
 
 export const institutional = [["Para empresas", "/empresas"], ["Para instituições", "/parceiro"]] as const;
 
+// Links de topo pedidos pela arquitetura de ofertas (secao 14): ficam antes
+// dos dropdowns de jornada, sem remover nenhum deles, so somando visibilidade.
+export const topLevelLinks = [["Vagas", "/todas-as-vagas"], ["Currículo", "/curriculo-gratis"], ["Estudos", "/estudos"]] as const;
+
 function JourneyDropdown({ journey, open, onToggle, onClose }: { journey: (typeof journeys)[number]; open: boolean; onToggle: () => void; onClose: () => void }) {
   return <div className="relative">
     <button type="button" aria-expanded={open} aria-haspopup="true" onClick={onToggle} className="cursor-pointer whitespace-nowrap hover:text-white transition-colors">{journey.label}</button>
@@ -40,6 +44,8 @@ export function PublicNav() {
   }, []);
 
   return <nav ref={navRef} aria-label="Navegação principal" className="hidden items-center gap-6 text-xs font-semibold text-slate-300 xl:flex">
+    {topLevelLinks.map(([label, href]) => <Link key={href} href={href} className="whitespace-nowrap hover:text-white transition-colors">{label}</Link>)}
+    <span className="h-4 w-px bg-white/15" aria-hidden="true" />
     {journeys.map((journey) => <JourneyDropdown key={journey.label} journey={journey} open={openJourney === journey.label} onToggle={() => setOpenJourney((current) => current === journey.label ? null : journey.label)} onClose={() => setOpenJourney(null)} />)}
     <span className="h-4 w-px bg-white/15" aria-hidden="true" />
     {institutional.map(([label, href]) => <Link key={href} href={href} className="whitespace-nowrap hover:text-white transition-colors">{label}</Link>)}
@@ -50,6 +56,7 @@ export function PublicNavMobile() {
   return <details className="group relative xl:hidden">
     <summary aria-label="Abrir menu" className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-white/20 text-white marker:content-none [&::-webkit-details-marker]:hidden"><Menu className="h-4.5 w-4.5" /></summary>
     <div className="absolute right-0 top-full z-50 mt-3 max-h-[70vh] w-72 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b2032] p-3 shadow-xl">
+      <div className="mb-2 space-y-0.5 border-b border-white/10 pb-2">{topLevelLinks.map(([label, href]) => <Link key={href} href={href} className="block rounded-lg px-3 py-2 text-xs font-bold text-white hover:bg-white/5">{label}</Link>)}</div>
       {journeys.map((journey) => <div key={journey.label} className="mb-2 last:mb-0">
         <Link href={journey.href} className="block rounded-lg px-3 py-2 text-xs font-bold text-white">{journey.label}</Link>
         <div className="ml-2 space-y-0.5 border-l border-white/10 pl-2">{journey.items.map(([label, href]) => <Link key={href} href={href} className="block rounded-lg px-2 py-1.5 text-xs text-slate-300 hover:bg-white/5 hover:text-white transition-colors">{label}</Link>)}</div>

@@ -2,6 +2,7 @@ import { InterviewSimulatorForm } from "./InterviewSimulatorForm";
 import { requireAuthPage } from "@/lib/require-auth-page";
 import { prisma } from "@/lib/prisma";
 import { TRACK_LABELS, type CareerTrack } from "@/components/analysis-display";
+import { JourneyUpsellBanner } from "@/components/journey-upsell-banner";
 
 export default async function InterviewSimulatorPage({
   searchParams,
@@ -26,10 +27,17 @@ export default async function InterviewSimulatorPage({
   }
 
   return (
-    <InterviewSimulatorForm
-      analysisId={analysisId}
-      initialTargetRole={initialTargetRole}
-      initialArea={initialArea}
-    />
+    <>
+      <InterviewSimulatorForm
+        analysisId={analysisId}
+        initialTargetRole={initialTargetRole}
+        initialArea={initialArea}
+      />
+      <JourneyUpsellBanner
+        journey="career"
+        title="Quer se preparar para uma vaga específica de ponta a ponta?"
+        description="O Plano de Candidatura junta esta simulação com Match, ajustes de currículo e mensagem para o recrutador."
+      />
+    </>
   );
 }

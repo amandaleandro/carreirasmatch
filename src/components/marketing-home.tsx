@@ -193,22 +193,22 @@ export function MarketingHome({ analysisCount = 0 }: { analysisCount?: number })
         <div className="relative mx-auto grid max-w-7xl gap-12 px-4 pb-20 pt-8 md:px-8 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:pb-28 lg:pt-14">
           <div className="space-y-6">
             <span className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-blue-300">
-              Seu copiloto para decisões de carreira
+              Pare de se candidatar no escuro
             </span>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.15] tracking-tight text-white">
-              Escolha melhor a vaga. Prepare melhor a candidatura.
+              Encontrou uma vaga? Descubra se ela realmente combina com você.
             </h1>
 
             <p className="text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
-              Compare seu perfil com oportunidades reais, descubra onde vale investir seu tempo e avance com um plano claro: do primeiro Match à próxima entrevista.
+              Envie seu currículo e a descrição da vaga. Veja seu Match, entenda o que está faltando e descubra qual deve ser seu próximo passo.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row pt-2">
-              <PrimaryCta label="Analisar uma vaga grátis" />
-              <a href="#exemplo" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
-                Ver como funciona
-              </a>
+              <PrimaryCta label="Analisar uma vaga" />
+              <Link href="/todas-as-vagas" className="inline-flex items-center justify-center rounded-full border border-slate-700 bg-white/5 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:bg-white/10 transition-all">
+                Encontrar vagas
+              </Link>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs font-medium text-slate-300 pt-2">

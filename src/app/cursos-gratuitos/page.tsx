@@ -172,6 +172,19 @@ export default async function FreeCoursesPage({
           na sua área.
         </p>
       </section>
+
+      <section className="mt-6 rounded-2xl border border-blue-100 bg-blue-50/60 p-5 text-center dark:border-blue-950/60 dark:bg-blue-950/20">
+        <p className="text-sm font-bold text-slate-900 dark:text-white">É uma instituição de ensino?</p>
+        <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-400">
+          Apareça para quem acabou de descobrir que precisa aprender o que você ensina.
+        </p>
+        <Link
+          href="/parceiro"
+          className="mt-4 inline-block rounded-full bg-blue-600 px-6 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition-all"
+        >
+          Divulgar meu curso
+        </Link>
+      </section>
     </ContentPage>
   );
 }

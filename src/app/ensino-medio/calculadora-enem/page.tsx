@@ -5,6 +5,7 @@ import { PublicSiteHeader } from "@/components/public-site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { EnsinoMedioToolsNav } from "@/components/ensino-medio-tools-nav";
 import { EnemAnalysisResult } from "@/lib/ensino-medio-tools";
+import { JourneyUpsellBanner } from "@/components/journey-upsell-banner";
 import {
   Calculator,
   Sparkles,
@@ -298,6 +299,12 @@ export default function EnemCalculatorPage() {
           </div>
         )}
       </main>
+
+      <JourneyUpsellBanner
+        journey="study"
+        title="Quer um plano de estudos completo, não só a nota estimada?"
+        description="A Rota de Aprovação organiza diagnóstico, cronograma e simulados pro seu objetivo."
+      />
 
       <SiteFooter />
     </div>
