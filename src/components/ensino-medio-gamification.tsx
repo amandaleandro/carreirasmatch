@@ -74,15 +74,15 @@ export function EnsinoMedioGamification() {
                 key={b.title}
                 className={`p-3 rounded-2xl border transition-all ${
                   b.unlocked
-                    ? "bg-white/10 border-white/20 text-white"
-                    : "bg-white/5 border-white/10 text-blue-300/40"
+                    ? "bg-white border-white/20 text-blue-950"
+                    : "bg-white/10 border-white/10 text-blue-100/50"
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  <Icon className={`h-4 w-4 shrink-0 ${b.unlocked ? "text-amber-300" : "text-neutral-500"}`} />
+                  <Icon className={`h-4 w-4 shrink-0 ${b.unlocked ? "text-amber-500" : "text-blue-100/50"}`} />
                   <p className="text-xs font-extrabold truncate">{b.title}</p>
                 </div>
-                <p className="text-[10px] text-blue-200/80 mt-1 leading-snug line-clamp-2">
+                <p className={`text-[10px] mt-1 leading-snug line-clamp-2 ${b.unlocked ? "text-blue-900/70" : "text-blue-100/50"}`}>
                   {b.desc}
                 </p>
               </div>
