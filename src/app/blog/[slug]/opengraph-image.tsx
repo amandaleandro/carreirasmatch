@@ -48,7 +48,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       >
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ fontSize: 64 }}>{emoji}</div>
-          <div style={{ fontSize: 28, fontWeight: 700, opacity: 0.85 }}>
+          <div style={{ display: "flex", fontSize: 28, fontWeight: 700, opacity: 0.85 }}>
             CarreirasMatch · {areaLabel}
           </div>
         </div>
